@@ -87,12 +87,12 @@
     <div id="root"></div>
 
     <script type="text/babel" data-type="module">
-        import React, { useState, useEffect, useMemo, useCallback } from 'react';
+        import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
         import { createRoot } from 'react-dom/client';
         import { 
             TrendingUp, BarChart2, Zap, AlertCircle, Save, Trash2, 
             Download, Upload, Eye, FileText, CheckCircle, Calculator,
-            ClipboardCopy, Search, PlusCircle, LayoutDashboard, Star, X
+            ClipboardCopy, Search, PlusCircle, LayoutDashboard, Star, X, Target
         } from 'lucide-react';
 
         // ==========================================
@@ -152,21 +152,31 @@
         }
 
         const ConfirmModal = ({ isOpen, title, message, onConfirm, onCancel }) => {
+            const btnRef = useRef(null);
+
             useEffect(() => {
+                if (isOpen && btnRef.current) {
+                    // 視窗打開時，強制把焦點拉到確認按鈕上
+                    setTimeout(() => btnRef.current.focus(), 10);
+                }
+
                 if (!isOpen) return;
                 
                 const handleKeyDown = (e) => {
                     if (e.key === 'Enter') {
                         e.preventDefault();
+                        e.stopPropagation(); // 強制攔截，避免觸發背景其他事件
                         onConfirm();
                     } else if (e.key === 'Escape') {
                         e.preventDefault();
+                        e.stopPropagation();
                         onCancel();
                     }
                 };
                 
-                window.addEventListener('keydown', handleKeyDown);
-                return () => window.removeEventListener('keydown', handleKeyDown);
+                // 使用 capture 階段攔截事件，確保彈窗優先處理鍵盤按鍵
+                window.addEventListener('keydown', handleKeyDown, true);
+                return () => window.removeEventListener('keydown', handleKeyDown, true);
             }, [isOpen, onConfirm, onCancel]);
 
             if (!isOpen) return null;
@@ -179,8 +189,8 @@
                         </div>
                         <p className="text-slate-300 mb-6">{message}</p>
                         <div className="flex justify-end gap-3">
-                            <button onClick={onCancel} className="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition">取消 (ESC)</button>
-                            <button onClick={onConfirm} className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-500 transition text-white">確認執行 (Enter)</button>
+                            <button onClick={onCancel} className="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition outline-none focus:ring-2 focus:ring-slate-500">取消 (ESC)</button>
+                            <button ref={btnRef} onClick={onConfirm} className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-500 transition text-white outline-none focus:ring-2 focus:ring-red-400">確認執行 (Enter)</button>
                         </div>
                     </div>
                 </div>
@@ -188,18 +198,25 @@
         };
 
         const AlertModal = ({ isOpen, message, onClose }) => {
+            const btnRef = useRef(null);
+
             useEffect(() => {
+                if (isOpen && btnRef.current) {
+                    setTimeout(() => btnRef.current.focus(), 10);
+                }
+
                 if (!isOpen) return;
                 
                 const handleKeyDown = (e) => {
                     if (e.key === 'Enter' || e.key === 'Escape') {
                         e.preventDefault();
+                        e.stopPropagation();
                         onClose();
                     }
                 };
                 
-                window.addEventListener('keydown', handleKeyDown);
-                return () => window.removeEventListener('keydown', handleKeyDown);
+                window.addEventListener('keydown', handleKeyDown, true);
+                return () => window.removeEventListener('keydown', handleKeyDown, true);
             }, [isOpen, onClose]);
 
             if (!isOpen) return null;
@@ -208,7 +225,7 @@
                     <div className="bg-slate-900 border border-slate-700 p-6 rounded-xl w-80 shadow-2xl text-center">
                         <CheckCircle size={48} className="mx-auto text-green-500 mb-4" />
                         <p className="text-slate-200 mb-6 text-lg">{message}</p>
-                        <button onClick={onClose} className="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 transition w-full text-white">了解 (Enter)</button>
+                        <button ref={btnRef} onClick={onClose} className="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 transition w-full text-white outline-none focus:ring-2 focus:ring-blue-400">了解 (Enter)</button>
                     </div>
                 </div>
             );
@@ -338,7 +355,7 @@
                 setLogs([...logs, newLog]);
                 setStockId('');
                 setStockName('');
-                setSelectedSubTags([]);
+                // 移除 setSelectedSubTags([])，讓子標籤維持使用者原本的選項
             };
 
             const toggleSubTag = (tag) => {
@@ -356,6 +373,10 @@
 
             const toggleStar = (id) => {
                 setLogs(logs.map(log => log.id === id ? { ...log, starred: !log.starred } : log));
+            };
+
+            const togglePlan = (id) => {
+                setLogs(logs.map(log => log.id === id ? { ...log, inPlan: !log.inPlan } : log));
             };
 
             const deleteLog = (id) => {
@@ -612,10 +633,13 @@
                                                 </td>
                                                 <td className="p-4 text-center">
                                                     <div className="flex justify-center gap-3">
-                                                        <button onClick={() => toggleStar(log.id)} className={`transition ${log.starred ? 'text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.6)]' : 'text-slate-600 hover:text-yellow-400'}`}>
+                                                        <button onClick={() => togglePlan(log.id)} className={`transition ${log.inPlan ? 'text-blue-400 drop-shadow-[0_0_8px_rgba(96,165,250,0.6)]' : 'text-slate-600 hover:text-blue-400'}`} title={log.inPlan ? '移出規劃' : '加入規劃'}>
+                                                            <Target size={20} />
+                                                        </button>
+                                                        <button onClick={() => toggleStar(log.id)} className={`transition ${log.starred ? 'text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.6)]' : 'text-slate-600 hover:text-yellow-400'}`} title="追蹤標記">
                                                             <Star fill={log.starred ? "currentColor" : "none"} size={20} />
                                                         </button>
-                                                        <button onClick={() => setConfirm({ show: true, action: () => deleteLog(log.id) })} className="text-slate-600 hover:text-red-400 transition">
+                                                        <button onClick={() => setConfirm({ show: true, action: () => deleteLog(log.id) })} className="text-slate-600 hover:text-red-400 transition" title="刪除">
                                                             <Trash2 size={20} />
                                                         </button>
                                                     </div>
@@ -914,17 +938,88 @@
         // ==========================================
         // 5. 模組三：交易規劃與績效統計 (Plan & Dashboard)
         // ==========================================
-        const PlanDashboard = ({ logs, setLogs }) => {
+        const PlanDashboard = ({ logs, setLogs, stockMap, setCustomStocks }) => {
             const [filterDate, setFilterDate] = useState('all');
             const [editingId, setEditingId] = useState(null);
             
+            // 獨立新增規劃狀態
+            const [planDate, setPlanDate] = useState(new Date().toISOString().split('T')[0]);
+            const [planStockId, setPlanStockId] = useState('');
+            const [planStockName, setPlanStockName] = useState('');
+            const [alert, setAlert] = useState({ show: false, msg: '' });
+
+            const handleStockIdChange = (e) => {
+                const val = e.target.value.trim();
+                setPlanStockId(val);
+                if (stockMap[val]) {
+                    setPlanStockName(stockMap[val].name);
+                } else {
+                    const isKnownName = Object.values(stockMap).some(s => s.name === planStockName);
+                    if (isKnownName) setPlanStockName('');
+                }
+            };
+
+            const handleStockNameChange = (e) => {
+                const val = e.target.value.trim();
+                setPlanStockName(val);
+                const foundId = Object.keys(stockMap).find(key => stockMap[key].name === val);
+                if (foundId) {
+                    setPlanStockId(foundId);
+                } else {
+                    if (stockMap[planStockId]) setPlanStockId('');
+                }
+            };
+
+            const isUnknownStock = planStockId && planStockName && !stockMap[planStockId];
+
+            const stockIdsDatalist = useMemo(() => (
+                <datalist id="plan-stock-ids-list">
+                    {Object.keys(stockMap).map(id => <option key={id} value={id}>{stockMap[id].name}</option>)}
+                </datalist>
+            ), [stockMap]);
+
+            const stockNamesDatalist = useMemo(() => (
+                <datalist id="plan-stock-names-list">
+                    {Object.keys(stockMap).map(id => <option key={id} value={stockMap[id].name} />)}
+                </datalist>
+            ), [stockMap]);
+
+            const handleAddIndependentPlan = () => {
+                if (!planStockId || !planStockName) {
+                    setAlert({ show: true, msg: '請填寫股號與名稱！' });
+                    return;
+                }
+                if (!stockMap[planStockId]) {
+                    setCustomStocks(prev => ({ ...prev, [planStockId]: { name: planStockName, industry: "自訂/手動新增" } }));
+                }
+                const newLog = {
+                    id: Date.now().toString(),
+                    date: planDate,
+                    stockId: planStockId,
+                    name: planStockName,
+                    strategy: '獨立規劃',
+                    subTags: [],
+                    starred: false,
+                    inPlan: true,
+                    plan: { entry: '', stopLoss: '', trailing: '', exit: '', shares: '', warrantCode: '', warrantEntry: '', warrantShares: '', currentPrice: '' }
+                };
+                setLogs([...logs, newLog]);
+                setPlanStockId('');
+                setPlanStockName('');
+            };
+
+            // 篩選出有被加入規劃，或已經有輸入進場價的舊資料
+            const plannedLogs = useMemo(() => {
+                return logs.filter(log => log.inPlan || (log.plan && log.plan.entry));
+            }, [logs]);
+
             // 計算儀表板數據
             const stats = useMemo(() => {
-                let filtered = logs;
+                let filtered = plannedLogs;
                 if (filterDate === 'month') {
                     const monthAgo = new Date();
                     monthAgo.setMonth(monthAgo.getMonth() - 1);
-                    filtered = logs.filter(l => new Date(l.date) >= monthAgo);
+                    filtered = plannedLogs.filter(l => new Date(l.date) >= monthAgo);
                 }
 
                 let totalTrades = 0;
@@ -1015,6 +1110,27 @@
                         <StatCard title="總累積獲利" value={stats.totalProfit.toLocaleString()} unit="TWD" color="yellow" />
                     </div>
 
+                    {/* 新增獨立規劃 */}
+                    <div className="bg-[#111827] p-5 rounded-2xl border border-slate-800 shadow-lg mb-6">
+                        <h3 className="text-lg font-bold text-slate-300 mb-4 flex items-center gap-2"><Target size={18} className="text-blue-400" /> 新增交易標的</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div>
+                                <input type="date" value={planDate} onChange={e => setPlanDate(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm font-mono-num focus:border-blue-500 outline-none" />
+                            </div>
+                            <div className="relative">
+                                <input type="text" list="plan-stock-ids-list" value={planStockId} onChange={handleStockIdChange} onKeyDown={e => { if (e.key === 'Enter') handleAddIndependentPlan(); }} placeholder="股號 (可搜尋)" className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm font-mono-num focus:border-blue-500 outline-none" />
+                            </div>
+                            <div className="relative">
+                                <input type="text" list="plan-stock-names-list" value={planStockName} onChange={handleStockNameChange} onKeyDown={e => { if (e.key === 'Enter') handleAddIndependentPlan(); }} placeholder="名稱 (可反查)" className={`w-full bg-slate-900 border ${isUnknownStock ? 'border-yellow-500/50' : 'border-slate-700'} rounded-lg p-2 text-sm focus:border-blue-500 outline-none ${stockMap[planStockId] ? 'text-green-400' : 'text-slate-200'}`} />
+                                {stockIdsDatalist}
+                                {stockNamesDatalist}
+                            </div>
+                            <button onClick={handleAddIndependentPlan} className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg p-2 text-sm font-bold flex items-center justify-center gap-2 transition">
+                                <PlusCircle size={16} /> 加入規劃清單
+                            </button>
+                        </div>
+                    </div>
+
                     {/* 交易規劃編輯器與總表 */}
                     <div className="bg-[#111827] rounded-2xl border border-slate-800 overflow-hidden shadow-lg">
                         <div className="overflow-x-auto">
@@ -1032,7 +1148,7 @@
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-800/50">
-                                    {logs.slice().reverse().map(log => {
+                                    {plannedLogs.slice().reverse().map(log => {
                                         const p = log.plan || {};
                                         const isEditing = editingId === log.id;
                                         const isOpen = p.entry && !p.exit;
@@ -1130,15 +1246,15 @@
                                             </React.Fragment>
                                         )
                                     })}
-                                    {logs.length === 0 && <tr><td colSpan="8" className="p-8 text-center text-slate-500">尚無規劃紀錄</td></tr>}
+                                    {plannedLogs.length === 0 && <tr><td colSpan="8" className="p-8 text-center text-slate-500">尚無規劃紀錄（請從上方新增，或至選股日誌中點擊「🎯加入規劃」）</td></tr>}
                                 </tbody>
                             </table>
                         </div>
                     </div>
+                    <AlertModal isOpen={alert.show} message={alert.msg} onClose={() => setAlert({ show: false, msg: '' })} />
                 </div>
             );
         };
-
 
         // ==========================================
         // 0. 主應用程式 (App)
@@ -1194,7 +1310,7 @@
                             <CalculatorModule calcHistory={calcHistory} setCalcHistory={setCalcHistory} stockMap={stockMap} />
                         )}
                         {activeTab === 'plan' && (
-                            <PlanDashboard logs={logs} setLogs={setLogs} />
+                            <PlanDashboard logs={logs} setLogs={setLogs} stockMap={stockMap} setCustomStocks={setCustomStocks} />
                         )}
                     </main>
                 </div>
