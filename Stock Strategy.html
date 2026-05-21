@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>萊恩交易手札</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- SheetJS -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Ma+Shan+Zheng&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <script type="importmap">
+    {
+        "imports": {
+            "react": "https://esm.sh/react@18.2.0",
+            "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+            "lucide-react": "https://esm.sh/lucide-react@0.292.0?deps=react@18.2.0"
+        }
+    }
+    </script>
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        :root {
+            --bg-main: #0B1121;
+            --bg-card: #111827;
+            --bg-card-alt: #0f172a;
+        }
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--bg-main);
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+        .font-mono-num { font-family: 'JetBrains Mono', monospace; }
+        .font-title { font-family: 'Ma Shan Zheng', cursive; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-main); }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+        
+        /* Hide number input arrows */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        
+        /* Animations */
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes bounceIn {
+            0% { opacity: 0; transform: scale(0.8); }
+            60% { opacity: 1; transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .animate-fade-in-down { animation: fadeInDown 0.4s ease-out forwards; }
+        .animate-fade-in-up { animation: fadeInUp 0.4s ease-out forwards; }
+        .animate-bounce-in { animation: bounceIn 0.5s ease-out forwards; }
+        
+        /* Tailwind config overrides */
+        script[type="text/tailwindcss"] {
+            theme: {
+                extend: {
+                    colors: {
+                        slate: { 900: '#0f172a' }
+                    }
+                }
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel" data-type="module">
+        import React, { useState, useEffect, useMemo, useCallback } from 'react';
+        import { createRoot } from 'react-dom/client';
+        import { 
+            TrendingUp, BarChart2, Zap, AlertCircle, Save, Trash2, 
+            Download, Upload, Eye, FileText, CheckCircle, Calculator,
+            ClipboardCopy, Search, PlusCircle, LayoutDashboard, Star, X
+        } from 'lucide-react';
+
+        // ==========================================
+        // 1. 靜態資料庫 (STATIC_STOCK_DB) Mock Data
+        // ==========================================
+        const STATIC_STOCK_DB = {
+            "2330": { name: "台積電", industry: "半導體" },
+            "2317": { name: "鴻海", industry: "電子" },
+            "2454": { name: "聯發科", industry: "半導體" },
+            "2303": { name: "聯電", industry: "半導體" },
+            "2603": { name: "長榮", industry: "航運" },
+            "3481": { name: "群創", industry: "光電" },
+            "3231": { name: "緯創", industry: "電腦及週邊" },
+        };
+
+        // ==========================================
+        // 2. 共用元件 (Hooks & Modals)
+        // ==========================================
+        const fallbackCopyTextToClipboard = (text) => {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";  // 避免滾動到底部
+            textArea.style.top = "0";
+            textArea.style.left = "0";
+            textArea.style.opacity = "0";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+            } catch (err) {
+                console.error('Fallback: Oops, unable to copy', err);
+            }
+            document.body.removeChild(textArea);
+        };
+
+        function useLocalStorage(key, initialValue) {
+            const [storedValue, setStoredValue] = useState(() => {
+                try {
+                    const item = window.localStorage.getItem(key);
+                    return item ? JSON.parse(item) : initialValue;
+                } catch (error) {
+                    console.error(error);
+                    return initialValue;
+                }
+            });
+            const setValue = (value) => {
+                try {
+                    const valueToStore = value instanceof Function ? value(storedValue) : value;
+                    setStoredValue(valueToStore);
+                    window.localStorage.setItem(key, JSON.stringify(valueToStore));
+                } catch (error) {
+                    console.error(error);
+                }
+            };
+            return [storedValue, setValue];
+        }
+
+        const ConfirmModal = ({ isOpen, title, message, onConfirm, onCancel }) => {
+            if (!isOpen) return null;
+            return (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in-down">
+                    <div className="bg-slate-900 border border-slate-700 p-6 rounded-xl w-96 shadow-2xl">
+                        <div className="flex items-center gap-3 mb-4 text-red-400">
+                            <AlertCircle size={24} />
+                            <h3 className="text-xl font-bold">{title}</h3>
+                        </div>
+                        <p className="text-slate-300 mb-6">{message}</p>
+                        <div className="flex justify-end gap-3">
+                            <button onClick={onCancel} className="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition">取消</button>
+                            <button onClick={onConfirm} className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-500 transition text-white">確認執行</button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const AlertModal = ({ isOpen, message, onClose }) => {
+            if (!isOpen) return null;
+            return (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-bounce-in">
+                    <div className="bg-slate-900 border border-slate-700 p-6 rounded-xl w-80 shadow-2xl text-center">
+                        <CheckCircle size={48} className="mx-auto text-green-500 mb-4" />
+                        <p className="text-slate-200 mb-6 text-lg">{message}</p>
+                        <button onClick={onClose} className="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 transition w-full text-white">了解</button>
+                    </div>
+                </div>
+            );
+        };
+
+        // ==========================================
+        // 3. 模組一：選股日誌與 EPS (Stock Journal)
+        // ==========================================
+        const STRATEGIES = [
+            { id: 'trend', label: '趨勢與型態', icon: TrendingUp, color: 'from-blue-600 to-indigo-600', emoji: '📈' },
+            { id: 'chips', label: '籌碼與法人', icon: BarChart2, color: 'from-emerald-600 to-teal-600', emoji: '💧' },
+            { id: 'daytrade', label: '當沖專區', icon: Zap, color: 'from-orange-500 to-red-600', emoji: '⚡' },
+            { id: 'emerging', label: '興櫃專區', icon: AlertCircle, color: 'from-purple-600 to-pink-600', emoji: '🚀' },
+        ];
+
+        const SUB_TAGS = {
+            'trend': ['量價齊揚', '芝麻開花', '月來越好', '季不可失', '守株待兔', 'OBV突破', '回後買上漲', '高成交值多頭突破上關', 'KD金叉', 'MACD翻紅', '收盤期貨續拉', '跌破月季線'],
+            'chips': ['法人加持', '外資買進', '投信買進', '權證大單追蹤', '四線上揚籌碼集中', '多頭月營收創高', '1日籌碼集中度>10%', '1日籌碼集中度>20%', '5日籌碼集中度>10%', '5日籌碼集中度>20%'],
+            'daytrade': ['當沖多方標的', '當沖空方標的', '當沖十字變盤'],
+            'emerging': ['興櫃-多頭突破上關價']
+        };
+
+        const SUB_TAG_COLORS = {
+            '量價齊揚': 'from-red-500 to-rose-600',
+            '芝麻開花': 'from-orange-400 to-amber-500',
+            '月來越好': 'from-amber-500 to-yellow-500',
+            '季不可失': 'from-lime-500 to-green-600',
+            '守株待兔': 'from-emerald-500 to-teal-600',
+            'OBV突破': 'from-teal-500 to-cyan-600',
+            '回後買上漲': 'from-cyan-500 to-sky-600',
+            '高成交值多頭突破上關': 'from-sky-500 to-blue-600',
+            'KD金叉': 'from-blue-500 to-indigo-600',
+            'MACD翻紅': 'from-indigo-500 to-violet-600',
+            '收盤期貨續拉': 'from-violet-500 to-purple-600',
+            '跌破月季線': 'from-fuchsia-500 to-pink-600',
+            
+            '法人加持': 'from-rose-500 to-pink-600',
+            '外資買進': 'from-pink-500 to-fuchsia-600',
+            '投信買進': 'from-fuchsia-500 to-purple-600',
+            '權證大單追蹤': 'from-purple-500 to-violet-600',
+            '四線上揚籌碼集中': 'from-violet-500 to-indigo-600',
+            '多頭月營收創高': 'from-indigo-500 to-blue-600',
+            '1日籌碼集中度>10%': 'from-blue-500 to-sky-600',
+            '1日籌碼集中度>20%': 'from-sky-500 to-cyan-600',
+            '5日籌碼集中度>10%': 'from-cyan-500 to-teal-600',
+            '5日籌碼集中度>20%': 'from-teal-500 to-emerald-600',
+
+            '當沖多方標的': 'from-red-600 to-orange-600',
+            '當沖空方標的': 'from-green-600 to-emerald-600',
+            '當沖十字變盤': 'from-slate-500 to-slate-700',
+
+            '興櫃-多頭突破上關價': 'from-amber-600 to-orange-700'
+        };
+
+        const StockJournal = ({ logs, setLogs, customStocks, setCustomStocks, epsData, setEpsData, stockMap }) => {
+            const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+            const [copyDate, setCopyDate] = useState(new Date().toISOString().split('T')[0]);
+            const [copySubTag, setCopySubTag] = useState('all');
+            const [stockId, setStockId] = useState('');
+            const [stockName, setStockName] = useState('');
+            const [selectedStrategy, setSelectedStrategy] = useState('');
+            const [selectedSubTags, setSelectedSubTags] = useState([]);
+            const [alert, setAlert] = useState({ show: false, msg: '' });
+            const [confirm, setConfirm] = useState({ show: false, action: null });
+
+            const handleStockIdChange = (e) => {
+                const val = e.target.value.trim();
+                setStockId(val);
+                // 股號改變時，若找得到就自動填入名稱
+                if (stockMap[val]) {
+                    setStockName(stockMap[val].name);
+                } else {
+                    // 若股號變為未知，且當前名稱是已知的股票，則清空名稱以免錯亂
+                    const isKnownName = Object.values(stockMap).some(s => s.name === stockName);
+                    if (isKnownName) setStockName('');
+                }
+            };
+
+            const handleStockNameChange = (e) => {
+                const val = e.target.value.trim();
+                setStockName(val);
+                // 名稱改變時，反查股號 (精準匹配)
+                const foundId = Object.keys(stockMap).find(key => stockMap[key].name === val);
+                if (foundId) {
+                    setStockId(foundId);
+                } else {
+                    if (stockMap[stockId]) setStockId('');
+                }
+            };
+
+            const isUnknownStock = stockId && stockName && !stockMap[stockId];
+
+            // 使用 useMemo 確保效能，產出原生 datalist 提供智慧搜尋下拉選單
+            const stockIdsDatalist = useMemo(() => (
+                <datalist id="stock-ids-list">
+                    {Object.keys(stockMap).map(id => <option key={id} value={id}>{stockMap[id].name}</option>)}
+                </datalist>
+            ), [stockMap]);
+
+            const stockNamesDatalist = useMemo(() => (
+                <datalist id="stock-names-list">
+                    {Object.keys(stockMap).map(id => <option key={id} value={stockMap[id].name} />)}
+                </datalist>
+            ), [stockMap]);
+
+            const handleAddLog = () => {
+                if (!stockId || !stockName || !selectedStrategy) {
+                    setAlert({ show: true, msg: '請填寫完整資訊 (股號、名稱、策略)！' });
+                    return;
+                }
+
+                // 自動補齊未知的股號與名稱，無須再點擊新增按鈕
+                if (!stockMap[stockId]) {
+                    setCustomStocks(prev => ({ ...prev, [stockId]: { name: stockName, industry: "自訂/手動新增" } }));
+                }
+
+                const newLog = {
+                    id: Date.now().toString(),
+                    date,
+                    stockId,
+                    name: stockName,
+                    strategy: selectedStrategy,
+                    subTags: selectedSubTags,
+                    starred: false,
+                    plan: { entry: '', stopLoss: '', trailing: '', exit: '', shares: '', warrantCode: '', warrantEntry: '', warrantShares: '', currentPrice: '' }
+                };
+                setLogs([...logs, newLog]);
+                setStockId('');
+                setStockName('');
+                setSelectedSubTags([]);
+            };
+
+            const toggleSubTag = (tag) => {
+                if (selectedSubTags.includes(tag)) {
+                    setSelectedSubTags(selectedSubTags.filter(t => t !== tag));
+                } else {
+                    setSelectedSubTags([...selectedSubTags, tag]);
+                }
+            };
+            
+            const handleStrategySelect = (id) => {
+                setSelectedStrategy(id);
+                setSelectedSubTags([]); // 切換主策略時清空子標籤
+            };
+
+            const toggleStar = (id) => {
+                setLogs(logs.map(log => log.id === id ? { ...log, starred: !log.starred } : log));
+            };
+
+            const deleteLog = (id) => {
+                setLogs(logs.filter(log => log.id !== id));
+            };
+
+            const handleEpsImport = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (evt) => {
+                    const bstr = evt.target.result;
+                    const wb = XLSX.read(bstr, { type: 'binary' });
+                    const wsname = wb.SheetNames[0];
+                    const ws = wb.Sheets[wsname];
+                    const data = XLSX.utils.sheet_to_json(ws);
+                    
+                    let newEps = { ...epsData };
+                    let newCustom = { ...customStocks };
+                    let addedCustomCount = 0;
+
+                    data.forEach(row => {
+                        const code = row['代號'] || row['code'] || row['Code'];
+                        const name = row['股名'] || row['名稱'] || row['name'] || row['Name'];
+                        const eps25 = row['2025EPS'] || row['2025'] || row['25'] || row['EPS25'];
+                        const eps26 = row['預估2026EPS'] || row['2026'] || row['26'] || row['EPS26'];
+
+                        if (code) {
+                            const strCode = String(code).trim();
+                            newEps[strCode] = { eps25: eps25 || '-', eps26: eps26 || '-' };
+                            // 【隱藏邏輯】自動補齊
+                            if (!stockMap[strCode] && name) {
+                                newCustom[strCode] = { name: String(name).trim(), industry: "匯入補齊" };
+                                addedCustomCount++;
+                            }
+                        }
+                    });
+                    setEpsData(newEps);
+                    setCustomStocks(newCustom);
+                    setAlert({ show: true, msg: `EPS 匯入成功！自動補齊了 ${addedCustomCount} 檔未知股票。` });
+                };
+                reader.readAsBinaryString(file);
+            };
+
+            const copyLogs = () => {
+                let resultText = `【萊恩交易手札 - ${copyDate} 選股紀錄】\n`;
+                if (copySubTag !== 'all') {
+                    resultText += `🎯 篩選條件：${copySubTag}\n`;
+                }
+                resultText += `\n`;
+                
+                let hasData = false;
+                
+                STRATEGIES.forEach(strat => {
+                    let stratLogs = logs.filter(l => l.strategy === strat.id && l.date === copyDate);
+                    
+                    // 套用子標籤過濾
+                    if (copySubTag !== 'all') {
+                        stratLogs = stratLogs.filter(l => l.subTags && l.subTags.includes(copySubTag));
+                    }
+
+                    if (stratLogs.length === 0) return;
+                    hasData = true;
+                    
+                    // 排序邏輯
+                    if (strat.id === 'trend' || strat.id === 'emerging') {
+                        stratLogs.sort((a, b) => parseInt(a.id) - parseInt(b.id)); // 時間順序
+                    } else {
+                        stratLogs.sort((a, b) => a.stockId.localeCompare(b.stockId)); // 股號大小
+                    }
+
+                    resultText += `${strat.emoji} [${strat.label}]\n`;
+                    stratLogs.forEach(l => {
+                        const epsInfo = epsData[l.stockId] ? ` (25'EPS: ${epsData[l.stockId].eps25})` : '';
+                        const subTagsInfo = l.subTags && l.subTags.length > 0 ? ` [${l.subTags.join(', ')}]` : '';
+                        resultText += `  - ${l.stockId} ${l.name}${epsInfo}${subTagsInfo}\n`;
+                    });
+                    resultText += `\n`;
+                });
+                
+                if (!hasData) {
+                    setAlert({ show: true, msg: `找不到 ${copyDate} ${copySubTag !== 'all' ? '且包含 ['+copySubTag+'] ' : ''}的選股紀錄！` });
+                    return;
+                }
+                
+                resultText += `-------------------\n⚠️ 免責聲明：本資訊僅供個人交易紀錄參考，非任何買賣建議，投資有賺有賠，請盈虧自負。`;
+                
+                fallbackCopyTextToClipboard(resultText);
+                setAlert({ show: true, msg: `已成功複製 ${copyDate} 的清單！` });
+            };
+
+            return (
+                <div className="animate-fade-in-up space-y-6">
+                    {/* 控制區塊 */}
+                    <div className="bg-[#111827] p-6 rounded-2xl border border-slate-800 shadow-lg">
+                        <h2 className="text-2xl font-title text-blue-400 mb-6 flex items-center gap-2"><FileText /> 新增選股日誌</h2>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                            <div>
+                                <label className="block text-sm text-slate-400 mb-1">日期</label>
+                                <input type="date" value={date} onChange={e => setDate(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 font-mono-num focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition" />
+                            </div>
+                            <div className="relative">
+                                <label className="block text-sm text-slate-400 mb-1">股號</label>
+                                <div className="flex gap-2">
+                                    <input 
+                                        type="text" 
+                                        list="stock-ids-list"
+                                        value={stockId} 
+                                        onChange={handleStockIdChange} 
+                                        onKeyDown={e => { if (e.key === 'Enter') handleAddLog(); }}
+                                        placeholder="e.g. 2330" 
+                                        className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 font-mono-num focus:border-blue-500 outline-none transition" 
+                                    />
+                                </div>
+                            </div>
+                            <div className="col-span-2">
+                                <label className="block text-sm text-slate-400 mb-1">對應股票名稱 (可輸入名稱反查)</label>
+                                <div className="relative h-[46px]">
+                                    <input 
+                                        type="text" 
+                                        list="stock-names-list"
+                                        value={stockName} 
+                                        onChange={handleStockNameChange}
+                                        onKeyDown={e => { if (e.key === 'Enter') handleAddLog(); }}
+                                        placeholder="輸入股名自動帶出股號..." 
+                                        className={`w-full h-full bg-slate-800/50 border ${isUnknownStock ? 'border-yellow-500/50' : 'border-slate-700/50'} rounded-lg p-2.5 focus:border-blue-500 outline-none transition ${stockMap[stockId] ? 'text-green-400 font-bold' : 'text-slate-200'}`} 
+                                    />
+                                    {isUnknownStock && (
+                                        <span className="absolute right-3 top-2.5 text-xs text-yellow-500 bg-yellow-500/10 px-2 py-1 rounded">送出自動記憶</span>
+                                    )}
+                                </div>
+                                {stockIdsDatalist}
+                                {stockNamesDatalist}
+                            </div>
+                        </div>
+
+                        <div className="mb-6">
+                            <label className="block text-sm text-slate-400 mb-2">符合策略條件</label>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                {STRATEGIES.map(s => (
+                                    <button 
+                                        key={s.id}
+                                        onClick={() => handleStrategySelect(s.id)}
+                                        className={`flex flex-col items-center justify-center p-3 rounded-xl border transition-all ${selectedStrategy === s.id ? `bg-gradient-to-br ${s.color} border-transparent text-white shadow-lg scale-105` : 'bg-slate-900 border-slate-700 text-slate-400 hover:border-slate-500'}`}
+                                    >
+                                        <s.icon size={24} className="mb-2" />
+                                        <span className="font-medium">{s.label}</span>
+                                    </button>
+                                ))}
+                            </div>
+                            
+                            {/* 子標籤選擇區 (當選擇趨勢與型態或籌碼與法人時顯示) */}
+                            {selectedStrategy && SUB_TAGS[selectedStrategy] && (
+                                <div className="mt-4 p-4 bg-slate-800/30 rounded-xl border border-slate-700/50 animate-fade-in-down">
+                                    <label className="block text-sm text-slate-400 mb-3">進階子標籤 (可多選)</label>
+                                    <div className="flex flex-wrap gap-2">
+                                        {SUB_TAGS[selectedStrategy].map(tag => (
+                                            <button
+                                                key={tag}
+                                                onClick={() => toggleSubTag(tag)}
+                                                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                                                    selectedSubTags.includes(tag) 
+                                                        ? `bg-gradient-to-r ${SUB_TAG_COLORS[tag] || 'from-blue-600 to-indigo-600'} text-white shadow-md shadow-slate-900/50` 
+                                                        : 'bg-slate-900 border border-slate-600 text-slate-400 hover:border-slate-400 hover:text-slate-200'
+                                                }`}
+                                            >
+                                                {tag}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="flex justify-between items-center border-t border-slate-800 pt-6">
+                            <div className="flex gap-3">
+                                <label className="cursor-pointer bg-slate-800 hover:bg-slate-700 text-sm text-slate-200 px-4 py-2 rounded-lg flex items-center gap-2 transition">
+                                    <Upload size={16} />
+                                    匯入 EPS (Excel/CSV)
+                                    <input type="file" accept=".csv, .xlsx, .xls" onChange={handleEpsImport} className="hidden" />
+                                </label>
+                                <div className="flex items-center gap-2 bg-slate-800 rounded-lg p-1 pr-2">
+                                    <input 
+                                        type="date" 
+                                        value={copyDate} 
+                                        onChange={e => setCopyDate(e.target.value)} 
+                                        className="bg-slate-900 border border-slate-700 rounded-md px-2 py-1 text-sm font-mono-num text-slate-300 outline-none"
+                                    />
+                                    <select 
+                                        value={copySubTag}
+                                        onChange={e => setCopySubTag(e.target.value)}
+                                        className="bg-slate-900 border border-slate-700 rounded-md px-2 py-1 text-sm text-slate-300 outline-none max-w-[120px]"
+                                    >
+                                        <option value="all">全部標籤</option>
+                                        {Object.values(SUB_TAGS).flat().map(tag => (
+                                            <option key={tag} value={tag}>{tag}</option>
+                                        ))}
+                                    </select>
+                                    <button onClick={copyLogs} className="text-sm text-slate-200 hover:text-white flex items-center gap-1 transition ml-1">
+                                        <ClipboardCopy size={16} /> 複製清單
+                                    </button>
+                                </div>
+                            </div>
+                            <button onClick={handleAddLog} className="bg-blue-600 hover:bg-blue-500 text-white px-8 py-2 rounded-lg font-bold flex items-center gap-2 shadow-lg shadow-blue-900/50 transition transform hover:-translate-y-0.5">
+                                <PlusCircle size={18} /> 加入日誌
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* 資料表格 */}
+                    <div className="bg-[#111827] rounded-2xl border border-slate-800 overflow-hidden shadow-lg">
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left border-collapse">
+                                <thead>
+                                    <tr className="bg-slate-800/50 text-slate-400 text-sm uppercase tracking-wider">
+                                        <th className="p-4 font-medium">日期</th>
+                                        <th className="p-4 font-medium">代號 / 名稱</th>
+                                        <th className="p-4 font-medium font-mono-num">25' EPS</th>
+                                        <th className="p-4 font-medium font-mono-num">26' EPS(預)</th>
+                                        <th className="p-4 font-medium">策略標籤</th>
+                                        <th className="p-4 font-medium text-center">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-800/50">
+                                    {logs.slice().reverse().map(log => {
+                                        const eps = epsData[log.stockId] || { eps25: '-', eps26: '-' };
+                                        const strat = STRATEGIES.find(s => s.id === log.strategy);
+                                        return (
+                                            <tr key={log.id} className="hover:bg-slate-800/20 transition group">
+                                                <td className="p-4 font-mono-num text-slate-300">{log.date}</td>
+                                                <td className="p-4">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="font-mono-num text-blue-400 font-bold">{log.stockId}</span>
+                                                        <span className="text-slate-200">{log.name}</span>
+                                                    </div>
+                                                </td>
+                                                <td className="p-4 font-mono-num text-emerald-400">{eps.eps25}</td>
+                                                <td className="p-4 font-mono-num text-emerald-500/70">{eps.eps26}</td>
+                                                <td className="p-4">
+                                                    <div className="flex flex-wrap gap-1.5 items-center">
+                                                        {log.subTags && log.subTags.length > 0 ? (
+                                                            log.subTags.map(t => (
+                                                                <span key={t} className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gradient-to-r ${SUB_TAG_COLORS[t] || strat?.color} text-white shadow-sm`}>
+                                                                    {t}
+                                                                </span>
+                                                            ))
+                                                        ) : (
+                                                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-gradient-to-r ${strat?.color} bg-opacity-10 text-white`}>
+                                                                {strat?.emoji} {strat?.label}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                                <td className="p-4 text-center">
+                                                    <div className="flex justify-center gap-3">
+                                                        <button onClick={() => toggleStar(log.id)} className={`transition ${log.starred ? 'text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.6)]' : 'text-slate-600 hover:text-yellow-400'}`}>
+                                                            <Star fill={log.starred ? "currentColor" : "none"} size={20} />
+                                                        </button>
+                                                        <button onClick={() => setConfirm({ show: true, action: () => deleteLog(log.id) })} className="text-slate-600 hover:text-red-400 transition">
+                                                            <Trash2 size={20} />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        )
+                                    })}
+                                    {logs.length === 0 && (
+                                        <tr><td colSpan="6" className="p-8 text-center text-slate-500">尚無選股紀錄</td></tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <AlertModal isOpen={alert.show} message={alert.msg} onClose={() => setAlert({ show: false, msg: '' })} />
+                    <ConfirmModal isOpen={confirm.show} title="確認刪除" message="您確定要刪除這筆紀錄嗎？此動作無法復原。" 
+                        onConfirm={() => { confirm.action(); setConfirm({ show: false, action: null }); }} 
+                        onCancel={() => setConfirm({ show: false, action: null })} />
+                </div>
+            );
+        };
+
+        // ==========================================
+        // 4. 模組二：大盤支撐壓力計算機 (Calculator)
+        // ==========================================
+        const CalculatorModule = ({ calcHistory, setCalcHistory, stockMap }) => {
+            const [session, setSession] = useState('日盤');
+            const [h, setH] = useState('');
+            const [l, setL] = useState('');
+            const [c, setC] = useState('');
+            const [stockId, setStockId] = useState('');
+            const [results, setResults] = useState(null);
+            const [expandedRowId, setExpandedRowId] = useState(null);
+
+            const calculate = () => {
+                const H = parseFloat(h);
+                const L = parseFloat(l);
+                const C = parseFloat(c);
+                if (isNaN(H) || isNaN(L) || isNaN(C)) return;
+
+                const Range = H - L;
+                
+                // CDP
+                const cdpVal = (H + L + 2 * C) / 4;
+                const cdp = {
+                    AH: (cdpVal + Range).toFixed(2),
+                    NH: (2 * cdpVal - L).toFixed(2),
+                    CDP: cdpVal.toFixed(2),
+                    NL: (2 * cdpVal - H).toFixed(2),
+                    AL: (cdpVal - Range).toFixed(2)
+                };
+
+                // Pivot
+                const pVal = (H + L + C) / 3;
+                const pivot = {
+                    R2: (pVal + Range).toFixed(2),
+                    R1: (2 * pVal - L).toFixed(2),
+                    P: pVal.toFixed(2),
+                    S1: (2 * pVal - H).toFixed(2),
+                    S2: (pVal - Range).toFixed(2)
+                };
+
+                // Fibo
+                const fibo = {
+                    R3: (pVal + Range * 1.0).toFixed(2),
+                    R2: (pVal + Range * 0.618).toFixed(2),
+                    R1: (pVal + Range * 0.382).toFixed(2),
+                    P: pVal.toFixed(2),
+                    S1: (pVal - Range * 0.382).toFixed(2),
+                    S2: (pVal - Range * 0.618).toFixed(2),
+                    S3: (pVal - Range * 1.0).toFixed(2)
+                };
+
+                setResults({ cdp, pivot, fibo });
+            };
+
+            const saveHistory = () => {
+                if (!results) return;
+                const name = stockMap[stockId]?.name || '';
+                const newRecord = {
+                    id: Date.now().toString(),
+                    date: new Date().toISOString().split('T')[0],
+                    session,
+                    stockId,
+                    name,
+                    inputs: { h, l, c },
+                    results
+                };
+                setCalcHistory([newRecord, ...calcHistory]);
+            };
+
+            const copySystem = (sysName, data, record = null) => {
+                const rec = record || { date: new Date().toISOString().split('T')[0], session, stockId, name: stockMap[stockId]?.name || '' };
+                const titleStr = `【${rec.date} ${rec.session} ${rec.stockId} ${rec.name} 關鍵點位參考 - ${sysName}】\n\n`;
+                let text = titleStr;
+                
+                Object.keys(data).forEach(k => {
+                    text += `${k}:\t${data[k]}\n`;
+                });
+                
+                fallbackCopyTextToClipboard(text);
+            };
+
+            const ColorRow = ({ label, value, type }) => {
+                let colorClass = 'text-slate-300';
+                if (type === 'R') colorClass = 'text-red-400 font-bold';
+                if (type === 'S') colorClass = 'text-emerald-400 font-bold';
+                if (type === 'P') colorClass = 'text-yellow-400 font-bold';
+
+                return (
+                    <div className="flex justify-between items-center py-1.5 border-b border-slate-800/50 last:border-0">
+                        <span className="text-sm text-slate-500 w-8">{label}</span>
+                        <span className={`font-mono-num text-lg ${colorClass}`}>{value}</span>
+                    </div>
+                );
+            };
+
+            return (
+                <div className="animate-fade-in-up space-y-6">
+                    {/* 輸入面板 */}
+                    <div className="bg-[#111827] p-6 rounded-2xl border border-slate-800 shadow-lg">
+                        <h2 className="text-2xl font-title text-indigo-400 mb-6 flex items-center gap-2"><Calculator /> 大盤支撐壓力計算機</h2>
+                        
+                        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+                            <div>
+                                <label className="block text-sm text-slate-400 mb-1">預測盤別</label>
+                                <select value={session} onChange={e=>setSession(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 focus:border-indigo-500 outline-none">
+                                    <option>日盤</option>
+                                    <option>夜盤</option>
+                                    <option>全盤</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-sm text-slate-400 mb-1">最高價 (H)</label>
+                                <input type="number" step="any" value={h} onChange={e=>setH(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 font-mono-num" />
+                            </div>
+                            <div>
+                                <label className="block text-sm text-slate-400 mb-1">最低價 (L)</label>
+                                <input type="number" step="any" value={l} onChange={e=>setL(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 font-mono-num" />
+                            </div>
+                            <div>
+                                <label className="block text-sm text-slate-400 mb-1">收盤價 (C)</label>
+                                <input type="number" step="any" value={c} onChange={e=>setC(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 font-mono-num" />
+                            </div>
+                            <div>
+                                <label className="block text-sm text-slate-400 mb-1">股號/代號 (選填)</label>
+                                <input type="text" value={stockId} onChange={e=>setStockId(e.target.value)} placeholder="如: TX00" className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 font-mono-num" />
+                                {stockMap[stockId]?.name && <span className="text-xs text-green-400 mt-1 block">{stockMap[stockId].name}</span>}
+                            </div>
+                        </div>
+
+                        <div className="flex gap-4">
+                            <button onClick={calculate} className="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-2.5 rounded-lg font-bold flex-1 shadow-lg shadow-indigo-900/50 transition">
+                                開始計算
+                            </button>
+                            {results && (
+                                <button onClick={saveHistory} className="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2.5 rounded-lg font-bold flex items-center gap-2 transition">
+                                    <Save size={18} /> 儲存紀錄
+                                </button>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* 輸出面板 */}
+                    {results && (
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-bounce-in">
+                            {/* CDP */}
+                            <div className="bg-slate-900 rounded-2xl border border-slate-700 p-5 shadow-xl relative overflow-hidden group">
+                                <div className="absolute top-0 right-0 w-16 h-16 bg-blue-500/10 rounded-bl-full -z-0"></div>
+                                <h3 className="text-lg font-bold text-blue-400 mb-4 border-b border-slate-700 pb-2 relative z-10">CDP 系統</h3>
+                                <div className="space-y-1 relative z-10">
+                                    <ColorRow label="AH" value={results.cdp.AH} type="R" />
+                                    <ColorRow label="NH" value={results.cdp.NH} type="R" />
+                                    <ColorRow label="CDP" value={results.cdp.CDP} type="P" />
+                                    <ColorRow label="NL" value={results.cdp.NL} type="S" />
+                                    <ColorRow label="AL" value={results.cdp.AL} type="S" />
+                                </div>
+                                <button onClick={() => copySystem('CDP系統', results.cdp)} className="mt-4 w-full py-2 bg-slate-800 hover:bg-slate-700 text-sm rounded-lg flex justify-center items-center gap-2 transition text-slate-300">
+                                    <ClipboardCopy size={16} /> 複製 (CDP)
+                                </button>
+                            </div>
+                            
+                            {/* Pivot */}
+                            <div className="bg-slate-900 rounded-2xl border border-slate-700 p-5 shadow-xl relative overflow-hidden group">
+                                <div className="absolute top-0 right-0 w-16 h-16 bg-purple-500/10 rounded-bl-full -z-0"></div>
+                                <h3 className="text-lg font-bold text-purple-400 mb-4 border-b border-slate-700 pb-2 relative z-10">Pivot 系統</h3>
+                                <div className="space-y-1 relative z-10">
+                                    <ColorRow label="R2" value={results.pivot.R2} type="R" />
+                                    <ColorRow label="R1" value={results.pivot.R1} type="R" />
+                                    <ColorRow label="P" value={results.pivot.P} type="P" />
+                                    <ColorRow label="S1" value={results.pivot.S1} type="S" />
+                                    <ColorRow label="S2" value={results.pivot.S2} type="S" />
+                                </div>
+                                <button onClick={() => copySystem('Pivot系統', results.pivot)} className="mt-4 w-full py-2 bg-slate-800 hover:bg-slate-700 text-sm rounded-lg flex justify-center items-center gap-2 transition text-slate-300">
+                                    <ClipboardCopy size={16} /> 複製 (Pivot)
+                                </button>
+                            </div>
+
+                            {/* Fibonacci */}
+                            <div className="bg-slate-900 rounded-2xl border border-slate-700 p-5 shadow-xl relative overflow-hidden group">
+                                <div className="absolute top-0 right-0 w-16 h-16 bg-amber-500/10 rounded-bl-full -z-0"></div>
+                                <h3 className="text-lg font-bold text-amber-400 mb-4 border-b border-slate-700 pb-2 relative z-10">Fibonacci</h3>
+                                <div className="space-y-1 relative z-10">
+                                    <ColorRow label="R3" value={results.fibo.R3} type="R" />
+                                    <ColorRow label="R2" value={results.fibo.R2} type="R" />
+                                    <ColorRow label="R1" value={results.fibo.R1} type="R" />
+                                    <ColorRow label="P" value={results.fibo.P} type="P" />
+                                    <ColorRow label="S1" value={results.fibo.S1} type="S" />
+                                    <ColorRow label="S2" value={results.fibo.S2} type="S" />
+                                    <ColorRow label="S3" value={results.fibo.S3} type="S" />
+                                </div>
+                                <button onClick={() => copySystem('Fibonacci', results.fibo)} className="mt-4 w-full py-2 bg-slate-800 hover:bg-slate-700 text-sm rounded-lg flex justify-center items-center gap-2 transition text-slate-300">
+                                    <ClipboardCopy size={16} /> 複製 (Fibo)
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* 歷史紀錄表 */}
+                    <div className="bg-[#111827] rounded-2xl border border-slate-800 overflow-hidden mt-8 shadow-lg">
+                        <div className="p-4 border-b border-slate-800 bg-slate-800/30 flex justify-between items-center">
+                            <h3 className="font-bold text-slate-300">歷史計算紀錄</h3>
+                        </div>
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="bg-slate-800/50 text-slate-400 text-sm">
+                                    <th className="p-3">日期</th>
+                                    <th className="p-3">盤別</th>
+                                    <th className="p-3">標的</th>
+                                    <th className="p-3 font-mono-num">H / L / C</th>
+                                    <th className="p-3 text-center">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-800/50">
+                                {calcHistory.map(rec => (
+                                    <React.Fragment key={rec.id}>
+                                        <tr className="hover:bg-slate-800/20 transition">
+                                            <td className="p-3 font-mono-num text-sm text-slate-400">{rec.date}</td>
+                                            <td className="p-3 text-sm"><span className="bg-slate-800 px-2 py-1 rounded text-slate-300">{rec.session}</span></td>
+                                            <td className="p-3 text-sm font-bold text-blue-400">{rec.stockId} <span className="text-slate-400 font-normal">{rec.name}</span></td>
+                                            <td className="p-3 text-sm font-mono-num text-slate-300">{rec.inputs.h} / {rec.inputs.l} / {rec.inputs.c}</td>
+                                            <td className="p-3 text-center">
+                                                <div className="flex justify-center gap-2">
+                                                    <button onClick={() => setExpandedRowId(expandedRowId === rec.id ? null : rec.id)} className="p-1.5 bg-blue-600/20 text-blue-400 hover:bg-blue-600/40 rounded transition" title="查看數據"><Eye size={16} /></button>
+                                                    <button onClick={() => { setH(rec.inputs.h); setL(rec.inputs.l); setC(rec.inputs.c); setSession(rec.session); setStockId(rec.stockId); }} className="p-1.5 bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600/40 rounded transition" title="載入參數"><Upload size={16} /></button>
+                                                    <button onClick={() => setCalcHistory(calcHistory.filter(h => h.id !== rec.id))} className="p-1.5 bg-red-600/20 text-red-400 hover:bg-red-600/40 rounded transition" title="刪除"><Trash2 size={16} /></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {/* 內嵌展開面板 */}
+                                        {expandedRowId === rec.id && (
+                                            <tr className="bg-slate-900/50 border-l-4 border-blue-500 animate-fade-in-down">
+                                                <td colSpan="5" className="p-4">
+                                                    <div className="flex gap-4">
+                                                        <div className="flex-1 bg-slate-900 p-3 rounded border border-slate-700/50">
+                                                            <div className="flex justify-between items-center mb-2">
+                                                                <span className="text-xs font-bold text-blue-400">CDP</span>
+                                                                <button onClick={()=>copySystem('CDP', rec.results.cdp, rec)} className="text-slate-500 hover:text-white"><ClipboardCopy size={14}/></button>
+                                                            </div>
+                                                            <div className="grid grid-cols-5 text-xs text-center font-mono-num">
+                                                                <div><div className="text-slate-500">AH</div><div className="text-red-400">{rec.results.cdp.AH}</div></div>
+                                                                <div><div className="text-slate-500">NH</div><div className="text-red-400">{rec.results.cdp.NH}</div></div>
+                                                                <div><div className="text-slate-500">CDP</div><div className="text-yellow-400">{rec.results.cdp.CDP}</div></div>
+                                                                <div><div className="text-slate-500">NL</div><div className="text-emerald-400">{rec.results.cdp.NL}</div></div>
+                                                                <div><div className="text-slate-500">AL</div><div className="text-emerald-400">{rec.results.cdp.AL}</div></div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex-1 bg-slate-900 p-3 rounded border border-slate-700/50">
+                                                            <div className="flex justify-between items-center mb-2">
+                                                                <span className="text-xs font-bold text-purple-400">Pivot</span>
+                                                                <button onClick={()=>copySystem('Pivot', rec.results.pivot, rec)} className="text-slate-500 hover:text-white"><ClipboardCopy size={14}/></button>
+                                                            </div>
+                                                            <div className="grid grid-cols-5 text-xs text-center font-mono-num">
+                                                                <div><div className="text-slate-500">R2</div><div className="text-red-400">{rec.results.pivot.R2}</div></div>
+                                                                <div><div className="text-slate-500">R1</div><div className="text-red-400">{rec.results.pivot.R1}</div></div>
+                                                                <div><div className="text-slate-500">P</div><div className="text-yellow-400">{rec.results.pivot.P}</div></div>
+                                                                <div><div className="text-slate-500">S1</div><div className="text-emerald-400">{rec.results.pivot.S1}</div></div>
+                                                                <div><div className="text-slate-500">S2</div><div className="text-emerald-400">{rec.results.pivot.S2}</div></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </React.Fragment>
+                                ))}
+                                {calcHistory.length === 0 && <tr><td colSpan="5" className="p-8 text-center text-slate-500">無歷史紀錄</td></tr>}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            );
+        };
+
+        // ==========================================
+        // 5. 模組三：交易規劃與績效統計 (Plan & Dashboard)
+        // ==========================================
+        const PlanDashboard = ({ logs, setLogs }) => {
+            const [filterDate, setFilterDate] = useState('all');
+            const [editingId, setEditingId] = useState(null);
+            
+            // 計算儀表板數據
+            const stats = useMemo(() => {
+                let filtered = logs;
+                if (filterDate === 'month') {
+                    const monthAgo = new Date();
+                    monthAgo.setMonth(monthAgo.getMonth() - 1);
+                    filtered = logs.filter(l => new Date(l.date) >= monthAgo);
+                }
+
+                let totalTrades = 0;
+                let closedTrades = 0;
+                let winCount = 0;
+                let totalProfit = 0;
+
+                filtered.forEach(log => {
+                    const p = log.plan || {};
+                    const hasPlan = p.entry && p.shares;
+                    if (hasPlan) totalTrades++;
+                    
+                    if (hasPlan && p.exit) {
+                        closedTrades++;
+                        const entry = parseFloat(p.entry);
+                        const exit = parseFloat(p.exit);
+                        const shares = parseFloat(p.shares) * 1000;
+                        const pnl = (exit - entry) * shares;
+                        totalProfit += pnl;
+                        if (pnl > 0) winCount++;
+                    }
+
+                    // Warrants
+                    if (p.warrantEntry && p.warrantExit && p.warrantShares) {
+                        const wEntry = parseFloat(p.warrantEntry);
+                        const wExit = parseFloat(p.warrantExit);
+                        const wShares = parseFloat(p.warrantShares) * 1000;
+                        const wPnl = (wExit - wEntry) * wShares;
+                        totalProfit += wPnl;
+                    }
+                });
+
+                return {
+                    totalTrades,
+                    closedTrades,
+                    winRate: closedTrades > 0 ? ((winCount / closedTrades) * 100).toFixed(1) : 0,
+                    totalProfit: Math.round(totalProfit)
+                };
+            }, [logs, filterDate]);
+
+            const updatePlan = (id, field, value) => {
+                setLogs(logs.map(log => {
+                    if (log.id === id) {
+                        let newPlan = { ...log.plan, [field]: value };
+                        // 防呆打95折
+                        if (field === 'entry' && value && !newPlan.stopLoss) {
+                            newPlan.stopLoss = (parseFloat(value) * 0.95).toFixed(2);
+                        }
+                        return { ...log, plan: newPlan };
+                    }
+                    return log;
+                }));
+            };
+
+            const calculateRR = (p) => {
+                if (!p.entry || !p.stopLoss || !p.exit) return '-';
+                const risk = parseFloat(p.entry) - parseFloat(p.stopLoss);
+                const reward = parseFloat(p.exit) - parseFloat(p.entry);
+                if (risk <= 0) return '-';
+                return (reward / risk).toFixed(2);
+            };
+
+            const StatCard = ({ title, value, unit, color }) => (
+                <div className="bg-slate-900 border border-slate-700 p-5 rounded-2xl flex flex-col justify-center shadow-lg relative overflow-hidden">
+                    <div className={`absolute -right-4 -bottom-4 w-20 h-20 bg-${color}-500/10 rounded-full blur-xl`}></div>
+                    <div className="text-slate-400 text-sm mb-1">{title}</div>
+                    <div className={`text-3xl font-bold font-mono-num text-${color}-400`}>
+                        {value} <span className="text-base text-slate-500 ml-1">{unit}</span>
+                    </div>
+                </div>
+            );
+
+            return (
+                <div className="animate-fade-in-up space-y-6">
+                    {/* 儀表板 */}
+                    <div className="flex justify-between items-end mb-4">
+                        <h2 className="text-2xl font-title text-emerald-400 flex items-center gap-2"><LayoutDashboard /> 績效儀表板</h2>
+                        <select value={filterDate} onChange={e=>setFilterDate(e.target.value)} className="bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm outline-none text-slate-300">
+                            <option value="all">全部紀錄</option>
+                            <option value="month">近一個月</option>
+                        </select>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                        <StatCard title="總交易次數" value={stats.totalTrades} unit="筆" color="blue" />
+                        <StatCard title="已平倉次數" value={stats.closedTrades} unit="筆" color="indigo" />
+                        <StatCard title="勝率" value={stats.winRate} unit="%" color="emerald" />
+                        <StatCard title="總累積獲利" value={stats.totalProfit.toLocaleString()} unit="TWD" color="yellow" />
+                    </div>
+
+                    {/* 交易規劃編輯器與總表 */}
+                    <div className="bg-[#111827] rounded-2xl border border-slate-800 overflow-hidden shadow-lg">
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left border-collapse min-w-[1000px]">
+                                <thead>
+                                    <tr className="bg-slate-800/50 text-slate-400 text-sm tracking-wider">
+                                        <th className="p-3">標的 / 狀態</th>
+                                        <th className="p-3">進場價</th>
+                                        <th className="p-3">停損價</th>
+                                        <th className="p-3">現價 / 出場</th>
+                                        <th className="p-3">張數</th>
+                                        <th className="p-3">風報比</th>
+                                        <th className="p-3">未平倉損益(預估)</th>
+                                        <th className="p-3 text-center">編輯</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-800/50">
+                                    {logs.slice().reverse().map(log => {
+                                        const p = log.plan || {};
+                                        const isEditing = editingId === log.id;
+                                        const isOpen = p.entry && !p.exit;
+                                        
+                                        // 損益試算
+                                        let unrealized = 0;
+                                        if (isOpen && p.currentPrice) {
+                                            unrealized = (parseFloat(p.currentPrice) - parseFloat(p.entry)) * parseFloat(p.shares) * 1000;
+                                        }
+
+                                        return (
+                                            <React.Fragment key={log.id}>
+                                                <tr className={`hover:bg-slate-800/20 transition ${isOpen ? 'bg-blue-900/5' : ''}`}>
+                                                    <td className="p-3">
+                                                        <div className="font-bold text-slate-200">{log.stockId} {log.name}</div>
+                                                        <div className="text-xs mt-1">
+                                                            {isOpen ? (
+                                                                <span className="bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded flex w-max items-center gap-1">
+                                                                    <span className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse"></span> 持倉中
+                                                                </span>
+                                                            ) : p.entry ? (
+                                                                <span className="bg-slate-700 text-slate-400 px-2 py-0.5 rounded">已平倉</span>
+                                                            ) : (
+                                                                <span className="bg-slate-800 text-slate-500 px-2 py-0.5 rounded">規劃中</span>
+                                                            )}
+                                                        </div>
+                                                    </td>
+                                                    <td className="p-3 font-mono-num text-slate-300">{p.entry || '-'}</td>
+                                                    <td className="p-3 font-mono-num text-red-400/80">{p.stopLoss || '-'}</td>
+                                                    <td className="p-3 font-mono-num">
+                                                        {isOpen ? (
+                                                            <div className="relative w-24">
+                                                                <input type="number" step="any" placeholder="輸入現價" value={p.currentPrice || ''} onChange={(e) => updatePlan(log.id, 'currentPrice', e.target.value)} className="w-full bg-slate-900 border border-slate-600 rounded px-2 py-1 text-sm text-yellow-400 italic outline-none focus:border-yellow-500" />
+                                                            </div>
+                                                        ) : (
+                                                            <span className="text-emerald-400">{p.exit || '-'}</span>
+                                                        )}
+                                                    </td>
+                                                    <td className="p-3 font-mono-num text-slate-300">{p.shares || '-'}</td>
+                                                    <td className="p-3 font-mono-num text-purple-400">{calculateRR(p)}</td>
+                                                    <td className="p-3 font-mono-num">
+                                                        {isOpen && p.currentPrice ? (
+                                                            <span className={unrealized >= 0 ? 'text-emerald-400' : 'text-red-400'}>
+                                                                {unrealized > 0 ? '+' : ''}{Math.round(unrealized).toLocaleString()}
+                                                            </span>
+                                                        ) : '-'}
+                                                    </td>
+                                                    <td className="p-3 text-center">
+                                                        <button onClick={() => setEditingId(isEditing ? null : log.id)} className={`px-3 py-1 rounded text-sm transition ${isEditing ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}>
+                                                            {isEditing ? '完成' : '規劃'}
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                
+                                                {/* 編輯面板 Inline Editor */}
+                                                {isEditing && (
+                                                    <tr className="bg-slate-900/80 border-l-4 border-blue-500 animate-fade-in-down shadow-inner">
+                                                        <td colSpan="8" className="p-6">
+                                                            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                                                                <div>
+                                                                    <label className="block text-xs text-slate-500 mb-1">進場價 (Entry)</label>
+                                                                    <input type="number" step="any" value={p.entry || ''} onChange={e => updatePlan(log.id, 'entry', e.target.value)} className="w-full bg-slate-950 border border-slate-700 rounded p-2 text-sm font-mono-num outline-none focus:border-blue-500" />
+                                                                </div>
+                                                                <div>
+                                                                    <label className="block text-xs text-slate-500 mb-1">停損價 (SL) <span className="text-[10px] text-slate-600">自動95折</span></label>
+                                                                    <input type="number" step="any" value={p.stopLoss || ''} onChange={e => updatePlan(log.id, 'stopLoss', e.target.value)} className="w-full bg-slate-950 border border-red-900/50 rounded p-2 text-sm font-mono-num text-red-400 outline-none focus:border-red-500" />
+                                                                </div>
+                                                                <div>
+                                                                    <label className="block text-xs text-slate-500 mb-1">移動停利 (Trailing)</label>
+                                                                    <input type="number" step="any" value={p.trailing || ''} onChange={e => updatePlan(log.id, 'trailing', e.target.value)} className="w-full bg-slate-950 border border-slate-700 rounded p-2 text-sm font-mono-num text-yellow-400 outline-none focus:border-yellow-500" />
+                                                                </div>
+                                                                <div>
+                                                                    <label className="block text-xs text-slate-500 mb-1">出場價 (Exit)</label>
+                                                                    <input type="number" step="any" value={p.exit || ''} onChange={e => updatePlan(log.id, 'exit', e.target.value)} className="w-full bg-slate-950 border border-emerald-900/50 rounded p-2 text-sm font-mono-num text-emerald-400 outline-none focus:border-emerald-500" />
+                                                                </div>
+                                                                <div>
+                                                                    <label className="block text-xs text-slate-500 mb-1">張數</label>
+                                                                    <input type="number" value={p.shares || ''} onChange={e => updatePlan(log.id, 'shares', e.target.value)} className="w-full bg-slate-950 border border-slate-700 rounded p-2 text-sm font-mono-num outline-none focus:border-blue-500" />
+                                                                </div>
+                                                                
+                                                                {/* 權證擴充 */}
+                                                                <div className="col-span-2 md:col-span-5 pt-3 mt-1 border-t border-slate-800/50">
+                                                                    <span className="text-xs font-bold text-slate-500 mb-2 block">權證擴充設定</span>
+                                                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                                                        <input type="text" placeholder="權證代號" value={p.warrantCode || ''} onChange={e => updatePlan(log.id, 'warrantCode', e.target.value)} className="w-full bg-slate-950 border border-slate-700 rounded p-2 text-sm font-mono-num" />
+                                                                        <input type="number" step="any" placeholder="買進價" value={p.warrantEntry || ''} onChange={e => updatePlan(log.id, 'warrantEntry', e.target.value)} className="w-full bg-slate-950 border border-slate-700 rounded p-2 text-sm font-mono-num" />
+                                                                        <input type="number" step="any" placeholder="賣出價" value={p.warrantExit || ''} onChange={e => updatePlan(log.id, 'warrantExit', e.target.value)} className="w-full bg-slate-950 border border-slate-700 rounded p-2 text-sm font-mono-num" />
+                                                                        <input type="number" placeholder="張數" value={p.warrantShares || ''} onChange={e => updatePlan(log.id, 'warrantShares', e.target.value)} className="w-full bg-slate-950 border border-slate-700 rounded p-2 text-sm font-mono-num" />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                )}
+                                            </React.Fragment>
+                                        )
+                                    })}
+                                    {logs.length === 0 && <tr><td colSpan="8" className="p-8 text-center text-slate-500">尚無規劃紀錄</td></tr>}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+
+        // ==========================================
+        // 0. 主應用程式 (App)
+        // ==========================================
+        const App = () => {
+            const [activeTab, setActiveTab] = useState('journal');
+            
+            // 核心持久化狀態
+            const [logs, setLogs] = useLocalStorage('ryan_stock_logs', []);
+            const [calcHistory, setCalcHistory] = useLocalStorage('ryan_calc_history', []);
+            const [epsData, setEpsData] = useLocalStorage('ryan_eps_data', {});
+            const [customStocks, setCustomStocks] = useLocalStorage('ryan_custom_stocks', {});
+
+            // 全域股票字典 (結合靜態與客製)
+            const stockMap = useMemo(() => {
+                return { ...STATIC_STOCK_DB, ...customStocks };
+            }, [customStocks]);
+
+            return (
+                <div className="min-h-screen pb-20">
+                    {/* Header */}
+                    <header className="bg-[#111827] border-b border-slate-800 sticky top-0 z-40 shadow-md">
+                        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
+                                    <TrendingUp size={20} className="text-white" />
+                                </div>
+                                <h1 className="text-2xl font-title tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">
+                                    萊恩交易手札
+                                </h1>
+                            </div>
+                        </div>
+                        {/* Tabs */}
+                        <div className="max-w-7xl mx-auto px-4 flex gap-6 text-sm font-medium">
+                            <button onClick={() => setActiveTab('journal')} className={`py-3 border-b-2 transition ${activeTab === 'journal' ? 'border-blue-500 text-blue-400' : 'border-transparent text-slate-400 hover:text-slate-200'}`}>
+                                模組一：選股日誌
+                            </button>
+                            <button onClick={() => setActiveTab('calculator')} className={`py-3 border-b-2 transition ${activeTab === 'calculator' ? 'border-indigo-500 text-indigo-400' : 'border-transparent text-slate-400 hover:text-slate-200'}`}>
+                                模組二：支撐壓力
+                            </button>
+                            <button onClick={() => setActiveTab('plan')} className={`py-3 border-b-2 transition ${activeTab === 'plan' ? 'border-emerald-500 text-emerald-400' : 'border-transparent text-slate-400 hover:text-slate-200'}`}>
+                                模組三：交易規劃
+                            </button>
+                        </div>
+                    </header>
+
+                    {/* Main Content */}
+                    <main className="max-w-7xl mx-auto px-4 mt-8">
+                        {activeTab === 'journal' && (
+                            <StockJournal logs={logs} setLogs={setLogs} epsData={epsData} setEpsData={setEpsData} customStocks={customStocks} setCustomStocks={setCustomStocks} stockMap={stockMap} />
+                        )}
+                        {activeTab === 'calculator' && (
+                            <CalculatorModule calcHistory={calcHistory} setCalcHistory={setCalcHistory} stockMap={stockMap} />
+                        )}
+                        {activeTab === 'plan' && (
+                            <PlanDashboard logs={logs} setLogs={setLogs} />
+                        )}
+                    </main>
+                </div>
+            );
+        };
+
+        const root = createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
