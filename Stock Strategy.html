@@ -152,6 +152,23 @@
         }
 
         const ConfirmModal = ({ isOpen, title, message, onConfirm, onCancel }) => {
+            useEffect(() => {
+                if (!isOpen) return;
+                
+                const handleKeyDown = (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        onConfirm();
+                    } else if (e.key === 'Escape') {
+                        e.preventDefault();
+                        onCancel();
+                    }
+                };
+                
+                window.addEventListener('keydown', handleKeyDown);
+                return () => window.removeEventListener('keydown', handleKeyDown);
+            }, [isOpen, onConfirm, onCancel]);
+
             if (!isOpen) return null;
             return (
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in-down">
@@ -162,8 +179,8 @@
                         </div>
                         <p className="text-slate-300 mb-6">{message}</p>
                         <div className="flex justify-end gap-3">
-                            <button onClick={onCancel} className="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition">取消</button>
-                            <button onClick={onConfirm} className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-500 transition text-white">確認執行</button>
+                            <button onClick={onCancel} className="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition">取消 (ESC)</button>
+                            <button onClick={onConfirm} className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-500 transition text-white">確認執行 (Enter)</button>
                         </div>
                     </div>
                 </div>
@@ -171,13 +188,27 @@
         };
 
         const AlertModal = ({ isOpen, message, onClose }) => {
+            useEffect(() => {
+                if (!isOpen) return;
+                
+                const handleKeyDown = (e) => {
+                    if (e.key === 'Enter' || e.key === 'Escape') {
+                        e.preventDefault();
+                        onClose();
+                    }
+                };
+                
+                window.addEventListener('keydown', handleKeyDown);
+                return () => window.removeEventListener('keydown', handleKeyDown);
+            }, [isOpen, onClose]);
+
             if (!isOpen) return null;
             return (
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-bounce-in">
                     <div className="bg-slate-900 border border-slate-700 p-6 rounded-xl w-80 shadow-2xl text-center">
                         <CheckCircle size={48} className="mx-auto text-green-500 mb-4" />
                         <p className="text-slate-200 mb-6 text-lg">{message}</p>
-                        <button onClick={onClose} className="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 transition w-full text-white">了解</button>
+                        <button onClick={onClose} className="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 transition w-full text-white">了解 (Enter)</button>
                     </div>
                 </div>
             );
