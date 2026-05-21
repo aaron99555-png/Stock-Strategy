@@ -98,15 +98,8 @@
         // ==========================================
         // 1. 靜態資料庫 (STATIC_STOCK_DB) Mock Data
         // ==========================================
-        const STATIC_STOCK_DB = {
-            "2330": { name: "台積電", industry: "半導體" },
-            "2317": { name: "鴻海", industry: "電子" },
-            "2454": { name: "聯發科", industry: "半導體" },
-            "2303": { name: "聯電", industry: "半導體" },
-            "2603": { name: "長榮", industry: "航運" },
-            "3481": { name: "群創", industry: "光電" },
-            "3231": { name: "緯創", industry: "電腦及週邊" },
-        };
+        // 取消預設股票資料，完全依賴使用者匯入或自行新增
+        const STATIC_STOCK_DB = {};
 
         // ==========================================
         // 2. 共用元件 (Hooks & Modals)
@@ -283,13 +276,27 @@
         const StockJournal = ({ logs, setLogs, customStocks, setCustomStocks, epsData, setEpsData, stockMap }) => {
             const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
             const [copyDate, setCopyDate] = useState(new Date().toISOString().split('T')[0]);
-            const [copySubTag, setCopySubTag] = useState('all');
+            const [copySubTags, setCopySubTags] = useState([]); // 改為陣列，支援多選
+            const [isCopyDropdownOpen, setIsCopyDropdownOpen] = useState(false);
+            const copyDropdownRef = useRef(null);
+            
             const [stockId, setStockId] = useState('');
             const [stockName, setStockName] = useState('');
             const [selectedStrategy, setSelectedStrategy] = useState('');
             const [selectedSubTags, setSelectedSubTags] = useState([]);
             const [alert, setAlert] = useState({ show: false, msg: '' });
             const [confirm, setConfirm] = useState({ show: false, action: null });
+
+            // 處理點擊外部關閉多選下拉選單
+            useEffect(() => {
+                const handleClickOutside = (event) => {
+                    if (copyDropdownRef.current && !copyDropdownRef.current.contains(event.target)) {
+                        setIsCopyDropdownOpen(false);
+                    }
+                };
+                document.addEventListener("mousedown", handleClickOutside);
+                return () => document.removeEventListener("mousedown", handleClickOutside);
+            }, []);
 
             const handleStockIdChange = (e) => {
                 const val = e.target.value.trim();
@@ -427,25 +434,25 @@
                 const timeString = now.toLocaleTimeString('zh-TW', { hour12: false });
                 resultText += `產出時間：${copyDate} ${timeString}\n`;
                 
-                if (copySubTag !== 'all') {
-                    resultText += `🎯 指定篩選：${copySubTag}\n`;
+                if (copySubTags.length > 0) {
+                    resultText += `🎯 指定篩選：${copySubTags.join(', ')}\n`;
                 }
                 resultText += `\n`;
                 
                 // 1. 先篩選出指定日期的所有紀錄
                 let dayLogs = logs.filter(l => l.date === copyDate);
                 
-                // 2. 套用子標籤過濾 (如果有選擇)
-                if (copySubTag !== 'all') {
-                    dayLogs = dayLogs.filter(l => l.subTags && l.subTags.includes(copySubTag));
+                // 2. 套用多選子標籤過濾 (若有選擇的話)
+                if (copySubTags.length > 0) {
+                    dayLogs = dayLogs.filter(l => l.subTags && l.subTags.some(t => copySubTags.includes(t)));
                 }
 
                 if (dayLogs.length === 0) {
-                    setAlert({ show: true, msg: `找不到 ${copyDate} ${copySubTag !== 'all' ? '且包含 ['+copySubTag+'] ' : ''}的選股紀錄！` });
+                    setAlert({ show: true, msg: `找不到 ${copyDate} ${copySubTags.length > 0 ? '符合所選標籤' : ''}的選股紀錄！` });
                     return;
                 }
 
-                // 3. 依據子標籤進行資料分群 (若一檔股票有多個子標籤，會分別歸類到對應的標籤下)
+                // 3. 依據子標籤進行資料分群
                 const groupMap = {};
                 const noSubTagLogs = [];
 
@@ -454,7 +461,7 @@
                         noSubTagLogs.push(log);
                     } else {
                         log.subTags.forEach(tag => {
-                            if (copySubTag === 'all' || tag === copySubTag) {
+                            if (copySubTags.length === 0 || copySubTags.includes(tag)) {
                                 if (!groupMap[tag]) groupMap[tag] = [];
                                 groupMap[tag].push(log);
                             }
@@ -490,7 +497,7 @@
                 });
 
                 // 處理完全沒有選擇進階標籤的紀錄
-                if (noSubTagLogs.length > 0 && copySubTag === 'all') {
+                if (noSubTagLogs.length > 0 && copySubTags.length === 0) {
                     hasData = true;
                     noSubTagLogs.sort((a, b) => parseInt(a.id) - parseInt(b.id));
                     summaryText += `- 未分類/無進階標籤: ${noSubTagLogs.length} 檔\n`;
@@ -613,24 +620,66 @@
                                     匯入 EPS (Excel/CSV)
                                     <input type="file" accept=".csv, .xlsx, .xls" onChange={handleEpsImport} className="hidden" />
                                 </label>
-                                <div className="flex items-center gap-2 bg-slate-800 rounded-lg p-1 pr-2">
+                                <div className="flex items-center gap-2 bg-slate-800 rounded-lg p-1 pr-2 relative" ref={copyDropdownRef}>
                                     <input 
                                         type="date" 
                                         value={copyDate} 
                                         onChange={e => setCopyDate(e.target.value)} 
                                         className="bg-slate-900 border border-slate-700 rounded-md px-2 py-1 text-sm font-mono-num text-slate-300 outline-none"
                                     />
-                                    <select 
-                                        value={copySubTag}
-                                        onChange={e => setCopySubTag(e.target.value)}
-                                        className="bg-slate-900 border border-slate-700 rounded-md px-2 py-1 text-sm text-slate-300 outline-none max-w-[120px]"
+                                    
+                                    {/* 多重篩選按鈕 */}
+                                    <button 
+                                        onClick={() => setIsCopyDropdownOpen(!isCopyDropdownOpen)}
+                                        className={`bg-slate-900 border border-slate-700 rounded-md px-3 py-1 text-sm outline-none flex items-center gap-1 transition-colors ${copySubTags.length > 0 ? 'text-blue-400 border-blue-500/50' : 'text-slate-300'}`}
                                     >
-                                        <option value="all">全部標籤</option>
-                                        {Object.values(SUB_TAGS).flat().map(tag => (
-                                            <option key={tag} value={tag}>{tag}</option>
-                                        ))}
-                                    </select>
-                                    <button onClick={copyLogs} className="text-sm text-slate-200 hover:text-white flex items-center gap-1 transition ml-1">
+                                        {copySubTags.length === 0 ? '全部標籤' : `已選 ${copySubTags.length} 項`}
+                                        <span className="text-[10px] ml-1">▼</span>
+                                    </button>
+
+                                    {/* 多重篩選下拉面板 */}
+                                    {isCopyDropdownOpen && (
+                                        <div className="absolute bottom-full mb-2 left-0 w-80 bg-slate-800 border border-slate-600 rounded-lg shadow-2xl p-4 z-50 flex flex-col gap-3 max-h-[400px] overflow-y-auto animate-fade-in-up">
+                                            <div className="flex justify-between items-center border-b border-slate-700 pb-2">
+                                                <span className="text-sm font-bold text-slate-200">選擇匯出標籤 (可多選)</span>
+                                                <button onClick={() => setCopySubTags([])} className="text-xs text-blue-400 hover:text-blue-300 bg-blue-500/10 px-2 py-1 rounded">清空選取 (匯出全部)</button>
+                                            </div>
+                                            {STRATEGIES.map(strat => {
+                                                const tags = SUB_TAGS[strat.id] || [];
+                                                if(tags.length === 0) return null;
+                                                return (
+                                                    <div key={strat.id} className="mb-1">
+                                                        <div className="text-xs font-bold text-slate-400 mb-2 flex items-center gap-1">
+                                                            <strat.icon size={12} /> {strat.label}
+                                                        </div>
+                                                        <div className="flex flex-wrap gap-1.5">
+                                                            {tags.map(tag => (
+                                                                <button
+                                                                    key={tag}
+                                                                    onClick={() => {
+                                                                        if (copySubTags.includes(tag)) {
+                                                                            setCopySubTags(copySubTags.filter(t => t !== tag));
+                                                                        } else {
+                                                                            setCopySubTags([...copySubTags, tag]);
+                                                                        }
+                                                                    }}
+                                                                    className={`px-2 py-1 rounded text-xs transition-all border ${
+                                                                        copySubTags.includes(tag) 
+                                                                            ? `bg-gradient-to-r ${SUB_TAG_COLORS[tag] || 'from-blue-600 to-indigo-600'} text-white border-transparent` 
+                                                                            : 'bg-slate-900 border-slate-700 text-slate-400 hover:border-slate-500 hover:text-slate-200'
+                                                                    }`}
+                                                                >
+                                                                    {tag}
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
+
+                                    <button onClick={copyLogs} className="text-sm text-slate-200 hover:text-white flex items-center gap-1 transition ml-2 bg-blue-600 hover:bg-blue-500 px-3 py-1 rounded-md shadow-lg">
                                         <ClipboardCopy size={16} /> 複製清單
                                     </button>
                                 </div>
