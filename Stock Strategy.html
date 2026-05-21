@@ -355,7 +355,7 @@
                 setLogs([...logs, newLog]);
                 setStockId('');
                 setStockName('');
-                // 移除 setSelectedSubTags([])，讓子標籤維持使用者原本的選項
+                // 特別保留 selectedSubTags 不清空，讓使用者可以快速連續輸入相同策略的股票
             };
 
             const toggleSubTag = (tag) => {
@@ -422,46 +422,95 @@
             };
 
             const copyLogs = () => {
-                let resultText = `【萊恩交易手札 - ${copyDate} 選股紀錄】\n`;
+                let resultText = `| ${copyDate} 多層篩選漏斗 |\n`;
+                const now = new Date();
+                const timeString = now.toLocaleTimeString('zh-TW', { hour12: false });
+                resultText += `產出時間：${copyDate} ${timeString}\n`;
+                
                 if (copySubTag !== 'all') {
-                    resultText += `🎯 篩選條件：${copySubTag}\n`;
+                    resultText += `🎯 指定篩選：${copySubTag}\n`;
                 }
                 resultText += `\n`;
                 
-                let hasData = false;
+                // 1. 先篩選出指定日期的所有紀錄
+                let dayLogs = logs.filter(l => l.date === copyDate);
                 
-                STRATEGIES.forEach(strat => {
-                    let stratLogs = logs.filter(l => l.strategy === strat.id && l.date === copyDate);
-                    
-                    // 套用子標籤過濾
-                    if (copySubTag !== 'all') {
-                        stratLogs = stratLogs.filter(l => l.subTags && l.subTags.includes(copySubTag));
-                    }
+                // 2. 套用子標籤過濾 (如果有選擇)
+                if (copySubTag !== 'all') {
+                    dayLogs = dayLogs.filter(l => l.subTags && l.subTags.includes(copySubTag));
+                }
 
-                    if (stratLogs.length === 0) return;
-                    hasData = true;
-                    
-                    // 排序邏輯
-                    if (strat.id === 'trend' || strat.id === 'emerging') {
-                        stratLogs.sort((a, b) => parseInt(a.id) - parseInt(b.id)); // 時間順序
-                    } else {
-                        stratLogs.sort((a, b) => a.stockId.localeCompare(b.stockId)); // 股號大小
-                    }
-
-                    resultText += `${strat.emoji} [${strat.label}]\n`;
-                    stratLogs.forEach(l => {
-                        const epsInfo = epsData[l.stockId] ? ` (25'EPS: ${epsData[l.stockId].eps25})` : '';
-                        const subTagsInfo = l.subTags && l.subTags.length > 0 ? ` [${l.subTags.join(', ')}]` : '';
-                        resultText += `  - ${l.stockId} ${l.name}${epsInfo}${subTagsInfo}\n`;
-                    });
-                    resultText += `\n`;
-                });
-                
-                if (!hasData) {
+                if (dayLogs.length === 0) {
                     setAlert({ show: true, msg: `找不到 ${copyDate} ${copySubTag !== 'all' ? '且包含 ['+copySubTag+'] ' : ''}的選股紀錄！` });
                     return;
                 }
-                
+
+                // 3. 依據子標籤進行資料分群 (若一檔股票有多個子標籤，會分別歸類到對應的標籤下)
+                const groupMap = {};
+                const noSubTagLogs = [];
+
+                dayLogs.forEach(log => {
+                    if (!log.subTags || log.subTags.length === 0) {
+                        noSubTagLogs.push(log);
+                    } else {
+                        log.subTags.forEach(tag => {
+                            if (copySubTag === 'all' || tag === copySubTag) {
+                                if (!groupMap[tag]) groupMap[tag] = [];
+                                groupMap[tag].push(log);
+                            }
+                        });
+                    }
+                });
+
+                let summaryText = `【各條件檔數統計】\n`;
+                let detailText = ``;
+                let hasData = false;
+
+                // 4. 依照 STRATEGIES 的順序來列印出有資料的子標籤群組
+                STRATEGIES.forEach(strat => {
+                    const tags = SUB_TAGS[strat.id] || [];
+                    tags.forEach(tag => {
+                        if (groupMap[tag] && groupMap[tag].length > 0) {
+                            hasData = true;
+                            let tagLogs = groupMap[tag];
+                            
+                            // 排序邏輯：統一按照「輸入時間順序由先到後」 (id 即為時間戳字串)
+                            tagLogs.sort((a, b) => parseInt(a.id) - parseInt(b.id));
+
+                            summaryText += `- ${tag}: ${tagLogs.length} 檔\n`;
+
+                            detailText += `🎯 [${tag}] (共 ${tagLogs.length} 檔)\n`;
+                            tagLogs.forEach(l => {
+                                const epsInfo = epsData[l.stockId] ? ` (25'EPS: ${epsData[l.stockId].eps25})` : '';
+                                detailText += `  - ${l.stockId} ${l.name}${epsInfo}\n`;
+                            });
+                            detailText += `\n`;
+                        }
+                    });
+                });
+
+                // 處理完全沒有選擇進階標籤的紀錄
+                if (noSubTagLogs.length > 0 && copySubTag === 'all') {
+                    hasData = true;
+                    noSubTagLogs.sort((a, b) => parseInt(a.id) - parseInt(b.id));
+                    summaryText += `- 未分類/無進階標籤: ${noSubTagLogs.length} 檔\n`;
+                    
+                    detailText += `🎯 [無進階標籤] (共 ${noSubTagLogs.length} 檔)\n`;
+                    noSubTagLogs.forEach(l => {
+                        const strat = STRATEGIES.find(s => s.id === l.strategy);
+                        const epsInfo = epsData[l.stockId] ? ` (25'EPS: ${epsData[l.stockId].eps25})` : '';
+                        detailText += `  - ${l.stockId} ${l.name}${epsInfo} (${strat?.label || ''})\n`;
+                    });
+                    detailText += `\n`;
+                }
+
+                if (!hasData) {
+                    setAlert({ show: true, msg: `找不到相關選股紀錄！` });
+                    return;
+                }
+
+                // 合併最終輸出文字
+                resultText += summaryText + `\n` + detailText;
                 resultText += `-------------------\n⚠️ 免責聲明：本資訊僅供個人交易紀錄參考，非任何買賣建議，投資有賺有賠，請盈虧自負。`;
                 
                 fallbackCopyTextToClipboard(resultText);
@@ -532,7 +581,12 @@
                             {/* 子標籤選擇區 (當選擇趨勢與型態或籌碼與法人時顯示) */}
                             {selectedStrategy && SUB_TAGS[selectedStrategy] && (
                                 <div className="mt-4 p-4 bg-slate-800/30 rounded-xl border border-slate-700/50 animate-fade-in-down">
-                                    <label className="block text-sm text-slate-400 mb-3">進階子標籤 (可多選)</label>
+                                    <div className="flex justify-between items-center mb-3">
+                                        <label className="block text-sm text-slate-400">進階子標籤 (可多選)</label>
+                                        {selectedSubTags.length > 0 && (
+                                            <button onClick={() => setSelectedSubTags([])} className="text-xs text-slate-500 hover:text-slate-300 transition px-2 py-1 rounded hover:bg-slate-700">🧹 清空已選標籤</button>
+                                        )}
+                                    </div>
                                     <div className="flex flex-wrap gap-2">
                                         {SUB_TAGS[selectedStrategy].map(tag => (
                                             <button
@@ -941,6 +995,7 @@
         const PlanDashboard = ({ logs, setLogs, stockMap, setCustomStocks }) => {
             const [filterDate, setFilterDate] = useState('all');
             const [editingId, setEditingId] = useState(null);
+            const [confirm, setConfirm] = useState({ show: false, action: null });
             
             // 獨立新增規劃狀態
             const [planDate, setPlanDate] = useState(new Date().toISOString().split('T')[0]);
@@ -1058,7 +1113,7 @@
                     winRate: closedTrades > 0 ? ((winCount / closedTrades) * 100).toFixed(1) : 0,
                     totalProfit: Math.round(totalProfit)
                 };
-            }, [logs, filterDate]);
+            }, [plannedLogs, filterDate]);
 
             const updatePlan = (id, field, value) => {
                 setLogs(logs.map(log => {
@@ -1144,7 +1199,7 @@
                                         <th className="p-3">張數</th>
                                         <th className="p-3">風報比</th>
                                         <th className="p-3">未平倉損益(預估)</th>
-                                        <th className="p-3 text-center">編輯</th>
+                                        <th className="p-3 text-center">操作</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-800/50">
@@ -1197,9 +1252,17 @@
                                                         ) : '-'}
                                                     </td>
                                                     <td className="p-3 text-center">
-                                                        <button onClick={() => setEditingId(isEditing ? null : log.id)} className={`px-3 py-1 rounded text-sm transition ${isEditing ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}>
-                                                            {isEditing ? '完成' : '規劃'}
-                                                        </button>
+                                                        <div className="flex justify-center items-center gap-2">
+                                                            <button onClick={() => setEditingId(isEditing ? null : log.id)} className={`px-3 py-1 rounded text-sm transition ${isEditing ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}>
+                                                                {isEditing ? '完成' : '規劃'}
+                                                            </button>
+                                                            <button onClick={() => setConfirm({ 
+                                                                show: true, 
+                                                                action: () => setLogs(logs.map(l => l.id === log.id ? { ...l, inPlan: false, plan: { ...l.plan, entry: '', stopLoss: '', exit: '' } } : l)) 
+                                                            })} className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-500/20 rounded transition" title="移出規劃清單">
+                                                                <X size={18} />
+                                                            </button>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                                 
@@ -1251,7 +1314,11 @@
                             </table>
                         </div>
                     </div>
+                    
                     <AlertModal isOpen={alert.show} message={alert.msg} onClose={() => setAlert({ show: false, msg: '' })} />
+                    <ConfirmModal isOpen={confirm.show} title="確認移出" message="確定要將此標的移出規劃清單嗎？（選股日誌中的原紀錄不會被刪除）" 
+                        onConfirm={() => { confirm.action(); setConfirm({ show: false, action: null }); }} 
+                        onCancel={() => setConfirm({ show: false, action: null })} />
                 </div>
             );
         };
