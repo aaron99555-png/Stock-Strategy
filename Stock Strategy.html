@@ -473,7 +473,8 @@
                             if (epsGrowth !== undefined && epsGrowth !== null && String(epsGrowth).trim().toUpperCase() !== 'NAN') {
                                 const numGrowth = parseFloat(epsGrowth);
                                 if (!isNaN(numGrowth)) {
-                                    formattedGrowth = numGrowth.toFixed(1) + '%';
+                                    // 最多保留兩位小數，自動去除多餘的 .0，還原 Excel 上的乾淨 % 數
+                                    formattedGrowth = Number(numGrowth.toFixed(2)) + '%';
                                 } else {
                                     formattedGrowth = epsGrowth; // 若為字串(如: 轉虧為盈)則保留原字串
                                 }
@@ -805,9 +806,17 @@
                                         const eps = epsData[log.stockId] || { eps25: '-', eps26: '-', epsGrowth: '-' };
                                         const strat = STRATEGIES.find(s => s.id === log.strategy);
                                         
+                                        // 判斷 26' EPS(預) 是否為正數以進行反黃凸顯，或是負數以改變成長率顏色
+                                        const eps26Num = parseFloat(eps.eps26);
+                                        const isEps26Positive = !isNaN(eps26Num) && eps26Num > 0;
+                                        const isEps26Negative = !isNaN(eps26Num) && eps26Num < 0;
+
                                         // 判斷成長率顏色
                                         let growthColorClass = 'text-slate-400';
-                                        if (eps.epsGrowth && eps.epsGrowth !== '-') {
+                                        if (isEps26Negative) {
+                                            // 如果 26' EPS(預) 是負的，成長率強制顯示為綠色
+                                            growthColorClass = 'text-emerald-400';
+                                        } else if (eps.epsGrowth && eps.epsGrowth !== '-') {
                                             const val = parseFloat(eps.epsGrowth);
                                             if (!isNaN(val)) {
                                                 growthColorClass = val > 0 ? 'text-red-400' : val < 0 ? 'text-emerald-400' : 'text-slate-300';
@@ -817,16 +826,16 @@
                                         }
 
                                         return (
-                                            <tr key={log.id} className="hover:bg-slate-800/20 transition group">
+                                            <tr key={log.id} className={`transition group ${isEps26Positive ? 'bg-yellow-500/10 hover:bg-yellow-500/20 border-l-2 border-yellow-500' : 'hover:bg-slate-800/20'}`}>
                                                 <td className="p-4 font-mono-num text-slate-300">{log.date}</td>
                                                 <td className="p-4">
                                                     <div className="flex items-center gap-2">
-                                                        <span className="font-mono-num text-blue-400 font-bold">{log.stockId}</span>
-                                                        <span className="text-slate-200">{log.name}</span>
+                                                        <span className={`font-mono-num font-bold ${isEps26Positive ? 'text-yellow-400' : 'text-blue-400'}`}>{log.stockId}</span>
+                                                        <span className={isEps26Positive ? 'text-yellow-100 font-bold' : 'text-slate-200'}>{log.name}</span>
                                                     </div>
                                                 </td>
                                                 <td className="p-4 font-mono-num text-emerald-400">{eps.eps25}</td>
-                                                <td className="p-4 font-mono-num text-emerald-500/70">{eps.eps26}</td>
+                                                <td className={`p-4 font-mono-num ${isEps26Positive ? 'text-yellow-400 font-bold drop-shadow-[0_0_5px_rgba(250,204,21,0.4)]' : 'text-emerald-500/70'}`}>{eps.eps26}</td>
                                                 <td className={`p-4 font-mono-num font-bold ${growthColorClass}`}>{eps.epsGrowth || '-'}</td>
                                                 <td className="p-4">
                                                     <div className="flex flex-wrap gap-1.5 items-center">
