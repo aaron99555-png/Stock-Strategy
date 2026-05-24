@@ -92,7 +92,8 @@
         import { 
             TrendingUp, BarChart2, Zap, AlertCircle, Save, Trash2, 
             Download, Upload, Eye, FileText, CheckCircle, Calculator,
-            ClipboardCopy, Search, PlusCircle, LayoutDashboard, Star, X, Target
+            ClipboardCopy, Search, PlusCircle, LayoutDashboard, Star, X, Target,
+            ArrowUp, ArrowDown, ArrowUpDown
         } from 'lucide-react';
 
         // ==========================================
@@ -224,6 +225,12 @@
             );
         };
 
+        // 共用排序圖示元件
+        const SortIcon = ({ sortKey, currentSort }) => {
+            if (currentSort.key !== sortKey) return <ArrowUpDown size={14} className="text-slate-600 opacity-50" />;
+            return currentSort.direction === 'asc' ? <ArrowUp size={14} className="text-blue-400" /> : <ArrowDown size={14} className="text-blue-400" />;
+        };
+
         // ==========================================
         // 3. 模組一：選股日誌與 EPS (Stock Journal)
         // ==========================================
@@ -287,6 +294,85 @@
             const [alert, setAlert] = useState({ show: false, msg: '' });
             const [confirm, setConfirm] = useState({ show: false, action: null });
             const [copySuccess, setCopySuccess] = useState(null); // 新增複製狀態
+
+            // 表格直覺篩選狀態
+            const [journalFilters, setJournalFilters] = useState({ date: '', stock: '', growth: 'all', tag: '' });
+            // 新增排序狀態
+            const [journalSort, setJournalSort] = useState({ key: 'id', direction: 'desc' });
+
+            const handleJournalSort = (key) => {
+                if (journalSort.key === key) {
+                    setJournalSort({ key, direction: journalSort.direction === 'asc' ? 'desc' : 'asc' });
+                } else {
+                    setJournalSort({ key, direction: 'desc' }); // 預設新排序都先走由大到小
+                }
+            };
+
+            // 根據篩選條件過濾與排序日誌
+            const filteredJournalLogs = useMemo(() => {
+                let result = logs.slice(); // 移除原本的 .reverse()，改由下方排序接手
+                
+                // 1. 篩選邏輯
+                if (journalFilters.date) result = result.filter(l => l.date === journalFilters.date);
+                if (journalFilters.stock) {
+                    const kw = journalFilters.stock.toLowerCase();
+                    result = result.filter(l => l.stockId.toLowerCase().includes(kw) || l.name.toLowerCase().includes(kw));
+                }
+                if (journalFilters.growth !== 'all') {
+                    result = result.filter(l => {
+                        const eps = epsData[l.stockId] || {};
+                        const g = parseFloat(eps.epsGrowth);
+                        if (journalFilters.growth === 'positive') return !isNaN(g) && g > 0;
+                        if (journalFilters.growth === 'negative') return !isNaN(g) && g < 0;
+                        return true;
+                    });
+                }
+                if (journalFilters.tag) {
+                    result = result.filter(l => {
+                        const strats = Array.isArray(l.strategy) ? l.strategy : (l.strategy ? [l.strategy] : []);
+                        const matchMain = strats.some(sId => {
+                            const s = STRATEGIES.find(x => x.id === sId);
+                            return s && s.label === journalFilters.tag;
+                        });
+                        const matchSub = l.subTags && l.subTags.includes(journalFilters.tag);
+                        return matchMain || matchSub;
+                    });
+                }
+
+                // 2. 排序邏輯
+                result.sort((a, b) => {
+                    let valA, valB;
+                    const epsA = epsData[a.stockId] || {};
+                    const epsB = epsData[b.stockId] || {};
+
+                    switch (journalSort.key) {
+                        case 'date':
+                            valA = a.date; valB = b.date;
+                            if (valA === valB) { valA = parseInt(a.id); valB = parseInt(b.id); } // 日期相同則依輸入順序
+                            break;
+                        case 'stock':
+                            valA = a.stockId; valB = b.stockId; break;
+                        case 'eps25':
+                            valA = parseFloat(epsA.eps25) || -999999; valB = parseFloat(epsB.eps25) || -999999; break;
+                        case 'eps26':
+                            valA = parseFloat(epsA.eps26) || -999999; valB = parseFloat(epsB.eps26) || -999999; break;
+                        case 'growth':
+                            valA = parseFloat(epsA.epsGrowth) || -999999; valB = parseFloat(epsB.epsGrowth) || -999999; break;
+                        case 'tags':
+                            valA = (a.subTags?.length || 0) + (Array.isArray(a.strategy) ? a.strategy.length : (a.strategy ? 1 : 0));
+                            valB = (b.subTags?.length || 0) + (Array.isArray(b.strategy) ? b.strategy.length : (b.strategy ? 1 : 0));
+                            break;
+                        default: // 'id'
+                            valA = parseInt(a.id); valB = parseInt(b.id); break;
+                    }
+
+                    if (valA < valB) return journalSort.direction === 'asc' ? -1 : 1;
+                    if (valA > valB) return journalSort.direction === 'asc' ? 1 : -1;
+                    return 0;
+                });
+
+                return result;
+            }, [logs, journalFilters, epsData, journalSort]);
 
             // 處理點擊外部關閉多選下拉選單
             useEffect(() => {
@@ -605,6 +691,32 @@
                         tagLogs.forEach(l => detailText += `  - ${l.stockId} ${l.name}\n`);
                         detailText += `\n`;
                     }
+                } else if (formatType === 'score') {
+                    // 格式三：依照策略標籤數量做為分數，由高到低排序
+                    const scoredLogs = dayLogs.map(l => {
+                        let tags = [];
+                        if (l.subTags && l.subTags.length > 0) {
+                            tags.push(...l.subTags);
+                        }
+                        const strategiesArray = Array.isArray(l.strategy) ? l.strategy : (l.strategy ? [l.strategy] : []);
+                        strategiesArray.forEach(sId => {
+                            const s = STRATEGIES.find(str => str.id === sId);
+                            if (s) {
+                                const hasSubTag = l.subTags?.some(tag => SUB_TAGS[sId]?.includes(tag));
+                                if (!hasSubTag) tags.push(s.label);
+                            }
+                        });
+                        return { ...l, computedTags: tags, score: tags.length };
+                    });
+
+                    // 排序：分數高的在前；若分數相同，則依輸入時間(id)排序
+                    scoredLogs.sort((a, b) => b.score - a.score || parseInt(a.id) - parseInt(b.id));
+
+                    scoredLogs.forEach(l => {
+                        const countStr = l.score > 0 ? ` (${l.score}分)` : '';
+                        const tagStr = l.computedTags.length > 0 ? ` (${l.computedTags.join('、')})` : '';
+                        detailText += `- ${l.stockId} ${l.name}${countStr}${tagStr}\n`;
+                    });
                 }
 
                 resultText += detailText;
@@ -777,6 +889,9 @@
                                         <button onClick={() => copyLogs('strategy')} className={`text-sm text-white flex items-center gap-1 transition px-3 py-1.5 rounded-md shadow-lg ${copySuccess === 'strategy' ? 'bg-green-600' : 'bg-indigo-600 hover:bg-indigo-500'}`} title="依策略標籤群組">
                                             {copySuccess === 'strategy' ? <CheckCircle size={16} /> : <ClipboardCopy size={16} />} {copySuccess === 'strategy' ? '已複製' : '依策略'}
                                         </button>
+                                        <button onClick={() => copyLogs('score')} className={`text-sm text-white flex items-center gap-1 transition px-3 py-1.5 rounded-md shadow-lg ${copySuccess === 'score' ? 'bg-green-600' : 'bg-rose-600 hover:bg-rose-500'}`} title="依標籤數量高低排序">
+                                            {copySuccess === 'score' ? <CheckCircle size={16} /> : <Star size={16} />} {copySuccess === 'score' ? '已複製' : '依分數'}
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -792,17 +907,50 @@
                             <table className="w-full text-left border-collapse">
                                 <thead>
                                     <tr className="bg-slate-800/50 text-slate-400 text-sm uppercase tracking-wider">
-                                        <th className="p-4 font-medium">日期</th>
-                                        <th className="p-4 font-medium">代號 / 名稱</th>
-                                        <th className="p-4 font-medium font-mono-num">25' EPS</th>
-                                        <th className="p-4 font-medium font-mono-num">26' EPS(預)</th>
-                                        <th className="p-4 font-medium font-mono-num whitespace-nowrap">EPS 成長率</th>
-                                        <th className="p-4 font-medium">策略標籤</th>
-                                        <th className="p-4 font-medium text-center">操作</th>
+                                        <th className="p-3 font-medium align-top min-w-[120px]">
+                                            <div className="mb-2 flex items-center gap-1 cursor-pointer hover:text-blue-400 select-none" onClick={() => handleJournalSort('date')}>日期 <SortIcon sortKey="date" currentSort={journalSort} /></div>
+                                            <input type="date" value={journalFilters.date} onChange={e => setJournalFilters({...journalFilters, date: e.target.value})} className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-xs font-mono-num outline-none focus:border-blue-500" />
+                                        </th>
+                                        <th className="p-3 font-medium align-top min-w-[140px]">
+                                            <div className="mb-2 flex items-center gap-1 cursor-pointer hover:text-blue-400 select-none" onClick={() => handleJournalSort('stock')}>代號 / 名稱 <SortIcon sortKey="stock" currentSort={journalSort} /></div>
+                                            <input type="text" placeholder="搜尋..." value={journalFilters.stock} onChange={e => setJournalFilters({...journalFilters, stock: e.target.value})} className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-xs outline-none focus:border-blue-500" />
+                                        </th>
+                                        <th className="p-3 font-medium font-mono-num align-top">
+                                            <div className="mb-2 flex items-center gap-1 cursor-pointer hover:text-blue-400 select-none" onClick={() => handleJournalSort('eps25')}>25' EPS <SortIcon sortKey="eps25" currentSort={journalSort} /></div>
+                                        </th>
+                                        <th className="p-3 font-medium font-mono-num align-top">
+                                            <div className="mb-2 flex items-center gap-1 cursor-pointer hover:text-blue-400 select-none" onClick={() => handleJournalSort('eps26')}>26' EPS(預) <SortIcon sortKey="eps26" currentSort={journalSort} /></div>
+                                        </th>
+                                        <th className="p-3 font-medium font-mono-num align-top whitespace-nowrap">
+                                            <div className="mb-2 flex items-center gap-1 cursor-pointer hover:text-blue-400 select-none" onClick={() => handleJournalSort('growth')}>EPS 成長率 <SortIcon sortKey="growth" currentSort={journalSort} /></div>
+                                            <select value={journalFilters.growth} onChange={e => setJournalFilters({...journalFilters, growth: e.target.value})} className="w-full bg-slate-900 border border-slate-700 rounded px-1 py-1 text-xs outline-none focus:border-blue-500">
+                                                <option value="all">全部</option>
+                                                <option value="positive">&gt; 0% (正成長)</option>
+                                                <option value="negative">&lt; 0% (衰退)</option>
+                                            </select>
+                                        </th>
+                                        <th className="p-3 font-medium align-top min-w-[160px]">
+                                            <div className="mb-2 flex items-center gap-1 cursor-pointer hover:text-blue-400 select-none" onClick={() => handleJournalSort('tags')}>策略標籤 <SortIcon sortKey="tags" currentSort={journalSort} /></div>
+                                            <select value={journalFilters.tag} onChange={e => setJournalFilters({...journalFilters, tag: e.target.value})} className="w-full bg-slate-900 border border-slate-700 rounded px-1 py-1 text-xs outline-none focus:border-blue-500">
+                                                <option value="">全部標籤</option>
+                                                {STRATEGIES.map(s => (
+                                                    <optgroup key={s.id} label={s.label}>
+                                                        <option value={s.label}>{s.label} (主策略)</option>
+                                                        {(SUB_TAGS[s.id] || []).map(t => (
+                                                            <option key={t} value={t}>{t}</option>
+                                                        ))}
+                                                    </optgroup>
+                                                ))}
+                                            </select>
+                                        </th>
+                                        <th className="p-3 font-medium text-center align-top">
+                                            <div className="mb-2">操作</div>
+                                            <button onClick={() => { setJournalFilters({date: '', stock: '', growth: 'all', tag: ''}); setJournalSort({key: 'id', direction: 'desc'}); }} className="text-xs text-slate-500 hover:text-slate-300 underline transition">還原預設</button>
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-800/50">
-                                    {logs.slice().reverse().map(log => {
+                                    {filteredJournalLogs.map(log => {
                                         const eps = epsData[log.stockId] || { eps25: '-', eps26: '-', epsGrowth: '-' };
                                         const strat = STRATEGIES.find(s => s.id === log.strategy);
                                         
@@ -1253,6 +1401,19 @@
             const [planStockId, setPlanStockId] = useState('');
             const [planStockName, setPlanStockName] = useState('');
             const [alert, setAlert] = useState({ show: false, msg: '' });
+            
+            // 規劃表篩選狀態
+            const [planFilters, setPlanFilters] = useState({ stock: '', status: 'all' });
+            // 新增排序狀態
+            const [planSort, setPlanSort] = useState({ key: 'id', direction: 'desc' });
+
+            const handlePlanSort = (key) => {
+                if (planSort.key === key) {
+                    setPlanSort({ key, direction: planSort.direction === 'asc' ? 'desc' : 'asc' });
+                } else {
+                    setPlanSort({ key, direction: 'desc' });
+                }
+            };
 
             const handleStockIdChange = (e) => {
                 const val = e.target.value;
@@ -1328,6 +1489,79 @@
             const plannedLogs = useMemo(() => {
                 return logs.filter(log => log.inPlan || (log.plan && log.plan.entry));
             }, [logs]);
+
+            // 過濾與排序規劃表
+            const filteredPlanLogs = useMemo(() => {
+                let result = plannedLogs.slice(); // 移除 .reverse()
+                
+                // 1. 篩選邏輯
+                if (planFilters.stock) {
+                    const kw = planFilters.stock.toLowerCase();
+                    result = result.filter(l => l.stockId.toLowerCase().includes(kw) || l.name.toLowerCase().includes(kw));
+                }
+                if (planFilters.status !== 'all') {
+                    result = result.filter(l => {
+                        const p = l.plan || {};
+                        const isOpen = p.entry && !p.exit;
+                        const isClosed = p.entry && p.exit;
+                        const isPlanning = !p.entry;
+                        
+                        if (planFilters.status === 'open') return isOpen;
+                        if (planFilters.status === 'closed') return isClosed;
+                        if (planFilters.status === 'planning') return isPlanning;
+                        return true;
+                    });
+                }
+
+                // 2. 排序邏輯
+                result.sort((a, b) => {
+                    let valA, valB;
+                    const pA = a.plan || {};
+                    const pB = b.plan || {};
+
+                    switch (planSort.key) {
+                        case 'stock':
+                            valA = a.stockId; valB = b.stockId; break;
+                        case 'entry':
+                            valA = parseFloat(pA.entry) || -999999; valB = parseFloat(pB.entry) || -999999; break;
+                        case 'sl':
+                            valA = parseFloat(pA.stopLoss) || (parseFloat(pA.entry)*0.95 || -999999);
+                            valB = parseFloat(pB.stopLoss) || (parseFloat(pB.entry)*0.95 || -999999); break;
+                        case 'exit':
+                            valA = parseFloat(pA.currentPrice || pA.exit) || -999999;
+                            valB = parseFloat(pB.currentPrice || pB.exit) || -999999; break;
+                        case 'shares':
+                            valA = parseFloat(pA.shares) || 0; valB = parseFloat(pB.shares) || 0; break;
+                        case 'rr':
+                            const getRR = (p) => {
+                                if (!p.entry || !p.stopLoss || !p.exit) return -999999;
+                                const risk = parseFloat(p.entry) - parseFloat(p.stopLoss);
+                                const reward = parseFloat(p.exit) - parseFloat(p.entry);
+                                if (risk <= 0) return -999999;
+                                return reward / risk;
+                            };
+                            valA = getRR(pA); valB = getRR(pB); break;
+                        case 'pnl':
+                            const getPnl = (p) => {
+                                const isOpen = p.entry && !p.exit;
+                                if (p.entry && p.shares) {
+                                    if (isOpen && p.currentPrice) return (parseFloat(p.currentPrice) - parseFloat(p.entry)) * parseFloat(p.shares) * 1000;
+                                    else if (!isOpen && p.exit) return (parseFloat(p.exit) - parseFloat(p.entry)) * parseFloat(p.shares) * 1000;
+                                }
+                                return -9999999; // 將未設定數值的項目排在最後
+                            };
+                            valA = getPnl(pA); valB = getPnl(pB); break;
+                        default: // 'id'
+                            valA = parseInt(a.id); valB = parseInt(b.id); break;
+                    }
+
+                    if (valA < valB) return planSort.direction === 'asc' ? -1 : 1;
+                    if (valA > valB) return planSort.direction === 'asc' ? 1 : -1;
+                    return 0;
+                });
+
+                return result;
+            }, [plannedLogs, planFilters, planSort]);
 
             // 計算儀表板數據
             const stats = useMemo(() => {
@@ -1453,18 +1687,32 @@
                             <table className="w-full text-left border-collapse min-w-[1000px]">
                                 <thead>
                                     <tr className="bg-slate-800/50 text-slate-400 text-sm tracking-wider">
-                                        <th className="p-3">標的 / 狀態</th>
-                                        <th className="p-3">進場價</th>
-                                        <th className="p-3">停損價</th>
-                                        <th className="p-3">現價 / 出場</th>
-                                        <th className="p-3">張數</th>
-                                        <th className="p-3">風報比</th>
-                                        <th className="p-3">預估/實現損益</th>
-                                        <th className="p-3 text-center">操作</th>
+                                        <th className="p-3 align-top min-w-[180px]">
+                                            <div className="mb-2 flex items-center gap-1 cursor-pointer hover:text-blue-400 select-none" onClick={() => handlePlanSort('stock')}>標的 / 狀態 <SortIcon sortKey="stock" currentSort={planSort} /></div>
+                                            <div className="flex flex-col gap-1.5">
+                                                <input type="text" placeholder="搜尋代號/名稱" value={planFilters.stock} onChange={e => setPlanFilters({...planFilters, stock: e.target.value})} className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs outline-none focus:border-blue-500" />
+                                                <select value={planFilters.status} onChange={e => setPlanFilters({...planFilters, status: e.target.value})} className="w-full bg-slate-900 border border-slate-700 rounded px-1 py-1 text-xs outline-none focus:border-blue-500">
+                                                    <option value="all">全部狀態</option>
+                                                    <option value="open">持倉中</option>
+                                                    <option value="closed">已平倉</option>
+                                                    <option value="planning">規劃中</option>
+                                                </select>
+                                            </div>
+                                        </th>
+                                        <th className="p-3 align-top"><div className="mb-2 flex items-center gap-1 cursor-pointer hover:text-blue-400 select-none" onClick={() => handlePlanSort('entry')}>進場價 <SortIcon sortKey="entry" currentSort={planSort} /></div></th>
+                                        <th className="p-3 align-top"><div className="mb-2 flex items-center gap-1 cursor-pointer hover:text-blue-400 select-none" onClick={() => handlePlanSort('sl')}>停損價 <SortIcon sortKey="sl" currentSort={planSort} /></div></th>
+                                        <th className="p-3 align-top"><div className="mb-2 flex items-center gap-1 cursor-pointer hover:text-blue-400 select-none" onClick={() => handlePlanSort('exit')}>現價 / 出場 <SortIcon sortKey="exit" currentSort={planSort} /></div></th>
+                                        <th className="p-3 align-top"><div className="mb-2 flex items-center gap-1 cursor-pointer hover:text-blue-400 select-none" onClick={() => handlePlanSort('shares')}>張數 <SortIcon sortKey="shares" currentSort={planSort} /></div></th>
+                                        <th className="p-3 align-top"><div className="mb-2 flex items-center gap-1 cursor-pointer hover:text-blue-400 select-none" onClick={() => handlePlanSort('rr')}>風報比 <SortIcon sortKey="rr" currentSort={planSort} /></div></th>
+                                        <th className="p-3 align-top"><div className="mb-2 flex items-center gap-1 cursor-pointer hover:text-blue-400 select-none" onClick={() => handlePlanSort('pnl')}>預估/實現損益 <SortIcon sortKey="pnl" currentSort={planSort} /></div></th>
+                                        <th className="p-3 text-center align-top">
+                                            <div className="mb-2">操作</div>
+                                            <button onClick={() => { setPlanFilters({stock: '', status: 'all'}); setPlanSort({key: 'id', direction: 'desc'}); }} className="text-xs text-slate-500 hover:text-slate-300 underline transition">還原預設</button>
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-800/50">
-                                    {plannedLogs.slice().reverse().map(log => {
+                                    {filteredPlanLogs.map(log => {
                                         const p = log.plan || {};
                                         const isEditing = editingId === log.id;
                                         const isOpen = p.entry && !p.exit;
