@@ -99,7 +99,6 @@
         // ==========================================
         // 1. 靜態資料庫 (STATIC_STOCK_DB) Mock Data
         // ==========================================
-        // 取消預設股票資料，完全依賴使用者匯入或自行新增
         const STATIC_STOCK_DB = {};
 
         // ==========================================
@@ -108,7 +107,7 @@
         const fallbackCopyTextToClipboard = (text) => {
             const textArea = document.createElement("textarea");
             textArea.value = text;
-            textArea.style.position = "fixed";  // 避免滾動到底部
+            textArea.style.position = "fixed";
             textArea.style.top = "0";
             textArea.style.left = "0";
             textArea.style.opacity = "0";
@@ -150,7 +149,6 @@
 
             useEffect(() => {
                 if (isOpen && btnRef.current) {
-                    // 視窗打開時，強制把焦點拉到確認按鈕上
                     setTimeout(() => btnRef.current.focus(), 10);
                 }
 
@@ -159,7 +157,7 @@
                 const handleKeyDown = (e) => {
                     if (e.key === 'Enter') {
                         e.preventDefault();
-                        e.stopPropagation(); // 強制攔截，避免觸發背景其他事件
+                        e.stopPropagation();
                         onConfirm();
                     } else if (e.key === 'Escape') {
                         e.preventDefault();
@@ -168,7 +166,6 @@
                     }
                 };
                 
-                // 使用 capture 階段攔截事件，確保彈窗優先處理鍵盤按鍵
                 window.addEventListener('keydown', handleKeyDown, true);
                 return () => window.removeEventListener('keydown', handleKeyDown, true);
             }, [isOpen, onConfirm, onCancel]);
@@ -231,6 +228,14 @@
             return currentSort.direction === 'asc' ? <ArrowUp size={14} className="text-blue-400" /> : <ArrowDown size={14} className="text-blue-400" />;
         };
 
+        // 共用：股期標示元件
+        const FuturesBadge = ({ hasFutures }) => {
+            if (!hasFutures) return null;
+            return (
+                <span className="bg-fuchsia-600/90 text-white text-[10px] px-1.5 py-0.5 rounded shadow-sm mr-1.5 flex-shrink-0" title="具備個股期貨">期</span>
+            );
+        };
+
         // ==========================================
         // 3. 模組一：選股日誌與 EPS (Stock Journal)
         // ==========================================
@@ -284,7 +289,7 @@
         const StockJournal = ({ logs, setLogs, customStocks, setCustomStocks, epsData, setEpsData, stockMap }) => {
             const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
             const [copyDate, setCopyDate] = useState(new Date().toISOString().split('T')[0]);
-            const [copySubTags, setCopySubTags] = useState([]); // 改為陣列，支援多選
+            const [copySubTags, setCopySubTags] = useState([]); 
             const [isCopyDropdownOpen, setIsCopyDropdownOpen] = useState(false);
             const copyDropdownRef = useRef(null);
             
@@ -294,7 +299,7 @@
             const [selectedSubTags, setSelectedSubTags] = useState([]);
             const [alert, setAlert] = useState({ show: false, msg: '' });
             const [confirm, setConfirm] = useState({ show: false, action: null });
-            const [copySuccess, setCopySuccess] = useState(null); // 新增複製狀態
+            const [copySuccess, setCopySuccess] = useState(null); 
 
             // 表格直覺篩選狀態
             const [journalFilters, setJournalFilters] = useState({ date: '', stock: '', growth: 'all', tag: '' });
@@ -305,13 +310,13 @@
                 if (journalSort.key === key) {
                     setJournalSort({ key, direction: journalSort.direction === 'asc' ? 'desc' : 'asc' });
                 } else {
-                    setJournalSort({ key, direction: 'desc' }); // 預設新排序都先走由大到小
+                    setJournalSort({ key, direction: 'desc' }); 
                 }
             };
 
             // 根據篩選條件過濾與排序日誌
             const filteredJournalLogs = useMemo(() => {
-                let result = logs.slice(); // 移除原本的 .reverse()，改由下方排序接手
+                let result = logs.slice();
                 
                 // 1. 篩選邏輯
                 if (journalFilters.date) result = result.filter(l => l.date === journalFilters.date);
@@ -349,7 +354,7 @@
                     switch (journalSort.key) {
                         case 'date':
                             valA = a.date; valB = b.date;
-                            if (valA === valB) { valA = parseInt(a.id); valB = parseInt(b.id); } // 日期相同則依輸入順序
+                            if (valA === valB) { valA = parseInt(a.id); valB = parseInt(b.id); } 
                             break;
                         case 'stock':
                             valA = a.stockId; valB = b.stockId; break;
@@ -417,7 +422,6 @@
 
             const isUnknownStock = stockId.trim() && stockName.trim() && !stockMap[stockId.trim()];
 
-            // 使用 useMemo 確保效能，產出原生 datalist 提供智慧搜尋下拉選單
             const stockIdsDatalist = useMemo(() => (
                 <datalist id="stock-ids-list">
                     {Object.keys(stockMap).map(id => <option key={id} value={id}>{stockMap[id].name}</option>)}
@@ -439,27 +443,22 @@
                     return;
                 }
 
-                // 自動補齊未知的股號與名稱，無須再點擊新增按鈕
                 if (!stockMap[sId]) {
                     setCustomStocks(prev => ({ ...prev, [sId]: { name: sName, industry: "自訂/手動新增" } }));
                 }
 
-                // 檢查同一天、同一檔股票是否已經有紀錄
                 const existingLogIndex = logs.findIndex(l => l.date === date && l.stockId === sId);
 
                 if (existingLogIndex !== -1) {
-                    // 已存在紀錄，進行合併
                     const updatedLogs = [...logs];
                     const existingLog = { ...updatedLogs[existingLogIndex] };
                     
-                    // 合併策略 (轉換為陣列)
                     let currentStrategies = Array.isArray(existingLog.strategy) ? [...existingLog.strategy] : (existingLog.strategy ? [existingLog.strategy] : []);
                     if (!currentStrategies.includes(selectedStrategy)) {
                         currentStrategies.push(selectedStrategy);
                     }
                     existingLog.strategy = currentStrategies;
 
-                    // 合併子標籤
                     let currentSubTags = existingLog.subTags ? [...existingLog.subTags] : [];
                     selectedSubTags.forEach(tag => {
                         if (!currentSubTags.includes(tag)) {
@@ -471,13 +470,12 @@
                     updatedLogs[existingLogIndex] = existingLog;
                     setLogs(updatedLogs);
                 } else {
-                    // 新增紀錄
                     const newLog = {
                         id: Date.now().toString(),
                         date,
                         stockId: sId,
                         name: sName,
-                        strategy: [selectedStrategy], // 儲存為陣列以利後續合併
+                        strategy: [selectedStrategy], 
                         subTags: selectedSubTags,
                         starred: false,
                         plan: { entry: '', stopLoss: '', trailing: '', exit: '', shares: '', warrantCode: '', warrantEntry: '', warrantShares: '', currentPrice: '' }
@@ -499,7 +497,7 @@
             
             const handleStrategySelect = (id) => {
                 setSelectedStrategy(id);
-                setSelectedSubTags([]); // 切換主策略時清空子標籤
+                setSelectedSubTags([]); 
             };
 
             const toggleStar = (id) => {
@@ -514,7 +512,6 @@
                 setLogs(logs.filter(log => log.id !== id));
             };
 
-            // 新增：移除單一標籤功能
             const removeTag = (logId, isSubTag, tagToRemove) => {
                 setLogs(logs.map(log => {
                     if (log.id !== logId) return log;
@@ -550,30 +547,32 @@
                         const name = row['股名'] || row['名稱'] || row['name'] || row['Name'];
                         const eps25 = row['2025EPS'] || row['2025'] || row['25'] || row['EPS25'];
                         const eps26 = row['預估2026EPS'] || row['2026'] || row['26'] || row['EPS26'];
-                        const epsGrowth = row['EPS成長率'] || row['成長率']; // 新增讀取成長率
+                        const epsGrowth = row['EPS成長率'] || row['成長率']; 
+                        const futures = row['股期'] || row['期貨']; // 讀取股期判斷
 
                         if (code) {
                             const strCode = String(code).trim();
                             
-                            // 處理成長率的格式，過濾掉 NaN 並轉換為百分比格式
                             let formattedGrowth = '-';
                             if (epsGrowth !== undefined && epsGrowth !== null && String(epsGrowth).trim().toUpperCase() !== 'NAN') {
                                 const numGrowth = parseFloat(epsGrowth);
                                 if (!isNaN(numGrowth)) {
-                                    // 最多保留兩位小數，自動去除多餘的 .0，還原 Excel 上的乾淨 % 數
                                     formattedGrowth = Number(numGrowth.toFixed(2)) + '%';
                                 } else {
-                                    formattedGrowth = epsGrowth; // 若為字串(如: 轉虧為盈)則保留原字串
+                                    formattedGrowth = epsGrowth; 
                                 }
                             }
+
+                            // 判斷是否具備股期 (只要欄位內有值就判定為 true)
+                            const hasFutures = !!futures && String(futures).trim() !== '';
 
                             newEps[strCode] = { 
                                 eps25: eps25 !== undefined && eps25 !== null ? eps25 : '-', 
                                 eps26: eps26 !== undefined && eps26 !== null ? eps26 : '-',
-                                epsGrowth: formattedGrowth
+                                epsGrowth: formattedGrowth,
+                                hasFutures: hasFutures
                             };
 
-                            // 【隱藏邏輯】自動補齊
                             if (!stockMap[strCode] && name) {
                                 newCustom[strCode] = { name: String(name).trim(), industry: "匯入補齊" };
                                 addedCustomCount++;
@@ -582,9 +581,11 @@
                     });
                     setEpsData(newEps);
                     setCustomStocks(newCustom);
-                    setAlert({ show: true, msg: `EPS 匯入成功！自動補齊了 ${addedCustomCount} 檔未知股票。` });
+                    setAlert({ show: true, msg: `EPS 與股期資料匯入成功！自動補齊了 ${addedCustomCount} 檔未知股票。` });
                 };
                 reader.readAsBinaryString(file);
+                // 清空 input 讓同檔名可以再次觸發 onChange
+                e.target.value = null;
             };
 
             const copyLogs = (formatType) => {
@@ -598,10 +599,8 @@
                 }
                 resultText += `\n`;
                 
-                // 1. 先篩選出指定日期的所有紀錄
                 let dayLogs = logs.filter(l => l.date === copyDate);
                 
-                // 2. 套用多選子標籤過濾 (若有選擇的話)
                 if (copySubTags.length > 0) {
                     dayLogs = dayLogs.filter(l => l.subTags && l.subTags.some(t => copySubTags.includes(t)));
                 }
@@ -614,7 +613,6 @@
                 let detailText = ``;
 
                 if (formatType === 'time') {
-                    // 格式一：依照輸入時間順序由先到後排序，並標註累加策略標籤數
                     dayLogs.sort((a, b) => parseInt(a.id) - parseInt(b.id));
 
                     dayLogs.forEach(l => {
@@ -636,7 +634,6 @@
                         detailText += `- ${l.stockId} ${l.name}${countStr}${tagStr}\n`;
                     });
                 } else if (formatType === 'strategy') {
-                    // 格式二：以策略標籤作為分類群組進行輸出
                     const groupMap = {};
                     dayLogs.forEach(l => {
                         let tags = [];
@@ -660,9 +657,7 @@
                         });
                     });
 
-                    // 依照定義的策略順序進行輸出
                     STRATEGIES.forEach(strat => {
-                        // 1. 先印只有主策略的
                         if (groupMap[strat.label] && groupMap[strat.label].length > 0) {
                             let tagLogs = groupMap[strat.label];
                             tagLogs.sort((a, b) => parseInt(a.id) - parseInt(b.id));
@@ -671,7 +666,6 @@
                             detailText += `\n`;
                         }
                         
-                        // 2. 再印該主策略底下的子標籤
                         const subTags = SUB_TAGS[strat.id] || [];
                         subTags.forEach(tag => {
                             if (groupMap[tag] && groupMap[tag].length > 0) {
@@ -684,7 +678,6 @@
                         });
                     });
 
-                    // 處理未分類
                     if (groupMap['未分類'] && groupMap['未分類'].length > 0) {
                         let tagLogs = groupMap['未分類'];
                         tagLogs.sort((a, b) => parseInt(a.id) - parseInt(b.id));
@@ -693,7 +686,6 @@
                         detailText += `\n`;
                     }
                 } else if (formatType === 'score') {
-                    // 格式三：依照策略標籤數量做為分數，由高到低排序
                     const scoredLogs = dayLogs.map(l => {
                         let tags = [];
                         if (l.subTags && l.subTags.length > 0) {
@@ -710,7 +702,6 @@
                         return { ...l, computedTags: tags, score: tags.length };
                     });
 
-                    // 排序：分數高的在前；若分數相同，則依輸入時間(id)排序
                     scoredLogs.sort((a, b) => b.score - a.score || parseInt(a.id) - parseInt(b.id));
 
                     scoredLogs.forEach(l => {
@@ -725,7 +716,7 @@
                 
                 fallbackCopyTextToClipboard(resultText);
                 setCopySuccess(formatType);
-                setTimeout(() => setCopySuccess(null), 2000); // 2秒後恢復按鈕原狀
+                setTimeout(() => setCopySuccess(null), 2000); 
             };
 
             return (
@@ -789,7 +780,6 @@
                                 ))}
                             </div>
                             
-                            {/* 子標籤選擇區 (當選擇趨勢與型態或籌碼與法人時顯示) */}
                             {selectedStrategy && SUB_TAGS[selectedStrategy] && (
                                 <div className="mt-4 p-4 bg-slate-800/30 rounded-xl border border-slate-700/50 animate-fade-in-down">
                                     <div className="flex justify-between items-center mb-3">
@@ -821,7 +811,7 @@
                             <div className="flex gap-3">
                                 <label className="cursor-pointer bg-slate-800 hover:bg-slate-700 text-sm text-slate-200 px-4 py-2 rounded-lg flex items-center gap-2 transition">
                                     <Upload size={16} />
-                                    匯入 EPS (Excel/CSV)
+                                    匯入 EPS / 股期 (Excel)
                                     <input type="file" accept=".csv, .xlsx, .xls" onChange={handleEpsImport} className="hidden" />
                                 </label>
                                 <div className="flex items-center gap-2 bg-slate-800 rounded-lg p-1 pr-2 relative" ref={copyDropdownRef}>
@@ -832,7 +822,6 @@
                                         className="bg-slate-900 border border-slate-700 rounded-md px-2 py-1 text-sm font-mono-num text-slate-300 outline-none"
                                     />
                                     
-                                    {/* 多重篩選按鈕 */}
                                     <button 
                                         onClick={() => setIsCopyDropdownOpen(!isCopyDropdownOpen)}
                                         className={`bg-slate-900 border border-slate-700 rounded-md px-3 py-1 text-sm outline-none flex items-center gap-1 transition-colors ${copySubTags.length > 0 ? 'text-blue-400 border-blue-500/50' : 'text-slate-300'}`}
@@ -841,7 +830,6 @@
                                         <span className="text-[10px] ml-1">▼</span>
                                     </button>
 
-                                    {/* 多重篩選下拉面板 */}
                                     {isCopyDropdownOpen && (
                                         <div className="absolute bottom-full mb-2 left-0 w-80 bg-slate-800 border border-slate-600 rounded-lg shadow-2xl p-4 z-50 flex flex-col gap-3 max-h-[400px] overflow-y-auto animate-fade-in-up">
                                             <div className="flex justify-between items-center border-b border-slate-700 pb-2">
@@ -952,18 +940,15 @@
                                 </thead>
                                 <tbody className="divide-y divide-slate-800/50">
                                     {filteredJournalLogs.map(log => {
-                                        const eps = epsData[log.stockId] || { eps25: '-', eps26: '-', epsGrowth: '-' };
+                                        const eps = epsData[log.stockId] || { eps25: '-', eps26: '-', epsGrowth: '-', hasFutures: false };
                                         const strat = STRATEGIES.find(s => s.id === log.strategy);
                                         
-                                        // 判斷 26' EPS(預) 是否為正數以進行反黃凸顯，或是負數以改變成長率顏色
                                         const eps26Num = parseFloat(eps.eps26);
                                         const isEps26Positive = !isNaN(eps26Num) && eps26Num > 0;
                                         const isEps26Negative = !isNaN(eps26Num) && eps26Num < 0;
 
-                                        // 判斷成長率顏色
                                         let growthColorClass = 'text-slate-400';
                                         if (isEps26Negative) {
-                                            // 如果 26' EPS(預) 是負的，成長率強制顯示為綠色
                                             growthColorClass = 'text-emerald-400';
                                         } else if (eps.epsGrowth && eps.epsGrowth !== '-') {
                                             const val = parseFloat(eps.epsGrowth);
@@ -978,8 +963,9 @@
                                             <tr key={log.id} className={`transition group ${isEps26Positive ? 'bg-yellow-500/10 hover:bg-yellow-500/20 border-l-2 border-yellow-500' : 'hover:bg-slate-800/20'}`}>
                                                 <td className="p-4 font-mono-num text-slate-300">{log.date}</td>
                                                 <td className="p-4">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className={`font-mono-num font-bold ${isEps26Positive ? 'text-yellow-400' : 'text-blue-400'}`}>{log.stockId}</span>
+                                                    <div className="flex items-center">
+                                                        <FuturesBadge hasFutures={eps.hasFutures} />
+                                                        <span className={`font-mono-num font-bold mr-2 ${isEps26Positive ? 'text-yellow-400' : 'text-blue-400'}`}>{log.stockId}</span>
                                                         <span className={isEps26Positive ? 'text-yellow-100 font-bold' : 'text-slate-200'}>{log.name}</span>
                                                     </div>
                                                 </td>
@@ -1009,7 +995,6 @@
                                                             return strategiesArray.map(stratId => {
                                                                 const s = STRATEGIES.find(str => str.id === stratId);
                                                                 if (!s) return null;
-                                                                // 若有選擇對應的子標籤，則不重複顯示該主策略標籤以保持簡潔
                                                                 const hasSubTag = log.subTags?.some(tag => SUB_TAGS[stratId]?.includes(tag));
                                                                 if (log.subTags && log.subTags.length > 0 && hasSubTag) return null;
                                                                 return (
@@ -1044,7 +1029,7 @@
                                         )
                                     })}
                                     {logs.length === 0 && (
-                                        <tr><td colSpan="6" className="p-8 text-center text-slate-500">尚無選股紀錄</td></tr>
+                                        <tr><td colSpan="7" className="p-8 text-center text-slate-500">尚無選股紀錄</td></tr>
                                     )}
                                 </tbody>
                             </table>
@@ -1062,17 +1047,16 @@
         // ==========================================
         // 4. 模組二：大盤支撐壓力計算機 (Calculator)
         // ==========================================
-        const CalculatorModule = ({ calcHistory, setCalcHistory, stockMap, setCustomStocks }) => {
+        const CalculatorModule = ({ calcHistory, setCalcHistory, stockMap, setCustomStocks, epsData }) => {
             const [session, setSession] = useState('日盤');
             const [h, setH] = useState('');
             const [l, setL] = useState('');
             const [c, setC] = useState('');
             const [stockId, setStockId] = useState('');
-            const [stockName, setStockName] = useState(''); // 新增股票名稱
+            const [stockName, setStockName] = useState(''); 
             const [results, setResults] = useState(null);
             const [expandedRowId, setExpandedRowId] = useState(null);
 
-            // 處理股號與名稱的連動
             const handleStockIdChange = (e) => {
                 const val = e.target.value;
                 setStockId(val);
@@ -1118,7 +1102,6 @@
                 const C = parseFloat(c);
                 if (isNaN(H) || isNaN(L) || isNaN(C)) return;
 
-                // 若輸入未知的股號與名稱，自動加入自訂清單
                 const sId = stockId.trim();
                 const sName = stockName.trim();
                 if (sId && sName && !stockMap[sId] && setCustomStocks) {
@@ -1127,7 +1110,6 @@
 
                 const Range = H - L;
                 
-                // CDP
                 const cdpVal = (H + L + 2 * C) / 4;
                 const cdp = {
                     AH: (cdpVal + Range).toFixed(2),
@@ -1137,7 +1119,6 @@
                     AL: (cdpVal - Range).toFixed(2)
                 };
 
-                // Pivot
                 const pVal = (H + L + C) / 3;
                 const pivot = {
                     R2: (pVal + Range).toFixed(2),
@@ -1147,7 +1128,6 @@
                     S2: (pVal - Range).toFixed(2)
                 };
 
-                // Fibo
                 const fibo = {
                     R3: (pVal + Range * 1.0).toFixed(2),
                     R2: (pVal + Range * 0.618).toFixed(2),
@@ -1209,7 +1189,6 @@
 
             return (
                 <div className="animate-fade-in-up space-y-6">
-                    {/* 輸入面板 */}
                     <div className="bg-[#111827] p-6 rounded-2xl border border-slate-800 shadow-lg">
                         <h2 className="text-2xl font-title text-indigo-400 mb-6 flex items-center gap-2"><Calculator /> 大盤支撐壓力計算機</h2>
                         
@@ -1258,10 +1237,8 @@
                         </div>
                     </div>
 
-                    {/* 輸出面板 */}
                     {results && (
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-bounce-in">
-                            {/* CDP */}
                             <div className="bg-slate-900 rounded-2xl border border-slate-700 p-5 shadow-xl relative overflow-hidden group">
                                 <div className="absolute top-0 right-0 w-16 h-16 bg-blue-500/10 rounded-bl-full -z-0"></div>
                                 <h3 className="text-lg font-bold text-blue-400 mb-4 border-b border-slate-700 pb-2 relative z-10">CDP 系統</h3>
@@ -1277,7 +1254,6 @@
                                 </button>
                             </div>
                             
-                            {/* Pivot */}
                             <div className="bg-slate-900 rounded-2xl border border-slate-700 p-5 shadow-xl relative overflow-hidden group">
                                 <div className="absolute top-0 right-0 w-16 h-16 bg-purple-500/10 rounded-bl-full -z-0"></div>
                                 <h3 className="text-lg font-bold text-purple-400 mb-4 border-b border-slate-700 pb-2 relative z-10">Pivot 系統</h3>
@@ -1293,7 +1269,6 @@
                                 </button>
                             </div>
 
-                            {/* Fibonacci */}
                             <div className="bg-slate-900 rounded-2xl border border-slate-700 p-5 shadow-xl relative overflow-hidden group">
                                 <div className="absolute top-0 right-0 w-16 h-16 bg-amber-500/10 rounded-bl-full -z-0"></div>
                                 <h3 className="text-lg font-bold text-amber-400 mb-4 border-b border-slate-700 pb-2 relative z-10">Fibonacci</h3>
@@ -1313,7 +1288,6 @@
                         </div>
                     )}
 
-                    {/* 歷史紀錄表 */}
                     <div className="bg-[#111827] rounded-2xl border border-slate-800 overflow-hidden mt-8 shadow-lg">
                         <div className="p-4 border-b border-slate-800 bg-slate-800/30 flex justify-between items-center">
                             <h3 className="font-bold text-slate-300">歷史計算紀錄</h3>
@@ -1329,12 +1303,19 @@
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-800/50">
-                                {calcHistory.map(rec => (
+                                {calcHistory.map(rec => {
+                                    const hasFutures = epsData && epsData[rec.stockId]?.hasFutures;
+                                    return (
                                     <React.Fragment key={rec.id}>
                                         <tr className="hover:bg-slate-800/20 transition">
                                             <td className="p-3 font-mono-num text-sm text-slate-400">{rec.date}</td>
                                             <td className="p-3 text-sm"><span className="bg-slate-800 px-2 py-1 rounded text-slate-300">{rec.session}</span></td>
-                                            <td className="p-3 text-sm font-bold text-blue-400">{rec.stockId} <span className="text-slate-400 font-normal">{rec.name}</span></td>
+                                            <td className="p-3 text-sm font-bold text-blue-400">
+                                                <div className="flex items-center">
+                                                    <FuturesBadge hasFutures={hasFutures} />
+                                                    {rec.stockId} <span className="text-slate-400 font-normal ml-1">{rec.name}</span>
+                                                </div>
+                                            </td>
                                             <td className="p-3 text-sm font-mono-num text-slate-300">{rec.inputs.h} / {rec.inputs.l} / {rec.inputs.c}</td>
                                             <td className="p-3 text-center">
                                                 <div className="flex justify-center gap-2">
@@ -1344,7 +1325,6 @@
                                                 </div>
                                             </td>
                                         </tr>
-                                        {/* 內嵌展開面板 */}
                                         {expandedRowId === rec.id && (
                                             <tr className="bg-slate-900/50 border-l-4 border-blue-500 animate-fade-in-down">
                                                 <td colSpan="5" className="p-4">
@@ -1380,7 +1360,7 @@
                                             </tr>
                                         )}
                                     </React.Fragment>
-                                ))}
+                                )})}
                                 {calcHistory.length === 0 && <tr><td colSpan="5" className="p-8 text-center text-slate-500">無歷史紀錄</td></tr>}
                             </tbody>
                         </table>
@@ -1392,20 +1372,17 @@
         // ==========================================
         // 5. 模組三：交易規劃與績效統計 (Plan & Dashboard)
         // ==========================================
-        const PlanDashboard = ({ logs, setLogs, stockMap, setCustomStocks }) => {
+        const PlanDashboard = ({ logs, setLogs, stockMap, setCustomStocks, epsData }) => {
             const [filterDate, setFilterDate] = useState('all');
             const [editingId, setEditingId] = useState(null);
             const [confirm, setConfirm] = useState({ show: false, action: null });
             
-            // 獨立新增規劃狀態
             const [planDate, setPlanDate] = useState(new Date().toISOString().split('T')[0]);
             const [planStockId, setPlanStockId] = useState('');
             const [planStockName, setPlanStockName] = useState('');
             const [alert, setAlert] = useState({ show: false, msg: '' });
             
-            // 規劃表篩選狀態
             const [planFilters, setPlanFilters] = useState({ stock: '', status: 'all' });
-            // 新增排序狀態
             const [planSort, setPlanSort] = useState({ key: 'id', direction: 'desc' });
 
             const handlePlanSort = (key) => {
@@ -1486,16 +1463,13 @@
                 setPlanStockName('');
             };
 
-            // 篩選出有被加入規劃，或已經有輸入進場價的舊資料
             const plannedLogs = useMemo(() => {
                 return logs.filter(log => log.inPlan || (log.plan && log.plan.entry));
             }, [logs]);
 
-            // 過濾與排序規劃表
             const filteredPlanLogs = useMemo(() => {
-                let result = plannedLogs.slice(); // 移除 .reverse()
+                let result = plannedLogs.slice(); 
                 
-                // 1. 篩選邏輯
                 if (planFilters.stock) {
                     const kw = planFilters.stock.toLowerCase();
                     result = result.filter(l => l.stockId.toLowerCase().includes(kw) || l.name.toLowerCase().includes(kw));
@@ -1514,7 +1488,6 @@
                     });
                 }
 
-                // 2. 排序邏輯
                 result.sort((a, b) => {
                     let valA, valB;
                     const pA = a.plan || {};
@@ -1549,7 +1522,7 @@
                                     if (isOpen && p.currentPrice) return (parseFloat(p.currentPrice) - parseFloat(p.entry)) * parseFloat(p.shares) * 1000;
                                     else if (!isOpen && p.exit) return (parseFloat(p.exit) - parseFloat(p.entry)) * parseFloat(p.shares) * 1000;
                                 }
-                                return -9999999; // 將未設定數值的項目排在最後
+                                return -9999999; 
                             };
                             valA = getPnl(pA); valB = getPnl(pB); break;
                         default: // 'id'
@@ -1564,7 +1537,6 @@
                 return result;
             }, [plannedLogs, planFilters, planSort]);
 
-            // 計算儀表板數據
             const stats = useMemo(() => {
                 let filtered = plannedLogs;
                 if (filterDate === 'month') {
@@ -1593,7 +1565,6 @@
                         if (pnl > 0) winCount++;
                     }
 
-                    // Warrants
                     if (p.warrantEntry && p.warrantExit && p.warrantShares) {
                         const wEntry = parseFloat(p.warrantEntry);
                         const wExit = parseFloat(p.warrantExit);
@@ -1615,7 +1586,6 @@
                 setLogs(logs.map(log => {
                     if (log.id === id) {
                         let newPlan = { ...log.plan, [field]: value };
-                        // 停損價自動95折：只要變更進場價，就強制寫入 95折 的價格
                         if (field === 'entry' && value) {
                             newPlan.stopLoss = (parseFloat(value) * 0.95).toFixed(2);
                         }
@@ -1645,7 +1615,6 @@
 
             return (
                 <div className="animate-fade-in-up space-y-6">
-                    {/* 儀表板 */}
                     <div className="flex justify-between items-end mb-4">
                         <h2 className="text-2xl font-title text-emerald-400 flex items-center gap-2"><LayoutDashboard /> 績效儀表板</h2>
                         <select value={filterDate} onChange={e=>setFilterDate(e.target.value)} className="bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm outline-none text-slate-300">
@@ -1661,7 +1630,6 @@
                         <StatCard title="總累積獲利" value={stats.totalProfit.toLocaleString()} unit="TWD" color="yellow" />
                     </div>
 
-                    {/* 新增獨立規劃 */}
                     <div className="bg-[#111827] p-5 rounded-2xl border border-slate-800 shadow-lg mb-6">
                         <h3 className="text-lg font-bold text-slate-300 mb-4 flex items-center gap-2"><Target size={18} className="text-blue-400" /> 新增交易標的</h3>
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -1682,7 +1650,6 @@
                         </div>
                     </div>
 
-                    {/* 交易規劃編輯器與總表 */}
                     <div className="bg-[#111827] rounded-2xl border border-slate-800 overflow-hidden shadow-lg">
                         <div className="overflow-x-auto">
                             <table className="w-full text-left border-collapse min-w-[1000px]">
@@ -1718,7 +1685,6 @@
                                         const isEditing = editingId === log.id;
                                         const isOpen = p.entry && !p.exit;
                                         
-                                        // 損益試算公式: (現價/出場 - 進場價) * 張數 * 1000
                                         let pnlValue = null;
                                         if (p.entry && p.shares) {
                                             if (isOpen && p.currentPrice) {
@@ -1728,11 +1694,16 @@
                                             }
                                         }
 
+                                        const hasFutures = epsData && epsData[log.stockId]?.hasFutures;
+
                                         return (
                                             <React.Fragment key={log.id}>
                                                 <tr className={`hover:bg-slate-800/20 transition ${isOpen ? 'bg-blue-900/5' : ''}`}>
                                                     <td className="p-3">
-                                                        <div className="font-bold text-slate-200">{log.stockId} {log.name}</div>
+                                                        <div className="font-bold text-slate-200 flex items-center">
+                                                            <FuturesBadge hasFutures={hasFutures} />
+                                                            {log.stockId} {log.name}
+                                                        </div>
                                                         <div className="text-xs mt-1">
                                                             {isOpen ? (
                                                                 <span className="bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded flex w-max items-center gap-1">
@@ -1780,7 +1751,6 @@
                                                     </td>
                                                 </tr>
                                                 
-                                                {/* 編輯面板 Inline Editor */}
                                                 {isEditing && (
                                                     <tr className="bg-slate-900/80 border-l-4 border-blue-500 animate-fade-in-down shadow-inner">
                                                         <td colSpan="8" className="p-6">
@@ -1806,7 +1776,6 @@
                                                                     <input type="number" value={p.shares || ''} onChange={e => updatePlan(log.id, 'shares', e.target.value)} className="w-full bg-slate-950 border border-slate-700 rounded p-2 text-sm font-mono-num outline-none focus:border-blue-500" />
                                                                 </div>
                                                                 
-                                                                {/* 權證擴充 */}
                                                                 <div className="col-span-2 md:col-span-5 pt-3 mt-1 border-t border-slate-800/50">
                                                                     <span className="text-xs font-bold text-slate-500 mb-2 block">權證擴充設定</span>
                                                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -1842,17 +1811,49 @@
         // ==========================================
         const App = () => {
             const [activeTab, setActiveTab] = useState('journal');
+            const [appAlert, setAppAlert] = useState({ show: false, msg: '' });
             
-            // 核心持久化狀態
             const [logs, setLogs] = useLocalStorage('ryan_stock_logs', []);
             const [calcHistory, setCalcHistory] = useLocalStorage('ryan_calc_history', []);
             const [epsData, setEpsData] = useLocalStorage('ryan_eps_data', {});
             const [customStocks, setCustomStocks] = useLocalStorage('ryan_custom_stocks', {});
 
-            // 全域股票字典 (結合靜態與客製)
             const stockMap = useMemo(() => {
                 return { ...STATIC_STOCK_DB, ...customStocks };
             }, [customStocks]);
+
+            // 匯出全部資料 (JSON)
+            const handleExportData = () => {
+                const backup = { logs, calcHistory, epsData, customStocks };
+                const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `萊恩手札備份_${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+            };
+
+            // 匯入全部資料 (JSON)
+            const handleImportData = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (evt) => {
+                    try {
+                        const data = JSON.parse(evt.target.result);
+                        if (data.logs) setLogs(data.logs);
+                        if (data.calcHistory) setCalcHistory(data.calcHistory);
+                        if (data.epsData) setEpsData(data.epsData);
+                        if (data.customStocks) setCustomStocks(data.customStocks);
+                        setAppAlert({ show: true, msg: '系統資料已成功匯入還原！' });
+                    } catch (err) {
+                        setAppAlert({ show: true, msg: '匯入失敗：檔案格式錯誤或損毀。' });
+                    }
+                };
+                reader.readAsText(file);
+                e.target.value = null; // 清空選擇，允許重複匯入同檔名
+            };
 
             return (
                 <div className="min-h-screen pb-20">
@@ -1866,6 +1867,17 @@
                                 <h1 className="text-2xl font-title tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">
                                     萊恩交易手札
                                 </h1>
+                            </div>
+                            
+                            {/* 新增：資料匯入/匯出按鈕區塊 */}
+                            <div className="flex items-center gap-3">
+                                <label className="cursor-pointer flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-slate-200 transition bg-slate-800/50 hover:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700">
+                                    <Upload size={14} /> 匯入備份
+                                    <input type="file" accept=".json" onChange={handleImportData} className="hidden" />
+                                </label>
+                                <button onClick={handleExportData} className="flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-slate-200 transition bg-slate-800/50 hover:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700">
+                                    <Download size={14} /> 匯出備份
+                                </button>
                             </div>
                         </div>
                         {/* Tabs */}
@@ -1888,12 +1900,14 @@
                             <StockJournal logs={logs} setLogs={setLogs} epsData={epsData} setEpsData={setEpsData} customStocks={customStocks} setCustomStocks={setCustomStocks} stockMap={stockMap} />
                         )}
                         {activeTab === 'calculator' && (
-                            <CalculatorModule calcHistory={calcHistory} setCalcHistory={setCalcHistory} stockMap={stockMap} setCustomStocks={setCustomStocks} />
+                            <CalculatorModule calcHistory={calcHistory} setCalcHistory={setCalcHistory} stockMap={stockMap} setCustomStocks={setCustomStocks} epsData={epsData} />
                         )}
                         {activeTab === 'plan' && (
-                            <PlanDashboard logs={logs} setLogs={setLogs} stockMap={stockMap} setCustomStocks={setCustomStocks} />
+                            <PlanDashboard logs={logs} setLogs={setLogs} stockMap={stockMap} setCustomStocks={setCustomStocks} epsData={epsData} />
                         )}
                     </main>
+
+                    <AlertModal isOpen={appAlert.show} message={appAlert.msg} onClose={() => setAppAlert({ show: false, msg: '' })} />
                 </div>
             );
         };
