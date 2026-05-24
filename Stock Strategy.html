@@ -302,7 +302,7 @@
             const [copySuccess, setCopySuccess] = useState(null); 
 
             // 表格直覺篩選狀態
-            const [journalFilters, setJournalFilters] = useState({ date: '', stock: '', growth: 'all', tag: '' });
+            const [journalFilters, setJournalFilters] = useState({ date: '', stock: '', futures: 'all', growth: 'all', tag: '' });
             // 新增排序狀態
             const [journalSort, setJournalSort] = useState({ key: 'id', direction: 'desc' });
 
@@ -323,6 +323,13 @@
                 if (journalFilters.stock) {
                     const kw = journalFilters.stock.toLowerCase();
                     result = result.filter(l => l.stockId.toLowerCase().includes(kw) || l.name.toLowerCase().includes(kw));
+                }
+                if (journalFilters.futures !== 'all') {
+                    result = result.filter(l => {
+                        const eps = epsData[l.stockId] || {};
+                        if (journalFilters.futures === 'yes') return eps.hasFutures;
+                        return true; // (目前不提供 'no' 的選項，只提供 'all' 和 'yes')
+                    });
                 }
                 if (journalFilters.growth !== 'all') {
                     result = result.filter(l => {
@@ -902,7 +909,13 @@
                                         </th>
                                         <th className="p-3 font-medium align-top min-w-[140px]">
                                             <div className="mb-2 flex items-center gap-1 cursor-pointer hover:text-blue-400 select-none" onClick={() => handleJournalSort('stock')}>代號 / 名稱 <SortIcon sortKey="stock" currentSort={journalSort} /></div>
-                                            <input type="text" placeholder="搜尋..." value={journalFilters.stock} onChange={e => setJournalFilters({...journalFilters, stock: e.target.value})} className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-xs outline-none focus:border-blue-500" />
+                                            <div className="flex flex-col gap-1.5">
+                                                <input type="text" placeholder="搜尋..." value={journalFilters.stock} onChange={e => setJournalFilters({...journalFilters, stock: e.target.value})} className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs outline-none focus:border-blue-500" />
+                                                <select value={journalFilters.futures} onChange={e => setJournalFilters({...journalFilters, futures: e.target.value})} className="w-full bg-slate-900 border border-slate-700 rounded px-1 py-1 text-xs outline-none focus:border-blue-500">
+                                                    <option value="all">全部</option>
+                                                    <option value="yes">僅顯示有股期</option>
+                                                </select>
+                                            </div>
                                         </th>
                                         <th className="p-3 font-medium font-mono-num align-top">
                                             <div className="mb-2 flex items-center gap-1 cursor-pointer hover:text-blue-400 select-none" onClick={() => handleJournalSort('eps25')}>25' EPS <SortIcon sortKey="eps25" currentSort={journalSort} /></div>
@@ -934,7 +947,7 @@
                                         </th>
                                         <th className="p-3 font-medium text-center align-top">
                                             <div className="mb-2">操作</div>
-                                            <button onClick={() => { setJournalFilters({date: '', stock: '', growth: 'all', tag: ''}); setJournalSort({key: 'id', direction: 'desc'}); }} className="text-xs text-slate-500 hover:text-slate-300 underline transition">還原預設</button>
+                                            <button onClick={() => { setJournalFilters({date: '', stock: '', futures: 'all', growth: 'all', tag: ''}); setJournalSort({key: 'id', direction: 'desc'}); }} className="text-xs text-slate-500 hover:text-slate-300 underline transition">還原預設</button>
                                         </th>
                                     </tr>
                                 </thead>
@@ -1382,7 +1395,7 @@
             const [planStockName, setPlanStockName] = useState('');
             const [alert, setAlert] = useState({ show: false, msg: '' });
             
-            const [planFilters, setPlanFilters] = useState({ stock: '', status: 'all' });
+            const [planFilters, setPlanFilters] = useState({ stock: '', status: 'all', futures: 'all' });
             const [planSort, setPlanSort] = useState({ key: 'id', direction: 'desc' });
 
             const handlePlanSort = (key) => {
@@ -1473,6 +1486,13 @@
                 if (planFilters.stock) {
                     const kw = planFilters.stock.toLowerCase();
                     result = result.filter(l => l.stockId.toLowerCase().includes(kw) || l.name.toLowerCase().includes(kw));
+                }
+                if (planFilters.futures !== 'all') {
+                    result = result.filter(l => {
+                        const eps = epsData[l.stockId] || {};
+                        if (planFilters.futures === 'yes') return eps.hasFutures;
+                        return true;
+                    });
                 }
                 if (planFilters.status !== 'all') {
                     result = result.filter(l => {
@@ -1659,12 +1679,18 @@
                                             <div className="mb-2 flex items-center gap-1 cursor-pointer hover:text-blue-400 select-none" onClick={() => handlePlanSort('stock')}>標的 / 狀態 <SortIcon sortKey="stock" currentSort={planSort} /></div>
                                             <div className="flex flex-col gap-1.5">
                                                 <input type="text" placeholder="搜尋代號/名稱" value={planFilters.stock} onChange={e => setPlanFilters({...planFilters, stock: e.target.value})} className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs outline-none focus:border-blue-500" />
-                                                <select value={planFilters.status} onChange={e => setPlanFilters({...planFilters, status: e.target.value})} className="w-full bg-slate-900 border border-slate-700 rounded px-1 py-1 text-xs outline-none focus:border-blue-500">
-                                                    <option value="all">全部狀態</option>
-                                                    <option value="open">持倉中</option>
-                                                    <option value="closed">已平倉</option>
-                                                    <option value="planning">規劃中</option>
-                                                </select>
+                                                <div className="flex gap-1.5">
+                                                    <select value={planFilters.status} onChange={e => setPlanFilters({...planFilters, status: e.target.value})} className="w-1/2 bg-slate-900 border border-slate-700 rounded px-1 py-1 text-xs outline-none focus:border-blue-500">
+                                                        <option value="all">全部狀態</option>
+                                                        <option value="open">持倉中</option>
+                                                        <option value="closed">已平倉</option>
+                                                        <option value="planning">規劃中</option>
+                                                    </select>
+                                                    <select value={planFilters.futures} onChange={e => setPlanFilters({...planFilters, futures: e.target.value})} className="w-1/2 bg-slate-900 border border-slate-700 rounded px-1 py-1 text-xs outline-none focus:border-blue-500">
+                                                        <option value="all">全部標的</option>
+                                                        <option value="yes">僅有股期</option>
+                                                    </select>
+                                                </div>
                                             </div>
                                         </th>
                                         <th className="p-3 align-top"><div className="mb-2 flex items-center gap-1 cursor-pointer hover:text-blue-400 select-none" onClick={() => handlePlanSort('entry')}>進場價 <SortIcon sortKey="entry" currentSort={planSort} /></div></th>
@@ -1675,7 +1701,7 @@
                                         <th className="p-3 align-top"><div className="mb-2 flex items-center gap-1 cursor-pointer hover:text-blue-400 select-none" onClick={() => handlePlanSort('pnl')}>預估/實現損益 <SortIcon sortKey="pnl" currentSort={planSort} /></div></th>
                                         <th className="p-3 text-center align-top">
                                             <div className="mb-2">操作</div>
-                                            <button onClick={() => { setPlanFilters({stock: '', status: 'all'}); setPlanSort({key: 'id', direction: 'desc'}); }} className="text-xs text-slate-500 hover:text-slate-300 underline transition">還原預設</button>
+                                            <button onClick={() => { setPlanFilters({stock: '', status: 'all', futures: 'all'}); setPlanSort({key: 'id', direction: 'desc'}); }} className="text-xs text-slate-500 hover:text-slate-300 underline transition">還原預設</button>
                                         </th>
                                     </tr>
                                 </thead>
