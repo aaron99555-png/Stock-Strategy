@@ -1822,36 +1822,168 @@
                 return { ...STATIC_STOCK_DB, ...customStocks };
             }, [customStocks]);
 
-            // 匯出全部資料 (JSON)
+            // 匯出全部資料 (改為 Excel 格式)
             const handleExportData = () => {
-                const backup = { logs, calcHistory, epsData, customStocks };
-                const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `萊恩手札備份_${new Date().toISOString().split('T')[0]}.json`;
-                a.click();
-                URL.revokeObjectURL(url);
+                const wb = XLSX.utils.book_new();
+
+                // 1. 選股與規劃紀錄
+                const logsSheetData = logs.map(l => ({
+                    '系統ID(勿改)': l.id,
+                    '日期': l.date,
+                    '股號': l.stockId,
+                    '名稱': l.name,
+                    '主策略': Array.isArray(l.strategy) ? l.strategy.join(',') : (l.strategy || ''),
+                    '進階標籤': Array.isArray(l.subTags) ? l.subTags.join(',') : '',
+                    '追蹤標記': l.starred ? 'Y' : 'N',
+                    '加入規劃': l.inPlan ? 'Y' : 'N',
+                    '進場價': l.plan?.entry || '',
+                    '停損價': l.plan?.stopLoss || '',
+                    '移動停利': l.plan?.trailing || '',
+                    '出場價': l.plan?.exit || '',
+                    '張數': l.plan?.shares || '',
+                    '現價': l.plan?.currentPrice || '',
+                    '權證代號': l.plan?.warrantCode || '',
+                    '權證買進': l.plan?.warrantEntry || '',
+                    '權證賣出': l.plan?.warrantExit || '',
+                    '權證張數': l.plan?.warrantShares || ''
+                }));
+                const wsLogs = XLSX.utils.json_to_sheet(logsSheetData);
+                XLSX.utils.book_append_sheet(wb, wsLogs, "選股與規劃");
+
+                // 2. 支撐壓力紀錄
+                const calcSheetData = calcHistory.map(c => ({
+                    '系統ID(勿改)': c.id,
+                    '日期': c.date,
+                    '盤別': c.session,
+                    '股號': c.stockId,
+                    '名稱': c.name,
+                    'H': c.inputs.h,
+                    'L': c.inputs.l,
+                    'C': c.inputs.c,
+                    '結果快取(勿改)': JSON.stringify(c.results)
+                }));
+                const wsCalc = XLSX.utils.json_to_sheet(calcSheetData);
+                XLSX.utils.book_append_sheet(wb, wsCalc, "支撐壓力紀錄");
+
+                // 3. EPS與股期快取
+                const epsSheetData = Object.keys(epsData).map(id => ({
+                    '股號': id,
+                    '25EPS': epsData[id].eps25,
+                    '26EPS': epsData[id].eps26,
+                    '成長率': epsData[id].epsGrowth,
+                    '有股期': epsData[id].hasFutures ? 'Y' : 'N'
+                }));
+                const wsEps = XLSX.utils.json_to_sheet(epsSheetData);
+                XLSX.utils.book_append_sheet(wb, wsEps, "EPS與股期快取");
+
+                // 4. 自訂股票快取
+                const customStocksData = Object.keys(customStocks).map(id => ({
+                    '股號': id,
+                    '名稱': customStocks[id].name,
+                    '產業': customStocks[id].industry
+                }));
+                const wsCustom = XLSX.utils.json_to_sheet(customStocksData);
+                XLSX.utils.book_append_sheet(wb, wsCustom, "自訂股票快取");
+
+                XLSX.writeFile(wb, `萊恩手札備份_${new Date().toISOString().split('T')[0]}.xlsx`);
             };
 
-            // 匯入全部資料 (JSON)
+            // 匯入全部資料 (讀取 Excel 格式)
             const handleImportData = (e) => {
                 const file = e.target.files[0];
                 if (!file) return;
                 const reader = new FileReader();
                 reader.onload = (evt) => {
                     try {
-                        const data = JSON.parse(evt.target.result);
-                        if (data.logs) setLogs(data.logs);
-                        if (data.calcHistory) setCalcHistory(data.calcHistory);
-                        if (data.epsData) setEpsData(data.epsData);
-                        if (data.customStocks) setCustomStocks(data.customStocks);
-                        setAppAlert({ show: true, msg: '系統資料已成功匯入還原！' });
+                        const bstr = evt.target.result;
+                        const wb = XLSX.read(bstr, { type: 'binary' });
+
+                        // 1. Logs
+                        if (wb.Sheets["選股與規劃"]) {
+                            const logsData = XLSX.utils.sheet_to_json(wb.Sheets["選股與規劃"]);
+                            const newLogs = logsData.map(row => ({
+                                id: row['系統ID(勿改)']?.toString() || Date.now().toString() + Math.random(),
+                                date: row['日期'] || '',
+                                stockId: row['股號']?.toString() || '',
+                                name: row['名稱'] || '',
+                                strategy: row['主策略'] ? row['主策略'].toString().split(',') : [],
+                                subTags: row['進階標籤'] ? row['進階標籤'].toString().split(',') : [],
+                                starred: row['追蹤標記'] === 'Y',
+                                inPlan: row['加入規劃'] === 'Y',
+                                plan: {
+                                    entry: row['進場價']?.toString() || '',
+                                    stopLoss: row['停損價']?.toString() || '',
+                                    trailing: row['移動停利']?.toString() || '',
+                                    exit: row['出場價']?.toString() || '',
+                                    shares: row['張數']?.toString() || '',
+                                    currentPrice: row['現價']?.toString() || '',
+                                    warrantCode: row['權證代號']?.toString() || '',
+                                    warrantEntry: row['權證買進']?.toString() || '',
+                                    warrantExit: row['權證賣出']?.toString() || '',
+                                    warrantShares: row['權證張數']?.toString() || ''
+                                }
+                            }));
+                            setLogs(newLogs);
+                        }
+
+                        // 2. Calc History
+                        if (wb.Sheets["支撐壓力紀錄"]) {
+                            const calcData = XLSX.utils.sheet_to_json(wb.Sheets["支撐壓力紀錄"]);
+                            const newCalcHistory = calcData.map(row => ({
+                                id: row['系統ID(勿改)']?.toString() || Date.now().toString() + Math.random(),
+                                date: row['日期'] || '',
+                                session: row['盤別'] || '日盤',
+                                stockId: row['股號']?.toString() || '',
+                                name: row['名稱'] || '',
+                                inputs: {
+                                    h: row['H']?.toString() || '',
+                                    l: row['L']?.toString() || '',
+                                    c: row['C']?.toString() || ''
+                                },
+                                results: row['結果快取(勿改)'] ? JSON.parse(row['結果快取(勿改)']) : null
+                            }));
+                            setCalcHistory(newCalcHistory);
+                        }
+
+                        // 3. EPS快取
+                        if (wb.Sheets["EPS與股期快取"]) {
+                            const epsDataRaw = XLSX.utils.sheet_to_json(wb.Sheets["EPS與股期快取"]);
+                            let newEpsData = {};
+                            epsDataRaw.forEach(row => {
+                                if (row['股號']) {
+                                    newEpsData[row['股號'].toString()] = {
+                                        eps25: row['25EPS'] || '-',
+                                        eps26: row['26EPS'] || '-',
+                                        epsGrowth: row['成長率'] || '-',
+                                        hasFutures: row['有股期'] === 'Y'
+                                    };
+                                }
+                            });
+                            setEpsData(newEpsData);
+                        }
+
+                        // 4. Custom Stocks快取
+                        if (wb.Sheets["自訂股票快取"]) {
+                            const customDataRaw = XLSX.utils.sheet_to_json(wb.Sheets["自訂股票快取"]);
+                            let newCustomStocks = {};
+                            customDataRaw.forEach(row => {
+                                if (row['股號']) {
+                                    newCustomStocks[row['股號'].toString()] = {
+                                        name: row['名稱'] || '',
+                                        industry: row['產業'] || '匯入備份'
+                                    };
+                                }
+                            });
+                            setCustomStocks(newCustomStocks);
+                        }
+
+                        setAppAlert({ show: true, msg: 'Excel 備份資料已成功匯入還原！' });
                     } catch (err) {
-                        setAppAlert({ show: true, msg: '匯入失敗：檔案格式錯誤或損毀。' });
+                        console.error(err);
+                        setAppAlert({ show: true, msg: '匯入失敗：檔案格式錯誤或損毀。請確保使用系統匯出的 Excel 檔案。' });
                     }
                 };
-                reader.readAsText(file);
+                reader.readAsBinaryString(file);
                 e.target.value = null; // 清空選擇，允許重複匯入同檔名
             };
 
@@ -1869,11 +2001,11 @@
                                 </h1>
                             </div>
                             
-                            {/* 新增：資料匯入/匯出按鈕區塊 */}
+                            {/* 新增：資料匯入/匯出按鈕區塊 (更新 accept 為 .xlsx, .xls) */}
                             <div className="flex items-center gap-3">
                                 <label className="cursor-pointer flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-slate-200 transition bg-slate-800/50 hover:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700">
                                     <Upload size={14} /> 匯入備份
-                                    <input type="file" accept=".json" onChange={handleImportData} className="hidden" />
+                                    <input type="file" accept=".xlsx, .xls" onChange={handleImportData} className="hidden" />
                                 </label>
                                 <button onClick={handleExportData} className="flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-slate-200 transition bg-slate-800/50 hover:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700">
                                     <Download size={14} /> 匯出備份
