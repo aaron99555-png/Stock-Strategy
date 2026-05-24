@@ -716,6 +716,39 @@
                         const tagStr = l.computedTags.length > 0 ? ` (${l.computedTags.join('、')})` : '';
                         detailText += `- ${l.stockId} ${l.name}${countStr}${tagStr}\n`;
                     });
+                } else if (formatType === 'score-futures') {
+                    // 格式四：僅篩選有股期標的，並依照策略標籤數量做為分數，由高到低排序
+                    const futuresLogs = dayLogs.filter(l => epsData[l.stockId]?.hasFutures);
+                    
+                    if (futuresLogs.length === 0) {
+                        setAlert({ show: true, msg: `找不到 ${copyDate} 符合條件且具備「股期」的選股紀錄！` });
+                        return;
+                    }
+
+                    const scoredLogs = futuresLogs.map(l => {
+                        let tags = [];
+                        if (l.subTags && l.subTags.length > 0) {
+                            tags.push(...l.subTags);
+                        }
+                        const strategiesArray = Array.isArray(l.strategy) ? l.strategy : (l.strategy ? [l.strategy] : []);
+                        strategiesArray.forEach(sId => {
+                            const s = STRATEGIES.find(str => str.id === sId);
+                            if (s) {
+                                const hasSubTag = l.subTags?.some(tag => SUB_TAGS[sId]?.includes(tag));
+                                if (!hasSubTag) tags.push(s.label);
+                            }
+                        });
+                        return { ...l, computedTags: tags, score: tags.length };
+                    });
+
+                    // 排序：分數高的在前；若分數相同，則依輸入時間(id)排序
+                    scoredLogs.sort((a, b) => b.score - a.score || parseInt(a.id) - parseInt(b.id));
+
+                    scoredLogs.forEach(l => {
+                        const countStr = l.score > 0 ? ` (${l.score}分)` : '';
+                        const tagStr = l.computedTags.length > 0 ? ` (${l.computedTags.join('、')})` : '';
+                        detailText += `- ${l.stockId} ${l.name}${countStr}${tagStr}\n`;
+                    });
                 }
 
                 resultText += detailText;
@@ -887,6 +920,9 @@
                                         </button>
                                         <button onClick={() => copyLogs('score')} className={`text-sm text-white flex items-center gap-1 transition px-3 py-1.5 rounded-md shadow-lg ${copySuccess === 'score' ? 'bg-green-600' : 'bg-rose-600 hover:bg-rose-500'}`} title="依標籤數量高低排序">
                                             {copySuccess === 'score' ? <CheckCircle size={16} /> : <Star size={16} />} {copySuccess === 'score' ? '已複製' : '依分數'}
+                                        </button>
+                                        <button onClick={() => copyLogs('score-futures')} className={`text-sm text-white flex items-center gap-1 transition px-3 py-1.5 rounded-md shadow-lg ${copySuccess === 'score-futures' ? 'bg-green-600' : 'bg-fuchsia-600 hover:bg-fuchsia-500'}`} title="僅篩選有股期標的，依標籤數量高低排序">
+                                            {copySuccess === 'score-futures' ? <CheckCircle size={16} /> : <Star size={16} />} {copySuccess === 'score-futures' ? '已複製' : '股期依分數'}
                                         </button>
                                     </div>
                                 </div>
