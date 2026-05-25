@@ -564,7 +564,8 @@
                             if (epsGrowth !== undefined && epsGrowth !== null && String(epsGrowth).trim().toUpperCase() !== 'NAN') {
                                 const numGrowth = parseFloat(epsGrowth);
                                 if (!isNaN(numGrowth)) {
-                                    formattedGrowth = Number(numGrowth.toFixed(2)) + '%';
+                                    // 將原始數值乘上 100，轉換為百分比格式 (例: 1.10 -> 110%)
+                                    formattedGrowth = Number((numGrowth * 100).toFixed(2)) + '%';
                                 } else {
                                     formattedGrowth = epsGrowth; 
                                 }
@@ -596,7 +597,13 @@
             };
 
             const copyLogs = (formatType) => {
-                let resultText = `| ${copyDate} 多層篩選漏斗 |\n`;
+                // 動態判斷複製輸出時的標題
+                let titleName = "多層篩選漏斗";
+                if (formatType === 'score-futures') {
+                    titleName = "個股期篩選漏斗";
+                }
+
+                let resultText = `| ${copyDate} ${titleName} |\n`;
                 const now = new Date();
                 const timeString = now.toLocaleTimeString('zh-TW', { hour12: false });
                 resultText += `產出時間：${copyDate} ${timeString}\n`;
