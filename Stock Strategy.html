@@ -339,7 +339,7 @@
                     result = result.filter(l => {
                         const eps = epsData[l.stockId] || {};
                         if (journalFilters.futures === 'yes') return eps.hasFutures;
-                        return true; // (目前不提供 'no' 的選項，只提供 'all' 和 'yes')
+                        return true; 
                     });
                 }
                 if (journalFilters.growth !== 'all') {
@@ -803,37 +803,38 @@
                             </div>
                         </div>
 
-                        <div className="mb-6">
-                            <label className="block text-sm text-slate-400 mb-2">符合策略條件</label>
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        {/* 修改這裡：更緊湊的策略按鈕區塊 */}
+                        <div className="mb-4">
+                            <label className="block text-sm text-slate-400 mb-1.5">符合策略條件</label>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                                 {STRATEGIES.map(s => (
                                     <button 
                                         key={s.id}
                                         onClick={() => handleStrategySelect(s.id)}
-                                        className={`flex flex-col items-center justify-center p-3 rounded-xl border transition-all ${selectedStrategy === s.id ? `bg-gradient-to-br ${s.color} border-transparent text-white shadow-lg scale-105` : 'bg-slate-900 border-slate-700 text-slate-400 hover:border-slate-500'}`}
+                                        className={`flex items-center justify-center gap-1.5 p-2 rounded-lg border transition-all ${selectedStrategy === s.id ? `bg-gradient-to-r ${s.color} border-transparent text-white shadow-md` : 'bg-slate-900 border-slate-700 text-slate-400 hover:border-slate-500'}`}
                                     >
-                                        <s.icon size={24} className="mb-2" />
-                                        <span className="font-medium">{s.label}</span>
+                                        <s.icon size={16} />
+                                        <span className="text-sm font-medium">{s.label}</span>
                                     </button>
                                 ))}
                             </div>
                             
                             {selectedStrategy && SUB_TAGS[selectedStrategy] && (
-                                <div className="mt-4 p-4 bg-slate-800/30 rounded-xl border border-slate-700/50 animate-fade-in-down">
-                                    <div className="flex justify-between items-center mb-3">
-                                        <label className="block text-sm text-slate-400">進階子標籤 (單選)</label>
+                                <div className="mt-2 p-3 bg-slate-800/30 rounded-lg border border-slate-700/50 animate-fade-in-down">
+                                    <div className="flex justify-between items-center mb-2">
+                                        <label className="block text-xs text-slate-400">進階子標籤 (單選)</label>
                                         {selectedSubTags.length > 0 && (
-                                            <button onClick={() => setSelectedSubTags([])} className="text-xs text-slate-500 hover:text-slate-300 transition px-2 py-1 rounded hover:bg-slate-700">🧹 清空已選標籤</button>
+                                            <button onClick={() => setSelectedSubTags([])} className="text-[10px] text-slate-500 hover:text-slate-300 transition px-1.5 py-0.5 rounded hover:bg-slate-700">🧹 清空已選</button>
                                         )}
                                     </div>
-                                    <div className="flex flex-wrap gap-2">
+                                    <div className="flex flex-wrap gap-1.5">
                                         {SUB_TAGS[selectedStrategy].map(tag => (
                                             <button
                                                 key={tag}
                                                 onClick={() => toggleSubTag(tag)}
-                                                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                                                className={`px-2.5 py-1 rounded-full text-[11px] font-medium transition-all ${
                                                     selectedSubTags.includes(tag) 
-                                                        ? `bg-gradient-to-r ${SUB_TAG_COLORS[tag] || 'from-blue-600 to-indigo-600'} text-white shadow-md shadow-slate-900/50` 
+                                                        ? `bg-gradient-to-r ${SUB_TAG_COLORS[tag] || 'from-blue-600 to-indigo-600'} text-white shadow-sm` 
                                                         : 'bg-slate-900 border border-slate-600 text-slate-400 hover:border-slate-400 hover:text-slate-200'
                                                 }`}
                                             >
@@ -2365,19 +2366,19 @@
                                 </button>
                             </div>
                         </div>
-                        {/* Tabs */}
-                        <div className="max-w-7xl mx-auto px-4 flex gap-4 overflow-x-auto text-sm font-medium">
-                            <button onClick={() => setActiveTab('journal')} className={`py-3 border-b-2 whitespace-nowrap transition ${activeTab === 'journal' ? 'border-blue-500 text-blue-400' : 'border-transparent text-slate-400 hover:text-slate-200'}`}>
-                                模組一：選股日誌
+                        {/* Tabs: 修改這裡為彩色區塊顯示 */}
+                        <div className="max-w-7xl mx-auto px-4 flex gap-6 overflow-x-auto text-sm font-bold">
+                            <button onClick={() => setActiveTab('journal')} className={`py-3 px-1 border-b-2 whitespace-nowrap transition flex items-center gap-1.5 ${activeTab === 'journal' ? 'border-blue-500 text-blue-400' : 'border-transparent text-blue-500/50 hover:text-blue-400'}`}>
+                                <FileText size={16} /> 模組一：選股日誌
                             </button>
-                            <button onClick={() => setActiveTab('calculator')} className={`py-3 border-b-2 whitespace-nowrap transition ${activeTab === 'calculator' ? 'border-indigo-500 text-indigo-400' : 'border-transparent text-slate-400 hover:text-slate-200'}`}>
-                                模組二：支撐壓力
+                            <button onClick={() => setActiveTab('calculator')} className={`py-3 px-1 border-b-2 whitespace-nowrap transition flex items-center gap-1.5 ${activeTab === 'calculator' ? 'border-indigo-500 text-indigo-400' : 'border-transparent text-indigo-500/50 hover:text-indigo-400'}`}>
+                                <Calculator size={16} /> 模組二：支撐壓力
                             </button>
-                            <button onClick={() => setActiveTab('plan')} className={`py-3 border-b-2 whitespace-nowrap transition ${activeTab === 'plan' ? 'border-emerald-500 text-emerald-400' : 'border-transparent text-slate-400 hover:text-slate-200'}`}>
-                                模組三：交易規劃
+                            <button onClick={() => setActiveTab('plan')} className={`py-3 px-1 border-b-2 whitespace-nowrap transition flex items-center gap-1.5 ${activeTab === 'plan' ? 'border-emerald-500 text-emerald-400' : 'border-transparent text-emerald-500/50 hover:text-emerald-400'}`}>
+                                <LayoutDashboard size={16} /> 模組三：交易規劃
                             </button>
-                            <button onClick={() => setActiveTab('watchlist')} className={`py-3 border-b-2 whitespace-nowrap transition ${activeTab === 'watchlist' ? 'border-yellow-500 text-yellow-400' : 'border-transparent text-slate-400 hover:text-slate-200'}`}>
-                                模組四：追蹤清單
+                            <button onClick={() => setActiveTab('watchlist')} className={`py-3 px-1 border-b-2 whitespace-nowrap transition flex items-center gap-1.5 ${activeTab === 'watchlist' ? 'border-yellow-500 text-yellow-400' : 'border-transparent text-yellow-500/50 hover:text-yellow-400'}`}>
+                                <Star size={16} /> 模組四：追蹤清單
                             </button>
                         </div>
                     </header>
