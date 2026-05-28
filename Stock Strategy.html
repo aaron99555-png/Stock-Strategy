@@ -104,6 +104,16 @@
         // ==========================================
         // 2. 共用元件 (Hooks & Modals)
         // ==========================================
+        
+        // 取得台灣本地的今天日期 (YYYY-MM-DD)，避免 UTC 造成的跨日誤差
+        const getTodayLocal = () => {
+            const d = new Date();
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
+
         const fallbackCopyTextToClipboard = (text) => {
             const textArea = document.createElement("textarea");
             textArea.value = text;
@@ -287,9 +297,9 @@
         };
 
         const StockJournal = ({ logs, setLogs, customStocks, setCustomStocks, epsData, setEpsData, stockMap }) => {
-            const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-            const [copyStartDate, setCopyStartDate] = useState(new Date().toISOString().split('T')[0]);
-            const [copyEndDate, setCopyEndDate] = useState(new Date().toISOString().split('T')[0]);
+            const [date, setDate] = useState(getTodayLocal());
+            const [copyStartDate, setCopyStartDate] = useState(getTodayLocal());
+            const [copyEndDate, setCopyEndDate] = useState(getTodayLocal());
             const [copySubTags, setCopySubTags] = useState([]); 
             const [isCopyDropdownOpen, setIsCopyDropdownOpen] = useState(false);
             const copyDropdownRef = useRef(null);
@@ -302,8 +312,8 @@
             const [confirm, setConfirm] = useState({ show: false, action: null });
             const [copySuccess, setCopySuccess] = useState(null); 
 
-            // 表格直覺篩選狀態
-            const [journalFilters, setJournalFilters] = useState({ date: '', stock: '', futures: 'all', growth: 'all', tag: '' });
+            // 表格直覺篩選狀態 (預設顯示今天)
+            const [journalFilters, setJournalFilters] = useState({ date: getTodayLocal(), stock: '', futures: 'all', growth: 'all', tag: '' });
             // 新增排序狀態
             const [journalSort, setJournalSort] = useState({ key: 'id', direction: 'desc' });
 
@@ -982,7 +992,7 @@
                                         </th>
                                         <th className="p-3 font-medium text-center align-top">
                                             <div className="mb-2">操作</div>
-                                            <button onClick={() => { setJournalFilters({date: '', stock: '', futures: 'all', growth: 'all', tag: ''}); setJournalSort({key: 'id', direction: 'desc'}); }} className="text-xs text-slate-500 hover:text-slate-300 underline transition">還原預設</button>
+                                            <button onClick={() => { setJournalFilters({date: getTodayLocal(), stock: '', futures: 'all', growth: 'all', tag: ''}); setJournalSort({key: 'id', direction: 'desc'}); }} className="text-xs text-slate-500 hover:text-slate-300 underline transition">還原預設</button>
                                         </th>
                                     </tr>
                                 </thead>
@@ -1077,7 +1087,7 @@
                                         )
                                     })}
                                     {logs.length === 0 && (
-                                        <tr><td colSpan="7" className="p-8 text-center text-slate-500">尚無選股紀錄</td></tr>
+                                        <tr><td colSpan="7" className="p-8 text-center text-slate-500">目前所選條件下無紀錄</td></tr>
                                     )}
                                 </tbody>
                             </table>
@@ -1197,7 +1207,7 @@
                 
                 const newRecord = {
                     id: Date.now().toString(),
-                    date: new Date().toISOString().split('T')[0],
+                    date: getTodayLocal(),
                     session,
                     stockId: sId,
                     name: finalName,
@@ -1210,7 +1220,7 @@
             const copySystem = (sysName, data, record = null) => {
                 const sId = stockId.trim();
                 const finalName = stockName.trim() || stockMap[sId]?.name || '';
-                const rec = record || { date: new Date().toISOString().split('T')[0], session, stockId: sId, name: finalName };
+                const rec = record || { date: getTodayLocal(), session, stockId: sId, name: finalName };
                 const titleStr = `【${rec.date} ${rec.session} ${rec.stockId} ${rec.name} 關鍵點位參考 - ${sysName}】\n\n`;
                 let text = titleStr;
                 
@@ -1425,7 +1435,7 @@
             const [editingId, setEditingId] = useState(null);
             const [confirm, setConfirm] = useState({ show: false, action: null });
             
-            const [planDate, setPlanDate] = useState(new Date().toISOString().split('T')[0]);
+            const [planDate, setPlanDate] = useState(getTodayLocal());
             const [planStockId, setPlanStockId] = useState('');
             const [planStockName, setPlanStockName] = useState('');
             const [alert, setAlert] = useState({ show: false, msg: '' });
@@ -1946,7 +1956,7 @@
                 const wsCustom = XLSX.utils.json_to_sheet(customStocksData);
                 XLSX.utils.book_append_sheet(wb, wsCustom, "自訂股票快取");
 
-                XLSX.writeFile(wb, `萊恩手札備份_${new Date().toISOString().split('T')[0]}.xlsx`);
+                XLSX.writeFile(wb, `萊恩手札備份_${getTodayLocal()}.xlsx`);
             };
 
             // 匯入全部資料 (讀取 Excel 格式)
