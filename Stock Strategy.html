@@ -1878,6 +1878,288 @@
         };
 
         // ==========================================
+        // 6. 模組四：追蹤清單 (Watchlist)
+        // ==========================================
+        const WatchlistModule = ({ logs, setLogs, epsData }) => {
+            const [confirm, setConfirm] = useState({ show: false, action: null });
+            const [watchlistFilters, setWatchlistFilters] = useState({ date: '', stock: '', futures: 'all', growth: 'all', tag: '' });
+            const [watchlistSort, setWatchlistSort] = useState({ key: 'id', direction: 'desc' });
+
+            const handleWatchlistSort = (key) => {
+                if (watchlistSort.key === key) {
+                    setWatchlistSort({ key, direction: watchlistSort.direction === 'asc' ? 'desc' : 'asc' });
+                } else {
+                    setWatchlistSort({ key, direction: 'desc' }); 
+                }
+            };
+
+            const toggleStar = (id) => {
+                setLogs(logs.map(log => log.id === id ? { ...log, starred: !log.starred } : log));
+            };
+
+            const togglePlan = (id) => {
+                setLogs(logs.map(log => log.id === id ? { ...log, inPlan: !log.inPlan } : log));
+            };
+
+            const deleteLog = (id) => {
+                setLogs(logs.filter(log => log.id !== id));
+            };
+
+            const removeTag = (logId, isSubTag, tagToRemove) => {
+                setLogs(logs.map(log => {
+                    if (log.id !== logId) return log;
+                    const newLog = { ...log };
+                    if (isSubTag) {
+                        newLog.subTags = (newLog.subTags || []).filter(t => t !== tagToRemove);
+                    } else {
+                        const strategiesArray = Array.isArray(newLog.strategy) ? newLog.strategy : (newLog.strategy ? [newLog.strategy] : []);
+                        newLog.strategy = strategiesArray.filter(s => s !== tagToRemove);
+                    }
+                    return newLog;
+                }));
+            };
+
+            const filteredWatchlistLogs = useMemo(() => {
+                // 僅抓取被標記星號 (starred) 的紀錄
+                let result = logs.filter(l => l.starred);
+                
+                // 1. 篩選邏輯
+                if (watchlistFilters.date) result = result.filter(l => l.date === watchlistFilters.date);
+                if (watchlistFilters.stock) {
+                    const kw = watchlistFilters.stock.toLowerCase();
+                    result = result.filter(l => l.stockId.toLowerCase().includes(kw) || l.name.toLowerCase().includes(kw));
+                }
+                if (watchlistFilters.futures !== 'all') {
+                    result = result.filter(l => {
+                        const eps = epsData[l.stockId] || {};
+                        if (watchlistFilters.futures === 'yes') return eps.hasFutures;
+                        return true;
+                    });
+                }
+                if (watchlistFilters.growth !== 'all') {
+                    result = result.filter(l => {
+                        const eps = epsData[l.stockId] || {};
+                        const g = parseFloat(eps.epsGrowth);
+                        if (watchlistFilters.growth === 'positive') return !isNaN(g) && g > 0;
+                        if (watchlistFilters.growth === 'negative') return !isNaN(g) && g < 0;
+                        return true;
+                    });
+                }
+                if (watchlistFilters.tag) {
+                    result = result.filter(l => {
+                        const strats = Array.isArray(l.strategy) ? l.strategy : (l.strategy ? [l.strategy] : []);
+                        const matchMain = strats.some(sId => {
+                            const s = STRATEGIES.find(x => x.id === sId);
+                            return s && s.label === watchlistFilters.tag;
+                        });
+                        const matchSub = l.subTags && l.subTags.includes(watchlistFilters.tag);
+                        return matchMain || matchSub;
+                    });
+                }
+
+                // 2. 排序邏輯
+                result.sort((a, b) => {
+                    let valA, valB;
+                    const epsA = epsData[a.stockId] || {};
+                    const epsB = epsData[b.stockId] || {};
+
+                    switch (watchlistSort.key) {
+                        case 'date':
+                            valA = a.date; valB = b.date;
+                            if (valA === valB) { valA = parseInt(a.id); valB = parseInt(b.id); } 
+                            break;
+                        case 'stock':
+                            valA = a.stockId; valB = b.stockId; break;
+                        case 'eps25':
+                            valA = parseFloat(epsA.eps25) || -999999; valB = parseFloat(epsB.eps25) || -999999; break;
+                        case 'eps26':
+                            valA = parseFloat(epsA.eps26) || -999999; valB = parseFloat(epsB.eps26) || -999999; break;
+                        case 'growth':
+                            valA = parseFloat(epsA.epsGrowth) || -999999; valB = parseFloat(epsB.epsGrowth) || -999999; break;
+                        case 'tags':
+                            valA = (a.subTags?.length || 0) + (Array.isArray(a.strategy) ? a.strategy.length : (a.strategy ? 1 : 0));
+                            valB = (b.subTags?.length || 0) + (Array.isArray(b.strategy) ? b.strategy.length : (b.strategy ? 1 : 0));
+                            break;
+                        default: // 'id'
+                            valA = parseInt(a.id); valB = parseInt(b.id); break;
+                    }
+
+                    if (valA < valB) return watchlistSort.direction === 'asc' ? -1 : 1;
+                    if (valA > valB) return watchlistSort.direction === 'asc' ? 1 : -1;
+                    return 0;
+                });
+
+                return result;
+            }, [logs, watchlistFilters, epsData, watchlistSort]);
+
+            return (
+                <div className="animate-fade-in-up space-y-6">
+                    <div className="flex justify-between items-end mb-4">
+                        <h2 className="text-2xl font-title text-yellow-400 flex items-center gap-2"><Star fill="currentColor" /> 專屬追蹤清單</h2>
+                        <span className="text-sm text-slate-400">目前共追蹤 {filteredWatchlistLogs.length} 檔標的</span>
+                    </div>
+
+                    <div className="bg-[#111827] rounded-2xl border border-slate-800 overflow-hidden shadow-lg">
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left border-collapse">
+                                <thead>
+                                    <tr className="bg-slate-800/50 text-slate-400 text-sm uppercase tracking-wider">
+                                        <th className="p-3 font-medium align-top min-w-[120px]">
+                                            <div className="mb-2 flex items-center gap-1 cursor-pointer hover:text-blue-400 select-none" onClick={() => handleWatchlistSort('date')}>日期 <SortIcon sortKey="date" currentSort={watchlistSort} /></div>
+                                            <input type="date" value={watchlistFilters.date} onChange={e => setWatchlistFilters({...watchlistFilters, date: e.target.value})} className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-xs font-mono-num outline-none focus:border-blue-500" />
+                                        </th>
+                                        <th className="p-3 font-medium align-top min-w-[140px]">
+                                            <div className="mb-2 flex items-center gap-1 cursor-pointer hover:text-blue-400 select-none" onClick={() => handleWatchlistSort('stock')}>代號 / 名稱 <SortIcon sortKey="stock" currentSort={watchlistSort} /></div>
+                                            <div className="flex flex-col gap-1.5">
+                                                <input type="text" placeholder="搜尋..." value={watchlistFilters.stock} onChange={e => setWatchlistFilters({...watchlistFilters, stock: e.target.value})} className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs outline-none focus:border-blue-500" />
+                                                <select value={watchlistFilters.futures} onChange={e => setWatchlistFilters({...watchlistFilters, futures: e.target.value})} className="w-full bg-slate-900 border border-slate-700 rounded px-1 py-1 text-xs outline-none focus:border-blue-500">
+                                                    <option value="all">全部</option>
+                                                    <option value="yes">僅顯示有股期</option>
+                                                </select>
+                                            </div>
+                                        </th>
+                                        <th className="p-3 font-medium font-mono-num align-top">
+                                            <div className="mb-2 flex items-center gap-1 cursor-pointer hover:text-blue-400 select-none" onClick={() => handleWatchlistSort('eps25')}>25' EPS <SortIcon sortKey="eps25" currentSort={watchlistSort} /></div>
+                                        </th>
+                                        <th className="p-3 font-medium font-mono-num align-top">
+                                            <div className="mb-2 flex items-center gap-1 cursor-pointer hover:text-blue-400 select-none" onClick={() => handleWatchlistSort('eps26')}>26' EPS(預) <SortIcon sortKey="eps26" currentSort={watchlistSort} /></div>
+                                        </th>
+                                        <th className="p-3 font-medium font-mono-num align-top whitespace-nowrap">
+                                            <div className="mb-2 flex items-center gap-1 cursor-pointer hover:text-blue-400 select-none" onClick={() => handleWatchlistSort('growth')}>EPS 成長率 <SortIcon sortKey="growth" currentSort={watchlistSort} /></div>
+                                            <select value={watchlistFilters.growth} onChange={e => setWatchlistFilters({...watchlistFilters, growth: e.target.value})} className="w-full bg-slate-900 border border-slate-700 rounded px-1 py-1 text-xs outline-none focus:border-blue-500">
+                                                <option value="all">全部</option>
+                                                <option value="positive">&gt; 0% (正成長)</option>
+                                                <option value="negative">&lt; 0% (衰退)</option>
+                                            </select>
+                                        </th>
+                                        <th className="p-3 font-medium align-top min-w-[160px]">
+                                            <div className="mb-2 flex items-center gap-1 cursor-pointer hover:text-blue-400 select-none" onClick={() => handleWatchlistSort('tags')}>策略標籤 <SortIcon sortKey="tags" currentSort={watchlistSort} /></div>
+                                            <select value={watchlistFilters.tag} onChange={e => setWatchlistFilters({...watchlistFilters, tag: e.target.value})} className="w-full bg-slate-900 border border-slate-700 rounded px-1 py-1 text-xs outline-none focus:border-blue-500">
+                                                <option value="">全部標籤</option>
+                                                {STRATEGIES.map(s => (
+                                                    <optgroup key={s.id} label={s.label}>
+                                                        <option value={s.label}>{s.label} (主策略)</option>
+                                                        {(SUB_TAGS[s.id] || []).map(t => (
+                                                            <option key={t} value={t}>{t}</option>
+                                                        ))}
+                                                    </optgroup>
+                                                ))}
+                                            </select>
+                                        </th>
+                                        <th className="p-3 font-medium text-center align-top">
+                                            <div className="mb-2">操作</div>
+                                            <button onClick={() => { setWatchlistFilters({date: '', stock: '', futures: 'all', growth: 'all', tag: ''}); setWatchlistSort({key: 'id', direction: 'desc'}); }} className="text-xs text-slate-500 hover:text-slate-300 underline transition">還原預設</button>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-800/50">
+                                    {filteredWatchlistLogs.map(log => {
+                                        const eps = epsData[log.stockId] || { eps25: '-', eps26: '-', epsGrowth: '-', hasFutures: false };
+                                        
+                                        const eps26Num = parseFloat(eps.eps26);
+                                        const isEps26Positive = !isNaN(eps26Num) && eps26Num > 0;
+                                        const isEps26Negative = !isNaN(eps26Num) && eps26Num < 0;
+
+                                        let growthColorClass = 'text-slate-400';
+                                        if (isEps26Negative) {
+                                            growthColorClass = 'text-emerald-400';
+                                        } else if (eps.epsGrowth && eps.epsGrowth !== '-') {
+                                            const val = parseFloat(eps.epsGrowth);
+                                            if (!isNaN(val)) {
+                                                growthColorClass = val > 0 ? 'text-red-400' : val < 0 ? 'text-emerald-400' : 'text-slate-300';
+                                            } else {
+                                                growthColorClass = 'text-amber-400';
+                                            }
+                                        }
+
+                                        return (
+                                            <tr key={log.id} className={`transition group ${isEps26Positive ? 'bg-yellow-500/10 hover:bg-yellow-500/20 border-l-2 border-yellow-500' : 'hover:bg-slate-800/20'}`}>
+                                                <td className="p-4 font-mono-num text-slate-300">{log.date}</td>
+                                                <td className="p-4">
+                                                    <div className="flex items-center">
+                                                        <FuturesBadge hasFutures={eps.hasFutures} />
+                                                        <span className={`font-mono-num font-bold mr-2 ${isEps26Positive ? 'text-yellow-400' : 'text-blue-400'}`}>{log.stockId}</span>
+                                                        <span className={isEps26Positive ? 'text-yellow-100 font-bold' : 'text-slate-200'}>{log.name}</span>
+                                                    </div>
+                                                </td>
+                                                <td className="p-4 font-mono-num text-emerald-400">{eps.eps25}</td>
+                                                <td className={`p-4 font-mono-num ${isEps26Positive ? 'text-yellow-400 font-bold drop-shadow-[0_0_5px_rgba(250,204,21,0.4)]' : 'text-emerald-500/70'}`}>{eps.eps26}</td>
+                                                <td className={`p-4 font-mono-num font-bold ${growthColorClass}`}>{eps.epsGrowth || '-'}</td>
+                                                <td className="p-4">
+                                                    <div className="flex flex-wrap gap-1.5 items-center">
+                                                        {log.subTags && log.subTags.length > 0 && (
+                                                            log.subTags.map(t => {
+                                                                const stratForTag = STRATEGIES.find(s => SUB_TAGS[s.id]?.includes(t));
+                                                                return (
+                                                                    <span 
+                                                                        key={t} 
+                                                                        onClick={() => removeTag(log.id, true, t)}
+                                                                        className={`group cursor-pointer inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gradient-to-r ${SUB_TAG_COLORS[t] || stratForTag?.color || 'from-blue-600 to-indigo-600'} text-white shadow-sm hover:opacity-80 transition-all`}
+                                                                        title="點擊移除標籤"
+                                                                    >
+                                                                        {t}
+                                                                        <X size={12} className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity w-3 h-3" />
+                                                                    </span>
+                                                                );
+                                                            })
+                                                        )}
+                                                        {(() => {
+                                                            const strategiesArray = Array.isArray(log.strategy) ? log.strategy : (log.strategy ? [log.strategy] : []);
+                                                            return strategiesArray.map(stratId => {
+                                                                const s = STRATEGIES.find(str => str.id === stratId);
+                                                                if (!s) return null;
+                                                                const hasSubTag = log.subTags?.some(tag => SUB_TAGS[stratId]?.includes(tag));
+                                                                if (log.subTags && log.subTags.length > 0 && hasSubTag) return null;
+                                                                return (
+                                                                    <span 
+                                                                        key={s.id} 
+                                                                        onClick={() => removeTag(log.id, false, s.id)}
+                                                                        className={`group cursor-pointer inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-gradient-to-r ${s.color} bg-opacity-10 text-white hover:opacity-80 transition-all`}
+                                                                        title="點擊移除策略"
+                                                                    >
+                                                                        {s.emoji} {s.label}
+                                                                        <X size={12} className="opacity-0 group-hover:opacity-100 transition-opacity w-3 h-3" />
+                                                                    </span>
+                                                                );
+                                                            });
+                                                        })()}
+                                                    </div>
+                                                </td>
+                                                <td className="p-4 text-center">
+                                                    <div className="flex justify-center gap-3">
+                                                        <button onClick={() => togglePlan(log.id)} className={`transition ${log.inPlan ? 'text-blue-400 drop-shadow-[0_0_8px_rgba(96,165,250,0.6)]' : 'text-slate-600 hover:text-blue-400'}`} title={log.inPlan ? '移出規劃' : '加入規劃'}>
+                                                            <Target size={20} />
+                                                        </button>
+                                                        <button onClick={() => toggleStar(log.id)} className={`transition ${log.starred ? 'text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.6)]' : 'text-slate-600 hover:text-yellow-400'}`} title="取消追蹤">
+                                                            <Star fill={log.starred ? "currentColor" : "none"} size={20} />
+                                                        </button>
+                                                        <button onClick={() => setConfirm({ show: true, action: () => deleteLog(log.id) })} className="text-slate-600 hover:text-red-400 transition" title="刪除">
+                                                            <Trash2 size={20} />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        )
+                                    })}
+                                    {filteredWatchlistLogs.length === 0 && (
+                                        <tr><td colSpan="7" className="p-12 text-center text-slate-500">
+                                            <Star size={48} className="mx-auto text-slate-700 mb-4" />
+                                            尚無追蹤標的<br/><span className="text-sm mt-2 block">在「選股日誌」點擊星星圖示即可將股票加入追蹤清單</span>
+                                        </td></tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <ConfirmModal isOpen={confirm.show} title="確認刪除" message="您確定要刪除這筆紀錄嗎？此動作無法復原。" 
+                        onConfirm={() => { confirm.action(); setConfirm({ show: false, action: null }); }} 
+                        onCancel={() => setConfirm({ show: false, action: null })} />
+                </div>
+            );
+        };
+
+        // ==========================================
         // 0. 主應用程式 (App)
         // ==========================================
         const App = () => {
@@ -2084,15 +2366,18 @@
                             </div>
                         </div>
                         {/* Tabs */}
-                        <div className="max-w-7xl mx-auto px-4 flex gap-6 text-sm font-medium">
-                            <button onClick={() => setActiveTab('journal')} className={`py-3 border-b-2 transition ${activeTab === 'journal' ? 'border-blue-500 text-blue-400' : 'border-transparent text-slate-400 hover:text-slate-200'}`}>
+                        <div className="max-w-7xl mx-auto px-4 flex gap-4 overflow-x-auto text-sm font-medium">
+                            <button onClick={() => setActiveTab('journal')} className={`py-3 border-b-2 whitespace-nowrap transition ${activeTab === 'journal' ? 'border-blue-500 text-blue-400' : 'border-transparent text-slate-400 hover:text-slate-200'}`}>
                                 模組一：選股日誌
                             </button>
-                            <button onClick={() => setActiveTab('calculator')} className={`py-3 border-b-2 transition ${activeTab === 'calculator' ? 'border-indigo-500 text-indigo-400' : 'border-transparent text-slate-400 hover:text-slate-200'}`}>
+                            <button onClick={() => setActiveTab('calculator')} className={`py-3 border-b-2 whitespace-nowrap transition ${activeTab === 'calculator' ? 'border-indigo-500 text-indigo-400' : 'border-transparent text-slate-400 hover:text-slate-200'}`}>
                                 模組二：支撐壓力
                             </button>
-                            <button onClick={() => setActiveTab('plan')} className={`py-3 border-b-2 transition ${activeTab === 'plan' ? 'border-emerald-500 text-emerald-400' : 'border-transparent text-slate-400 hover:text-slate-200'}`}>
+                            <button onClick={() => setActiveTab('plan')} className={`py-3 border-b-2 whitespace-nowrap transition ${activeTab === 'plan' ? 'border-emerald-500 text-emerald-400' : 'border-transparent text-slate-400 hover:text-slate-200'}`}>
                                 模組三：交易規劃
+                            </button>
+                            <button onClick={() => setActiveTab('watchlist')} className={`py-3 border-b-2 whitespace-nowrap transition ${activeTab === 'watchlist' ? 'border-yellow-500 text-yellow-400' : 'border-transparent text-slate-400 hover:text-slate-200'}`}>
+                                模組四：追蹤清單
                             </button>
                         </div>
                     </header>
@@ -2107,6 +2392,9 @@
                         )}
                         {activeTab === 'plan' && (
                             <PlanDashboard logs={logs} setLogs={setLogs} stockMap={stockMap} setCustomStocks={setCustomStocks} epsData={epsData} />
+                        )}
+                        {activeTab === 'watchlist' && (
+                            <WatchlistModule logs={logs} setLogs={setLogs} epsData={epsData} stockMap={stockMap} />
                         )}
                     </main>
 
