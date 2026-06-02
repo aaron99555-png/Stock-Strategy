@@ -8,6 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- SheetJS -->
     <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+    <!-- html2canvas 用於產出圖片 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -93,7 +95,7 @@
             TrendingUp, BarChart2, Zap, AlertCircle, Save, Trash2, 
             Download, Upload, Eye, FileText, CheckCircle, Calculator,
             ClipboardCopy, Search, PlusCircle, LayoutDashboard, Star, X, Target,
-            ArrowUp, ArrowDown, ArrowUpDown
+            ArrowUp, ArrowDown, ArrowUpDown, Camera, Image as ImageIcon
         } from 'lucide-react';
 
         // ==========================================
@@ -159,7 +161,9 @@
 
             useEffect(() => {
                 if (isOpen && btnRef.current) {
-                    setTimeout(() => btnRef.current.focus(), 10);
+                    setTimeout(() => {
+                        if (btnRef.current) btnRef.current.focus();
+                    }, 10);
                 }
 
                 if (!isOpen) return;
@@ -203,7 +207,9 @@
 
             useEffect(() => {
                 if (isOpen && btnRef.current) {
-                    setTimeout(() => btnRef.current.focus(), 10);
+                    setTimeout(() => {
+                        if (btnRef.current) btnRef.current.focus();
+                    }, 10);
                 }
 
                 if (!isOpen) return;
@@ -296,6 +302,25 @@
             '興櫃-多頭突破上關價': 'from-amber-600 to-orange-700'
         };
 
+        // 供圖片匯出使用的背景樣式邏輯 (淺色美圖設計)
+        const getLightBgClass = (label) => {
+            if (!label) return 'bg-slate-100/90';
+            if (label.includes('當沖')) return 'bg-orange-100/80';
+            if (label.includes('興櫃')) return 'bg-purple-100/80';
+            if (label.includes('籌碼') || label.includes('法人') || label.includes('買進') || label.includes('大單') || label.includes('營收')) return 'bg-emerald-100/80';
+            if (label.includes('趨勢') || label.includes('齊揚') || label.includes('開花') || label.includes('破繭') || label.includes('金叉') || label.includes('MACD') || label.includes('突破') || label.includes('上漲') || label.includes('不可失')) return 'bg-blue-100/80';
+            return 'bg-indigo-100/80';
+        };
+
+        const getDarkTextClass = (label) => {
+            if (!label) return 'text-slate-700';
+            if (label.includes('當沖')) return 'text-orange-700';
+            if (label.includes('興櫃')) return 'text-purple-700';
+            if (label.includes('籌碼') || label.includes('法人') || label.includes('買進') || label.includes('大單') || label.includes('營收')) return 'text-emerald-700';
+            if (label.includes('趨勢') || label.includes('齊揚') || label.includes('開花') || label.includes('破繭') || label.includes('金叉') || label.includes('MACD') || label.includes('突破') || label.includes('上漲') || label.includes('不可失')) return 'text-blue-700';
+            return 'text-indigo-700';
+        };
+
         const StockJournal = ({ logs, setLogs, customStocks, setCustomStocks, epsData, setEpsData, stockMap }) => {
             const [date, setDate] = useState(getTodayLocal());
             const [copyStartDate, setCopyStartDate] = useState(getTodayLocal());
@@ -304,6 +329,9 @@
             const [isCopyDropdownOpen, setIsCopyDropdownOpen] = useState(false);
             const copyDropdownRef = useRef(null);
             
+            // 用於產出圖片的狀態
+            const [exportImgData, setExportImgData] = useState(null);
+
             const [stockId, setStockId] = useState('');
             const [stockName, setStockName] = useState('');
             const [selectedStrategy, setSelectedStrategy] = useState('');
@@ -312,8 +340,8 @@
             const [confirm, setConfirm] = useState({ show: false, action: null });
             const [copySuccess, setCopySuccess] = useState(null); 
 
-            // 表格直覺篩選狀態 (預設顯示今天)
-            const [journalFilters, setJournalFilters] = useState({ date: getTodayLocal(), stock: '', futures: 'all', growth: 'all', tag: '' });
+            // 表格直覺篩選狀態 (預設顯示今天，新增 tagCount)
+            const [journalFilters, setJournalFilters] = useState({ date: getTodayLocal(), stock: '', futures: 'all', growth: 'all', tag: '', tagCount: 'all' });
             // 新增排序狀態
             const [journalSort, setJournalSort] = useState({ key: 'id', direction: 'desc' });
 
@@ -362,6 +390,24 @@
                         return matchMain || matchSub;
                     });
                 }
+                // 新增：依「符合條件數量」過濾
+                if (journalFilters.tagCount !== 'all') {
+                    result = result.filter(l => {
+                        let tCount = [];
+                        if (l.subTags && l.subTags.length > 0) tCount.push(...l.subTags);
+                        const strats = Array.isArray(l.strategy) ? l.strategy : (l.strategy ? [l.strategy] : []);
+                        strats.forEach(sId => {
+                            const hasSub = l.subTags?.some(tag => SUB_TAGS[sId]?.includes(tag));
+                            if (!hasSub) tCount.push(sId);
+                        });
+                        const c = tCount.length;
+                        if (journalFilters.tagCount === '1') return c === 1;
+                        if (journalFilters.tagCount === '2') return c === 2;
+                        if (journalFilters.tagCount === '3') return c === 3;
+                        if (journalFilters.tagCount === '4+') return c >= 4;
+                        return true;
+                    });
+                }
 
                 // 2. 排序邏輯
                 result.sort((a, b) => {
@@ -382,10 +428,19 @@
                             valA = parseFloat(epsA.eps26) || -999999; valB = parseFloat(epsB.eps26) || -999999; break;
                         case 'growth':
                             valA = parseFloat(epsA.epsGrowth) || -999999; valB = parseFloat(epsB.epsGrowth) || -999999; break;
-                        case 'tags':
-                            valA = (a.subTags?.length || 0) + (Array.isArray(a.strategy) ? a.strategy.length : (a.strategy ? 1 : 0));
-                            valB = (b.subTags?.length || 0) + (Array.isArray(b.strategy) ? b.strategy.length : (b.strategy ? 1 : 0));
-                            break;
+                        case 'tags': {
+                            const getScore = (l) => {
+                                let t = [];
+                                if (l.subTags && l.subTags.length > 0) t.push(...l.subTags);
+                                const strats = Array.isArray(l.strategy) ? l.strategy : (l.strategy ? [l.strategy] : []);
+                                strats.forEach(sId => {
+                                    const hasSub = l.subTags?.some(tag => SUB_TAGS[sId]?.includes(tag));
+                                    if (!hasSub) t.push(sId);
+                                });
+                                return t.length;
+                            };
+                            valA = getScore(a); valB = getScore(b); break;
+                        }
                         default: // 'id'
                             valA = parseInt(a.id); valB = parseInt(b.id); break;
                     }
@@ -408,6 +463,34 @@
                 document.addEventListener("mousedown", handleClickOutside);
                 return () => document.removeEventListener("mousedown", handleClickOutside);
             }, []);
+
+            // 圖片產出 Effect：等待 DOM 渲染完成後啟動 html2canvas
+            useEffect(() => {
+                if (exportImgData) {
+                    setAlert({ show: true, msg: '⏳ 正在產生精美圖片，請稍候...' });
+                    setTimeout(() => {
+                        const el = document.getElementById('image-export-container');
+                        if (el && window.html2canvas) {
+                            window.html2canvas(el, {
+                                scale: 2,
+                                backgroundColor: '#f8fafc', // 配合淺色背景基底
+                                useCORS: true
+                            }).then(canvas => {
+                                const link = document.createElement('a');
+                                link.download = `萊恩手札_${exportImgData.dateRangeStr}_${exportImgData.titleName}.png`;
+                                link.href = canvas.toDataURL('image/png');
+                                link.click();
+                                setExportImgData(null);
+                                setAlert({ show: true, msg: '✅ 圖片產出成功，已開始下載！' });
+                            }).catch(err => {
+                                console.error('html2canvas error:', err);
+                                setExportImgData(null);
+                                setAlert({ show: true, msg: '❌ 圖片產出失敗，請重試。' });
+                            });
+                        }
+                    }, 300); // 留點時間確保 React state 已經被繪製到畫面上
+                }
+            }, [exportImgData]);
 
             const handleStockIdChange = (e) => {
                 const val = e.target.value;
@@ -607,50 +690,31 @@
                 e.target.value = null;
             };
 
-            const copyLogs = (formatType) => {
-                // 動態判斷複製輸出時的標題
-                let titleName = "多層篩選漏斗";
-                if (formatType === 'score-futures') {
-                    titleName = "個股期篩選漏斗";
-                }
+            // 萃取共同的過濾與整理邏輯
+            const getExportData = (formatType) => {
+                let titleName = "多重篩選漏斗";
 
-                // 處理日期區間
                 const sDate = copyStartDate <= copyEndDate ? copyStartDate : copyEndDate;
                 const eDate = copyStartDate <= copyEndDate ? copyEndDate : copyStartDate;
                 const dateRangeStr = sDate === eDate ? sDate : `${sDate} ~ ${eDate}`;
 
-                let resultText = `| ${dateRangeStr} ${titleName} |\n`;
-                const now = new Date();
-                const timeString = now.toLocaleTimeString('zh-TW', { hour12: false });
-                resultText += `產出時間：${dateRangeStr} ${timeString}\n`;
-                
-                if (copySubTags.length > 0) {
-                    resultText += `🎯 指定篩選：${copySubTags.join(', ')}\n`;
-                }
-                resultText += `\n`;
-                
-                // 1. 根據日期區間初步過濾
+                // 初步日期與標籤過濾
                 let targetLogs = logs.filter(l => l.date >= sDate && l.date <= eDate);
-                
-                // 2. 根據指定標籤過濾符合的標的
                 if (copySubTags.length > 0) {
                     targetLogs = targetLogs.filter(l => {
-                        const hasSub = l.subTags && l.subTags.some(t => copySubTags.includes(t));
-                        return hasSub;
+                        return l.subTags && l.subTags.some(t => copySubTags.includes(t));
                     });
                 }
 
                 if (targetLogs.length === 0) {
                     setAlert({ show: true, msg: `找不到 ${dateRangeStr} ${copySubTags.length > 0 ? '符合所選標籤' : ''}的選股紀錄！` });
-                    return;
+                    return null;
                 }
 
-                // 3. 預先計算並整理每檔股票的標籤與總分
-                const processedLogs = targetLogs.map(l => {
+                // 整理標籤與計算分數
+                let processedLogs = targetLogs.map(l => {
                     let allTags = [];
-                    if (l.subTags && l.subTags.length > 0) {
-                        allTags.push(...l.subTags);
-                    }
+                    if (l.subTags && l.subTags.length > 0) allTags.push(...l.subTags);
                     const strategiesArray = Array.isArray(l.strategy) ? l.strategy : (l.strategy ? [l.strategy] : []);
                     strategiesArray.forEach(sId => {
                         const s = STRATEGIES.find(str => str.id === sId);
@@ -661,8 +725,6 @@
                     });
 
                     const score = allTags.length;
-                    
-                    // 根據選擇決定要顯示的標籤 (未選則全顯示)
                     let displayTags = allTags;
                     if (copySubTags.length > 0) {
                         displayTags = allTags.filter(t => copySubTags.includes(t));
@@ -671,16 +733,21 @@
                     return { ...l, allTags, displayTags, score };
                 });
 
-                let detailText = ``;
+                // 根據格式分群或排序
+                let strategyGroups = [];
+                let sortedLogs = [...processedLogs];
 
                 if (formatType === 'time') {
-                    processedLogs.sort((a, b) => parseInt(a.id) - parseInt(b.id));
-
-                    processedLogs.forEach(l => {
-                        const countStr = l.score > 0 ? ` (${l.score}分)` : '';
-                        const tagStr = l.displayTags.length > 0 ? ` (${l.displayTags.join('、')})` : '';
-                        detailText += `- ${l.stockId} ${l.name}${countStr}${tagStr}\n`;
-                    });
+                    sortedLogs.sort((a, b) => parseInt(a.id) - parseInt(b.id));
+                } else if (formatType === 'score') {
+                    sortedLogs.sort((a, b) => b.score - a.score || parseInt(a.id) - parseInt(b.id));
+                } else if (formatType === 'score-futures') {
+                    sortedLogs = sortedLogs.filter(l => epsData[l.stockId]?.hasFutures);
+                    if (sortedLogs.length === 0) {
+                        setAlert({ show: true, msg: `找不到 ${dateRangeStr} 符合條件且具備「股期」的選股紀錄！` });
+                        return null;
+                    }
+                    sortedLogs.sort((a, b) => b.score - a.score || parseInt(a.id) - parseInt(b.id));
                 } else if (formatType === 'strategy') {
                     const groupMap = {};
                     processedLogs.forEach(l => {
@@ -689,9 +756,7 @@
 
                         tagsToGroup.forEach(tag => {
                             if (!groupMap[tag]) groupMap[tag] = [];
-                            if (!groupMap[tag].includes(l)) {
-                                groupMap[tag].push(l);
-                            }
+                            if (!groupMap[tag].includes(l)) groupMap[tag].push(l);
                         });
                     });
 
@@ -699,19 +764,14 @@
                         if (groupMap[strat.label] && groupMap[strat.label].length > 0) {
                             let tagLogs = groupMap[strat.label];
                             tagLogs.sort((a, b) => parseInt(a.id) - parseInt(b.id));
-                            detailText += `🎯 [${strat.label}] (共 ${tagLogs.length} 檔)\n`;
-                            tagLogs.forEach(l => detailText += `  - ${l.stockId} ${l.name}\n`);
-                            detailText += `\n`;
+                            strategyGroups.push({ label: strat.label, logs: tagLogs });
                         }
-                        
                         const subTags = SUB_TAGS[strat.id] || [];
                         subTags.forEach(tag => {
                             if (groupMap[tag] && groupMap[tag].length > 0) {
                                 let tagLogs = groupMap[tag];
                                 tagLogs.sort((a, b) => parseInt(a.id) - parseInt(b.id));
-                                detailText += `🎯 [${tag}] (共 ${tagLogs.length} 檔)\n`;
-                                tagLogs.forEach(l => detailText += `  - ${l.stockId} ${l.name}\n`);
-                                detailText += `\n`;
+                                strategyGroups.push({ label: tag, logs: tagLogs });
                             }
                         });
                     });
@@ -719,30 +779,37 @@
                     if (groupMap['未分類'] && groupMap['未分類'].length > 0) {
                         let tagLogs = groupMap['未分類'];
                         tagLogs.sort((a, b) => parseInt(a.id) - parseInt(b.id));
-                        detailText += `🎯 [未分類] (共 ${tagLogs.length} 檔)\n`;
-                        tagLogs.forEach(l => detailText += `  - ${l.stockId} ${l.name}\n`);
+                        strategyGroups.push({ label: '未分類', logs: tagLogs });
+                    }
+                }
+
+                return { titleName, dateRangeStr, sortedLogs, strategyGroups };
+            };
+
+            const copyLogs = (formatType) => {
+                const data = getExportData(formatType);
+                if (!data) return;
+
+                let resultText = `| ${data.dateRangeStr} ${data.titleName} |\n`;
+                const now = new Date();
+                const timeString = now.toLocaleTimeString('zh-TW', { hour12: false });
+                resultText += `產出時間：${data.dateRangeStr} ${timeString}\n`;
+                
+                if (copySubTags.length > 0) {
+                    resultText += `🎯 指定篩選：${copySubTags.join(', ')}\n`;
+                }
+                resultText += `\n`;
+                
+                let detailText = ``;
+
+                if (formatType === 'strategy') {
+                    data.strategyGroups.forEach(grp => {
+                        detailText += `🎯 [${grp.label}] (共 ${grp.logs.length} 檔)\n`;
+                        grp.logs.forEach(l => detailText += `  - ${l.stockId} ${l.name}\n`);
                         detailText += `\n`;
-                    }
-                } else if (formatType === 'score') {
-                    processedLogs.sort((a, b) => b.score - a.score || parseInt(a.id) - parseInt(b.id));
-
-                    processedLogs.forEach(l => {
-                        const countStr = l.score > 0 ? ` (${l.score}分)` : '';
-                        const tagStr = l.displayTags.length > 0 ? ` (${l.displayTags.join('、')})` : '';
-                        detailText += `- ${l.stockId} ${l.name}${countStr}${tagStr}\n`;
                     });
-                } else if (formatType === 'score-futures') {
-                    // 格式四：僅篩選有股期標的，並依照策略標籤數量做為分數，由高到低排序
-                    const futuresLogs = processedLogs.filter(l => epsData[l.stockId]?.hasFutures);
-                    
-                    if (futuresLogs.length === 0) {
-                        setAlert({ show: true, msg: `找不到 ${dateRangeStr} 符合條件且具備「股期」的選股紀錄！` });
-                        return;
-                    }
-
-                    futuresLogs.sort((a, b) => b.score - a.score || parseInt(a.id) - parseInt(b.id));
-
-                    futuresLogs.forEach(l => {
+                } else {
+                    data.sortedLogs.forEach(l => {
                         const countStr = l.score > 0 ? ` (${l.score}分)` : '';
                         const tagStr = l.displayTags.length > 0 ? ` (${l.displayTags.join('、')})` : '';
                         detailText += `- ${l.stockId} ${l.name}${countStr}${tagStr}\n`;
@@ -757,8 +824,107 @@
                 setTimeout(() => setCopySuccess(null), 2000); 
             };
 
+            const generateImage = (formatType) => {
+                const data = getExportData(formatType);
+                if (!data) return;
+                setExportImgData({
+                    formatType,
+                    titleName: data.titleName,
+                    dateRangeStr: data.dateRangeStr,
+                    sortedLogs: data.sortedLogs,
+                    strategyGroups: data.strategyGroups,
+                    copySubTags
+                });
+            };
+
             return (
                 <div className="animate-fade-in-up space-y-6">
+                    {/* 隱藏的圖片匯出渲染容器 - 升級為橫式寬度 1280px, 無格子, 淺色美圖漸層 */}
+                    {exportImgData && (
+                        <div className="fixed top-[-9999px] left-[-9999px] z-0">
+                            <div id="image-export-container" className="w-[1280px] min-h-[720px] flex flex-col bg-gradient-to-br from-slate-50 via-blue-50/60 to-indigo-100 text-slate-800 p-12 font-sans shadow-2xl relative z-0">
+                                {/* Header - 橫向佈局 (不包含條件標籤) */}
+                                <div className="flex items-center gap-5 mb-8 pb-6 border-b border-slate-300">
+                                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
+                                        <TrendingUp size={32} className="text-white" />
+                                    </div>
+                                    <div>
+                                        <h1 className="text-4xl font-bold text-slate-800 tracking-wider">
+                                            {exportImgData.dateRangeStr} 多重篩選漏斗
+                                        </h1>
+                                    </div>
+                                </div>
+
+                                {/* Body Content - 橫向四欄式緊湊排版 (無僵硬框線) */}
+                                <div className="flex-1">
+                                    {exportImgData.formatType === 'strategy' ? (
+                                        /* 依策略分群：瀑布流式四欄佈局 (Masonry Layout) */
+                                        <div className="columns-4 gap-6 space-y-6">
+                                            {exportImgData.strategyGroups.map(grp => {
+                                                const bgClass = getLightBgClass(grp.label);
+                                                const txtClass = getDarkTextClass(grp.label);
+                                                return (
+                                                <div key={grp.label} className={`break-inside-avoid rounded-3xl p-5 shadow-sm ${bgClass}`}>
+                                                    <div className={`font-bold mb-4 text-xl flex items-center justify-between ${txtClass}`}>
+                                                        <span>🎯 {grp.label}</span>
+                                                        <span className="text-xs bg-white/70 px-2.5 py-1 rounded-full text-slate-600">共 {grp.logs.length} 檔</span>
+                                                    </div>
+                                                    <div className="flex flex-col gap-3">
+                                                        {grp.logs.map(l => (
+                                                            <div key={l.stockId} className="flex px-1 items-center gap-3 pb-3 border-b border-white/50 last:border-0 last:pb-0">
+                                                                <div className="font-bold text-2xl text-slate-700 tracking-wider w-[76px] shrink-0 leading-none">{l.stockId}</div>
+                                                                <div className="flex items-center gap-2 flex-1 flex-wrap">
+                                                                    <div className="font-bold text-2xl text-slate-800 whitespace-normal break-words leading-none">{l.name}</div>
+                                                                    {epsData[l.stockId]?.hasFutures && <span className="inline-flex items-center justify-center bg-fuchsia-100 text-fuchsia-700 border border-fuchsia-200 px-1.5 rounded font-bold text-[11px] tracking-widest shrink-0 leading-none h-[22px]">股期</span>}
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )})}
+                                        </div>
+                                    ) : (
+                                        /* 依時間或分數排序：方塊卡片式四欄佈局 (Grid Layout) */
+                                        <div className="grid grid-cols-4 gap-6">
+                                            {exportImgData.sortedLogs.map((l, idx) => {
+                                                const mainStrat = l.allTags[0] || '未分類';
+                                                const bgClass = getLightBgClass(mainStrat);
+                                                return (
+                                                <div key={idx} className={`flex flex-col p-5 rounded-3xl shadow-sm ${bgClass}`}>
+                                                    <div className="flex justify-between items-center mb-4 pb-4 border-b border-white/60">
+                                                        <div className="flex flex-col gap-2 flex-1 min-w-0 pr-2">
+                                                            <div className="font-bold text-4xl text-slate-800 tracking-wider leading-none">{l.stockId}</div>
+                                                            <div className="flex items-center gap-2 flex-wrap">
+                                                                <span className="font-bold text-3xl text-slate-700 whitespace-normal break-words leading-none">{l.name}</span>
+                                                                {epsData[l.stockId]?.hasFutures && <span className="inline-flex items-center justify-center bg-fuchsia-100 text-fuchsia-700 border border-fuchsia-200 px-2 rounded font-bold text-xs tracking-widest shrink-0 leading-none h-[26px]">股期</span>}
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex items-center justify-end shrink-0">
+                                                            {l.score > 0 && (
+                                                                <div className="flex items-baseline gap-1">
+                                                                    <div className="text-4xl font-bold text-indigo-600 drop-shadow-sm leading-none">{l.score}</div>
+                                                                    <div className="text-sm text-indigo-500/80 font-bold">分</div>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex flex-wrap items-center gap-2">
+                                                        {l.displayTags.map(t => <span key={t} className="px-3 py-1 bg-white/70 rounded-md font-bold text-sm text-slate-600 shadow-sm border border-white/50">{t}</span>)}
+                                                    </div>
+                                                </div>
+                                            )})}
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Footer */}
+                                <div className="mt-8 pt-5 border-t border-slate-300/80 text-sm text-slate-500 text-center tracking-widest font-bold">
+                                    此圖片由系統自動產生 | 投資有賺有賠，本表僅供個人交易紀錄參考
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     {/* 控制區塊 */}
                     <div className="bg-[#111827] p-6 rounded-2xl border border-slate-800 shadow-lg">
                         <h2 className="text-2xl font-title text-blue-400 mb-6 flex items-center gap-2"><FileText /> 新增選股日誌</h2>
@@ -850,7 +1016,7 @@
                             <div className="flex gap-3">
                                 <label className="cursor-pointer bg-slate-800 hover:bg-slate-700 text-sm text-slate-200 px-4 py-2 rounded-lg flex items-center gap-2 transition">
                                     <Upload size={16} />
-                                    匯入 EPS / 股期 (Excel)
+                                    匯入 EPS / 股期
                                     <input type="file" accept=".csv, .xlsx, .xls" onChange={handleEpsImport} className="hidden" />
                                 </label>
                                 <div className="flex items-center gap-2 bg-slate-800 rounded-lg p-1 pr-2 relative" ref={copyDropdownRef}>
@@ -922,18 +1088,33 @@
                                     )}
 
                                     <div className="flex gap-2 ml-2">
-                                        <button onClick={() => copyLogs('time')} className={`text-sm text-white flex items-center gap-1 transition px-3 py-1.5 rounded-md shadow-lg ${copySuccess === 'time' ? 'bg-green-600' : 'bg-blue-600 hover:bg-blue-500'}`} title="依輸入時間順序">
-                                            {copySuccess === 'time' ? <CheckCircle size={16} /> : <ClipboardCopy size={16} />} {copySuccess === 'time' ? '已複製' : '依時間'}
-                                        </button>
-                                        <button onClick={() => copyLogs('strategy')} className={`text-sm text-white flex items-center gap-1 transition px-3 py-1.5 rounded-md shadow-lg ${copySuccess === 'strategy' ? 'bg-green-600' : 'bg-indigo-600 hover:bg-indigo-500'}`} title="依策略標籤群組">
-                                            {copySuccess === 'strategy' ? <CheckCircle size={16} /> : <ClipboardCopy size={16} />} {copySuccess === 'strategy' ? '已複製' : '依策略'}
-                                        </button>
-                                        <button onClick={() => copyLogs('score')} className={`text-sm text-white flex items-center gap-1 transition px-3 py-1.5 rounded-md shadow-lg ${copySuccess === 'score' ? 'bg-green-600' : 'bg-rose-600 hover:bg-rose-500'}`} title="依標籤數量高低排序">
-                                            {copySuccess === 'score' ? <CheckCircle size={16} /> : <Star size={16} />} {copySuccess === 'score' ? '已複製' : '依分數'}
-                                        </button>
-                                        <button onClick={() => copyLogs('score-futures')} className={`text-sm text-white flex items-center gap-1 transition px-3 py-1.5 rounded-md shadow-lg ${copySuccess === 'score-futures' ? 'bg-green-600' : 'bg-fuchsia-600 hover:bg-fuchsia-500'}`} title="僅篩選有股期標的，依標籤數量高低排序">
-                                            {copySuccess === 'score-futures' ? <CheckCircle size={16} /> : <Star size={16} />} {copySuccess === 'score-futures' ? '已複製' : '股期依分數'}
-                                        </button>
+                                        <div className="flex shadow-lg rounded-md overflow-hidden">
+                                            <button onClick={() => copyLogs('time')} className={`text-sm text-white flex items-center gap-1 transition px-3 py-1.5 ${copySuccess === 'time' ? 'bg-green-600' : 'bg-blue-600 hover:bg-blue-500'}`} title="複製文字：依輸入時間順序">
+                                                {copySuccess === 'time' ? <CheckCircle size={16} /> : <ClipboardCopy size={16} />} {copySuccess === 'time' ? '已複製' : '依時間'}
+                                            </button>
+                                            <button onClick={() => generateImage('time')} className="bg-blue-700 hover:bg-blue-600 text-white px-2.5 py-1.5 border-l border-blue-800 transition flex items-center" title="將結果下載成精美圖片"><Camera size={14} /></button>
+                                        </div>
+
+                                        <div className="flex shadow-lg rounded-md overflow-hidden">
+                                            <button onClick={() => copyLogs('strategy')} className={`text-sm text-white flex items-center gap-1 transition px-3 py-1.5 ${copySuccess === 'strategy' ? 'bg-green-600' : 'bg-indigo-600 hover:bg-indigo-500'}`} title="複製文字：依策略標籤群組">
+                                                {copySuccess === 'strategy' ? <CheckCircle size={16} /> : <ClipboardCopy size={16} />} {copySuccess === 'strategy' ? '已複製' : '依策略'}
+                                            </button>
+                                            <button onClick={() => generateImage('strategy')} className="bg-indigo-700 hover:bg-indigo-600 text-white px-2.5 py-1.5 border-l border-indigo-800 transition flex items-center" title="將結果下載成精美圖片"><Camera size={14} /></button>
+                                        </div>
+
+                                        <div className="flex shadow-lg rounded-md overflow-hidden">
+                                            <button onClick={() => copyLogs('score')} className={`text-sm text-white flex items-center gap-1 transition px-3 py-1.5 ${copySuccess === 'score' ? 'bg-green-600' : 'bg-rose-600 hover:bg-rose-500'}`} title="複製文字：依標籤數量高低排序">
+                                                {copySuccess === 'score' ? <CheckCircle size={16} /> : <Star size={16} />} {copySuccess === 'score' ? '已複製' : '依分數'}
+                                            </button>
+                                            <button onClick={() => generateImage('score')} className="bg-rose-700 hover:bg-rose-600 text-white px-2.5 py-1.5 border-l border-rose-800 transition flex items-center" title="將結果下載成精美圖片"><Camera size={14} /></button>
+                                        </div>
+
+                                        <div className="flex shadow-lg rounded-md overflow-hidden">
+                                            <button onClick={() => copyLogs('score-futures')} className={`text-sm text-white flex items-center gap-1 transition px-3 py-1.5 ${copySuccess === 'score-futures' ? 'bg-green-600' : 'bg-fuchsia-600 hover:bg-fuchsia-500'}`} title="複製文字：僅篩選有股期標的，依標籤數量高低排序">
+                                                {copySuccess === 'score-futures' ? <CheckCircle size={16} /> : <Star size={16} />} {copySuccess === 'score-futures' ? '已複製' : '股期分數'}
+                                            </button>
+                                            <button onClick={() => generateImage('score-futures')} className="bg-fuchsia-700 hover:bg-fuchsia-600 text-white px-2.5 py-1.5 border-l border-fuchsia-800 transition flex items-center" title="將結果下載成精美圖片"><Camera size={14} /></button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -979,21 +1160,30 @@
                                         </th>
                                         <th className="p-3 font-medium align-top min-w-[160px]">
                                             <div className="mb-2 flex items-center gap-1 cursor-pointer hover:text-blue-400 select-none" onClick={() => handleJournalSort('tags')}>策略標籤 <SortIcon sortKey="tags" currentSort={journalSort} /></div>
-                                            <select value={journalFilters.tag} onChange={e => setJournalFilters({...journalFilters, tag: e.target.value})} className="w-full bg-slate-900 border border-slate-700 rounded px-1 py-1 text-xs outline-none focus:border-blue-500">
-                                                <option value="">全部標籤</option>
-                                                {STRATEGIES.map(s => (
-                                                    <optgroup key={s.id} label={s.label}>
-                                                        <option value={s.label}>{s.label} (主策略)</option>
-                                                        {(SUB_TAGS[s.id] || []).map(t => (
-                                                            <option key={t} value={t}>{t}</option>
-                                                        ))}
-                                                    </optgroup>
-                                                ))}
-                                            </select>
+                                            <div className="flex flex-col gap-1.5">
+                                                <select value={journalFilters.tag} onChange={e => setJournalFilters({...journalFilters, tag: e.target.value})} className="w-full bg-slate-900 border border-slate-700 rounded px-1 py-1 text-xs outline-none focus:border-blue-500">
+                                                    <option value="">全部標籤</option>
+                                                    {STRATEGIES.map(s => (
+                                                        <optgroup key={s.id} label={s.label}>
+                                                            <option value={s.label}>{s.label} (主策略)</option>
+                                                            {(SUB_TAGS[s.id] || []).map(t => (
+                                                                <option key={t} value={t}>{t}</option>
+                                                            ))}
+                                                        </optgroup>
+                                                    ))}
+                                                </select>
+                                                <select value={journalFilters.tagCount} onChange={e => setJournalFilters({...journalFilters, tagCount: e.target.value})} className="w-full bg-slate-900 border border-slate-700 rounded px-1 py-1 text-xs outline-none focus:border-blue-500">
+                                                    <option value="all">不限條件數</option>
+                                                    <option value="1">1 項條件</option>
+                                                    <option value="2">2 項條件</option>
+                                                    <option value="3">3 項條件</option>
+                                                    <option value="4+">4 項(含)以上</option>
+                                                </select>
+                                            </div>
                                         </th>
                                         <th className="p-3 font-medium text-center align-top">
                                             <div className="mb-2">操作</div>
-                                            <button onClick={() => { setJournalFilters({date: getTodayLocal(), stock: '', futures: 'all', growth: 'all', tag: ''}); setJournalSort({key: 'id', direction: 'desc'}); }} className="text-xs text-slate-500 hover:text-slate-300 underline transition">還原預設</button>
+                                            <button onClick={() => { setJournalFilters({date: getTodayLocal(), stock: '', futures: 'all', growth: 'all', tag: '', tagCount: 'all'}); setJournalSort({key: 'id', direction: 'desc'}); }} className="text-xs text-slate-500 hover:text-slate-300 underline transition">還原預設</button>
                                         </th>
                                     </tr>
                                 </thead>
@@ -1883,7 +2073,7 @@
         // ==========================================
         const WatchlistModule = ({ logs, setLogs, epsData }) => {
             const [confirm, setConfirm] = useState({ show: false, action: null });
-            const [watchlistFilters, setWatchlistFilters] = useState({ date: '', stock: '', futures: 'all', growth: 'all', tag: '' });
+            const [watchlistFilters, setWatchlistFilters] = useState({ date: '', stock: '', futures: 'all', growth: 'all', tag: '', tagCount: 'all' });
             const [watchlistSort, setWatchlistSort] = useState({ key: 'id', direction: 'desc' });
 
             const handleWatchlistSort = (key) => {
@@ -1957,6 +2147,24 @@
                         return matchMain || matchSub;
                     });
                 }
+                // 新增：依「符合條件數量」過濾
+                if (watchlistFilters.tagCount !== 'all') {
+                    result = result.filter(l => {
+                        let tCount = [];
+                        if (l.subTags && l.subTags.length > 0) tCount.push(...l.subTags);
+                        const strats = Array.isArray(l.strategy) ? l.strategy : (l.strategy ? [l.strategy] : []);
+                        strats.forEach(sId => {
+                            const hasSub = l.subTags?.some(tag => SUB_TAGS[sId]?.includes(tag));
+                            if (!hasSub) tCount.push(sId);
+                        });
+                        const c = tCount.length;
+                        if (watchlistFilters.tagCount === '1') return c === 1;
+                        if (watchlistFilters.tagCount === '2') return c === 2;
+                        if (watchlistFilters.tagCount === '3') return c === 3;
+                        if (watchlistFilters.tagCount === '4+') return c >= 4;
+                        return true;
+                    });
+                }
 
                 // 2. 排序邏輯
                 result.sort((a, b) => {
@@ -1977,10 +2185,19 @@
                             valA = parseFloat(epsA.eps26) || -999999; valB = parseFloat(epsB.eps26) || -999999; break;
                         case 'growth':
                             valA = parseFloat(epsA.epsGrowth) || -999999; valB = parseFloat(epsB.epsGrowth) || -999999; break;
-                        case 'tags':
-                            valA = (a.subTags?.length || 0) + (Array.isArray(a.strategy) ? a.strategy.length : (a.strategy ? 1 : 0));
-                            valB = (b.subTags?.length || 0) + (Array.isArray(b.strategy) ? b.strategy.length : (b.strategy ? 1 : 0));
-                            break;
+                        case 'tags': {
+                            const getScore = (l) => {
+                                let t = [];
+                                if (l.subTags && l.subTags.length > 0) t.push(...l.subTags);
+                                const strats = Array.isArray(l.strategy) ? l.strategy : (l.strategy ? [l.strategy] : []);
+                                strats.forEach(sId => {
+                                    const hasSub = l.subTags?.some(tag => SUB_TAGS[sId]?.includes(tag));
+                                    if (!hasSub) t.push(sId);
+                                });
+                                return t.length;
+                            };
+                            valA = getScore(a); valB = getScore(b); break;
+                        }
                         default: // 'id'
                             valA = parseInt(a.id); valB = parseInt(b.id); break;
                     }
@@ -2035,21 +2252,30 @@
                                         </th>
                                         <th className="p-3 font-medium align-top min-w-[160px]">
                                             <div className="mb-2 flex items-center gap-1 cursor-pointer hover:text-blue-400 select-none" onClick={() => handleWatchlistSort('tags')}>策略標籤 <SortIcon sortKey="tags" currentSort={watchlistSort} /></div>
-                                            <select value={watchlistFilters.tag} onChange={e => setWatchlistFilters({...watchlistFilters, tag: e.target.value})} className="w-full bg-slate-900 border border-slate-700 rounded px-1 py-1 text-xs outline-none focus:border-blue-500">
-                                                <option value="">全部標籤</option>
-                                                {STRATEGIES.map(s => (
-                                                    <optgroup key={s.id} label={s.label}>
-                                                        <option value={s.label}>{s.label} (主策略)</option>
-                                                        {(SUB_TAGS[s.id] || []).map(t => (
-                                                            <option key={t} value={t}>{t}</option>
-                                                        ))}
-                                                    </optgroup>
-                                                ))}
-                                            </select>
+                                            <div className="flex flex-col gap-1.5">
+                                                <select value={watchlistFilters.tag} onChange={e => setWatchlistFilters({...watchlistFilters, tag: e.target.value})} className="w-full bg-slate-900 border border-slate-700 rounded px-1 py-1 text-xs outline-none focus:border-blue-500">
+                                                    <option value="">全部標籤</option>
+                                                    {STRATEGIES.map(s => (
+                                                        <optgroup key={s.id} label={s.label}>
+                                                            <option value={s.label}>{s.label} (主策略)</option>
+                                                            {(SUB_TAGS[s.id] || []).map(t => (
+                                                                <option key={t} value={t}>{t}</option>
+                                                            ))}
+                                                        </optgroup>
+                                                    ))}
+                                                </select>
+                                                <select value={watchlistFilters.tagCount} onChange={e => setWatchlistFilters({...watchlistFilters, tagCount: e.target.value})} className="w-full bg-slate-900 border border-slate-700 rounded px-1 py-1 text-xs outline-none focus:border-blue-500">
+                                                    <option value="all">不限條件數</option>
+                                                    <option value="1">1 項條件</option>
+                                                    <option value="2">2 項條件</option>
+                                                    <option value="3">3 項條件</option>
+                                                    <option value="4+">4 項(含)以上</option>
+                                                </select>
+                                            </div>
                                         </th>
                                         <th className="p-3 font-medium text-center align-top">
                                             <div className="mb-2">操作</div>
-                                            <button onClick={() => { setWatchlistFilters({date: '', stock: '', futures: 'all', growth: 'all', tag: ''}); setWatchlistSort({key: 'id', direction: 'desc'}); }} className="text-xs text-slate-500 hover:text-slate-300 underline transition">還原預設</button>
+                                            <button onClick={() => { setWatchlistFilters({date: '', stock: '', futures: 'all', growth: 'all', tag: '', tagCount: 'all'}); setWatchlistSort({key: 'id', direction: 'desc'}); }} className="text-xs text-slate-500 hover:text-slate-300 underline transition">還原預設</button>
                                         </th>
                                     </tr>
                                 </thead>
