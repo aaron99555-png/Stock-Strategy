@@ -4,9 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>萊恩交易手札</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- SheetJS -->
     <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+    <!-- html2canvas 用於產出圖片 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Ma+Shan+Zheng&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
@@ -20,6 +24,7 @@
         }
     }
     </script>
+    <!-- Babel -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <style>
@@ -90,19 +95,27 @@
             TrendingUp, BarChart2, Zap, AlertCircle, Save, Trash2, 
             Download, Upload, Eye, FileText, CheckCircle, Calculator,
             ClipboardCopy, Search, PlusCircle, LayoutDashboard, Star, X, Target,
-            ArrowUp, ArrowDown, ArrowUpDown, Camera, Image as ImageIcon
+            ArrowUp, ArrowDown, ArrowUpDown, Camera, Image as ImageIcon, Ban
         } from 'lucide-react';
 
         // ==========================================
-        // 1. 靜態資料庫 (STATIC_STOCK_DB) Mock Data
+        // 1. 靜態資料庫與預設黑名單
         // ==========================================
         const STATIC_STOCK_DB = {};
+        
+        const DEFAULT_FORBIDDEN = [
+            { id: '2313', name: '華通' }, { id: '2812', name: '台中銀' }, { id: '3149', name: '正達' },
+            { id: '6126', name: '信音' }, { id: '2547', name: '日勝生' }, { id: '3325', name: '旭品' },
+            { id: '2342', name: '茂矽' }, { id: '2392', name: '正崴' }, { id: '2352', name: '佳世達' },
+            { id: '2317', name: '鴻海' }, { id: '1815', name: '富喬' }, { id: '3013', name: '晟銘電' },
+            { id: '3376', name: '新日興' }, { id: '3312', name: '弘憶股' }, { id: '9999', name: '信甫' },
+            { id: '9998', name: '佳士達' }, { id: '9997', name: '弘億股' }
+        ];
 
         // ==========================================
         // 2. 共用元件 (Hooks & Modals)
         // ==========================================
         
-        // 取得台灣本地的今天日期 (YYYY-MM-DD)，避免 UTC 造成的跨日誤差
         const getTodayLocal = () => {
             const d = new Date();
             const year = d.getFullYear();
@@ -121,11 +134,7 @@
             document.body.appendChild(textArea);
             textArea.focus();
             textArea.select();
-            try {
-                document.execCommand('copy');
-            } catch (err) {
-                console.error('Fallback: Oops, unable to copy', err);
-            }
+            try { document.execCommand('copy'); } catch (err) {}
             document.body.removeChild(textArea);
         };
 
@@ -134,47 +143,27 @@
                 try {
                     const item = window.localStorage.getItem(key);
                     return item ? JSON.parse(item) : initialValue;
-                } catch (error) {
-                    console.error(error);
-                    return initialValue;
-                }
+                } catch (error) { return initialValue; }
             });
             const setValue = (value) => {
                 try {
                     const valueToStore = value instanceof Function ? value(storedValue) : value;
                     setStoredValue(valueToStore);
                     window.localStorage.setItem(key, JSON.stringify(valueToStore));
-                } catch (error) {
-                    console.error(error);
-                }
+                } catch (error) {}
             };
             return [storedValue, setValue];
         }
 
         const ConfirmModal = ({ isOpen, title, message, onConfirm, onCancel }) => {
             const btnRef = useRef(null);
-
             useEffect(() => {
-                if (isOpen && btnRef.current) {
-                    setTimeout(() => {
-                        if (btnRef.current) btnRef.current.focus();
-                    }, 10);
-                }
-
+                if (isOpen && btnRef.current) setTimeout(() => { if (btnRef.current) btnRef.current.focus(); }, 10);
                 if (!isOpen) return;
-                
                 const handleKeyDown = (e) => {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        onConfirm();
-                    } else if (e.key === 'Escape') {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        onCancel();
-                    }
+                    if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); onConfirm(); } 
+                    else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); onCancel(); }
                 };
-                
                 window.addEventListener('keydown', handleKeyDown, true);
                 return () => window.removeEventListener('keydown', handleKeyDown, true);
             }, [isOpen, onConfirm, onCancel]);
@@ -199,24 +188,12 @@
 
         const AlertModal = ({ isOpen, message, onClose }) => {
             const btnRef = useRef(null);
-
             useEffect(() => {
-                if (isOpen && btnRef.current) {
-                    setTimeout(() => {
-                        if (btnRef.current) btnRef.current.focus();
-                    }, 10);
-                }
-
+                if (isOpen && btnRef.current) setTimeout(() => { if (btnRef.current) btnRef.current.focus(); }, 10);
                 if (!isOpen) return;
-                
                 const handleKeyDown = (e) => {
-                    if (e.key === 'Enter' || e.key === 'Escape') {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        onClose();
-                    }
+                    if (e.key === 'Enter' || e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); onClose(); }
                 };
-                
                 window.addEventListener('keydown', handleKeyDown, true);
                 return () => window.removeEventListener('keydown', handleKeyDown, true);
             }, [isOpen, onClose]);
@@ -233,18 +210,62 @@
             );
         };
 
-        // 共用排序圖示元件
+        const ForbiddenModal = ({ isOpen, stockName, onConfirm, onCancel }) => {
+            const btnRef = useRef(null);
+            useEffect(() => {
+                if (isOpen && btnRef.current) setTimeout(() => { if (btnRef.current) btnRef.current.focus(); }, 10);
+                if (!isOpen) return;
+                const handleKeyDown = (e) => {
+                    if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); onConfirm(); }
+                    else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); onCancel(); }
+                };
+                window.addEventListener('keydown', handleKeyDown, true);
+                return () => window.removeEventListener('keydown', handleKeyDown, true);
+            }, [isOpen, onConfirm, onCancel]);
+
+            if (!isOpen) return null;
+            return (
+                <div className="fixed inset-0 bg-red-950/90 backdrop-blur-md flex items-center justify-center z-[9999] animate-bounce-in">
+                    <div className="bg-red-900 border-4 border-red-500 p-10 rounded-3xl w-[90%] max-w-md shadow-[0_0_100px_rgba(239,68,68,0.8)] text-center relative">
+                        <button onClick={onCancel} className="absolute top-5 right-5 text-red-400 hover:text-white transition"><X size={28} /></button>
+                        <div className="text-8xl mb-6">🛑</div>
+                        <h2 className="text-5xl font-black text-white mb-6 tracking-widest drop-shadow-lg">警告！</h2>
+                        <h3 className="text-3xl font-black text-yellow-300 mb-10 drop-shadow-lg leading-snug">
+                            【{stockName}】<br/>佳佳持股 嚴禁買入
+                        </h3>
+                        <div className="flex gap-4">
+                            <button onClick={onCancel} className="px-4 py-4 rounded-xl bg-red-800 text-red-200 font-bold text-lg hover:bg-red-700 transition w-1/3 shadow-lg outline-none focus:ring-2 focus:ring-red-400">取消</button>
+                            <button ref={btnRef} onClick={onConfirm} className="px-4 py-4 rounded-xl bg-white text-red-900 font-black text-lg hover:bg-gray-200 transition w-2/3 shadow-2xl focus:ring-4 focus:ring-red-300 outline-none">我明白了並加入 (Enter)</button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
         const SortIcon = ({ sortKey, currentSort }) => {
             if (currentSort.key !== sortKey) return <ArrowUpDown size={14} className="text-slate-600 opacity-50" />;
             return currentSort.direction === 'asc' ? <ArrowUp size={14} className="text-blue-400" /> : <ArrowDown size={14} className="text-blue-400" />;
         };
 
-        // 共用：股期標示元件
         const FuturesBadge = ({ hasFutures }) => {
             if (!hasFutures) return null;
             return (
                 <span className="bg-fuchsia-600/90 text-white text-[10px] px-1.5 py-0.5 rounded shadow-sm mr-1.5 flex-shrink-0" title="具備個股期貨">期</span>
             );
+        };
+
+        const getTwStockColor = (valStr) => {
+            if (valStr === undefined || valStr === null || valStr === '-' || valStr === '') return 'text-white';
+            const val = parseFloat(String(valStr).replace(/,/g, '').replace('%', ''));
+            if (isNaN(val) || val === 0) return 'text-white';
+            return val > 0 ? 'text-red-400' : 'text-emerald-400';
+        };
+
+        const getTwStockColorForImg = (valStr) => {
+            if (valStr === undefined || valStr === null || valStr === '-' || valStr === '') return 'text-slate-700';
+            const val = parseFloat(String(valStr).replace(/,/g, '').replace('%', ''));
+            if (isNaN(val) || val === 0) return 'text-slate-700';
+            return val > 0 ? 'text-red-600' : 'text-emerald-600';
         };
 
         // ==========================================
@@ -297,7 +318,6 @@
             '興櫃-多頭突破上關價': 'from-amber-600 to-orange-700'
         };
 
-        // 供圖片匯出使用的背景樣式邏輯 (淺色美圖設計)
         const getLightBgClass = (label) => {
             if (!label) return 'bg-slate-100/90';
             if (label.includes('當沖')) return 'bg-orange-100/80';
@@ -316,7 +336,7 @@
             return 'text-indigo-700';
         };
 
-        const StockJournal = ({ logs, setLogs, customStocks, setCustomStocks, epsData, setEpsData, stockMap }) => {
+        const StockJournal = ({ logs, setLogs, customStocks, setCustomStocks, epsData, setEpsData, stockMap, forbiddenStocks }) => {
             const [date, setDate] = useState(getTodayLocal());
             const [copyStartDate, setCopyStartDate] = useState(getTodayLocal());
             const [copyEndDate, setCopyEndDate] = useState(getTodayLocal());
@@ -324,7 +344,6 @@
             const [isCopyDropdownOpen, setIsCopyDropdownOpen] = useState(false);
             const copyDropdownRef = useRef(null);
             
-            // 用於產出圖片的狀態
             const [exportImgData, setExportImgData] = useState(null);
 
             const [stockId, setStockId] = useState('');
@@ -333,11 +352,13 @@
             const [selectedSubTags, setSelectedSubTags] = useState([]);
             const [alert, setAlert] = useState({ show: false, msg: '' });
             const [confirm, setConfirm] = useState({ show: false, action: null });
+            
+            // 加入動態放行的防呆 Alert State
+            const [forbiddenAlert, setForbiddenAlert] = useState({ show: false, stockName: '', action: null });
+            
             const [copySuccess, setCopySuccess] = useState(null); 
 
-            // 表格直覺篩選狀態 (預設顯示今天，新增 tagCount)
             const [journalFilters, setJournalFilters] = useState({ date: getTodayLocal(), stock: '', futures: 'all', growth: 'all', tag: '', tagCount: 'all' });
-            // 新增排序狀態
             const [journalSort, setJournalSort] = useState({ key: 'id', direction: 'desc' });
 
             const handleJournalSort = (key) => {
@@ -348,11 +369,9 @@
                 }
             };
 
-            // 根據篩選條件過濾與排序日誌
             const filteredJournalLogs = useMemo(() => {
                 let result = logs.slice();
                 
-                // 1. 篩選邏輯
                 if (journalFilters.date) result = result.filter(l => l.date === journalFilters.date);
                 if (journalFilters.stock) {
                     const kw = journalFilters.stock.toLowerCase();
@@ -385,7 +404,6 @@
                         return matchMain || matchSub;
                     });
                 }
-                // 新增：依「符合條件數量」過濾
                 if (journalFilters.tagCount !== 'all') {
                     result = result.filter(l => {
                         let tCount = [];
@@ -404,25 +422,17 @@
                     });
                 }
 
-                // 2. 排序邏輯
                 result.sort((a, b) => {
                     let valA, valB;
                     const epsA = epsData[a.stockId] || {};
                     const epsB = epsData[b.stockId] || {};
 
                     switch (journalSort.key) {
-                        case 'date':
-                            valA = a.date; valB = b.date;
-                            if (valA === valB) { valA = parseInt(a.id); valB = parseInt(b.id); } 
-                            break;
-                        case 'stock':
-                            valA = a.stockId; valB = b.stockId; break;
-                        case 'eps25':
-                            valA = parseFloat(epsA.eps25) || -999999; valB = parseFloat(epsB.eps25) || -999999; break;
-                        case 'eps26':
-                            valA = parseFloat(epsA.eps26) || -999999; valB = parseFloat(epsB.eps26) || -999999; break;
-                        case 'growth':
-                            valA = parseFloat(epsA.epsGrowth) || -999999; valB = parseFloat(epsB.epsGrowth) || -999999; break;
+                        case 'date': valA = a.date; valB = b.date; if (valA === valB) { valA = parseInt(a.id); valB = parseInt(b.id); } break;
+                        case 'stock': valA = a.stockId; valB = b.stockId; break;
+                        case 'eps25': valA = parseFloat(epsA.eps25) || -999999; valB = parseFloat(epsB.eps25) || -999999; break;
+                        case 'eps26': valA = parseFloat(epsA.eps26) || -999999; valB = parseFloat(epsB.eps26) || -999999; break;
+                        case 'growth': valA = parseFloat(epsA.epsGrowth) || -999999; valB = parseFloat(epsB.epsGrowth) || -999999; break;
                         case 'tags': {
                             const getScore = (l) => {
                                 let t = [];
@@ -436,19 +446,15 @@
                             };
                             valA = getScore(a); valB = getScore(b); break;
                         }
-                        default: // 'id'
-                            valA = parseInt(a.id); valB = parseInt(b.id); break;
+                        default: valA = parseInt(a.id); valB = parseInt(b.id); break;
                     }
-
                     if (valA < valB) return journalSort.direction === 'asc' ? -1 : 1;
                     if (valA > valB) return journalSort.direction === 'asc' ? 1 : -1;
                     return 0;
                 });
-
                 return result;
             }, [logs, journalFilters, epsData, journalSort]);
 
-            // 處理點擊外部關閉多選下拉選單
             useEffect(() => {
                 const handleClickOutside = (event) => {
                     if (copyDropdownRef.current && !copyDropdownRef.current.contains(event.target)) {
@@ -459,18 +465,14 @@
                 return () => document.removeEventListener("mousedown", handleClickOutside);
             }, []);
 
-            // 圖片產出 Effect：等待 DOM 渲染完成後啟動 html2canvas
             useEffect(() => {
                 if (exportImgData) {
                     setAlert({ show: true, msg: '⏳ 正在產生精美圖片，請稍候...' });
                     setTimeout(() => {
                         const el = document.getElementById('image-export-container');
                         if (el && window.html2canvas) {
-                            window.html2canvas(el, {
-                                scale: 2,
-                                backgroundColor: '#f8fafc', // 配合淺色背景基底
-                                useCORS: true
-                            }).then(canvas => {
+                            window.html2canvas(el, { scale: 2, backgroundColor: '#f8fafc', useCORS: true })
+                            .then(canvas => {
                                 const link = document.createElement('a');
                                 link.download = `萊恩手札_${exportImgData.dateRangeStr}_${exportImgData.titleName}.png`;
                                 link.href = canvas.toDataURL('image/png');
@@ -483,40 +485,30 @@
                                 setAlert({ show: true, msg: '❌ 圖片產出失敗，請重試。' });
                             });
                         }
-                    }, 300); // 留點時間確保 React state 已經被繪製到畫面上
+                    }, 300); 
                 }
             }, [exportImgData]);
 
             const handleStockIdChange = (e) => {
                 const val = e.target.value;
                 setStockId(val);
-                
                 const trimmedVal = val.trim();
-                if (trimmedVal === '') {
-                    setStockName('');
-                    return;
-                }
-                if (stockMap[trimmedVal]) {
-                    setStockName(stockMap[trimmedVal].name);
-                }
+                if (trimmedVal === '') { setStockName(''); return; }
+                if (stockMap[trimmedVal]) setStockName(stockMap[trimmedVal].name);
             };
 
             const handleStockNameChange = (e) => {
                 const val = e.target.value;
                 setStockName(val);
-                
                 const trimmedVal = val.trim();
-                if (trimmedVal === '') {
-                    setStockId('');
-                    return;
-                }
+                if (trimmedVal === '') { setStockId(''); return; }
                 const foundId = Object.keys(stockMap).find(key => stockMap[key].name === trimmedVal);
-                if (foundId) {
-                    setStockId(foundId);
-                }
+                if (foundId) setStockId(foundId);
             };
 
             const isUnknownStock = stockId.trim() && stockName.trim() && !stockMap[stockId.trim()];
+            const isForbiddenStock = (stockId.trim() !== '' && forbiddenStocks.some(f => f.id === stockId.trim())) || 
+                                     (stockName.trim() !== '' && forbiddenStocks.some(f => stockName.includes(f.name) || f.name === stockName.trim()));
 
             const stockIdsDatalist = useMemo(() => (
                 <datalist id="stock-ids-list">
@@ -534,61 +526,69 @@
                 const sId = stockId.trim();
                 const sName = stockName.trim();
                 
-                if (!sId || !sName || !selectedStrategy) {
-                    setAlert({ show: true, msg: '請填寫完整資訊 (股號、名稱、策略)！' });
+                if (!sId || !sName) {
+                    setAlert({ show: true, msg: '請填寫完整資訊 (股號、名稱)！' });
                     return;
                 }
 
-                if (!stockMap[sId]) {
-                    setCustomStocks(prev => ({ ...prev, [sId]: { name: sName, industry: "自訂/手動新增" } }));
-                }
-
-                const existingLogIndex = logs.findIndex(l => l.date === date && l.stockId === sId);
-
-                if (existingLogIndex !== -1) {
-                    const updatedLogs = [...logs];
-                    const existingLog = { ...updatedLogs[existingLogIndex] };
-                    
-                    let currentStrategies = Array.isArray(existingLog.strategy) ? [...existingLog.strategy] : (existingLog.strategy ? [existingLog.strategy] : []);
-                    if (!currentStrategies.includes(selectedStrategy)) {
-                        currentStrategies.push(selectedStrategy);
+                const executeAdd = () => {
+                    if (!stockMap[sId]) {
+                        setCustomStocks(prev => ({ ...prev, [sId]: { name: sName, industry: "自訂/手動新增" } }));
                     }
-                    existingLog.strategy = currentStrategies;
 
-                    let currentSubTags = existingLog.subTags ? [...existingLog.subTags] : [];
-                    selectedSubTags.forEach(tag => {
-                        if (!currentSubTags.includes(tag)) {
-                            currentSubTags.push(tag);
+                    const existingLogIndex = logs.findIndex(l => l.date === date && l.stockId === sId);
+
+                    if (existingLogIndex !== -1) {
+                        const updatedLogs = [...logs];
+                        const existingLog = { ...updatedLogs[existingLogIndex] };
+                        
+                        let currentStrategies = Array.isArray(existingLog.strategy) ? [...existingLog.strategy] : (existingLog.strategy ? [existingLog.strategy] : []);
+                        if (selectedStrategy && !currentStrategies.includes(selectedStrategy)) {
+                            currentStrategies.push(selectedStrategy);
                         }
-                    });
-                    existingLog.subTags = currentSubTags;
+                        existingLog.strategy = currentStrategies;
 
-                    updatedLogs[existingLogIndex] = existingLog;
-                    setLogs(updatedLogs);
-                } else {
-                    const newLog = {
-                        id: Date.now().toString(),
-                        date,
-                        stockId: sId,
-                        name: sName,
-                        strategy: [selectedStrategy], 
-                        subTags: selectedSubTags,
-                        starred: false,
-                        plan: { entry: '', stopLoss: '', trailing: '', exit: '', shares: '', warrantCode: '', warrantEntry: '', warrantShares: '', currentPrice: '' }
-                    };
-                    setLogs([...logs, newLog]);
+                        let currentSubTags = existingLog.subTags ? [...existingLog.subTags] : [];
+                        selectedSubTags.forEach(tag => {
+                            if (!currentSubTags.includes(tag)) {
+                                currentSubTags.push(tag);
+                            }
+                        });
+                        existingLog.subTags = currentSubTags;
+
+                        updatedLogs[existingLogIndex] = existingLog;
+                        setLogs(updatedLogs);
+                    } else {
+                        const newLog = {
+                            id: Date.now().toString(),
+                            date,
+                            stockId: sId,
+                            name: sName,
+                            strategy: selectedStrategy ? [selectedStrategy] : [], 
+                            subTags: selectedSubTags,
+                            starred: false,
+                            plan: { entry: '', stopLoss: '', trailing: '', exit: '', shares: '', warrantCode: '', warrantEntry: '', warrantShares: '', currentPrice: '' }
+                        };
+                        setLogs([...logs, newLog]);
+                    }
+                    
+                    setStockId('');
+                    setStockName('');
+                };
+
+                // 動態比對，若為黑名單則中斷並呼叫大視窗，將寫入動作暫存在 pendingAction
+                const isForbidden = forbiddenStocks.some(f => f.id === sId || sName.includes(f.name) || f.name === sName);
+                if (isForbidden) {
+                    setForbiddenAlert({ show: true, stockName: sName, action: executeAdd });
+                    return; 
                 }
-                
-                setStockId('');
-                setStockName('');
+
+                executeAdd();
             };
 
             const toggleSubTag = (tag) => {
-                if (selectedSubTags.includes(tag)) {
-                    setSelectedSubTags([]);
-                } else {
-                    setSelectedSubTags([tag]);
-                }
+                if (selectedSubTags.includes(tag)) setSelectedSubTags([]);
+                else setSelectedSubTags([tag]);
             };
             
             const handleStrategySelect = (id) => {
@@ -601,7 +601,21 @@
             };
 
             const togglePlan = (id) => {
-                setLogs(logs.map(log => log.id === id ? { ...log, inPlan: !log.inPlan } : log));
+                const log = logs.find(l => l.id === id);
+                if (!log) return;
+
+                const executeToggle = () => {
+                    setLogs(logs.map(l => l.id === id ? { ...l, inPlan: !l.inPlan } : l));
+                };
+
+                if (!log.inPlan) {
+                    const isForbidden = forbiddenStocks.some(f => f.id === log.stockId || log.name.includes(f.name) || f.name === log.name);
+                    if (isForbidden) {
+                        setForbiddenAlert({ show: true, stockName: log.name, action: executeToggle });
+                        return;
+                    }
+                }
+                executeToggle();
             };
 
             const deleteLog = (id) => {
@@ -644,23 +658,19 @@
                         const eps25 = row['2025EPS'] || row['2025'] || row['25'] || row['EPS25'];
                         const eps26 = row['預估2026EPS'] || row['2026'] || row['26'] || row['EPS26'];
                         const epsGrowth = row['EPS成長率'] || row['成長率']; 
-                        const futures = row['股期'] || row['期貨']; // 讀取股期判斷
+                        const futures = row['股期'] || row['期貨']; 
 
                         if (code) {
                             const strCode = String(code).trim();
-                            
                             let formattedGrowth = '-';
                             if (epsGrowth !== undefined && epsGrowth !== null && String(epsGrowth).trim().toUpperCase() !== 'NAN') {
                                 const numGrowth = parseFloat(epsGrowth);
                                 if (!isNaN(numGrowth)) {
-                                    // 將原始數值乘上 100，轉換為百分比格式 (例: 1.10 -> 110%)
                                     formattedGrowth = Number((numGrowth * 100).toFixed(2)) + '%';
                                 } else {
                                     formattedGrowth = epsGrowth; 
                                 }
                             }
-
-                            // 判斷是否具備股期 (只要欄位內有值就判定為 true)
                             const hasFutures = !!futures && String(futures).trim() !== '';
 
                             newEps[strCode] = { 
@@ -669,7 +679,6 @@
                                 epsGrowth: formattedGrowth,
                                 hasFutures: hasFutures
                             };
-
                             if (!stockMap[strCode] && name) {
                                 newCustom[strCode] = { name: String(name).trim(), industry: "匯入補齊" };
                                 addedCustomCount++;
@@ -681,24 +690,18 @@
                     setAlert({ show: true, msg: `EPS 與股期資料匯入成功！自動補齊了 ${addedCustomCount} 檔未知股票。` });
                 };
                 reader.readAsBinaryString(file);
-                // 清空 input 讓同檔名可以再次觸發 onChange
                 e.target.value = null;
             };
 
-            // 萃取共同的過濾與整理邏輯
             const getExportData = (formatType) => {
                 let titleName = "多重篩選漏斗";
-                if (formatType === 'score-futures') {
-                    titleName = "個股期篩選漏斗";
-                } else if (formatType === 'growth') {
-                    titleName = "EPS成長率排行";
-                }
+                if (formatType === 'score-futures') titleName = "個股期篩選漏斗";
+                else if (formatType === 'growth') titleName = "EPS成長率排行";
 
                 const sDate = copyStartDate <= copyEndDate ? copyStartDate : copyEndDate;
                 const eDate = copyStartDate <= copyEndDate ? copyEndDate : copyStartDate;
                 const dateRangeStr = sDate === eDate ? sDate : `${sDate} ~ ${eDate}`;
 
-                // 初步日期與標籤過濾
                 let targetLogs = logs.filter(l => l.date >= sDate && l.date <= eDate);
                 if (copySubTags.length > 0) {
                     targetLogs = targetLogs.filter(l => {
@@ -711,7 +714,6 @@
                     return null;
                 }
 
-                // 整理標籤與計算分數、成長率
                 let processedLogs = targetLogs.map(l => {
                     let allTags = [];
                     if (l.subTags && l.subTags.length > 0) allTags.push(...l.subTags);
@@ -739,7 +741,6 @@
                     return { ...l, allTags, displayTags, score, validGrowth, displayGrowth };
                 });
 
-                // 根據格式分群或排序
                 let strategyGroups = [];
                 let sortedLogs = [...processedLogs];
 
@@ -821,8 +822,8 @@
                         const countStr = l.score > 0 ? ` (${l.score}分)` : '';
                         const tagStr = l.displayTags.length > 0 ? ` (${l.displayTags.join('、')})` : '';
                         if (formatType === 'growth') {
-                            const growthStr = l.displayGrowth !== '-' ? ` [成長: ${l.displayGrowth}]` : '';
-                            detailText += `- ${l.stockId} ${l.name}${growthStr}${countStr}${tagStr}\n`;
+                            const growthStr = l.displayGrowth !== '-' ? ` [成長率: ${l.displayGrowth}]` : '';
+                            detailText += `- ${l.stockId} ${l.name}${growthStr}\n`;
                         } else {
                             detailText += `- ${l.stockId} ${l.name}${countStr}${tagStr}\n`;
                         }
@@ -852,26 +853,25 @@
 
             return (
                 <div className="animate-fade-in-up space-y-6">
-                    {/* 隱藏的圖片匯出渲染容器 - 升級為橫式寬度 1280px, 無格子, 淺色美圖漸層 */}
+                    {/* 隱藏的圖片匯出渲染容器 */}
                     {exportImgData && (
                         <div className="fixed top-[-9999px] left-[-9999px] z-0">
                             <div id="image-export-container" className="w-[1280px] min-h-[720px] flex flex-col bg-gradient-to-br from-slate-50 via-blue-50/60 to-indigo-100 text-slate-800 p-12 font-sans shadow-2xl relative z-0">
-                                {/* Header - 橫向佈局 (確保垂直置中對齊) */}
+                                {/* Header */}
                                 <div className="flex items-center gap-5 mb-8 pb-6 border-b border-slate-300">
                                     <div className="w-14 h-14 shrink-0 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
                                         <TrendingUp size={32} className="text-white" />
                                     </div>
                                     <div className="flex items-center h-14">
-                                        <h1 className="text-4xl font-bold text-slate-800 tracking-wider leading-none mt-1">
-                                            {exportImgData.dateRangeStr} 多重篩選漏斗
+                                        <h1 className="text-4xl font-bold text-slate-800 tracking-wider leading-none pt-1">
+                                            {exportImgData.dateRangeStr} {exportImgData.titleName}
                                         </h1>
                                     </div>
                                 </div>
 
-                                {/* Body Content - 橫向四欄式緊湊排版 (無僵硬框線) */}
+                                {/* Body Content */}
                                 <div className="flex-1">
                                     {exportImgData.formatType === 'strategy' ? (
-                                        /* 依策略分群：瀑布流式四欄佈局 (Masonry Layout) */
                                         <div className="columns-4 gap-6 space-y-6">
                                             {exportImgData.strategyGroups.map(grp => {
                                                 const bgClass = getLightBgClass(grp.label);
@@ -897,14 +897,13 @@
                                             )})}
                                         </div>
                                     ) : (
-                                        /* 依時間或分數排序：方塊卡片式四欄佈局 (Grid Layout) */
                                         <div className="grid grid-cols-4 gap-6">
                                             {exportImgData.sortedLogs.map((l, idx) => {
                                                 const mainStrat = l.allTags[0] || '未分類';
                                                 const bgClass = getLightBgClass(mainStrat);
                                                 return (
                                                 <div key={idx} className={`flex flex-col p-5 rounded-3xl shadow-sm ${bgClass}`}>
-                                                    <div className="flex justify-between items-center mb-4 pb-4 border-b border-white/60">
+                                                    <div className={`flex justify-between items-center ${exportImgData.formatType !== 'growth' ? 'mb-4 pb-4 border-b border-white/60' : ''}`}>
                                                         <div className="flex flex-col gap-1 flex-1 min-w-0 pr-2">
                                                             <div className="font-bold text-3xl text-slate-800 tracking-wider">{l.stockId}</div>
                                                             <div className="flex items-center gap-1.5 flex-wrap">
@@ -915,10 +914,10 @@
                                                         <div className="flex items-center justify-end shrink-0 gap-4">
                                                             {exportImgData.formatType === 'growth' && l.displayGrowth !== '-' && (
                                                                 <div className="flex items-baseline gap-1">
-                                                                    <div className="text-3xl font-bold text-emerald-600 drop-shadow-sm leading-none">{l.displayGrowth}</div>
+                                                                    <div className={`text-3xl font-bold drop-shadow-sm leading-none ${getTwStockColorForImg(l.displayGrowth)}`}>{l.displayGrowth}</div>
                                                                 </div>
                                                             )}
-                                                            {l.score > 0 && (
+                                                            {exportImgData.formatType !== 'growth' && l.score > 0 && (
                                                                 <div className="flex items-baseline gap-1">
                                                                     <div className="text-4xl font-bold text-indigo-600 drop-shadow-sm leading-none">{l.score}</div>
                                                                     <div className="text-sm text-indigo-500/80 font-bold">分</div>
@@ -926,9 +925,11 @@
                                                             )}
                                                         </div>
                                                     </div>
-                                                    <div className="flex flex-wrap items-center gap-2">
-                                                        {l.displayTags.map(t => <span key={t} className="px-3 py-1 bg-white/70 rounded-md font-bold text-sm text-slate-600 shadow-sm border border-white/50">{t}</span>)}
-                                                    </div>
+                                                    {exportImgData.formatType !== 'growth' && (
+                                                        <div className="flex flex-wrap items-center gap-2">
+                                                            {l.displayTags.map(t => <span key={t} className="px-3 py-1 bg-white/70 rounded-md font-bold text-sm text-slate-600 shadow-sm border border-white/50">{t}</span>)}
+                                                        </div>
+                                                    )}
                                                 </div>
                                             )})}
                                         </div>
@@ -962,7 +963,7 @@
                                         onChange={handleStockIdChange} 
                                         onKeyDown={e => { if (e.key === 'Enter') handleAddLog(); }}
                                         placeholder="e.g. 2330" 
-                                        className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 font-mono-num focus:border-blue-500 outline-none transition" 
+                                        className={`w-full bg-slate-900 border ${isForbiddenStock ? 'border-red-500' : 'border-slate-700'} rounded-lg p-2.5 font-mono-num focus:border-blue-500 outline-none transition ${isForbiddenStock ? 'text-red-500 font-bold bg-red-900/20' : 'text-white'}`} 
                                     />
                                 </div>
                             </div>
@@ -976,10 +977,13 @@
                                         onChange={handleStockNameChange}
                                         onKeyDown={e => { if (e.key === 'Enter') handleAddLog(); }}
                                         placeholder="輸入股名自動帶出股號..." 
-                                        className={`w-full h-full bg-slate-800/50 border ${isUnknownStock ? 'border-yellow-500/50' : 'border-slate-700/50'} rounded-lg p-2.5 focus:border-blue-500 outline-none transition ${stockMap[stockId] ? 'text-green-400 font-bold' : 'text-slate-200'}`} 
+                                        className={`w-full h-full bg-slate-800/50 border ${isForbiddenStock ? 'border-red-500' : (isUnknownStock ? 'border-yellow-500/50' : 'border-slate-700/50')} rounded-lg p-2.5 focus:border-blue-500 outline-none transition ${isForbiddenStock ? 'text-red-500 font-bold bg-red-900/20' : (stockMap[stockId] ? 'text-green-400 font-bold' : 'text-white')}`} 
                                     />
-                                    {isUnknownStock && (
+                                    {isUnknownStock && !isForbiddenStock && (
                                         <span className="absolute right-3 top-2.5 text-xs text-yellow-500 bg-yellow-500/10 px-2 py-1 rounded">送出自動記憶</span>
+                                    )}
+                                    {isForbiddenStock && (
+                                        <span className="absolute right-3 top-2.5 text-xs text-red-500 bg-red-500/20 px-2 py-1 rounded font-bold">嚴禁買入</span>
                                     )}
                                 </div>
                                 {stockIdsDatalist}
@@ -989,7 +993,7 @@
 
                         {/* 策略按鈕區塊 */}
                         <div className="mb-4">
-                            <label className="block text-sm text-slate-400 mb-1.5">符合策略條件</label>
+                            <label className="block text-sm text-slate-400 mb-1.5">符合策略條件 (選填)</label>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                                 {STRATEGIES.map(s => (
                                     <button 
@@ -1216,36 +1220,21 @@
                                     {filteredJournalLogs.map(log => {
                                         const eps = epsData[log.stockId] || { eps25: '-', eps26: '-', epsGrowth: '-', hasFutures: false };
                                         const strat = STRATEGIES.find(s => s.id === log.strategy);
-                                        
-                                        const eps26Num = parseFloat(eps.eps26);
-                                        const isEps26Positive = !isNaN(eps26Num) && eps26Num > 0;
-                                        const isEps26Negative = !isNaN(eps26Num) && eps26Num < 0;
-
-                                        let growthColorClass = 'text-slate-400';
-                                        if (isEps26Negative) {
-                                            growthColorClass = 'text-emerald-400';
-                                        } else if (eps.epsGrowth && eps.epsGrowth !== '-') {
-                                            const val = parseFloat(eps.epsGrowth);
-                                            if (!isNaN(val)) {
-                                                growthColorClass = val > 0 ? 'text-red-400' : val < 0 ? 'text-emerald-400' : 'text-slate-300';
-                                            } else {
-                                                growthColorClass = 'text-amber-400';
-                                            }
-                                        }
+                                        const hasFutures = eps.hasFutures;
 
                                         return (
-                                            <tr key={log.id} className={`transition group ${isEps26Positive ? 'bg-yellow-500/10 hover:bg-yellow-500/20 border-l-2 border-yellow-500' : 'hover:bg-slate-800/20'}`}>
-                                                <td className="p-4 font-mono-num text-slate-300">{log.date}</td>
+                                            <tr key={log.id} className={`transition group ${hasFutures ? 'bg-fuchsia-900/20 hover:bg-fuchsia-900/40 border-l-2 border-fuchsia-500' : 'hover:bg-slate-800/20 border-l-2 border-transparent'}`}>
+                                                <td className="p-4 font-mono-num text-white">{log.date}</td>
                                                 <td className="p-4">
                                                     <div className="flex items-center">
-                                                        <FuturesBadge hasFutures={eps.hasFutures} />
-                                                        <span className={`font-mono-num font-bold mr-2 ${isEps26Positive ? 'text-yellow-400' : 'text-blue-400'}`}>{log.stockId}</span>
-                                                        <span className={isEps26Positive ? 'text-yellow-100 font-bold' : 'text-slate-200'}>{log.name}</span>
+                                                        <FuturesBadge hasFutures={hasFutures} />
+                                                        <span className="font-mono-num font-bold mr-2 text-white">{log.stockId}</span>
+                                                        <span className="text-white font-bold">{log.name}</span>
                                                     </div>
                                                 </td>
-                                                <td className="p-4 font-mono-num text-emerald-400">{eps.eps25}</td>
-                                                <td className={`p-4 font-mono-num ${isEps26Positive ? 'text-yellow-400 font-bold drop-shadow-[0_0_5px_rgba(250,204,21,0.4)]' : 'text-emerald-500/70'}`}>{eps.eps26}</td>
-                                                <td className={`p-4 font-mono-num font-bold ${growthColorClass}`}>{eps.epsGrowth || '-'}</td>
+                                                <td className={`p-4 font-mono-num font-bold ${getTwStockColor(eps.eps25)}`}>{eps.eps25}</td>
+                                                <td className={`p-4 font-mono-num font-bold ${getTwStockColor(eps.eps26)}`}>{eps.eps26}</td>
+                                                <td className={`p-4 font-mono-num font-bold ${getTwStockColor(eps.epsGrowth)}`}>{eps.epsGrowth || '-'}</td>
                                                 <td className="p-4">
                                                     <div className="flex flex-wrap gap-1.5 items-center">
                                                         {log.subTags && log.subTags.length > 0 && (
@@ -1314,6 +1303,17 @@
                     <ConfirmModal isOpen={confirm.show} title="確認刪除" message="您確定要刪除這筆紀錄嗎？此動作無法復原。" 
                         onConfirm={() => { confirm.action(); setConfirm({ show: false, action: null }); }} 
                         onCancel={() => setConfirm({ show: false, action: null })} />
+                    
+                    {/* 防呆大視窗 */}
+                    <ForbiddenModal 
+                        isOpen={forbiddenAlert.show} 
+                        stockName={forbiddenAlert.stockName}
+                        onConfirm={() => {
+                            if (forbiddenAlert.action) forbiddenAlert.action();
+                            setForbiddenAlert({ show: false, stockName: '', action: null });
+                        }}
+                        onCancel={() => setForbiddenAlert({ show: false, stockName: '', action: null })}
+                    />
                 </div>
             );
         };
@@ -1584,10 +1584,10 @@
                                         <tr className="hover:bg-slate-800/20 transition">
                                             <td className="p-3 font-mono-num text-sm text-slate-400">{rec.date}</td>
                                             <td className="p-3 text-sm"><span className="bg-slate-800 px-2 py-1 rounded text-slate-300">{rec.session}</span></td>
-                                            <td className="p-3 text-sm font-bold text-blue-400">
+                                            <td className="p-3 text-sm font-bold text-white">
                                                 <div className="flex items-center">
                                                     <FuturesBadge hasFutures={hasFutures} />
-                                                    {rec.stockId} <span className="text-slate-400 font-normal ml-1">{rec.name}</span>
+                                                    {rec.stockId} <span className="font-normal ml-1">{rec.name}</span>
                                                 </div>
                                             </td>
                                             <td className="p-3 text-sm font-mono-num text-slate-300">{rec.inputs.h} / {rec.inputs.l} / {rec.inputs.c}</td>
@@ -1646,7 +1646,7 @@
         // ==========================================
         // 5. 模組三：交易規劃與績效統計 (Plan & Dashboard)
         // ==========================================
-        const PlanDashboard = ({ logs, setLogs, stockMap, setCustomStocks, epsData }) => {
+        const PlanDashboard = ({ logs, setLogs, stockMap, setCustomStocks, epsData, forbiddenStocks }) => {
             const [filterDate, setFilterDate] = useState('all');
             const [editingId, setEditingId] = useState(null);
             const [confirm, setConfirm] = useState({ show: false, action: null });
@@ -1655,6 +1655,9 @@
             const [planStockId, setPlanStockId] = useState('');
             const [planStockName, setPlanStockName] = useState('');
             const [alert, setAlert] = useState({ show: false, msg: '' });
+            
+            // 這裡也加入防呆 Alert State
+            const [forbiddenAlert, setForbiddenAlert] = useState({ show: false, stockName: '', action: null });
             
             const [planFilters, setPlanFilters] = useState({ stock: '', status: 'all', futures: 'all' });
             const [planSort, setPlanSort] = useState({ key: 'id', direction: 'desc' });
@@ -1697,6 +1700,8 @@
             };
 
             const isUnknownStock = planStockId.trim() && planStockName.trim() && !stockMap[planStockId.trim()];
+            const isForbiddenStock = (planStockId.trim() !== '' && forbiddenStocks.some(f => f.id === planStockId.trim())) || 
+                                     (planStockName.trim() !== '' && forbiddenStocks.some(f => planStockName.includes(f.name) || f.name === planStockName.trim()));
 
             const stockIdsDatalist = useMemo(() => (
                 <datalist id="plan-stock-ids-list">
@@ -1718,23 +1723,53 @@
                     setAlert({ show: true, msg: '請填寫股號與名稱！' });
                     return;
                 }
-                if (!stockMap[sId]) {
-                    setCustomStocks(prev => ({ ...prev, [sId]: { name: sName, industry: "自訂/手動新增" } }));
-                }
-                const newLog = {
-                    id: Date.now().toString(),
-                    date: planDate,
-                    stockId: sId,
-                    name: sName,
-                    strategy: ['獨立規劃'],
-                    subTags: [],
-                    starred: false,
-                    inPlan: true,
-                    plan: { entry: '', stopLoss: '', trailing: '', exit: '', shares: '', warrantCode: '', warrantEntry: '', warrantShares: '', currentPrice: '' }
+
+                const executeAdd = () => {
+                    if (!stockMap[sId]) {
+                        setCustomStocks(prev => ({ ...prev, [sId]: { name: sName, industry: "自訂/手動新增" } }));
+                    }
+                    const newLog = {
+                        id: Date.now().toString(),
+                        date: planDate,
+                        stockId: sId,
+                        name: sName,
+                        strategy: ['獨立規劃'],
+                        subTags: [],
+                        starred: false,
+                        inPlan: true,
+                        plan: { entry: '', stopLoss: '', trailing: '', exit: '', shares: '', warrantCode: '', warrantEntry: '', warrantShares: '', currentPrice: '' }
+                    };
+                    setLogs([...logs, newLog]);
+                    setPlanStockId('');
+                    setPlanStockName('');
                 };
-                setLogs([...logs, newLog]);
-                setPlanStockId('');
-                setPlanStockName('');
+
+                // 動態比對，若為黑名單則暫停寫入，並喚叫大視窗
+                if (forbiddenStocks.some(f => f.id === sId || sName.includes(f.name) || f.name === sName)) {
+                    setForbiddenAlert({ show: true, stockName: sName, action: executeAdd });
+                    return;
+                }
+
+                executeAdd();
+            };
+
+            const togglePlan = (id) => {
+                const log = logs.find(l => l.id === id);
+                if (!log) return;
+
+                const executeToggle = () => {
+                    setLogs(logs.map(l => l.id === id ? { ...l, inPlan: !l.inPlan } : l));
+                };
+
+                if (!log.inPlan) {
+                    const isForbidden = forbiddenStocks.some(f => f.id === log.stockId || log.name.includes(f.name) || f.name === log.name);
+                    if (isForbidden) {
+                        setForbiddenAlert({ show: true, stockName: log.name, action: executeToggle });
+                        return;
+                    }
+                }
+                
+                executeToggle();
             };
 
             const plannedLogs = useMemo(() => {
@@ -1775,18 +1810,11 @@
                     const pB = b.plan || {};
 
                     switch (planSort.key) {
-                        case 'stock':
-                            valA = a.stockId; valB = b.stockId; break;
-                        case 'entry':
-                            valA = parseFloat(pA.entry) || -999999; valB = parseFloat(pB.entry) || -999999; break;
-                        case 'sl':
-                            valA = parseFloat(pA.stopLoss) || (parseFloat(pA.entry)*0.95 || -999999);
-                            valB = parseFloat(pB.stopLoss) || (parseFloat(pB.entry)*0.95 || -999999); break;
-                        case 'exit':
-                            valA = parseFloat(pA.currentPrice || pA.exit) || -999999;
-                            valB = parseFloat(pB.currentPrice || pB.exit) || -999999; break;
-                        case 'shares':
-                            valA = parseFloat(pA.shares) || 0; valB = parseFloat(pB.shares) || 0; break;
+                        case 'stock': valA = a.stockId; valB = b.stockId; break;
+                        case 'entry': valA = parseFloat(pA.entry) || -999999; valB = parseFloat(pB.entry) || -999999; break;
+                        case 'sl': valA = parseFloat(pA.stopLoss) || (parseFloat(pA.entry)*0.95 || -999999); valB = parseFloat(pB.stopLoss) || (parseFloat(pB.entry)*0.95 || -999999); break;
+                        case 'exit': valA = parseFloat(pA.currentPrice || pA.exit) || -999999; valB = parseFloat(pB.currentPrice || pB.exit) || -999999; break;
+                        case 'shares': valA = parseFloat(pA.shares) || 0; valB = parseFloat(pB.shares) || 0; break;
                         case 'rr':
                             const getRR = (p) => {
                                 if (!p.entry || !p.stopLoss || !p.exit) return -999999;
@@ -1806,15 +1834,12 @@
                                 return -9999999; 
                             };
                             valA = getPnl(pA); valB = getPnl(pB); break;
-                        default: // 'id'
-                            valA = parseInt(a.id); valB = parseInt(b.id); break;
+                        default: valA = parseInt(a.id); valB = parseInt(b.id); break;
                     }
-
                     if (valA < valB) return planSort.direction === 'asc' ? -1 : 1;
                     if (valA > valB) return planSort.direction === 'asc' ? 1 : -1;
                     return 0;
                 });
-
                 return result;
             }, [plannedLogs, planFilters, planSort]);
 
@@ -1918,12 +1943,15 @@
                                 <input type="date" value={planDate} onChange={e => setPlanDate(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm font-mono-num focus:border-blue-500 outline-none" />
                             </div>
                             <div className="relative">
-                                <input type="text" list="plan-stock-ids-list" value={planStockId} onChange={handleStockIdChange} onKeyDown={e => { if (e.key === 'Enter') handleAddIndependentPlan(); }} placeholder="股號 (可搜尋)" className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm font-mono-num focus:border-blue-500 outline-none" />
+                                <input type="text" list="plan-stock-ids-list" value={planStockId} onChange={handleStockIdChange} onKeyDown={e => { if (e.key === 'Enter') handleAddIndependentPlan(); }} placeholder="股號 (可搜尋)" className={`w-full bg-slate-900 border ${isForbiddenStock ? 'border-red-500' : 'border-slate-700'} rounded-lg p-2 text-sm font-mono-num focus:border-blue-500 outline-none ${isForbiddenStock ? 'text-red-500 font-bold bg-red-900/20' : 'text-white'}`} />
                             </div>
                             <div className="relative">
-                                <input type="text" list="plan-stock-names-list" value={planStockName} onChange={handleStockNameChange} onKeyDown={e => { if (e.key === 'Enter') handleAddIndependentPlan(); }} placeholder="名稱 (可反查)" className={`w-full bg-slate-900 border ${isUnknownStock ? 'border-yellow-500/50' : 'border-slate-700'} rounded-lg p-2 text-sm focus:border-blue-500 outline-none ${stockMap[planStockId] ? 'text-green-400' : 'text-slate-200'}`} />
+                                <input type="text" list="plan-stock-names-list" value={planStockName} onChange={handleStockNameChange} onKeyDown={e => { if (e.key === 'Enter') handleAddIndependentPlan(); }} placeholder="名稱 (可反查)" className={`w-full bg-slate-900 border ${isForbiddenStock ? 'border-red-500' : (isUnknownStock ? 'border-yellow-500/50' : 'border-slate-700')} rounded-lg p-2 text-sm focus:border-blue-500 outline-none ${isForbiddenStock ? 'text-red-500 font-bold bg-red-900/20' : (stockMap[planStockId] ? 'text-green-400' : 'text-white')}`} />
                                 {stockIdsDatalist}
                                 {stockNamesDatalist}
+                                {isForbiddenStock && (
+                                    <span className="absolute right-3 top-2 text-xs text-red-500 bg-red-500/20 px-2 py-0.5 rounded font-bold">嚴禁買入</span>
+                                )}
                             </div>
                             <button onClick={handleAddIndependentPlan} className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg p-2 text-sm font-bold flex items-center justify-center gap-2 transition">
                                 <PlusCircle size={16} /> 加入規劃清單
@@ -1985,9 +2013,9 @@
 
                                         return (
                                             <React.Fragment key={log.id}>
-                                                <tr className={`hover:bg-slate-800/20 transition ${isOpen ? 'bg-blue-900/5' : ''}`}>
+                                                <tr className={`hover:bg-slate-800/20 transition ${hasFutures ? 'bg-fuchsia-900/20 hover:bg-fuchsia-900/40 border-l-2 border-fuchsia-500' : 'border-l-2 border-transparent'} ${isOpen ? 'bg-blue-900/5' : ''}`}>
                                                     <td className="p-3">
-                                                        <div className="font-bold text-slate-200 flex items-center">
+                                                        <div className="font-bold text-white flex items-center">
                                                             <FuturesBadge hasFutures={hasFutures} />
                                                             {log.stockId} {log.name}
                                                         </div>
@@ -2003,25 +2031,25 @@
                                                             )}
                                                         </div>
                                                     </td>
-                                                    <td className="p-3 font-mono-num text-slate-300">{p.entry || '-'}</td>
+                                                    <td className="p-3 font-mono-num text-white">{p.entry || '-'}</td>
                                                     <td className="p-3 font-mono-num text-red-400/80">{p.stopLoss || (p.entry ? (parseFloat(p.entry) * 0.95).toFixed(2) : '-')}</td>
-                                                    <td className="p-3 font-mono-num">
+                                                    <td className="p-3 font-mono-num text-white">
                                                         {isOpen ? (
                                                             <div className="relative w-24">
                                                                 <input type="number" step="any" placeholder="輸入現價" value={p.currentPrice || ''} onChange={(e) => updatePlan(log.id, 'currentPrice', e.target.value)} className="w-full bg-slate-900 border border-slate-600 rounded px-2 py-1 text-sm text-yellow-400 italic outline-none focus:border-yellow-500" />
                                                             </div>
                                                         ) : (
-                                                            <span className="text-emerald-400">{p.exit || '-'}</span>
+                                                            <span className="text-white">{p.exit || '-'}</span>
                                                         )}
                                                     </td>
-                                                    <td className="p-3 font-mono-num text-slate-300">{p.shares || '-'}</td>
+                                                    <td className="p-3 font-mono-num text-white">{p.shares || '-'}</td>
                                                     <td className="p-3 font-mono-num text-purple-400">{calculateRR(p)}</td>
-                                                    <td className="p-3 font-mono-num">
+                                                    <td className="p-3 font-mono-num font-bold">
                                                         {pnlValue !== null ? (
-                                                            <span className={pnlValue >= 0 ? 'text-emerald-400' : 'text-red-400'}>
+                                                            <span className={pnlValue > 0 ? 'text-red-400' : pnlValue < 0 ? 'text-emerald-400' : 'text-white'}>
                                                                 {pnlValue > 0 ? '+' : ''}{Math.round(pnlValue).toLocaleString()}
                                                             </span>
-                                                        ) : '-'}
+                                                        ) : <span className="text-white">-</span>}
                                                     </td>
                                                     <td className="p-3 text-center">
                                                         <div className="flex justify-center items-center gap-2">
@@ -2030,7 +2058,9 @@
                                                             </button>
                                                             <button onClick={() => setConfirm({ 
                                                                 show: true, 
-                                                                action: () => setLogs(logs.map(l => l.id === log.id ? { ...l, inPlan: false, plan: { ...l.plan, entry: '', stopLoss: '', exit: '' } } : l)) 
+                                                                action: () => {
+                                                                    setLogs(logs.map(l => l.id === log.id ? { ...l, inPlan: false, plan: { ...l.plan, entry: '', stopLoss: '', exit: '' } } : l));
+                                                                }
                                                             })} className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-500/20 rounded transition" title="移出規劃清單">
                                                                 <X size={18} />
                                                             </button>
@@ -2089,6 +2119,17 @@
                     <ConfirmModal isOpen={confirm.show} title="確認移出" message="確定要將此標的移出規劃清單嗎？（選股日誌中的原紀錄不會被刪除）" 
                         onConfirm={() => { confirm.action(); setConfirm({ show: false, action: null }); }} 
                         onCancel={() => setConfirm({ show: false, action: null })} />
+                    
+                    {/* 防呆大視窗 */}
+                    <ForbiddenModal 
+                        isOpen={forbiddenAlert.show} 
+                        stockName={forbiddenAlert.stockName}
+                        onConfirm={() => {
+                            if (forbiddenAlert.action) forbiddenAlert.action();
+                            setForbiddenAlert({ show: false, stockName: '', action: null });
+                        }}
+                        onCancel={() => setForbiddenAlert({ show: false, stockName: '', action: null })}
+                    />
                 </div>
             );
         };
@@ -2096,10 +2137,13 @@
         // ==========================================
         // 6. 模組四：追蹤清單 (Watchlist)
         // ==========================================
-        const WatchlistModule = ({ logs, setLogs, epsData }) => {
+        const WatchlistModule = ({ logs, setLogs, epsData, forbiddenStocks }) => {
             const [confirm, setConfirm] = useState({ show: false, action: null });
             const [watchlistFilters, setWatchlistFilters] = useState({ date: '', stock: '', futures: 'all', growth: 'all', tag: '', tagCount: 'all' });
             const [watchlistSort, setWatchlistSort] = useState({ key: 'id', direction: 'desc' });
+            
+            // 這裡也加入防呆 Alert State
+            const [forbiddenAlert, setForbiddenAlert] = useState({ show: false, stockName: '', action: null });
 
             const handleWatchlistSort = (key) => {
                 if (watchlistSort.key === key) {
@@ -2114,7 +2158,21 @@
             };
 
             const togglePlan = (id) => {
-                setLogs(logs.map(log => log.id === id ? { ...log, inPlan: !log.inPlan } : log));
+                const log = logs.find(l => l.id === id);
+                if (!log) return;
+
+                const executeToggle = () => {
+                    setLogs(logs.map(l => l.id === id ? { ...l, inPlan: !l.inPlan } : l));
+                };
+
+                if (!log.inPlan) {
+                    const isForbidden = forbiddenStocks.some(f => f.id === log.stockId || log.name.includes(f.name) || f.name === log.name);
+                    if (isForbidden) {
+                        setForbiddenAlert({ show: true, stockName: log.name, action: executeToggle });
+                        return;
+                    }
+                }
+                executeToggle();
             };
 
             const deleteLog = (id) => {
@@ -2136,10 +2194,7 @@
             };
 
             const filteredWatchlistLogs = useMemo(() => {
-                // 僅抓取被標記星號 (starred) 的紀錄
                 let result = logs.filter(l => l.starred);
-                
-                // 1. 篩選邏輯
                 if (watchlistFilters.date) result = result.filter(l => l.date === watchlistFilters.date);
                 if (watchlistFilters.stock) {
                     const kw = watchlistFilters.stock.toLowerCase();
@@ -2172,7 +2227,6 @@
                         return matchMain || matchSub;
                     });
                 }
-                // 新增：依「符合條件數量」過濾
                 if (watchlistFilters.tagCount !== 'all') {
                     result = result.filter(l => {
                         let tCount = [];
@@ -2191,25 +2245,17 @@
                     });
                 }
 
-                // 2. 排序邏輯
                 result.sort((a, b) => {
                     let valA, valB;
                     const epsA = epsData[a.stockId] || {};
                     const epsB = epsData[b.stockId] || {};
 
                     switch (watchlistSort.key) {
-                        case 'date':
-                            valA = a.date; valB = b.date;
-                            if (valA === valB) { valA = parseInt(a.id); valB = parseInt(b.id); } 
-                            break;
-                        case 'stock':
-                            valA = a.stockId; valB = b.stockId; break;
-                        case 'eps25':
-                            valA = parseFloat(epsA.eps25) || -999999; valB = parseFloat(epsB.eps25) || -999999; break;
-                        case 'eps26':
-                            valA = parseFloat(epsA.eps26) || -999999; valB = parseFloat(epsB.eps26) || -999999; break;
-                        case 'growth':
-                            valA = parseFloat(epsA.epsGrowth) || -999999; valB = parseFloat(epsB.epsGrowth) || -999999; break;
+                        case 'date': valA = a.date; valB = b.date; if (valA === valB) { valA = parseInt(a.id); valB = parseInt(b.id); } break;
+                        case 'stock': valA = a.stockId; valB = b.stockId; break;
+                        case 'eps25': valA = parseFloat(epsA.eps25) || -999999; valB = parseFloat(epsB.eps25) || -999999; break;
+                        case 'eps26': valA = parseFloat(epsA.eps26) || -999999; valB = parseFloat(epsB.eps26) || -999999; break;
+                        case 'growth': valA = parseFloat(epsA.epsGrowth) || -999999; valB = parseFloat(epsB.epsGrowth) || -999999; break;
                         case 'tags': {
                             const getScore = (l) => {
                                 let t = [];
@@ -2223,15 +2269,12 @@
                             };
                             valA = getScore(a); valB = getScore(b); break;
                         }
-                        default: // 'id'
-                            valA = parseInt(a.id); valB = parseInt(b.id); break;
+                        default: valA = parseInt(a.id); valB = parseInt(b.id); break;
                     }
-
                     if (valA < valB) return watchlistSort.direction === 'asc' ? -1 : 1;
                     if (valA > valB) return watchlistSort.direction === 'asc' ? 1 : -1;
                     return 0;
                 });
-
                 return result;
             }, [logs, watchlistFilters, epsData, watchlistSort]);
 
@@ -2307,36 +2350,21 @@
                                 <tbody className="divide-y divide-slate-800/50">
                                     {filteredWatchlistLogs.map(log => {
                                         const eps = epsData[log.stockId] || { eps25: '-', eps26: '-', epsGrowth: '-', hasFutures: false };
-                                        
-                                        const eps26Num = parseFloat(eps.eps26);
-                                        const isEps26Positive = !isNaN(eps26Num) && eps26Num > 0;
-                                        const isEps26Negative = !isNaN(eps26Num) && eps26Num < 0;
-
-                                        let growthColorClass = 'text-slate-400';
-                                        if (isEps26Negative) {
-                                            growthColorClass = 'text-emerald-400';
-                                        } else if (eps.epsGrowth && eps.epsGrowth !== '-') {
-                                            const val = parseFloat(eps.epsGrowth);
-                                            if (!isNaN(val)) {
-                                                growthColorClass = val > 0 ? 'text-red-400' : val < 0 ? 'text-emerald-400' : 'text-slate-300';
-                                            } else {
-                                                growthColorClass = 'text-amber-400';
-                                            }
-                                        }
+                                        const hasFutures = eps.hasFutures;
 
                                         return (
-                                            <tr key={log.id} className={`transition group ${isEps26Positive ? 'bg-yellow-500/10 hover:bg-yellow-500/20 border-l-2 border-yellow-500' : 'hover:bg-slate-800/20'}`}>
-                                                <td className="p-4 font-mono-num text-slate-300">{log.date}</td>
+                                            <tr key={log.id} className={`transition group ${hasFutures ? 'bg-fuchsia-900/20 hover:bg-fuchsia-900/40 border-l-2 border-fuchsia-500' : 'hover:bg-slate-800/20 border-l-2 border-transparent'}`}>
+                                                <td className="p-4 font-mono-num text-white">{log.date}</td>
                                                 <td className="p-4">
                                                     <div className="flex items-center">
-                                                        <FuturesBadge hasFutures={eps.hasFutures} />
-                                                        <span className={`font-mono-num font-bold mr-2 ${isEps26Positive ? 'text-yellow-400' : 'text-blue-400'}`}>{log.stockId}</span>
-                                                        <span className={isEps26Positive ? 'text-yellow-100 font-bold' : 'text-slate-200'}>{log.name}</span>
+                                                        <FuturesBadge hasFutures={hasFutures} />
+                                                        <span className="font-mono-num font-bold mr-2 text-white">{log.stockId}</span>
+                                                        <span className="text-white font-bold">{log.name}</span>
                                                     </div>
                                                 </td>
-                                                <td className="p-4 font-mono-num text-emerald-400">{eps.eps25}</td>
-                                                <td className={`p-4 font-mono-num ${isEps26Positive ? 'text-yellow-400 font-bold drop-shadow-[0_0_5px_rgba(250,204,21,0.4)]' : 'text-emerald-500/70'}`}>{eps.eps26}</td>
-                                                <td className={`p-4 font-mono-num font-bold ${growthColorClass}`}>{eps.epsGrowth || '-'}</td>
+                                                <td className={`p-4 font-mono-num font-bold ${getTwStockColor(eps.eps25)}`}>{eps.eps25}</td>
+                                                <td className={`p-4 font-mono-num font-bold ${getTwStockColor(eps.eps26)}`}>{eps.eps26}</td>
+                                                <td className={`p-4 font-mono-num font-bold ${getTwStockColor(eps.epsGrowth)}`}>{eps.epsGrowth || '-'}</td>
                                                 <td className="p-4">
                                                     <div className="flex flex-wrap gap-1.5 items-center">
                                                         {log.subTags && log.subTags.length > 0 && (
@@ -2407,6 +2435,136 @@
                     <ConfirmModal isOpen={confirm.show} title="確認刪除" message="您確定要刪除這筆紀錄嗎？此動作無法復原。" 
                         onConfirm={() => { confirm.action(); setConfirm({ show: false, action: null }); }} 
                         onCancel={() => setConfirm({ show: false, action: null })} />
+                    
+                    {/* 防呆大視窗 */}
+                    <ForbiddenModal 
+                        isOpen={forbiddenAlert.show} 
+                        stockName={forbiddenAlert.stockName}
+                        onConfirm={() => {
+                            if (forbiddenAlert.action) forbiddenAlert.action();
+                            setForbiddenAlert({ show: false, stockName: '', action: null });
+                        }}
+                        onCancel={() => setForbiddenAlert({ show: false, stockName: '', action: null })}
+                    />
+                </div>
+            );
+        };
+
+        // ==========================================
+        // 7. 模組五：佳佳持股專區 (Forbidden Module)
+        // ==========================================
+        const ForbiddenModule = ({ forbiddenStocks, setForbiddenStocks, stockMap, setCustomStocks }) => {
+            const [stockId, setStockId] = useState('');
+            const [stockName, setStockName] = useState('');
+            const [alert, setAlert] = useState({ show: false, msg: '' });
+
+            const handleStockIdChange = (e) => {
+                const val = e.target.value;
+                setStockId(val);
+                const trimmedVal = val.trim();
+                if (trimmedVal === '') { setStockName(''); return; }
+                if (stockMap[trimmedVal]) setStockName(stockMap[trimmedVal].name);
+            };
+
+            const handleStockNameChange = (e) => {
+                const val = e.target.value;
+                setStockName(val);
+                const trimmedVal = val.trim();
+                if (trimmedVal === '') { setStockId(''); return; }
+                const foundId = Object.keys(stockMap).find(key => stockMap[key].name === trimmedVal);
+                if (foundId) setStockId(foundId);
+            };
+
+            const handleAdd = () => {
+                const sId = stockId.trim();
+                const sName = stockName.trim();
+                if (!sId || !sName) {
+                    setAlert({ show: true, msg: '請輸入完整的股號與股名！' });
+                    return;
+                }
+                if (forbiddenStocks.some(f => f.id === sId)) {
+                    setAlert({ show: true, msg: `股號 ${sId} 已經在黑名單中囉！` });
+                    return;
+                }
+                if (!stockMap[sId]) {
+                    setCustomStocks(prev => ({ ...prev, [sId]: { name: sName, industry: "黑名單自訂" } }));
+                }
+                setForbiddenStocks([{ id: sId, name: sName }, ...forbiddenStocks]);
+                setStockId('');
+                setStockName('');
+                setAlert({ show: true, msg: `成功將「${sName}」加入嚴禁買入名單！` });
+            };
+
+            const handleDelete = (id) => {
+                setForbiddenStocks(forbiddenStocks.filter(f => f.id !== id));
+            };
+
+            return (
+                <div className="animate-fade-in-up space-y-6">
+                    <div className="bg-[#111827] p-6 rounded-2xl border border-red-900 shadow-[0_0_20px_rgba(220,38,38,0.15)] relative overflow-hidden">
+                        <div className="absolute -right-10 -top-10 text-red-500/10">
+                            <Ban size={200} />
+                        </div>
+                        <h2 className="text-2xl font-title text-red-500 mb-2 flex items-center gap-2 relative z-10"><Ban /> 佳佳持股 ‧ 嚴禁買入專區</h2>
+                        <p className="text-slate-400 text-sm mb-6 relative z-10">將高風險或特定股票加入此清單後，系統將在您建立日誌或規劃時進行全域攔截，保護您的資金安全。</p>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-2 relative z-10">
+                            <div className="relative">
+                                <label className="block text-sm text-slate-400 mb-1">輸入股號</label>
+                                <input 
+                                    type="text" 
+                                    value={stockId} 
+                                    onChange={handleStockIdChange} 
+                                    onKeyDown={e => { if (e.key === 'Enter') handleAdd(); }}
+                                    placeholder="e.g. 2317" 
+                                    className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 font-mono-num focus:border-red-500 outline-none transition text-white" 
+                                />
+                            </div>
+                            <div className="col-span-2 relative">
+                                <label className="block text-sm text-slate-400 mb-1">對應股票名稱 (可輸入名稱反查)</label>
+                                <input 
+                                    type="text" 
+                                    value={stockName} 
+                                    onChange={handleStockNameChange}
+                                    onKeyDown={e => { if (e.key === 'Enter') handleAdd(); }}
+                                    placeholder="輸入股名自動帶出股號..." 
+                                    className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 focus:border-red-500 outline-none transition text-white" 
+                                />
+                            </div>
+                            <div className="flex items-end">
+                                <button onClick={handleAdd} className="w-full bg-red-600 hover:bg-red-500 text-white p-2.5 rounded-lg font-bold flex items-center justify-center gap-2 transition shadow-lg shadow-red-900/50">
+                                    <PlusCircle size={18} /> 加入黑名單
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="bg-[#111827] rounded-2xl border border-slate-800 overflow-hidden shadow-lg">
+                        <div className="p-4 border-b border-slate-800 bg-red-950/20 flex justify-between items-center">
+                            <h3 className="font-bold text-red-400">目前防護名單 (共 {forbiddenStocks.length} 檔)</h3>
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-0">
+                            {forbiddenStocks.map(f => (
+                                <div key={f.id} className="p-4 border-r border-b border-slate-800/50 hover:bg-slate-800/30 flex justify-between items-center group transition">
+                                    <div>
+                                        <div className="font-bold text-slate-300 font-mono-num text-sm">{f.id}</div>
+                                        <div className="font-bold text-red-400 text-lg">{f.name}</div>
+                                    </div>
+                                    <button onClick={() => handleDelete(f.id)} className="text-slate-600 hover:text-red-500 opacity-0 group-hover:opacity-100 transition p-1 bg-red-500/10 rounded" title="解除封鎖">
+                                        <Trash2 size={16} />
+                                    </button>
+                                </div>
+                            ))}
+                            {forbiddenStocks.length === 0 && (
+                                <div className="col-span-full p-12 text-center text-slate-500">
+                                    <Ban size={48} className="mx-auto text-slate-700 mb-4" />
+                                    目前黑名單為空，您的交易沒有任何限制。
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    
+                    <AlertModal isOpen={alert.show} message={alert.msg} onClose={() => setAlert({ show: false, msg: '' })} />
                 </div>
             );
         };
@@ -2422,16 +2580,15 @@
             const [calcHistory, setCalcHistory] = useLocalStorage('ryan_calc_history', []);
             const [epsData, setEpsData] = useLocalStorage('ryan_eps_data', {});
             const [customStocks, setCustomStocks] = useLocalStorage('ryan_custom_stocks', {});
+            const [forbiddenStocks, setForbiddenStocks] = useLocalStorage('ryan_forbidden_stocks', DEFAULT_FORBIDDEN);
 
             const stockMap = useMemo(() => {
                 return { ...STATIC_STOCK_DB, ...customStocks };
             }, [customStocks]);
 
-            // 匯出全部資料 (改為 Excel 格式)
             const handleExportData = () => {
                 const wb = XLSX.utils.book_new();
 
-                // 1. 選股與規劃紀錄
                 const logsSheetData = logs.map(l => ({
                     '系統ID(勿改)': l.id,
                     '日期': l.date,
@@ -2455,7 +2612,6 @@
                 const wsLogs = XLSX.utils.json_to_sheet(logsSheetData);
                 XLSX.utils.book_append_sheet(wb, wsLogs, "選股與規劃");
 
-                // 2. 支撐壓力紀錄
                 const calcSheetData = calcHistory.map(c => ({
                     '系統ID(勿改)': c.id,
                     '日期': c.date,
@@ -2470,7 +2626,6 @@
                 const wsCalc = XLSX.utils.json_to_sheet(calcSheetData);
                 XLSX.utils.book_append_sheet(wb, wsCalc, "支撐壓力紀錄");
 
-                // 3. EPS與股期快取
                 const epsSheetData = Object.keys(epsData).map(id => ({
                     '股號': id,
                     '25EPS': epsData[id].eps25,
@@ -2481,7 +2636,6 @@
                 const wsEps = XLSX.utils.json_to_sheet(epsSheetData);
                 XLSX.utils.book_append_sheet(wb, wsEps, "EPS與股期快取");
 
-                // 4. 自訂股票快取
                 const customStocksData = Object.keys(customStocks).map(id => ({
                     '股號': id,
                     '名稱': customStocks[id].name,
@@ -2490,10 +2644,16 @@
                 const wsCustom = XLSX.utils.json_to_sheet(customStocksData);
                 XLSX.utils.book_append_sheet(wb, wsCustom, "自訂股票快取");
 
+                const forbiddenSheetData = forbiddenStocks.map(f => ({
+                    '股號': f.id,
+                    '名稱': f.name
+                }));
+                const wsForbidden = XLSX.utils.json_to_sheet(forbiddenSheetData);
+                XLSX.utils.book_append_sheet(wb, wsForbidden, "佳佳持股黑名單");
+
                 XLSX.writeFile(wb, `萊恩手札備份_${getTodayLocal()}.xlsx`);
             };
 
-            // 匯入全部資料 (讀取 Excel 格式)
             const handleImportData = (e) => {
                 const file = e.target.files[0];
                 if (!file) return;
@@ -2503,7 +2663,6 @@
                         const bstr = evt.target.result;
                         const wb = XLSX.read(bstr, { type: 'binary' });
 
-                        // 1. Logs
                         if (wb.Sheets["選股與規劃"]) {
                             const logsData = XLSX.utils.sheet_to_json(wb.Sheets["選股與規劃"]);
                             const newLogs = logsData.map(row => ({
@@ -2531,7 +2690,6 @@
                             setLogs(newLogs);
                         }
 
-                        // 2. Calc History
                         if (wb.Sheets["支撐壓力紀錄"]) {
                             const calcData = XLSX.utils.sheet_to_json(wb.Sheets["支撐壓力紀錄"]);
                             const newCalcHistory = calcData.map(row => ({
@@ -2550,7 +2708,6 @@
                             setCalcHistory(newCalcHistory);
                         }
 
-                        // 3. EPS快取
                         if (wb.Sheets["EPS與股期快取"]) {
                             const epsDataRaw = XLSX.utils.sheet_to_json(wb.Sheets["EPS與股期快取"]);
                             let newEpsData = {};
@@ -2567,7 +2724,6 @@
                             setEpsData(newEpsData);
                         }
 
-                        // 4. Custom Stocks快取
                         if (wb.Sheets["自訂股票快取"]) {
                             const customDataRaw = XLSX.utils.sheet_to_json(wb.Sheets["自訂股票快取"]);
                             let newCustomStocks = {};
@@ -2582,6 +2738,17 @@
                             setCustomStocks(newCustomStocks);
                         }
 
+                        if (wb.Sheets["佳佳持股黑名單"]) {
+                            const forbiddenDataRaw = XLSX.utils.sheet_to_json(wb.Sheets["佳佳持股黑名單"]);
+                            let newForbiddenStocks = [];
+                            forbiddenDataRaw.forEach(row => {
+                                if (row['股號'] && row['名稱']) {
+                                    newForbiddenStocks.push({ id: row['股號'].toString(), name: row['名稱'] });
+                                }
+                            });
+                            setForbiddenStocks(newForbiddenStocks.length > 0 ? newForbiddenStocks : DEFAULT_FORBIDDEN);
+                        }
+
                         setAppAlert({ show: true, msg: 'Excel 備份資料已成功匯入還原！' });
                     } catch (err) {
                         console.error(err);
@@ -2589,12 +2756,11 @@
                     }
                 };
                 reader.readAsBinaryString(file);
-                e.target.value = null; // 清空選擇，允許重複匯入同檔名
+                e.target.value = null; 
             };
 
             return (
                 <div className="min-h-screen pb-20">
-                    {/* Header */}
                     <header className="bg-[#111827] border-b border-slate-800 sticky top-0 z-40 shadow-md">
                         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
                             <div className="flex items-center gap-3">
@@ -2606,7 +2772,6 @@
                                 </h1>
                             </div>
                             
-                            {/* 新增：資料匯入/匯出按鈕區塊 (更新 accept 為 .xlsx, .xls) */}
                             <div className="flex items-center gap-3">
                                 <label className="cursor-pointer flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-slate-200 transition bg-slate-800/50 hover:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700">
                                     <Upload size={14} /> 匯入備份
@@ -2617,36 +2782,40 @@
                                 </button>
                             </div>
                         </div>
-                        {/* Tabs: 修改這裡為彩色區塊顯示 */}
-                        <div className="max-w-7xl mx-auto px-4 flex gap-6 overflow-x-auto text-sm font-bold">
-                            <button onClick={() => setActiveTab('journal')} className={`py-3 px-1 border-b-2 whitespace-nowrap transition flex items-center gap-1.5 ${activeTab === 'journal' ? 'border-blue-500 text-blue-400' : 'border-transparent text-blue-500/50 hover:text-blue-400'}`}>
+                        <div className="max-w-7xl mx-auto px-4 flex flex-wrap gap-x-6 gap-y-2 text-sm font-bold pb-2">
+                            <button onClick={() => setActiveTab('journal')} className={`py-2 px-1 border-b-2 whitespace-nowrap transition flex items-center gap-1.5 ${activeTab === 'journal' ? 'border-blue-500 text-blue-400' : 'border-transparent text-blue-500/50 hover:text-blue-400'}`}>
                                 <FileText size={16} /> 模組一：選股日誌
                             </button>
-                            <button onClick={() => setActiveTab('calculator')} className={`py-3 px-1 border-b-2 whitespace-nowrap transition flex items-center gap-1.5 ${activeTab === 'calculator' ? 'border-indigo-500 text-indigo-400' : 'border-transparent text-indigo-500/50 hover:text-indigo-400'}`}>
+                            <button onClick={() => setActiveTab('calculator')} className={`py-2 px-1 border-b-2 whitespace-nowrap transition flex items-center gap-1.5 ${activeTab === 'calculator' ? 'border-indigo-500 text-indigo-400' : 'border-transparent text-indigo-500/50 hover:text-indigo-400'}`}>
                                 <Calculator size={16} /> 模組二：支撐壓力
                             </button>
-                            <button onClick={() => setActiveTab('plan')} className={`py-3 px-1 border-b-2 whitespace-nowrap transition flex items-center gap-1.5 ${activeTab === 'plan' ? 'border-emerald-500 text-emerald-400' : 'border-transparent text-emerald-500/50 hover:text-emerald-400'}`}>
+                            <button onClick={() => setActiveTab('plan')} className={`py-2 px-1 border-b-2 whitespace-nowrap transition flex items-center gap-1.5 ${activeTab === 'plan' ? 'border-emerald-500 text-emerald-400' : 'border-transparent text-emerald-500/50 hover:text-emerald-400'}`}>
                                 <LayoutDashboard size={16} /> 模組三：交易規劃
                             </button>
-                            <button onClick={() => setActiveTab('watchlist')} className={`py-3 px-1 border-b-2 whitespace-nowrap transition flex items-center gap-1.5 ${activeTab === 'watchlist' ? 'border-yellow-500 text-yellow-400' : 'border-transparent text-yellow-500/50 hover:text-yellow-400'}`}>
+                            <button onClick={() => setActiveTab('watchlist')} className={`py-2 px-1 border-b-2 whitespace-nowrap transition flex items-center gap-1.5 ${activeTab === 'watchlist' ? 'border-yellow-500 text-yellow-400' : 'border-transparent text-yellow-500/50 hover:text-yellow-400'}`}>
                                 <Star size={16} /> 模組四：追蹤清單
+                            </button>
+                            <button onClick={() => setActiveTab('forbidden')} className={`py-2 px-1 border-b-2 whitespace-nowrap transition flex items-center gap-1.5 ${activeTab === 'forbidden' ? 'border-red-500 text-red-400' : 'border-transparent text-red-500/50 hover:text-red-400'}`}>
+                                <Ban size={16} /> 模組五：佳佳持股
                             </button>
                         </div>
                     </header>
 
-                    {/* Main Content */}
                     <main className="max-w-7xl mx-auto px-4 mt-8">
                         {activeTab === 'journal' && (
-                            <StockJournal logs={logs} setLogs={setLogs} epsData={epsData} setEpsData={setEpsData} customStocks={customStocks} setCustomStocks={setCustomStocks} stockMap={stockMap} />
+                            <StockJournal logs={logs} setLogs={setLogs} epsData={epsData} setEpsData={setEpsData} customStocks={customStocks} setCustomStocks={setCustomStocks} stockMap={stockMap} forbiddenStocks={forbiddenStocks} />
                         )}
                         {activeTab === 'calculator' && (
                             <CalculatorModule calcHistory={calcHistory} setCalcHistory={setCalcHistory} stockMap={stockMap} setCustomStocks={setCustomStocks} epsData={epsData} />
                         )}
                         {activeTab === 'plan' && (
-                            <PlanDashboard logs={logs} setLogs={setLogs} stockMap={stockMap} setCustomStocks={setCustomStocks} epsData={epsData} />
+                            <PlanDashboard logs={logs} setLogs={setLogs} stockMap={stockMap} setCustomStocks={setCustomStocks} epsData={epsData} forbiddenStocks={forbiddenStocks} />
                         )}
                         {activeTab === 'watchlist' && (
-                            <WatchlistModule logs={logs} setLogs={setLogs} epsData={epsData} stockMap={stockMap} />
+                            <WatchlistModule logs={logs} setLogs={setLogs} epsData={epsData} stockMap={stockMap} forbiddenStocks={forbiddenStocks} />
+                        )}
+                        {activeTab === 'forbidden' && (
+                            <ForbiddenModule forbiddenStocks={forbiddenStocks} setForbiddenStocks={setForbiddenStocks} stockMap={stockMap} setCustomStocks={setCustomStocks} />
                         )}
                     </main>
 
