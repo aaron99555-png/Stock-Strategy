@@ -8,8 +8,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- SheetJS -->
     <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
-    <!-- html2canvas 用於產出圖片 -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -95,7 +93,7 @@
             TrendingUp, BarChart2, Zap, AlertCircle, Save, Trash2, 
             Download, Upload, Eye, FileText, CheckCircle, Calculator,
             ClipboardCopy, Search, PlusCircle, LayoutDashboard, Star, X, Target,
-            ArrowUp, ArrowDown, ArrowUpDown, Camera, Image as ImageIcon, Ban
+            ArrowUp, ArrowDown, ArrowUpDown, Ban
         } from 'lucide-react';
 
         // ==========================================
@@ -261,13 +259,6 @@
             return val > 0 ? 'text-red-400' : 'text-emerald-400';
         };
 
-        const getTwStockColorForImg = (valStr) => {
-            if (valStr === undefined || valStr === null || valStr === '-' || valStr === '') return 'text-slate-700';
-            const val = parseFloat(String(valStr).replace(/,/g, '').replace('%', ''));
-            if (isNaN(val) || val === 0) return 'text-slate-700';
-            return val > 0 ? 'text-red-600' : 'text-emerald-600';
-        };
-
         // ==========================================
         // 3. 模組一：選股日誌與 EPS (Stock Journal)
         // ==========================================
@@ -318,24 +309,6 @@
             '興櫃-多頭突破上關價': 'from-amber-600 to-orange-700'
         };
 
-        const getLightBgClass = (label) => {
-            if (!label) return 'bg-slate-100/90';
-            if (label.includes('當沖')) return 'bg-orange-100/80';
-            if (label.includes('興櫃')) return 'bg-purple-100/80';
-            if (label.includes('籌碼') || label.includes('法人') || label.includes('買進') || label.includes('大單') || label.includes('營收')) return 'bg-emerald-100/80';
-            if (label.includes('趨勢') || label.includes('齊揚') || label.includes('開花') || label.includes('破繭') || label.includes('金叉') || label.includes('MACD') || label.includes('突破') || label.includes('上漲') || label.includes('不可失')) return 'bg-blue-100/80';
-            return 'bg-indigo-100/80';
-        };
-
-        const getDarkTextClass = (label) => {
-            if (!label) return 'text-slate-700';
-            if (label.includes('當沖')) return 'text-orange-700';
-            if (label.includes('興櫃')) return 'text-purple-700';
-            if (label.includes('籌碼') || label.includes('法人') || label.includes('買進') || label.includes('大單') || label.includes('營收')) return 'text-emerald-700';
-            if (label.includes('趨勢') || label.includes('齊揚') || label.includes('開花') || label.includes('破繭') || label.includes('金叉') || label.includes('MACD') || label.includes('突破') || label.includes('上漲') || label.includes('不可失')) return 'text-blue-700';
-            return 'text-indigo-700';
-        };
-
         const StockJournal = ({ logs, setLogs, customStocks, setCustomStocks, epsData, setEpsData, stockMap, forbiddenStocks }) => {
             const [date, setDate] = useState(getTodayLocal());
             const [copyStartDate, setCopyStartDate] = useState(getTodayLocal());
@@ -343,8 +316,6 @@
             const [copySubTags, setCopySubTags] = useState([]); 
             const [isCopyDropdownOpen, setIsCopyDropdownOpen] = useState(false);
             const copyDropdownRef = useRef(null);
-            
-            const [exportImgData, setExportImgData] = useState(null);
 
             const [stockId, setStockId] = useState('');
             const [stockName, setStockName] = useState('');
@@ -353,7 +324,6 @@
             const [alert, setAlert] = useState({ show: false, msg: '' });
             const [confirm, setConfirm] = useState({ show: false, action: null });
             
-            // 加入動態放行的防呆 Alert State
             const [forbiddenAlert, setForbiddenAlert] = useState({ show: false, stockName: '', action: null });
             
             const [copySuccess, setCopySuccess] = useState(null); 
@@ -442,7 +412,11 @@
                                     const hasSub = l.subTags?.some(tag => SUB_TAGS[sId]?.includes(tag));
                                     if (!hasSub) t.push(sId);
                                 });
-                                return t.length;
+                                let finalScore = t.length;
+                                const eps = epsData[l.stockId] || {};
+                                const g = parseFloat(eps.epsGrowth);
+                                if (!isNaN(g) && g > 0) finalScore += 1; // 成長率為正，自動加1分
+                                return finalScore;
                             };
                             valA = getScore(a); valB = getScore(b); break;
                         }
@@ -464,30 +438,6 @@
                 document.addEventListener("mousedown", handleClickOutside);
                 return () => document.removeEventListener("mousedown", handleClickOutside);
             }, []);
-
-            useEffect(() => {
-                if (exportImgData) {
-                    setAlert({ show: true, msg: '⏳ 正在產生精美圖片，請稍候...' });
-                    setTimeout(() => {
-                        const el = document.getElementById('image-export-container');
-                        if (el && window.html2canvas) {
-                            window.html2canvas(el, { scale: 2, backgroundColor: '#f8fafc', useCORS: true })
-                            .then(canvas => {
-                                const link = document.createElement('a');
-                                link.download = `萊恩手札_${exportImgData.dateRangeStr}_${exportImgData.titleName}.png`;
-                                link.href = canvas.toDataURL('image/png');
-                                link.click();
-                                setExportImgData(null);
-                                setAlert({ show: true, msg: '✅ 圖片產出成功，已開始下載！' });
-                            }).catch(err => {
-                                console.error('html2canvas error:', err);
-                                setExportImgData(null);
-                                setAlert({ show: true, msg: '❌ 圖片產出失敗，請重試。' });
-                            });
-                        }
-                    }, 300); 
-                }
-            }, [exportImgData]);
 
             const handleStockIdChange = (e) => {
                 const val = e.target.value;
@@ -576,7 +526,6 @@
                     setStockName('');
                 };
 
-                // 動態比對，若為黑名單則中斷並呼叫大視窗，將寫入動作暫存在 pendingAction
                 const isForbidden = forbiddenStocks.some(f => f.id === sId || sName.includes(f.name) || f.name === sName);
                 if (isForbidden) {
                     setForbiddenAlert({ show: true, stockName: sName, action: executeAdd });
@@ -642,52 +591,86 @@
                 if (!file) return;
                 const reader = new FileReader();
                 reader.onload = (evt) => {
-                    const bstr = evt.target.result;
-                    const wb = XLSX.read(bstr, { type: 'binary' });
-                    const wsname = wb.SheetNames[0];
-                    const ws = wb.Sheets[wsname];
-                    const data = XLSX.utils.sheet_to_json(ws);
-                    
-                    let newEps = { ...epsData };
-                    let newCustom = { ...customStocks };
-                    let addedCustomCount = 0;
+                    try {
+                        const bstr = evt.target.result;
+                        const wb = XLSX.read(bstr, { type: 'binary' });
+                        const wsname = wb.SheetNames[0];
+                        const ws = wb.Sheets[wsname];
+                        const rawData = XLSX.utils.sheet_to_json(ws, { header: 1 });
+                        
+                        let newEps = { ...epsData };
+                        let newCustom = { ...customStocks };
+                        let addedCustomCount = 0;
 
-                    data.forEach(row => {
-                        const code = row['代號'] || row['code'] || row['Code'];
-                        const name = row['股名'] || row['名稱'] || row['name'] || row['Name'];
-                        const eps25 = row['2025EPS'] || row['2025'] || row['25'] || row['EPS25'];
-                        const eps26 = row['預估2026EPS'] || row['2026'] || row['26'] || row['EPS26'];
-                        const epsGrowth = row['EPS成長率'] || row['成長率']; 
-                        const futures = row['股期'] || row['期貨']; 
+                        let headerRowIndex = -1;
+                        let colIdx = { code: -1, name: -1, eps25: -1, eps26: -1, growth: -1, futures: -1 };
 
-                        if (code) {
-                            const strCode = String(code).trim();
-                            let formattedGrowth = '-';
-                            if (epsGrowth !== undefined && epsGrowth !== null && String(epsGrowth).trim().toUpperCase() !== 'NAN') {
-                                const numGrowth = parseFloat(epsGrowth);
-                                if (!isNaN(numGrowth)) {
-                                    formattedGrowth = Number((numGrowth * 100).toFixed(2)) + '%';
-                                } else {
-                                    formattedGrowth = epsGrowth; 
-                                }
-                            }
-                            const hasFutures = !!futures && String(futures).trim() !== '';
-
-                            newEps[strCode] = { 
-                                eps25: eps25 !== undefined && eps25 !== null ? eps25 : '-', 
-                                eps26: eps26 !== undefined && eps26 !== null ? eps26 : '-',
-                                epsGrowth: formattedGrowth,
-                                hasFutures: hasFutures
-                            };
-                            if (!stockMap[strCode] && name) {
-                                newCustom[strCode] = { name: String(name).trim(), industry: "匯入補齊" };
-                                addedCustomCount++;
+                        for (let i = 0; i < Math.min(20, rawData.length); i++) {
+                            const row = rawData[i];
+                            if (!Array.isArray(row)) continue;
+                            
+                            const code = row.findIndex(c => typeof c === 'string' && (c.includes('代號') || c.includes('股號') || c.includes('代碼')));
+                            if (code !== -1) {
+                                headerRowIndex = i;
+                                colIdx.code = code;
+                                colIdx.name = row.findIndex(c => typeof c === 'string' && (c.includes('股名') || c.includes('名稱') || c.includes('公司')));
+                                colIdx.eps25 = row.findIndex(c => typeof c === 'string' && (c.includes('2025EPS') || c === '2025' || c.includes('EPS25')));
+                                colIdx.eps26 = row.findIndex(c => typeof c === 'string' && (c.includes('2026EPS') || c === '2026' || c.includes('EPS26')));
+                                colIdx.growth = row.findIndex(c => typeof c === 'string' && c.includes('成長率'));
+                                colIdx.futures = row.findIndex(c => typeof c === 'string' && (c.includes('股期') || c.includes('期貨')));
+                                break;
                             }
                         }
-                    });
-                    setEpsData(newEps);
-                    setCustomStocks(newCustom);
-                    setAlert({ show: true, msg: `EPS 與股期資料匯入成功！自動補齊了 ${addedCustomCount} 檔未知股票。` });
+
+                        if (headerRowIndex !== -1) {
+                            for (let i = headerRowIndex + 1; i < rawData.length; i++) {
+                                const row = rawData[i];
+                                if (!row || row[colIdx.code] === undefined) continue;
+                                
+                                const code = row[colIdx.code];
+                                const name = colIdx.name !== -1 ? row[colIdx.name] : '';
+                                const eps25 = colIdx.eps25 !== -1 ? row[colIdx.eps25] : undefined;
+                                const eps26 = colIdx.eps26 !== -1 ? row[colIdx.eps26] : undefined;
+                                const epsGrowth = colIdx.growth !== -1 ? row[colIdx.growth] : undefined;
+                                const futures = colIdx.futures !== -1 ? row[colIdx.futures] : undefined;
+
+                                const strCode = String(code).trim();
+                                if (strCode === '') continue;
+
+                                let formattedGrowth = '-';
+                                if (epsGrowth !== undefined && epsGrowth !== null && String(epsGrowth).trim().toUpperCase() !== 'NAN') {
+                                    const numGrowth = parseFloat(epsGrowth);
+                                    if (!isNaN(numGrowth)) {
+                                        formattedGrowth = Number((numGrowth * 100).toFixed(2)) + '%';
+                                    } else {
+                                        formattedGrowth = epsGrowth; 
+                                    }
+                                }
+
+                                const hasFutures = !!futures && String(futures).trim() !== '';
+
+                                newEps[strCode] = { 
+                                    eps25: eps25 !== undefined && eps25 !== null && String(eps25).trim() !== '' ? eps25 : '-', 
+                                    eps26: eps26 !== undefined && eps26 !== null && String(eps26).trim() !== '' ? eps26 : '-',
+                                    epsGrowth: formattedGrowth,
+                                    hasFutures: hasFutures
+                                };
+
+                                if (!stockMap[strCode] && name) {
+                                    newCustom[strCode] = { name: String(name).trim(), industry: "匯入補齊" };
+                                    addedCustomCount++;
+                                }
+                            }
+                            setEpsData(newEps);
+                            setCustomStocks(newCustom);
+                            setAlert({ show: true, msg: `EPS 與股期資料匯入成功！自動補齊了 ${addedCustomCount} 檔未知股票。` });
+                        } else {
+                            setAlert({ show: true, msg: `找不到「股票代號」欄位，請確認檔案格式！` });
+                        }
+                    } catch(e) {
+                        console.error(e);
+                        setAlert({ show: true, msg: `檔案解析失敗，請確認是否為有效的 Excel 檔案。` });
+                    }
                 };
                 reader.readAsBinaryString(file);
                 e.target.value = null;
@@ -726,7 +709,7 @@
                         }
                     });
 
-                    const score = allTags.length;
+                    let baseScore = allTags.length;
                     let displayTags = allTags;
                     if (copySubTags.length > 0) {
                         displayTags = allTags.filter(t => copySubTags.includes(t));
@@ -738,7 +721,12 @@
                     const validGrowth = !isNaN(numGrowth) ? numGrowth : -999999;
                     const displayGrowth = rawGrowth || '-';
 
-                    return { ...l, allTags, displayTags, score, validGrowth, displayGrowth };
+                    // 成長率為正，自動加1分
+                    if (validGrowth > 0) {
+                        baseScore += 1;
+                    }
+
+                    return { ...l, allTags, displayTags, score: baseScore, validGrowth, displayGrowth };
                 });
 
                 let strategyGroups = [];
@@ -814,7 +802,9 @@
                 if (formatType === 'strategy') {
                     data.strategyGroups.forEach(grp => {
                         detailText += `🎯 [${grp.label}] (共 ${grp.logs.length} 檔)\n`;
-                        grp.logs.forEach(l => detailText += `  - ${l.stockId} ${l.name}\n`);
+                        grp.logs.forEach(l => {
+                            detailText += `  - ${l.stockId} ${l.name}\n`;
+                        });
                         detailText += `\n`;
                     });
                 } else {
@@ -824,6 +814,9 @@
                         if (formatType === 'growth') {
                             const growthStr = l.displayGrowth !== '-' ? ` [成長率: ${l.displayGrowth}]` : '';
                             detailText += `- ${l.stockId} ${l.name}${growthStr}\n`;
+                        } else if (formatType === 'score' || formatType === 'score-futures') {
+                            const growthStr = l.displayGrowth !== '-' ? ` [成長率: ${l.displayGrowth}]` : '';
+                            detailText += `- ${l.stockId} ${l.name}${growthStr}${countStr}${tagStr}\n`;
                         } else {
                             detailText += `- ${l.stockId} ${l.name}${countStr}${tagStr}\n`;
                         }
@@ -838,112 +831,8 @@
                 setTimeout(() => setCopySuccess(null), 2000); 
             };
 
-            const generateImage = (formatType) => {
-                const data = getExportData(formatType);
-                if (!data) return;
-                setExportImgData({
-                    formatType,
-                    titleName: data.titleName,
-                    dateRangeStr: data.dateRangeStr,
-                    sortedLogs: data.sortedLogs,
-                    strategyGroups: data.strategyGroups,
-                    copySubTags
-                });
-            };
-
             return (
                 <div className="animate-fade-in-up space-y-6">
-                    {/* 隱藏的圖片匯出渲染容器 */}
-                    {exportImgData && (
-                        <div className="fixed top-[-9999px] left-[-9999px] z-0">
-                            <div id="image-export-container" className="w-[1280px] min-h-[720px] flex flex-col bg-gradient-to-br from-slate-50 via-blue-50/60 to-indigo-100 text-slate-800 p-12 font-sans shadow-2xl relative z-0">
-                                {/* Header */}
-                                <div className="flex items-center gap-5 mb-8 pb-6 border-b border-slate-300">
-                                    <div className="w-14 h-14 shrink-0 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
-                                        <TrendingUp size={32} className="text-white" />
-                                    </div>
-                                    <div className="flex items-center h-14">
-                                        <h1 className="text-4xl font-bold text-slate-800 tracking-wider leading-none pt-1">
-                                            {exportImgData.dateRangeStr} {exportImgData.titleName}
-                                        </h1>
-                                    </div>
-                                </div>
-
-                                {/* Body Content */}
-                                <div className="flex-1">
-                                    {exportImgData.formatType === 'strategy' ? (
-                                        <div className="columns-4 gap-6 space-y-6">
-                                            {exportImgData.strategyGroups.map(grp => {
-                                                const bgClass = getLightBgClass(grp.label);
-                                                const txtClass = getDarkTextClass(grp.label);
-                                                return (
-                                                <div key={grp.label} className={`break-inside-avoid rounded-3xl p-5 shadow-sm ${bgClass}`}>
-                                                    <div className={`font-bold mb-4 text-xl flex items-center justify-between ${txtClass}`}>
-                                                        <span>🎯 {grp.label}</span>
-                                                        <span className="text-xs bg-white/70 px-2.5 py-1 rounded-full text-slate-600">共 {grp.logs.length} 檔</span>
-                                                    </div>
-                                                    <div className="flex flex-col gap-3">
-                                                        {grp.logs.map(l => (
-                                                            <div key={l.stockId} className="flex px-1 items-center gap-2 pb-3 border-b border-white/50 last:border-0 last:pb-0">
-                                                                <div className="font-bold text-xl text-slate-700 tracking-wider w-14 shrink-0">{l.stockId}</div>
-                                                                <div className="flex items-center gap-1.5 flex-1 flex-wrap">
-                                                                    <div className="font-bold text-xl text-slate-800 whitespace-normal break-words leading-none">{l.name}</div>
-                                                                    {epsData[l.stockId]?.hasFutures && <span className="inline-flex items-center justify-center bg-fuchsia-100 text-fuchsia-700 border border-fuchsia-200 px-1.5 pt-[3px] pb-[1px] rounded font-bold text-[11px] tracking-widest shrink-0 leading-none">股期</span>}
-                                                                </div>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            )})}
-                                        </div>
-                                    ) : (
-                                        <div className="grid grid-cols-4 gap-6">
-                                            {exportImgData.sortedLogs.map((l, idx) => {
-                                                const mainStrat = l.allTags[0] || '未分類';
-                                                const bgClass = getLightBgClass(mainStrat);
-                                                return (
-                                                <div key={idx} className={`flex flex-col p-5 rounded-3xl shadow-sm ${bgClass}`}>
-                                                    <div className={`flex justify-between items-center ${exportImgData.formatType !== 'growth' ? 'mb-4 pb-4 border-b border-white/60' : ''}`}>
-                                                        <div className="flex flex-col gap-1 flex-1 min-w-0 pr-2">
-                                                            <div className="font-bold text-3xl text-slate-800 tracking-wider">{l.stockId}</div>
-                                                            <div className="flex items-center gap-1.5 flex-wrap">
-                                                                <span className="font-bold text-2xl text-slate-700 whitespace-normal break-words leading-none">{l.name}</span>
-                                                                {epsData[l.stockId]?.hasFutures && <span className="inline-flex items-center justify-center bg-fuchsia-100 text-fuchsia-700 border border-fuchsia-200 px-1.5 pt-[3px] pb-[1px] rounded font-bold text-[11px] tracking-widest shrink-0 leading-none">股期</span>}
-                                                            </div>
-                                                        </div>
-                                                        <div className="flex items-center justify-end shrink-0 gap-4">
-                                                            {exportImgData.formatType === 'growth' && l.displayGrowth !== '-' && (
-                                                                <div className="flex items-baseline gap-1">
-                                                                    <div className={`text-3xl font-bold drop-shadow-sm leading-none ${getTwStockColorForImg(l.displayGrowth)}`}>{l.displayGrowth}</div>
-                                                                </div>
-                                                            )}
-                                                            {exportImgData.formatType !== 'growth' && l.score > 0 && (
-                                                                <div className="flex items-baseline gap-1">
-                                                                    <div className="text-4xl font-bold text-indigo-600 drop-shadow-sm leading-none">{l.score}</div>
-                                                                    <div className="text-sm text-indigo-500/80 font-bold">分</div>
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                    {exportImgData.formatType !== 'growth' && (
-                                                        <div className="flex flex-wrap items-center gap-2">
-                                                            {l.displayTags.map(t => <span key={t} className="px-3 py-1 bg-white/70 rounded-md font-bold text-sm text-slate-600 shadow-sm border border-white/50">{t}</span>)}
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            )})}
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Footer */}
-                                <div className="mt-8 pt-5 border-t border-slate-300/80 text-sm text-slate-500 text-center tracking-widest font-bold">
-                                    此圖片由系統自動產生 | 投資有賺有賠，本表僅供個人交易紀錄參考
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
                     {/* 控制區塊 */}
                     <div className="bg-[#111827] p-6 rounded-2xl border border-slate-800 shadow-lg">
                         <h2 className="text-2xl font-title text-blue-400 mb-6 flex items-center gap-2"><FileText /> 新增選股日誌</h2>
@@ -1041,7 +930,8 @@
                                     匯入 EPS / 股期
                                     <input type="file" accept=".csv, .xlsx, .xls" onChange={handleEpsImport} className="hidden" />
                                 </label>
-                                <div className="flex items-center gap-2 bg-slate-800 rounded-lg p-1 pr-2 relative" ref={copyDropdownRef}>
+
+                                <div className="flex items-center gap-2 bg-slate-800 rounded-lg p-1 pr-2 relative ml-4" ref={copyDropdownRef}>
                                     <div className="flex items-center bg-slate-900 border border-slate-700 rounded-md">
                                         <input 
                                             type="date" 
@@ -1110,40 +1000,21 @@
                                     )}
 
                                     <div className="flex flex-wrap gap-2 ml-2">
-                                        <div className="flex shadow-lg rounded-md overflow-hidden">
-                                            <button onClick={() => copyLogs('time')} className={`text-sm text-white flex items-center gap-1 transition px-3 py-1.5 ${copySuccess === 'time' ? 'bg-green-600' : 'bg-blue-600 hover:bg-blue-500'}`} title="複製文字：依輸入時間順序">
-                                                {copySuccess === 'time' ? <CheckCircle size={16} /> : <ClipboardCopy size={16} />} {copySuccess === 'time' ? '已複製' : '依時間'}
-                                            </button>
-                                            <button onClick={() => generateImage('time')} className="bg-blue-700 hover:bg-blue-600 text-white px-2.5 py-1.5 border-l border-blue-800 transition flex items-center" title="將結果下載成精美圖片"><Camera size={14} /></button>
-                                        </div>
-
-                                        <div className="flex shadow-lg rounded-md overflow-hidden">
-                                            <button onClick={() => copyLogs('strategy')} className={`text-sm text-white flex items-center gap-1 transition px-3 py-1.5 ${copySuccess === 'strategy' ? 'bg-green-600' : 'bg-indigo-600 hover:bg-indigo-500'}`} title="複製文字：依策略標籤群組">
-                                                {copySuccess === 'strategy' ? <CheckCircle size={16} /> : <ClipboardCopy size={16} />} {copySuccess === 'strategy' ? '已複製' : '依策略'}
-                                            </button>
-                                            <button onClick={() => generateImage('strategy')} className="bg-indigo-700 hover:bg-indigo-600 text-white px-2.5 py-1.5 border-l border-indigo-800 transition flex items-center" title="將結果下載成精美圖片"><Camera size={14} /></button>
-                                        </div>
-
-                                        <div className="flex shadow-lg rounded-md overflow-hidden">
-                                            <button onClick={() => copyLogs('score')} className={`text-sm text-white flex items-center gap-1 transition px-3 py-1.5 ${copySuccess === 'score' ? 'bg-green-600' : 'bg-rose-600 hover:bg-rose-500'}`} title="複製文字：依標籤數量高低排序">
-                                                {copySuccess === 'score' ? <CheckCircle size={16} /> : <Star size={16} />} {copySuccess === 'score' ? '已複製' : '依分數'}
-                                            </button>
-                                            <button onClick={() => generateImage('score')} className="bg-rose-700 hover:bg-rose-600 text-white px-2.5 py-1.5 border-l border-rose-800 transition flex items-center" title="將結果下載成精美圖片"><Camera size={14} /></button>
-                                        </div>
-
-                                        <div className="flex shadow-lg rounded-md overflow-hidden">
-                                            <button onClick={() => copyLogs('score-futures')} className={`text-sm text-white flex items-center gap-1 transition px-3 py-1.5 ${copySuccess === 'score-futures' ? 'bg-green-600' : 'bg-fuchsia-600 hover:bg-fuchsia-500'}`} title="複製文字：僅篩選有股期標的，依標籤數量高低排序">
-                                                {copySuccess === 'score-futures' ? <CheckCircle size={16} /> : <Star size={16} />} {copySuccess === 'score-futures' ? '已複製' : '股期分數'}
-                                            </button>
-                                            <button onClick={() => generateImage('score-futures')} className="bg-fuchsia-700 hover:bg-fuchsia-600 text-white px-2.5 py-1.5 border-l border-fuchsia-800 transition flex items-center" title="將結果下載成精美圖片"><Camera size={14} /></button>
-                                        </div>
-
-                                        <div className="flex shadow-lg rounded-md overflow-hidden">
-                                            <button onClick={() => copyLogs('growth')} className={`text-sm text-white flex items-center gap-1 transition px-3 py-1.5 ${copySuccess === 'growth' ? 'bg-green-600' : 'bg-teal-600 hover:bg-teal-500'}`} title="複製文字：依 EPS 成長率高低排序">
-                                                {copySuccess === 'growth' ? <CheckCircle size={16} /> : <TrendingUp size={16} />} {copySuccess === 'growth' ? '已複製' : '依成長率'}
-                                            </button>
-                                            <button onClick={() => generateImage('growth')} className="bg-teal-700 hover:bg-teal-600 text-white px-2.5 py-1.5 border-l border-teal-800 transition flex items-center" title="將結果下載成精美圖片"><Camera size={14} /></button>
-                                        </div>
+                                        <button onClick={() => copyLogs('time')} className={`text-sm text-white flex items-center gap-1 transition px-3 py-1.5 shadow-lg rounded-md ${copySuccess === 'time' ? 'bg-green-600' : 'bg-blue-600 hover:bg-blue-500'}`} title="複製文字：依輸入時間順序">
+                                            {copySuccess === 'time' ? <CheckCircle size={16} /> : <ClipboardCopy size={16} />} {copySuccess === 'time' ? '已複製' : '依時間'}
+                                        </button>
+                                        <button onClick={() => copyLogs('strategy')} className={`text-sm text-white flex items-center gap-1 transition px-3 py-1.5 shadow-lg rounded-md ${copySuccess === 'strategy' ? 'bg-green-600' : 'bg-indigo-600 hover:bg-indigo-500'}`} title="複製文字：依策略標籤群組">
+                                            {copySuccess === 'strategy' ? <CheckCircle size={16} /> : <ClipboardCopy size={16} />} {copySuccess === 'strategy' ? '已複製' : '依策略'}
+                                        </button>
+                                        <button onClick={() => copyLogs('score')} className={`text-sm text-white flex items-center gap-1 transition px-3 py-1.5 shadow-lg rounded-md ${copySuccess === 'score' ? 'bg-green-600' : 'bg-rose-600 hover:bg-rose-500'}`} title="複製文字：依標籤數量高低排序">
+                                            {copySuccess === 'score' ? <CheckCircle size={16} /> : <Star size={16} />} {copySuccess === 'score' ? '已複製' : '依分數'}
+                                        </button>
+                                        <button onClick={() => copyLogs('score-futures')} className={`text-sm text-white flex items-center gap-1 transition px-3 py-1.5 shadow-lg rounded-md ${copySuccess === 'score-futures' ? 'bg-green-600' : 'bg-fuchsia-600 hover:bg-fuchsia-500'}`} title="複製文字：僅篩選有股期標的，依標籤數量高低排序">
+                                            {copySuccess === 'score-futures' ? <CheckCircle size={16} /> : <Star size={16} />} {copySuccess === 'score-futures' ? '已複製' : '股期分數'}
+                                        </button>
+                                        <button onClick={() => copyLogs('growth')} className={`text-sm text-white flex items-center gap-1 transition px-3 py-1.5 shadow-lg rounded-md ${copySuccess === 'growth' ? 'bg-green-600' : 'bg-teal-600 hover:bg-teal-500'}`} title="複製文字：依 EPS 成長率高低排序">
+                                            {copySuccess === 'growth' ? <CheckCircle size={16} /> : <TrendingUp size={16} />} {copySuccess === 'growth' ? '已複製' : '依成長率'}
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -1810,11 +1681,18 @@
                     const pB = b.plan || {};
 
                     switch (planSort.key) {
-                        case 'stock': valA = a.stockId; valB = b.stockId; break;
-                        case 'entry': valA = parseFloat(pA.entry) || -999999; valB = parseFloat(pB.entry) || -999999; break;
-                        case 'sl': valA = parseFloat(pA.stopLoss) || (parseFloat(pA.entry)*0.95 || -999999); valB = parseFloat(pB.stopLoss) || (parseFloat(pB.entry)*0.95 || -999999); break;
-                        case 'exit': valA = parseFloat(pA.currentPrice || pA.exit) || -999999; valB = parseFloat(pB.currentPrice || pB.exit) || -999999; break;
-                        case 'shares': valA = parseFloat(pA.shares) || 0; valB = parseFloat(pB.shares) || 0; break;
+                        case 'stock':
+                            valA = a.stockId; valB = b.stockId; break;
+                        case 'entry':
+                            valA = parseFloat(pA.entry) || -999999; valB = parseFloat(pB.entry) || -999999; break;
+                        case 'sl':
+                            valA = parseFloat(pA.stopLoss) || (parseFloat(pA.entry)*0.95 || -999999);
+                            valB = parseFloat(pB.stopLoss) || (parseFloat(pB.entry)*0.95 || -999999); break;
+                        case 'exit':
+                            valA = parseFloat(pA.currentPrice || pA.exit) || -999999;
+                            valB = parseFloat(pB.currentPrice || pB.exit) || -999999; break;
+                        case 'shares':
+                            valA = parseFloat(pA.shares) || 0; valB = parseFloat(pB.shares) || 0; break;
                         case 'rr':
                             const getRR = (p) => {
                                 if (!p.entry || !p.stopLoss || !p.exit) return -999999;
@@ -1834,12 +1712,15 @@
                                 return -9999999; 
                             };
                             valA = getPnl(pA); valB = getPnl(pB); break;
-                        default: valA = parseInt(a.id); valB = parseInt(b.id); break;
+                        default: // 'id'
+                            valA = parseInt(a.id); valB = parseInt(b.id); break;
                     }
+
                     if (valA < valB) return planSort.direction === 'asc' ? -1 : 1;
                     if (valA > valB) return planSort.direction === 'asc' ? 1 : -1;
                     return 0;
                 });
+
                 return result;
             }, [plannedLogs, planFilters, planSort]);
 
@@ -2141,8 +2022,7 @@
             const [confirm, setConfirm] = useState({ show: false, action: null });
             const [watchlistFilters, setWatchlistFilters] = useState({ date: '', stock: '', futures: 'all', growth: 'all', tag: '', tagCount: 'all' });
             const [watchlistSort, setWatchlistSort] = useState({ key: 'id', direction: 'desc' });
-            
-            // 這裡也加入防呆 Alert State
+            const [showForbidden, setShowForbidden] = useState(false);
             const [forbiddenAlert, setForbiddenAlert] = useState({ show: false, stockName: '', action: null });
 
             const handleWatchlistSort = (key) => {
@@ -2159,20 +2039,14 @@
 
             const togglePlan = (id) => {
                 const log = logs.find(l => l.id === id);
-                if (!log) return;
-
-                const executeToggle = () => {
-                    setLogs(logs.map(l => l.id === id ? { ...l, inPlan: !l.inPlan } : l));
-                };
-
-                if (!log.inPlan) {
+                if (log && !log.inPlan) {
                     const isForbidden = forbiddenStocks.some(f => f.id === log.stockId || log.name.includes(f.name) || f.name === log.name);
                     if (isForbidden) {
-                        setForbiddenAlert({ show: true, stockName: log.name, action: executeToggle });
+                        setForbiddenAlert({ show: true, stockName: log.name, action: () => setLogs(logs.map(l => l.id === id ? { ...l, inPlan: !l.inPlan } : l)) });
                         return;
                     }
                 }
-                executeToggle();
+                setLogs(logs.map(log => log.id === id ? { ...log, inPlan: !log.inPlan } : log));
             };
 
             const deleteLog = (id) => {
@@ -2265,7 +2139,11 @@
                                     const hasSub = l.subTags?.some(tag => SUB_TAGS[sId]?.includes(tag));
                                     if (!hasSub) t.push(sId);
                                 });
-                                return t.length;
+                                let finalScore = t.length;
+                                const eps = epsData[l.stockId] || {};
+                                const g = parseFloat(eps.epsGrowth);
+                                if (!isNaN(g) && g > 0) finalScore += 1;
+                                return finalScore;
                             };
                             valA = getScore(a); valB = getScore(b); break;
                         }
