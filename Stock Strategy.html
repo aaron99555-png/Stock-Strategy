@@ -93,8 +93,51 @@
             TrendingUp, BarChart2, Zap, AlertCircle, Save, Trash2, 
             Download, Upload, Eye, FileText, CheckCircle, Calculator,
             ClipboardCopy, Search, PlusCircle, LayoutDashboard, Star, X, Target,
-            ArrowUp, ArrowDown, ArrowUpDown, Ban
+            ArrowUp, ArrowDown, ArrowUpDown, Ban, Sparkles, Bot
         } from 'lucide-react';
+
+        // ==========================================
+        // Gemini API Hook
+        // ==========================================
+        const useGeminiAPI = () => {
+            const apiKey = ""; // API 金鑰由執行環境自動注入
+
+            const generateText = async (prompt, systemInstructionText) => {
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+                const payload = {
+                    contents: [{ parts: [{ text: prompt }] }],
+                    systemInstruction: { parts: [{ text: systemInstructionText }] }
+                };
+
+                const fetchWithRetry = async (retries = 5, delay = 1000) => {
+                    try {
+                        const response = await fetch(url, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+                        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                        const result = await response.json();
+                        return result.candidates?.[0]?.content?.parts?.[0]?.text || "無法取得 AI 回應，請稍後再試。";
+                    } catch (error) {
+                        if (retries > 0) {
+                            await new Promise(res => setTimeout(res, delay));
+                            return fetchWithRetry(retries - 1, delay * 2);
+                        }
+                        throw error;
+                    }
+                };
+
+                try {
+                    return await fetchWithRetry();
+                } catch (error) {
+                    console.error("Gemini API Error:", error);
+                    return "❌ AI 連線失敗，請稍後再試。";
+                }
+            };
+
+            return { generateText };
+        };
 
         // ==========================================
         // 1. 靜態資料庫與預設黑名單
@@ -240,6 +283,34 @@
             );
         };
 
+        const AiModal = ({ isOpen, onClose, content, loading, title }) => {
+            if (!isOpen) return null;
+            return (
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-[100] animate-fade-in-down">
+                    <div className="bg-slate-900 border border-purple-500/50 p-6 rounded-2xl w-[600px] shadow-[0_0_80px_rgba(168,85,247,0.3)]">
+                        <div className="flex items-center gap-3 mb-4 text-purple-400 border-b border-slate-700 pb-3">
+                            <Sparkles size={24} className="animate-pulse" />
+                            <h3 className="text-xl font-bold">{title}</h3>
+                            <button onClick={onClose} className="ml-auto text-slate-500 hover:text-white transition"><X size={24} /></button>
+                        </div>
+                        <div className="text-slate-300 mb-6 min-h-[150px] max-h-[60vh] overflow-y-auto whitespace-pre-wrap leading-relaxed text-sm p-2">
+                            {loading ? (
+                                <div className="flex flex-col items-center justify-center h-32 space-y-4 text-purple-400 opacity-80">
+                                    <Bot size={48} className="animate-bounce" />
+                                    <span className="font-bold tracking-widest">AI 正在深度分析中，請稍候...</span>
+                                </div>
+                            ) : (
+                                content
+                            )}
+                        </div>
+                        <div className="flex justify-end pt-3 border-t border-slate-700/50">
+                            <button onClick={onClose} className="px-6 py-2.5 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 transition text-white outline-none focus:ring-2 focus:ring-purple-400 font-bold w-full shadow-lg shadow-purple-900/50">完成閱讀</button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
         const SortIcon = ({ sortKey, currentSort }) => {
             if (currentSort.key !== sortKey) return <ArrowUpDown size={14} className="text-slate-600 opacity-50" />;
             return currentSort.direction === 'asc' ? <ArrowUp size={14} className="text-blue-400" /> : <ArrowDown size={14} className="text-blue-400" />;
@@ -309,7 +380,7 @@
             '興櫃-多頭突破上關價': 'from-amber-600 to-orange-700'
         };
 
-        const StockJournal = ({ logs, setLogs, customStocks, setCustomStocks, epsData, setEpsData, stockMap, forbiddenStocks }) => {
+        const StockJournal = ({ logs, setLogs, customStocks, setCustomStocks, epsData, setEpsData, stockMap, forbiddenStocks, onAiDiagnose }) => {
             const [date, setDate] = useState(getTodayLocal());
             const [copyStartDate, setCopyStartDate] = useState(getTodayLocal());
             const [copyEndDate, setCopyEndDate] = useState(getTodayLocal());
@@ -415,7 +486,7 @@
                                 let finalScore = t.length;
                                 const eps = epsData[l.stockId] || {};
                                 const g = parseFloat(eps.epsGrowth);
-                                if (!isNaN(g) && g > 0) finalScore += 1; // 成長率為正，自動加1分
+                                if (!isNaN(g) && g > 0) finalScore += 1;
                                 return finalScore;
                             };
                             valA = getScore(a); valB = getScore(b); break;
@@ -681,7 +752,6 @@
                 if (formatType === 'score-futures') titleName = "個股期篩選漏斗";
                 else if (formatType === 'growth') titleName = "EPS成長率排行";
 
-                // 因為移除了自訂日期功能，一律使用今日作為匯出區間
                 const sDate = getTodayLocal();
                 const eDate = getTodayLocal();
                 const dateRangeStr = sDate;
@@ -722,7 +792,6 @@
                     const validGrowth = !isNaN(numGrowth) ? numGrowth : -999999;
                     const displayGrowth = rawGrowth || '-';
 
-                    // 成長率為正，自動加1分
                     if (validGrowth > 0) {
                         baseScore += 1;
                     }
@@ -933,7 +1002,6 @@
                                 </label>
 
                                 <div className="flex items-center gap-2 bg-slate-800 rounded-lg p-1 pr-2 relative ml-4" ref={copyDropdownRef}>
-                                    
                                     <button 
                                         onClick={() => setIsCopyDropdownOpen(!isCopyDropdownOpen)}
                                         className={`bg-slate-900 border border-slate-700 rounded-md px-3 py-1 text-sm outline-none flex items-center gap-1 transition-colors ${copySubTags.length > 0 ? 'text-blue-400 border-blue-500/50' : 'text-slate-300'}`}
@@ -1131,7 +1199,10 @@
                                                     </div>
                                                 </td>
                                                 <td className="p-4 text-center">
-                                                    <div className="flex justify-center gap-3">
+                                                    <div className="flex justify-center items-center gap-3">
+                                                        <button onClick={() => onAiDiagnose(log)} className="text-purple-400 hover:text-purple-300 transition" title="✨ AI 個股診斷">
+                                                            <Sparkles size={20} className="hover:drop-shadow-[0_0_8px_rgba(168,85,247,0.6)]" />
+                                                        </button>
                                                         <button onClick={() => togglePlan(log.id)} className={`transition ${log.inPlan ? 'text-blue-400 drop-shadow-[0_0_8px_rgba(96,165,250,0.6)]' : 'text-slate-600 hover:text-blue-400'}`} title={log.inPlan ? '移出規劃' : '加入規劃'}>
                                                             <Target size={20} />
                                                         </button>
@@ -1501,7 +1572,7 @@
         // ==========================================
         // 5. 模組三：交易規劃與績效統計 (Plan & Dashboard)
         // ==========================================
-        const PlanDashboard = ({ logs, setLogs, stockMap, setCustomStocks, epsData, forbiddenStocks }) => {
+        const PlanDashboard = ({ logs, setLogs, stockMap, setCustomStocks, epsData, forbiddenStocks, onAiReview }) => {
             const [filterDate, setFilterDate] = useState('all');
             const [editingId, setEditingId] = useState(null);
             const [confirm, setConfirm] = useState({ show: false, action: null });
@@ -1917,7 +1988,10 @@
                                                         ) : <span className="text-white">-</span>}
                                                     </td>
                                                     <td className="p-3 text-center">
-                                                        <div className="flex justify-center items-center gap-2">
+                                                        <div className="flex justify-center items-center gap-3">
+                                                            <button onClick={() => onAiReview(log, pnlValue, calculateRR(p))} className="text-purple-400 hover:text-purple-300 transition" title={isOpen ? "✨ AI 持倉健診" : "✨ AI 盤後檢討"}>
+                                                                <Sparkles size={20} className="hover:drop-shadow-[0_0_8px_rgba(168,85,247,0.6)]" />
+                                                            </button>
                                                             <button onClick={() => setEditingId(isEditing ? null : log.id)} className={`px-3 py-1 rounded text-sm transition ${isEditing ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}>
                                                                 {isEditing ? '完成' : '規劃'}
                                                             </button>
@@ -2002,7 +2076,7 @@
         // ==========================================
         // 6. 模組四：追蹤清單 (Watchlist)
         // ==========================================
-        const WatchlistModule = ({ logs, setLogs, epsData, forbiddenStocks }) => {
+        const WatchlistModule = ({ logs, setLogs, epsData, forbiddenStocks, onAiDiagnose }) => {
             const [confirm, setConfirm] = useState({ show: false, action: null });
             const [watchlistFilters, setWatchlistFilters] = useState({ date: '', stock: '', futures: 'all', growth: 'all', tag: '', tagCount: 'all' });
             const [watchlistSort, setWatchlistSort] = useState({ key: 'id', direction: 'desc' });
@@ -2268,7 +2342,10 @@
                                                     </div>
                                                 </td>
                                                 <td className="p-4 text-center">
-                                                    <div className="flex justify-center gap-3">
+                                                    <div className="flex justify-center items-center gap-3">
+                                                        <button onClick={() => onAiDiagnose(log)} className="text-purple-400 hover:text-purple-300 transition" title="✨ AI 個股診斷">
+                                                            <Sparkles size={20} className="hover:drop-shadow-[0_0_8px_rgba(168,85,247,0.6)]" />
+                                                        </button>
                                                         <button onClick={() => togglePlan(log.id)} className={`transition ${log.inPlan ? 'text-blue-400 drop-shadow-[0_0_8px_rgba(96,165,250,0.6)]' : 'text-slate-600 hover:text-blue-400'}`} title={log.inPlan ? '移出規劃' : '加入規劃'}>
                                                             <Target size={20} />
                                                         </button>
@@ -2444,9 +2521,57 @@
             const [customStocks, setCustomStocks] = useLocalStorage('ryan_custom_stocks', {});
             const [forbiddenStocks, setForbiddenStocks] = useLocalStorage('ryan_forbidden_stocks', DEFAULT_FORBIDDEN);
 
+            // AI 相關狀態
+            const { generateText } = useGeminiAPI();
+            const [aiModal, setAiModal] = useState({ isOpen: false, loading: false, content: '', title: '' });
+
             const stockMap = useMemo(() => {
                 return { ...STATIC_STOCK_DB, ...customStocks };
             }, [customStocks]);
+
+            const handleAiDiagnose = async (log) => {
+                setAiModal({ isOpen: true, loading: true, content: '', title: `✨ AI 個股診斷：${log.name}` });
+                const epsInfo = epsData[log.stockId] || {};
+                const strategyLabels = Array.isArray(log.strategy) ? log.strategy.map(sId => STRATEGIES.find(s => s.id === sId)?.label).filter(Boolean) : [];
+                const allTags = [...strategyLabels, ...(log.subTags || [])].join('、');
+                
+                const prompt = `請針對台股「${log.name} (${log.stockId})」進行簡要的技術面或籌碼面診斷。
+                【使用者提供的數據】
+                - 策略與觀察特徵：${allTags || '無'}
+                - EPS 成長率：${epsInfo.epsGrowth || '未知'}
+                
+                請用大約 150 字的繁體中文，給出客觀的分析與後續觀察重點，並提醒潛在風險。語氣請專業且具建設性，直接回覆重點即可，不需寒暄。`;
+                
+                const result = await generateText(prompt, "你是一位專業的台股分析師。");
+                setAiModal(prev => ({ ...prev, loading: false, content: result }));
+            };
+
+            const handleAiReview = async (log, pnl, rr) => {
+                const p = log.plan || {};
+                const isOpen = p.entry && !p.exit;
+                setAiModal({ isOpen: true, loading: true, content: '', title: isOpen ? `✨ AI 持倉健診：${log.name}` : `✨ AI 盤後檢討：${log.name}` });
+                
+                const strategyLabels = Array.isArray(log.strategy) ? log.strategy.map(sId => STRATEGIES.find(s => s.id === sId)?.label).filter(Boolean) : [];
+                const allTags = [...strategyLabels, ...(log.subTags || [])].join('、');
+
+                let prompt = "";
+                if (isOpen) {
+                    prompt = `我目前持倉台股「${log.name} (${log.stockId})」。
+                    進場價：${p.entry}，停損價：${p.stopLoss}，目前現價：${p.currentPrice || '未知'}。
+                    我的進場理由標籤：${allTags || '無'}。
+                    目前未實現損益：${pnl ? Math.round(pnl) + '元' : '未知'}。
+                    請以專業交易心理教練的身份，用大約 150 字給我持倉中的心理建議與停利停損的紀律提醒。請使用繁體中文。`;
+                } else {
+                    prompt = `我剛完成了一筆台股「${log.name} (${log.stockId})」的交易。
+                    進場價：${p.entry}，出場價：${p.exit}，當初設定的停損價：${p.stopLoss}。
+                    我的進場理由標籤：${allTags || '無'}。
+                    這筆交易的最終損益為：${pnl > 0 ? '獲利' : '虧損'} ${pnl ? Math.abs(Math.round(pnl)) + '元' : '未知'}，風報比為：${rr}。
+                    請以專業交易心理教練的身份，用大約 150 字幫我做盤後檢討，針對我的執行紀律給予回饋或鼓勵。請使用繁體中文。`;
+                }
+
+                const result = await generateText(prompt, "你是一位專業的金融交易心理教練。");
+                setAiModal(prev => ({ ...prev, loading: false, content: result }));
+            };
 
             const handleExportData = () => {
                 const wb = XLSX.utils.book_new();
@@ -2665,22 +2790,29 @@
 
                     <main className="max-w-7xl mx-auto px-4 mt-8">
                         {activeTab === 'journal' && (
-                            <StockJournal logs={logs} setLogs={setLogs} epsData={epsData} setEpsData={setEpsData} customStocks={customStocks} setCustomStocks={setCustomStocks} stockMap={stockMap} forbiddenStocks={forbiddenStocks} />
+                            <StockJournal logs={logs} setLogs={setLogs} epsData={epsData} setEpsData={setEpsData} customStocks={customStocks} setCustomStocks={setCustomStocks} stockMap={stockMap} forbiddenStocks={forbiddenStocks} onAiDiagnose={handleAiDiagnose} />
                         )}
                         {activeTab === 'calculator' && (
                             <CalculatorModule calcHistory={calcHistory} setCalcHistory={setCalcHistory} stockMap={stockMap} setCustomStocks={setCustomStocks} epsData={epsData} />
                         )}
                         {activeTab === 'plan' && (
-                            <PlanDashboard logs={logs} setLogs={setLogs} stockMap={stockMap} setCustomStocks={setCustomStocks} epsData={epsData} forbiddenStocks={forbiddenStocks} />
+                            <PlanDashboard logs={logs} setLogs={setLogs} stockMap={stockMap} setCustomStocks={setCustomStocks} epsData={epsData} forbiddenStocks={forbiddenStocks} onAiReview={handleAiReview} />
                         )}
                         {activeTab === 'watchlist' && (
-                            <WatchlistModule logs={logs} setLogs={setLogs} epsData={epsData} stockMap={stockMap} forbiddenStocks={forbiddenStocks} />
+                            <WatchlistModule logs={logs} setLogs={setLogs} epsData={epsData} stockMap={stockMap} forbiddenStocks={forbiddenStocks} onAiDiagnose={handleAiDiagnose} />
                         )}
                         {activeTab === 'forbidden' && (
                             <ForbiddenModule forbiddenStocks={forbiddenStocks} setForbiddenStocks={setForbiddenStocks} stockMap={stockMap} setCustomStocks={setCustomStocks} />
                         )}
                     </main>
 
+                    <AiModal 
+                        isOpen={aiModal.isOpen} 
+                        onClose={() => setAiModal({ ...aiModal, isOpen: false })} 
+                        content={aiModal.content} 
+                        loading={aiModal.loading} 
+                        title={aiModal.title} 
+                    />
                     <AlertModal isOpen={appAlert.show} message={appAlert.msg} onClose={() => setAppAlert({ show: false, msg: '' })} />
                 </div>
             );
