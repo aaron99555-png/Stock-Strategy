@@ -382,8 +382,6 @@
 
         const StockJournal = ({ logs, setLogs, customStocks, setCustomStocks, epsData, setEpsData, stockMap, forbiddenStocks, onAiDiagnose }) => {
             const [date, setDate] = useState(getTodayLocal());
-            const [copyStartDate, setCopyStartDate] = useState(getTodayLocal());
-            const [copyEndDate, setCopyEndDate] = useState(getTodayLocal());
             const [copySubTags, setCopySubTags] = useState([]); 
             const [isCopyDropdownOpen, setIsCopyDropdownOpen] = useState(false);
             const copyDropdownRef = useRef(null);
@@ -486,7 +484,7 @@
                                 let finalScore = t.length;
                                 const eps = epsData[l.stockId] || {};
                                 const g = parseFloat(eps.epsGrowth);
-                                if (!isNaN(g) && g > 0) finalScore += 1;
+                                if (!isNaN(g) && g > 0) finalScore += 1; // 成長率為正，自動加1分
                                 return finalScore;
                             };
                             valA = getScore(a); valB = getScore(b); break;
@@ -816,6 +814,9 @@
                 } else if (formatType === 'growth') {
                     sortedLogs.sort((a, b) => b.validGrowth - a.validGrowth || parseInt(a.id) - parseInt(b.id));
                 } else if (formatType === 'strategy') {
+                    // 自訂義排序權重
+                    const strategyOrder = ['破繭而出', '月來越好', '季不可失', '量價齊揚', 'OBV突破'];
+                    
                     const groupMap = {};
                     processedLogs.forEach(l => {
                         let tagsToGroup = l.displayTags;
@@ -827,11 +828,24 @@
                         });
                     });
 
+                    // 1. 先處理指定的排序名單
+                    strategyOrder.forEach(label => {
+                        if (groupMap[label] && groupMap[label].length > 0) {
+                            let tagLogs = groupMap[label];
+                            tagLogs.sort((a, b) => parseInt(a.id) - parseInt(b.id));
+                            strategyGroups.push({ label: label, logs: tagLogs });
+                            // 處理完後標記或刪除，避免重複
+                            delete groupMap[label];
+                        }
+                    });
+
+                    // 2. 處理剩下的主策略標籤
                     STRATEGIES.forEach(strat => {
                         if (groupMap[strat.label] && groupMap[strat.label].length > 0) {
                             let tagLogs = groupMap[strat.label];
                             tagLogs.sort((a, b) => parseInt(a.id) - parseInt(b.id));
                             strategyGroups.push({ label: strat.label, logs: tagLogs });
+                            delete groupMap[strat.label];
                         }
                         const subTags = SUB_TAGS[strat.id] || [];
                         subTags.forEach(tag => {
@@ -839,15 +853,19 @@
                                 let tagLogs = groupMap[tag];
                                 tagLogs.sort((a, b) => parseInt(a.id) - parseInt(b.id));
                                 strategyGroups.push({ label: tag, logs: tagLogs });
+                                delete groupMap[tag];
                             }
                         });
                     });
 
-                    if (groupMap['未分類'] && groupMap['未分類'].length > 0) {
-                        let tagLogs = groupMap['未分類'];
-                        tagLogs.sort((a, b) => parseInt(a.id) - parseInt(b.id));
-                        strategyGroups.push({ label: '未分類', logs: tagLogs });
-                    }
+                    // 3. 處理未分類或其他不在上述名單內的標籤
+                    Object.keys(groupMap).forEach(label => {
+                         if (groupMap[label] && groupMap[label].length > 0) {
+                            let tagLogs = groupMap[label];
+                            tagLogs.sort((a, b) => parseInt(a.id) - parseInt(b.id));
+                            strategyGroups.push({ label: label, logs: tagLogs });
+                        }
+                    });
                 }
 
                 return { titleName, dateRangeStr, sortedLogs, strategyGroups };
