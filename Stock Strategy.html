@@ -340,8 +340,9 @@
             { id: 'emerging', label: '興櫃專區', icon: AlertCircle, color: 'from-purple-600 to-pink-600', emoji: '🚀' },
         ];
 
+        // --- 這裡將「披荊斬棘」加入「趨勢與型態」子標籤清單 ---
         const SUB_TAGS = {
-            'trend': ['量價齊揚', '破繭而出', '月來越好', '季不可失', '守株待兔', 'OBV突破', '回後買上漲', '高成交值多頭突破上關', '高成交值', 'KD金叉', 'MACD翻紅', '收盤期貨續拉', '跌破月季線'],
+            'trend': ['量價齊揚', '破繭而出', '披荊斬棘', '月來越好', '季不可失', '守株待兔', 'OBV突破', '回後買上漲', '高成交值多頭突破上關', '高成交值', 'KD金叉', 'MACD翻紅', '收盤期貨續拉', '跌破月季線'],
             'chips': ['法人加持', '外資買進', '投信買進', '權證大單追蹤', '四線上揚籌碼集中', '多頭月營收創高', '1日籌碼集中度>10%', '1日籌碼集中度>20%', '5日籌碼集中度>10%', '5日籌碼集中度>20%'],
             'daytrade': ['當沖多方標的', '當沖空方標的', '當沖十字變盤'],
             'emerging': ['興櫃-多頭突破上關價']
@@ -350,6 +351,7 @@
         const SUB_TAG_COLORS = {
             '量價齊揚': 'from-red-500 to-rose-600',
             '破繭而出': 'from-orange-400 to-amber-500',
+            '披荊斬棘': 'from-yellow-400 to-orange-500', // 新增披荊斬棘的漸層顏色
             '月來越好': 'from-amber-500 to-yellow-500',
             '季不可失': 'from-lime-500 to-green-600',
             '守株待兔': 'from-emerald-500 to-teal-600',
@@ -814,8 +816,8 @@
                 } else if (formatType === 'growth') {
                     sortedLogs.sort((a, b) => b.validGrowth - a.validGrowth || parseInt(a.id) - parseInt(b.id));
                 } else if (formatType === 'strategy') {
-                    // 自訂義排序權重
-                    const strategyOrder = ['破繭而出', '月來越好', '季不可失', '量價齊揚', 'OBV突破'];
+                    // --- 將「披荊斬棘」加入自訂義排序權重中 ---
+                    const strategyOrder = ['破繭而出', '披荊斬棘', '月來越好', '季不可失', '量價齊揚', 'OBV突破'];
                     
                     const groupMap = {};
                     processedLogs.forEach(l => {
