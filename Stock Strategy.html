@@ -93,14 +93,14 @@
             TrendingUp, BarChart2, Zap, AlertCircle, Save, Trash2, 
             Download, Upload, Eye, FileText, CheckCircle, Calculator,
             ClipboardCopy, Search, PlusCircle, LayoutDashboard, Star, X, Target,
-            ArrowUp, ArrowDown, ArrowUpDown, Ban, Sparkles, Bot
+            ArrowUp, ArrowDown, ArrowUpDown, Ban, Sparkles, Bot, Key
         } from 'lucide-react';
 
         // ==========================================
         // Gemini API Hook
         // ==========================================
         const useGeminiAPI = () => {
-            const apiKey = ""; // API 金鑰由執行環境自動注入
+            const apiKey = "" || window.localStorage.getItem('ryan_gemini_api_key'); // API 金鑰由執行環境自動注入，或由本地端讀取
 
             const generateText = async (prompt, systemInstructionText) => {
                 const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
@@ -2783,11 +2783,21 @@
                                     <input type="file" accept=".xlsx, .xls" onChange={handleImportData} className="hidden" />
                                 </label>
                                 <button onClick={handleExportData} className="flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-slate-200 transition bg-slate-800/50 hover:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700">
-                                    <Download size={14} /> 匯出備份
-                                </button>
-                            </div>
+                                <Download size={14} /> 匯出備份
+                            </button>
+                            <button onClick={() => {
+                                const currentKey = window.localStorage.getItem('ryan_gemini_api_key') || '';
+                                const key = window.prompt('【獨立網頁版專用】\n請輸入您的 Google Gemini API Key：\n(金鑰將安全地儲存於您的瀏覽器本地端)', currentKey);
+                                if (key !== null) {
+                                    window.localStorage.setItem('ryan_gemini_api_key', key.trim());
+                                    alert('API 金鑰已儲存！AI 功能已準備就緒。');
+                                }
+                            }} className="flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-slate-200 transition bg-slate-800/50 hover:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700">
+                                <Key size={14} /> 設定金鑰
+                            </button>
                         </div>
-                        <div className="max-w-7xl mx-auto px-4 flex flex-wrap gap-x-6 gap-y-2 text-sm font-bold pb-2">
+                    </div>
+                    <div className="max-w-7xl mx-auto px-4 flex flex-wrap gap-x-6 gap-y-2 text-sm font-bold pb-2">
                             <button onClick={() => setActiveTab('journal')} className={`py-2 px-1 border-b-2 whitespace-nowrap transition flex items-center gap-1.5 ${activeTab === 'journal' ? 'border-blue-500 text-blue-400' : 'border-transparent text-blue-500/50 hover:text-blue-400'}`}>
                                 <FileText size={16} /> 模組一：選股日誌
                             </button>
