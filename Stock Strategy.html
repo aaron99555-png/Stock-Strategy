@@ -356,26 +356,26 @@
             if (!isOpen) return null;
             return (
                 <div className="fixed inset-0 bg-red-950/90 backdrop-blur-md flex items-center justify-center z-[9999] animate-bounce-in px-4 py-6 overflow-y-auto">
-                    <div className="bg-[#1a0505] border border-red-500/50 p-6 sm:p-8 md:p-12 rounded-[2rem] w-full max-w-lg shadow-[0_0_100px_rgba(239,68,68,0.4)] text-center relative overflow-hidden my-auto">
+                    <div className="bg-[#1a0505] border border-red-500/50 p-8 md:p-12 rounded-[2rem] w-full max-w-lg shadow-[0_0_100px_rgba(239,68,68,0.4)] text-center relative overflow-hidden my-auto">
                         <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-600 via-rose-500 to-red-600"></div>
                         <div className="absolute -left-20 -top-20 w-64 h-64 bg-red-600/20 rounded-full blur-[80px]"></div>
                         <div className="absolute -right-20 -bottom-20 w-64 h-64 bg-orange-600/20 rounded-full blur-[80px]"></div>
 
                         <button onClick={onCancel} className="absolute top-4 right-4 md:top-6 md:right-6 text-red-400/60 hover:text-red-300 transition z-10"><X size={24} className="md:w-7 md:h-7" /></button>
                         
-                        <div className="text-6xl md:text-8xl mb-4 md:mb-8 relative z-10 drop-shadow-[0_0_15px_rgba(239,68,68,0.8)] animate-pulse">🛑</div>
-                        <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white mb-4 tracking-widest drop-shadow-md relative z-10">警告攔截</h2>
+                        <div className="text-6xl md:text-8xl mb-6 md:mb-8 relative z-10 drop-shadow-[0_0_15px_rgba(239,68,68,0.8)] animate-pulse">🛑</div>
+                        <h2 className="text-3xl md:text-4xl font-black text-white mb-4 tracking-widest drop-shadow-md relative z-10">警告攔截</h2>
                         
-                        <div className="bg-red-950/50 border border-red-900/50 rounded-2xl p-4 md:p-6 mb-6 md:mb-10 relative z-10">
-                            <h3 className="text-xl sm:text-2xl font-bold text-yellow-400 mb-2">
+                        <div className="bg-red-950/50 border border-red-900/50 rounded-2xl p-4 md:p-6 mb-8 md:mb-10 relative z-10">
+                            <h3 className="text-xl md:text-2xl font-bold text-yellow-400 mb-2">
                                 【{stockName}】
                             </h3>
                             <p className="text-red-200/80 font-medium text-sm md:text-base">已被列為佳佳持股，嚴禁買入！</p>
                         </div>
 
                         <div className="flex flex-col sm:flex-row gap-3 md:gap-4 relative z-10">
-                            <button onClick={onCancel} className="px-4 py-3 md:py-4 rounded-2xl bg-red-900/40 text-red-200 border border-red-800/50 font-bold text-base md:text-lg hover:bg-red-800/60 transition w-full sm:w-1/3">取消</button>
-                            <button ref={btnRef} onClick={onConfirm} className="px-4 py-3 md:py-4 rounded-2xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-black text-base md:text-lg transition w-full sm:w-2/3 shadow-lg shadow-red-900/50 focus:ring-4 focus:ring-red-500/30 outline-none">了解風險，強制加入</button>
+                            <button onClick={onCancel} className="px-4 py-3 md:py-4 rounded-2xl bg-red-900/40 text-red-200 border border-red-800/50 font-bold text-base md:text-lg hover:bg-red-800/60 transition w-full sm:w-1/3">取消操作</button>
+                            <button ref={btnRef} onClick={onConfirm} className="px-4 py-3 md:py-4 rounded-2xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-black text-base md:text-lg transition w-full sm:w-2/3 shadow-lg shadow-red-900/50 focus:ring-4 focus:ring-red-500/30 outline-none">我明白了並加入 (Enter)</button>
                         </div>
                     </div>
                 </div>
@@ -391,7 +391,7 @@
                         <div className="absolute -right-20 -top-20 w-64 h-64 bg-purple-600/10 rounded-full blur-[80px]"></div>
 
                         <div className="flex items-center gap-3 md:gap-4 mb-4 md:mb-6 text-fuchsia-400 border-b border-slate-800 pb-4 relative z-10 shrink-0">
-                            <div className="p-2 md:p-3 bg-fuchsia-500/10 rounded-2xl shrink-0"><Sparkles className={`w-5 h-5 md:w-7 md:h-7 ${loading ? "animate-pulse" : ""}`} /></div>
+                            <div className="p-2 md:p-3 bg-fuchsia-500/10 rounded-2xl"><Sparkles className={`w-6 h-6 md:w-7 md:h-7 ${loading ? "animate-pulse" : ""}`} /></div>
                             <h3 className="text-lg md:text-2xl font-bold tracking-wide truncate">{title}</h3>
                             <button onClick={onClose} className="ml-auto text-slate-500 hover:text-slate-300 transition shrink-0"><X size={24} className="md:w-7 md:h-7" /></button>
                         </div>
@@ -400,7 +400,7 @@
                             {loading ? (
                                 <div className="flex flex-col items-center justify-center h-40 md:h-48 space-y-4 md:space-y-6 text-fuchsia-400/80">
                                     <Bot size={56} className="animate-bounce drop-shadow-[0_0_15px_rgba(217,70,239,0.5)] md:w-16 md:h-16" />
-                                    <span className="font-bold tracking-widest text-base md:text-lg text-center px-4">AI 教練正在深度解析中...</span>
+                                    <span className="font-bold tracking-widest text-base md:text-lg">AI 教練正在深度解析中...</span>
                                 </div>
                             ) : (
                                 <div className="prose prose-invert max-w-none prose-p:leading-loose">
@@ -589,7 +589,7 @@
                                 let finalScore = t.length;
                                 const eps = epsData[l.stockId] || {};
                                 const g = parseFloat(eps.epsGrowth);
-                                if (!isNaN(g) && g > 0) finalScore += 1; // 成長率為正，自動加1分
+                                if (!isNaN(g) && g > 0) finalScore += 1;
                                 return finalScore;
                             };
                             valA = getScore(a); valB = getScore(b); break;
@@ -1021,7 +1021,7 @@
 
             return (
                 <div className="animate-fade-in-up space-y-6">
-                    {/* 控制區塊 - 優化外觀 */}
+                    {/* 控制區塊 - 手機版表單排版修正 */}
                     <div className="glass-card p-4 md:p-6 rounded-3xl relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full blur-[60px] -z-10 pointer-events-none"></div>
                         <h2 className="text-xl md:text-2xl font-title text-blue-400 mb-6 flex items-center gap-3 drop-shadow-md">
@@ -1029,27 +1029,25 @@
                             新增選股日誌
                         </h2>
                         
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-5 mb-8 relative z-10">
-                            <div>
-                                <label className="block text-xs md:text-sm font-medium text-slate-400 mb-1.5 ml-1">記錄日期</label>
-                                <input type="date" value={date} onChange={e => setDate(e.target.value)} className="w-full input-styled rounded-xl p-2.5 md:p-3 font-mono-num text-slate-200" />
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5 mb-8 relative z-10">
+                            <div className="col-span-1">
+                                <label className="block text-[11px] md:text-sm font-medium text-slate-400 mb-1.5 ml-1">記錄日期</label>
+                                <input type="date" value={date} onChange={e => setDate(e.target.value)} className="w-full input-styled rounded-xl p-2 md:p-3 text-xs md:text-sm font-mono-num text-slate-200" />
                             </div>
-                            <div className="relative">
-                                <label className="block text-xs md:text-sm font-medium text-slate-400 mb-1.5 ml-1">股票代號</label>
-                                <div className="relative w-full h-auto">
-                                    <input 
-                                        type="text" 
-                                        list="stock-ids-list"
-                                        value={stockId} 
-                                        onChange={handleStockIdChange} 
-                                        onKeyDown={e => { if (e.key === 'Enter') handleAddLog(); }}
-                                        placeholder="例如: 2330" 
-                                        className={`w-full input-styled rounded-xl py-2.5 md:py-3 pl-3 pr-16 font-mono-num ${isForbiddenStock ? 'border-red-500 text-red-400 bg-red-900/10' : 'text-slate-200'}`} 
-                                    />
-                                </div>
+                            <div className="col-span-1 relative">
+                                <label className="block text-[11px] md:text-sm font-medium text-slate-400 mb-1.5 ml-1">股票代號</label>
+                                <input 
+                                    type="text" 
+                                    list="stock-ids-list"
+                                    value={stockId} 
+                                    onChange={handleStockIdChange} 
+                                    onKeyDown={e => { if (e.key === 'Enter') handleAddLog(); }}
+                                    placeholder="例: 2330" 
+                                    className={`w-full input-styled rounded-xl p-2 md:p-3 text-xs md:text-sm font-mono-num ${isForbiddenStock ? 'border-red-500 text-red-400 bg-red-900/10' : 'text-slate-200'}`} 
+                                />
                             </div>
-                            <div className="col-span-1 sm:col-span-2 relative">
-                                <label className="block text-xs md:text-sm font-medium text-slate-400 mb-1.5 ml-1">對應股票名稱 (支援反查)</label>
+                            <div className="col-span-2 relative mt-1 md:mt-0">
+                                <label className="block text-[11px] md:text-sm font-medium text-slate-400 mb-1.5 ml-1">對應股票名稱 (支援反查)</label>
                                 <div className="relative w-full h-auto">
                                     <input 
                                         type="text" 
@@ -1057,8 +1055,8 @@
                                         value={stockName} 
                                         onChange={handleStockNameChange}
                                         onKeyDown={e => { if (e.key === 'Enter') handleAddLog(); }}
-                                        placeholder="輸入股名自動帶出代號..." 
-                                        className={`w-full input-styled rounded-xl py-2.5 md:py-3 pl-3 pr-24 ${isForbiddenStock ? 'border-red-500 text-red-400 bg-red-900/10' : (isUnknownStock ? 'border-amber-500/50 text-slate-200' : 'text-emerald-400 font-medium tracking-wide')}`} 
+                                        placeholder="輸入名稱自動帶入..." 
+                                        className={`w-full input-styled rounded-xl p-2 md:p-3 text-xs md:text-sm ${isForbiddenStock ? 'border-red-500 text-red-400 bg-red-900/10' : (isUnknownStock ? 'border-amber-500/50 text-slate-200' : 'text-emerald-400 font-medium tracking-wide')}`} 
                                     />
                                     {isUnknownStock && !isForbiddenStock && stockName && (
                                         <span className="hidden sm:inline-block absolute right-2 top-1/2 -translate-y-1/2 text-[10px] md:text-xs text-amber-400 bg-amber-400/10 px-2 py-1 rounded-md font-medium">✨ 自動記憶</span>
@@ -1271,7 +1269,7 @@
                                                 </select>
                                             </div>
                                         </th>
-                                        <th className="p-4 font-bold text-center align-top min-w-[160px]">
+                                        <th className="p-4 font-bold text-center align-top min-w-[150px]">
                                             <div className="mb-3">操作</div>
                                             <button onClick={() => { setJournalFilters({date: getTodayLocal(), stock: '', futures: 'all', growth: 'all', tag: '', tagCount: 'all'}); setJournalSort({key: 'id', direction: 'desc'}); }} className="text-xs font-bold text-slate-500 hover:text-blue-400 bg-slate-800/50 hover:bg-slate-800 px-3 py-1.5 rounded-lg transition border border-slate-700/50 w-full">清除所有篩選</button>
                                         </th>
@@ -2069,19 +2067,19 @@
                         <h3 className="text-lg md:text-xl font-bold text-slate-200 mb-5 md:mb-6 flex items-center gap-2">
                             <Target size={20} className="text-emerald-400 md:w-6 md:h-6" /> 快速建立交易計畫
                         </h3>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-5 relative z-10">
-                            <div>
-                                <label className="block text-xs md:text-sm font-medium text-slate-400 mb-1.5 ml-1">規劃日期</label>
-                                <input type="date" value={planDate} onChange={e => setPlanDate(e.target.value)} className="w-full input-styled rounded-xl p-2.5 md:p-3 font-mono-num text-slate-200" />
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5 relative z-10">
+                            <div className="col-span-1">
+                                <label className="block text-[11px] md:text-sm font-medium text-slate-400 mb-1.5 ml-1">規劃日期</label>
+                                <input type="date" value={planDate} onChange={e => setPlanDate(e.target.value)} className="w-full input-styled rounded-xl p-2 md:p-3 text-xs md:text-sm font-mono-num text-slate-200" />
                             </div>
-                            <div className="relative">
-                                <label className="block text-xs md:text-sm font-medium text-slate-400 mb-1.5 ml-1">股票代號</label>
-                                <input type="text" list="plan-stock-ids-list" value={planStockId} onChange={handleStockIdChange} onKeyDown={e => { if (e.key === 'Enter') handleAddIndependentPlan(); }} placeholder="輸入股號/搜尋" className={`w-full input-styled rounded-xl p-2.5 md:p-3 font-mono-num ${isForbiddenStock ? 'border-red-500 text-red-400 bg-red-900/10' : 'text-white'}`} />
+                            <div className="col-span-1 relative">
+                                <label className="block text-[11px] md:text-sm font-medium text-slate-400 mb-1.5 ml-1">股票代號</label>
+                                <input type="text" list="plan-stock-ids-list" value={planStockId} onChange={handleStockIdChange} onKeyDown={e => { if (e.key === 'Enter') handleAddIndependentPlan(); }} placeholder="例: 2330" className={`w-full input-styled rounded-xl p-2 md:p-3 text-xs md:text-sm font-mono-num ${isForbiddenStock ? 'border-red-500 text-red-400 bg-red-900/10' : 'text-white'}`} />
                             </div>
-                            <div className="col-span-1 sm:col-span-2 relative">
-                                <label className="block text-xs md:text-sm font-medium text-slate-400 mb-1.5 ml-1">名稱 (可反查代號)</label>
+                            <div className="col-span-2 relative mt-1 md:mt-0">
+                                <label className="block text-[11px] md:text-sm font-medium text-slate-400 mb-1.5 ml-1">名稱 (可反查代號)</label>
                                 <div className="relative w-full h-auto">
-                                    <input type="text" list="plan-stock-names-list" value={planStockName} onChange={handleStockNameChange} onKeyDown={e => { if (e.key === 'Enter') handleAddIndependentPlan(); }} placeholder="輸入名稱自動帶入..." className={`w-full input-styled rounded-xl py-2.5 md:py-3 pl-3 pr-20 ${isForbiddenStock ? 'border-red-500 text-red-400 bg-red-900/10' : (isUnknownStock ? 'border-amber-500/50 text-slate-200' : 'text-emerald-400 font-medium')}`} />
+                                    <input type="text" list="plan-stock-names-list" value={planStockName} onChange={handleStockNameChange} onKeyDown={e => { if (e.key === 'Enter') handleAddIndependentPlan(); }} placeholder="輸入名稱自動帶入..." className={`w-full input-styled rounded-xl p-2 md:p-3 text-xs md:text-sm ${isForbiddenStock ? 'border-red-500 text-red-400 bg-red-900/10' : (isUnknownStock ? 'border-amber-500/50 text-slate-200' : 'text-emerald-400 font-medium')}`} />
                                     {isForbiddenStock && (
                                         <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] md:text-xs text-red-200 bg-red-600 px-2 md:px-3 py-1 rounded font-bold uppercase tracking-wider animate-pulse whitespace-nowrap">嚴禁買入</span>
                                     )}
@@ -2089,7 +2087,7 @@
                                 {stockIdsDatalist}
                                 {stockNamesDatalist}
                             </div>
-                            <div className="col-span-1 sm:col-span-2 md:col-span-4 flex items-end">
+                            <div className="col-span-2 md:col-span-4 flex items-end mt-2 md:mt-0">
                                 <button onClick={handleAddIndependentPlan} className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl p-3 md:p-3.5 font-bold tracking-wider flex items-center justify-center gap-2 shadow-[0_4px_15px_rgba(16,185,129,0.3)] transition-all transform hover:-translate-y-0.5 outline-none focus:ring-4 focus:ring-emerald-500/30">
                                     <PlusCircle size={18} /> 加入規劃白板
                                 </button>
@@ -2130,7 +2128,7 @@
                                         <th className="p-4 align-top whitespace-nowrap"><div className="mb-2 flex items-center gap-1.5 font-bold cursor-pointer hover:text-blue-400 transition select-none" onClick={() => handlePlanSort('shares')}>佈局張數 <SortIcon sortKey="shares" currentSort={planSort} /></div></th>
                                         <th className="p-4 align-top whitespace-nowrap"><div className="mb-2 flex items-center gap-1.5 font-bold cursor-pointer hover:text-purple-400 transition select-none" onClick={() => handlePlanSort('rr')}>風報比 <SortIcon sortKey="rr" currentSort={planSort} /></div></th>
                                         <th className="p-4 align-top whitespace-nowrap"><div className="mb-2 flex items-center gap-1.5 font-bold cursor-pointer hover:text-yellow-400 transition select-none" onClick={() => handlePlanSort('pnl')}>損益評估 (TWD) <SortIcon sortKey="pnl" currentSort={planSort} /></div></th>
-                                        <th className="p-4 text-center align-top min-w-[160px]">
+                                        <th className="p-4 text-center align-top min-w-[150px]">
                                             <div className="mb-3 font-bold text-slate-300">策略操作</div>
                                             <button onClick={() => { setPlanFilters({stock: '', status: 'all', futures: 'all'}); setPlanSort({key: 'id', direction: 'desc'}); }} className="text-xs font-bold text-slate-500 hover:text-emerald-400 bg-slate-800/50 hover:bg-slate-800 px-3 py-1.5 rounded-lg transition border border-slate-700/50 w-full">清除篩選</button>
                                         </th>
@@ -2606,8 +2604,7 @@
                             </table>
                         </div>
                     </div>
-
-                    <AlertModal isOpen={alert.show} message={alert.msg} onClose={() => setAlert({ show: false, msg: '' })} />
+                    
                     <ConfirmModal isOpen={confirm.show} title="確認刪除" message="您確定要徹底刪除這筆關注紀錄嗎？此動作無法復原。" 
                         onConfirm={() => { confirm.action(); setConfirm({ show: false, action: null }); }} 
                         onCancel={() => setConfirm({ show: false, action: null })} />
@@ -2686,8 +2683,8 @@
                         </h2>
                         <p className="text-slate-400 text-xs md:text-sm mb-6 md:mb-8 relative z-10 font-medium tracking-wide">將高風險或特定股票加入此清單後，系統將在全域操作中進行強制攔截，以最高規格保護您的資金安全。</p>
                         
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-5 mb-2 relative z-10">
-                            <div className="relative">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5 mb-2 relative z-10">
+                            <div className="col-span-1 relative">
                                 <label className="block text-xs md:text-sm font-bold text-red-400/80 mb-1.5 ml-1">輸入鎖定股號</label>
                                 <input 
                                     type="text" 
@@ -2698,7 +2695,7 @@
                                     className="w-full input-styled border-red-900/50 focus:border-red-500 rounded-xl p-2.5 md:p-3 font-mono-num transition text-white focus:shadow-[0_0_0_2px_rgba(239,68,68,0.2)]" 
                                 />
                             </div>
-                            <div className="col-span-1 sm:col-span-2 relative">
+                            <div className="col-span-1 md:col-span-2 relative">
                                 <label className="block text-xs md:text-sm font-bold text-red-400/80 mb-1.5 ml-1">對應股票名稱 (可反查)</label>
                                 <input 
                                     type="text" 
@@ -2709,7 +2706,7 @@
                                     className="w-full input-styled border-red-900/50 focus:border-red-500 rounded-xl p-2.5 md:p-3 transition text-white focus:shadow-[0_0_0_2px_rgba(239,68,68,0.2)]" 
                                 />
                             </div>
-                            <div className="col-span-1 sm:col-span-2 md:col-span-1 flex items-end mt-2 md:mt-0">
+                            <div className="col-span-2 md:col-span-1 flex items-end mt-2 md:mt-0">
                                 <button onClick={handleAdd} className="w-full bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white p-3 md:p-3.5 rounded-xl font-black tracking-widest flex items-center justify-center gap-2 transition shadow-[0_4px_15px_rgba(220,38,38,0.3)] transform hover:-translate-y-0.5 outline-none focus:ring-4 focus:ring-red-500/30">
                                     <Ban size={18} /> 執行封鎖
                                 </button>
