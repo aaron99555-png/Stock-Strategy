@@ -48,9 +48,7 @@
 
     <style>
         :root {
-            /* 優化：更深邃的背景底色，提升對比度 */
             --bg-main: #050A15; 
-            /* 優化：卡片背景微調，增加層次感 */
             --bg-card: #0F172A; 
             --bg-card-alt: #1E293B;
             --accent-glow: rgba(56, 189, 248, 0.1);
@@ -58,9 +56,8 @@
         body {
             font-family: 'Noto Sans TC', sans-serif;
             background-color: var(--bg-main);
-            color: #f1f5f9; /* 優化：稍微柔和的白色文字 */
+            color: #f1f5f9;
             overflow-x: hidden;
-            /* 新增：細微的背景紋理 */
             background-image: radial-gradient(circle at top right, rgba(30, 41, 59, 0.5) 0%, transparent 40%),
                               radial-gradient(circle at bottom left, rgba(15, 23, 42, 0.8) 0%, transparent 40%);
             background-attachment: fixed;
@@ -68,7 +65,7 @@
         .font-mono-num { font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; }
         .font-title { font-family: 'Ma Shan Zheng', cursive; }
         
-        /* Custom Scrollbar - 更優雅的設計 */
+        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.5); border-radius: 4px; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; border: 2px solid var(--bg-main); }
@@ -232,12 +229,10 @@
             document.body.removeChild(textArea);
         };
 
-        // 修改 useLocalStorage，讓它可以和 Firebase 同步
         function useFirebaseState(key, initialValue) {
             const [storedValue, setStoredValue] = useState(initialValue);
             const [isInitialized, setIsInitialized] = useState(false);
 
-            // 從 Firebase 讀取初始資料 (只在元件掛載時執行一次)
             useEffect(() => {
                 const initData = async () => {
                     try {
@@ -247,7 +242,6 @@
                             if (snapshot.exists()) {
                                 setStoredValue(snapshot.val());
                             } else {
-                                // 如果雲端沒有資料，將預設值寫入雲端
                                 window.firebaseSet(dbRef, initialValue);
                                 setStoredValue(initialValue);
                             }
@@ -261,7 +255,6 @@
                 initData();
             }, [key]);
 
-            // 監聽 Firebase 的資料變更 (其他電腦修改時同步更新)
             useEffect(() => {
                 if(!isInitialized || !window.firebaseDB) return;
                 
@@ -275,7 +268,6 @@
                 return () => unsubscribe();
             }, [key, isInitialized]);
 
-            // 當本機改變狀態時，同步寫入 Firebase
             const setValue = (value) => {
                 try {
                     const valueToStore = value instanceof Function ? value(storedValue) : value;
@@ -306,16 +298,16 @@
 
             if (!isOpen) return null;
             return (
-                <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-[100] animate-fade-in-down">
-                    <div className="bg-slate-900 border border-slate-700 p-8 rounded-3xl w-96 shadow-2xl">
+                <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-[100] animate-fade-in-down px-4">
+                    <div className="bg-slate-900 border border-slate-700 p-6 md:p-8 rounded-3xl w-full max-w-md shadow-2xl">
                         <div className="flex items-center gap-4 mb-6 text-red-400">
-                            <div className="p-3 bg-red-500/10 rounded-2xl"><AlertCircle size={28} /></div>
-                            <h3 className="text-2xl font-bold">{title}</h3>
+                            <div className="p-3 bg-red-500/10 rounded-2xl shrink-0"><AlertCircle size={28} /></div>
+                            <h3 className="text-xl md:text-2xl font-bold">{title}</h3>
                         </div>
-                        <p className="text-slate-300 mb-8 leading-relaxed">{message}</p>
-                        <div className="flex justify-end gap-4">
-                            <button onClick={onCancel} className="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 transition font-medium text-slate-300">取消</button>
-                            <button ref={btnRef} onClick={onConfirm} className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 transition text-white font-bold shadow-lg shadow-red-900/50">確認執行</button>
+                        <p className="text-slate-300 mb-8 leading-relaxed text-sm md:text-base">{message}</p>
+                        <div className="flex justify-end gap-3 md:gap-4 flex-wrap">
+                            <button onClick={onCancel} className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 transition font-medium text-slate-300 text-sm md:text-base w-full sm:w-auto">取消</button>
+                            <button ref={btnRef} onClick={onConfirm} className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 transition text-white font-bold shadow-lg shadow-red-900/50 text-sm md:text-base w-full sm:w-auto">確認執行</button>
                         </div>
                     </div>
                 </div>
@@ -336,13 +328,13 @@
 
             if (!isOpen) return null;
             return (
-                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-bounce-in">
-                    <div className="bg-slate-900 border border-slate-700 p-8 rounded-3xl w-80 shadow-2xl text-center">
-                        <div className="w-20 h-20 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <CheckCircle size={40} className="text-green-500" />
+                <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-[100] animate-bounce-in px-4">
+                    <div className="bg-slate-900 border border-slate-700 p-6 md:p-8 rounded-3xl w-full max-w-sm shadow-2xl text-center">
+                        <div className="w-16 h-16 md:w-20 md:h-20 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-6 shrink-0">
+                            <CheckCircle size={36} className="text-green-500 md:w-10 md:h-10" />
                         </div>
-                        <p className="text-slate-200 mb-8 text-lg font-medium leading-relaxed">{message}</p>
-                        <button ref={btnRef} onClick={onClose} className="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 transition w-full text-white font-bold shadow-lg shadow-blue-900/50">了解</button>
+                        <p className="text-slate-200 mb-8 text-base md:text-lg font-medium leading-relaxed">{message}</p>
+                        <button ref={btnRef} onClick={onClose} className="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 transition w-full text-white font-bold shadow-lg shadow-blue-900/50 text-sm md:text-base">了解</button>
                     </div>
                 </div>
             );
@@ -363,28 +355,27 @@
 
             if (!isOpen) return null;
             return (
-                <div className="fixed inset-0 bg-red-950/90 backdrop-blur-md flex items-center justify-center z-[9999] animate-bounce-in">
-                    <div className="bg-[#1a0505] border border-red-500/50 p-12 rounded-[2rem] w-[90%] max-w-lg shadow-[0_0_100px_rgba(239,68,68,0.4)] text-center relative overflow-hidden">
-                        {/* 裝飾性背景 */}
+                <div className="fixed inset-0 bg-red-950/90 backdrop-blur-md flex items-center justify-center z-[9999] animate-bounce-in px-4 py-6 overflow-y-auto">
+                    <div className="bg-[#1a0505] border border-red-500/50 p-6 sm:p-8 md:p-12 rounded-[2rem] w-full max-w-lg shadow-[0_0_100px_rgba(239,68,68,0.4)] text-center relative overflow-hidden my-auto">
                         <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-600 via-rose-500 to-red-600"></div>
                         <div className="absolute -left-20 -top-20 w-64 h-64 bg-red-600/20 rounded-full blur-[80px]"></div>
                         <div className="absolute -right-20 -bottom-20 w-64 h-64 bg-orange-600/20 rounded-full blur-[80px]"></div>
 
-                        <button onClick={onCancel} className="absolute top-6 right-6 text-red-400/60 hover:text-red-300 transition z-10"><X size={28} /></button>
+                        <button onClick={onCancel} className="absolute top-4 right-4 md:top-6 md:right-6 text-red-400/60 hover:text-red-300 transition z-10"><X size={24} className="md:w-7 md:h-7" /></button>
                         
-                        <div className="text-8xl mb-8 relative z-10 drop-shadow-[0_0_15px_rgba(239,68,68,0.8)] animate-pulse">🛑</div>
-                        <h2 className="text-4xl font-black text-white mb-4 tracking-widest drop-shadow-md relative z-10">警告攔截</h2>
+                        <div className="text-6xl md:text-8xl mb-4 md:mb-8 relative z-10 drop-shadow-[0_0_15px_rgba(239,68,68,0.8)] animate-pulse">🛑</div>
+                        <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white mb-4 tracking-widest drop-shadow-md relative z-10">警告攔截</h2>
                         
-                        <div className="bg-red-950/50 border border-red-900/50 rounded-2xl p-6 mb-10 relative z-10">
-                            <h3 className="text-2xl font-bold text-yellow-400 mb-2">
+                        <div className="bg-red-950/50 border border-red-900/50 rounded-2xl p-4 md:p-6 mb-6 md:mb-10 relative z-10">
+                            <h3 className="text-xl sm:text-2xl font-bold text-yellow-400 mb-2">
                                 【{stockName}】
                             </h3>
-                            <p className="text-red-200/80 font-medium">已被列為佳佳持股，嚴禁買入！</p>
+                            <p className="text-red-200/80 font-medium text-sm md:text-base">已被列為佳佳持股，嚴禁買入！</p>
                         </div>
 
-                        <div className="flex gap-4 relative z-10">
-                            <button onClick={onCancel} className="px-4 py-4 rounded-2xl bg-red-900/40 text-red-200 border border-red-800/50 font-bold text-lg hover:bg-red-800/60 transition w-1/3">取消操作</button>
-                            <button ref={btnRef} onClick={onConfirm} className="px-4 py-4 rounded-2xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-black text-lg transition w-2/3 shadow-lg shadow-red-900/50 focus:ring-4 focus:ring-red-500/30 outline-none">我明白了並加入 (Enter)</button>
+                        <div className="flex flex-col sm:flex-row gap-3 md:gap-4 relative z-10">
+                            <button onClick={onCancel} className="px-4 py-3 md:py-4 rounded-2xl bg-red-900/40 text-red-200 border border-red-800/50 font-bold text-base md:text-lg hover:bg-red-800/60 transition w-full sm:w-1/3">取消</button>
+                            <button ref={btnRef} onClick={onConfirm} className="px-4 py-3 md:py-4 rounded-2xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-black text-base md:text-lg transition w-full sm:w-2/3 shadow-lg shadow-red-900/50 focus:ring-4 focus:ring-red-500/30 outline-none">了解風險，強制加入</button>
                         </div>
                     </div>
                 </div>
@@ -394,22 +385,22 @@
         const AiModal = ({ isOpen, onClose, content, loading, title }) => {
             if (!isOpen) return null;
             return (
-                <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-[100] animate-fade-in-down">
-                    <div className="bg-[#0f111a] border border-purple-500/30 p-8 rounded-[2rem] w-[650px] shadow-[0_0_80px_rgba(168,85,247,0.15)] relative overflow-hidden">
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-[100] animate-fade-in-down px-4 py-6">
+                    <div className="bg-[#0f111a] border border-purple-500/30 p-5 md:p-8 rounded-[2rem] w-full max-w-2xl shadow-[0_0_80px_rgba(168,85,247,0.15)] relative overflow-hidden max-h-full flex flex-col">
                         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-600 via-fuchsia-500 to-blue-600"></div>
                         <div className="absolute -right-20 -top-20 w-64 h-64 bg-purple-600/10 rounded-full blur-[80px]"></div>
 
-                        <div className="flex items-center gap-4 mb-6 text-fuchsia-400 border-b border-slate-800 pb-4 relative z-10">
-                            <div className="p-3 bg-fuchsia-500/10 rounded-2xl"><Sparkles size={28} className={loading ? "animate-pulse" : ""} /></div>
-                            <h3 className="text-2xl font-bold tracking-wide">{title}</h3>
-                            <button onClick={onClose} className="ml-auto text-slate-500 hover:text-slate-300 transition"><X size={28} /></button>
+                        <div className="flex items-center gap-3 md:gap-4 mb-4 md:mb-6 text-fuchsia-400 border-b border-slate-800 pb-4 relative z-10 shrink-0">
+                            <div className="p-2 md:p-3 bg-fuchsia-500/10 rounded-2xl shrink-0"><Sparkles className={`w-5 h-5 md:w-7 md:h-7 ${loading ? "animate-pulse" : ""}`} /></div>
+                            <h3 className="text-lg md:text-2xl font-bold tracking-wide truncate">{title}</h3>
+                            <button onClick={onClose} className="ml-auto text-slate-500 hover:text-slate-300 transition shrink-0"><X size={24} className="md:w-7 md:h-7" /></button>
                         </div>
                         
-                        <div className="text-slate-300 mb-8 min-h-[200px] max-h-[60vh] overflow-y-auto whitespace-pre-wrap leading-relaxed text-base p-4 bg-slate-900/50 rounded-2xl border border-slate-800 relative z-10 custom-scrollbar">
+                        <div className="text-slate-300 mb-6 md:mb-8 flex-1 overflow-y-auto whitespace-pre-wrap leading-relaxed text-sm md:text-base p-4 bg-slate-900/50 rounded-2xl border border-slate-800 relative z-10 custom-scrollbar">
                             {loading ? (
-                                <div className="flex flex-col items-center justify-center h-48 space-y-6 text-fuchsia-400/80">
-                                    <Bot size={64} className="animate-bounce drop-shadow-[0_0_15px_rgba(217,70,239,0.5)]" />
-                                    <span className="font-bold tracking-widest text-lg">AI 教練正在深度解析中...</span>
+                                <div className="flex flex-col items-center justify-center h-40 md:h-48 space-y-4 md:space-y-6 text-fuchsia-400/80">
+                                    <Bot size={56} className="animate-bounce drop-shadow-[0_0_15px_rgba(217,70,239,0.5)] md:w-16 md:h-16" />
+                                    <span className="font-bold tracking-widest text-base md:text-lg text-center px-4">AI 教練正在深度解析中...</span>
                                 </div>
                             ) : (
                                 <div className="prose prose-invert max-w-none prose-p:leading-loose">
@@ -418,8 +409,8 @@
                             )}
                         </div>
                         
-                        <div className="flex justify-end pt-2 relative z-10">
-                            <button onClick={onClose} className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-500 hover:to-purple-500 transition text-white outline-none focus:ring-2 focus:ring-fuchsia-400 font-bold w-full shadow-lg shadow-fuchsia-900/30 text-lg tracking-wider">完成閱讀</button>
+                        <div className="flex justify-end pt-2 relative z-10 shrink-0">
+                            <button onClick={onClose} className="px-6 md:px-8 py-3 md:py-3.5 rounded-xl bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-500 hover:to-purple-500 transition text-white outline-none focus:ring-2 focus:ring-fuchsia-400 font-bold w-full shadow-lg shadow-fuchsia-900/30 text-base md:text-lg tracking-wider">完成閱讀</button>
                         </div>
                     </div>
                 </div>
@@ -598,7 +589,7 @@
                                 let finalScore = t.length;
                                 const eps = epsData[l.stockId] || {};
                                 const g = parseFloat(eps.epsGrowth);
-                                if (!isNaN(g) && g > 0) finalScore += 1;
+                                if (!isNaN(g) && g > 0) finalScore += 1; // 成長率為正，自動加1分
                                 return finalScore;
                             };
                             valA = getScore(a); valB = getScore(b); break;
@@ -1031,21 +1022,21 @@
             return (
                 <div className="animate-fade-in-up space-y-6">
                     {/* 控制區塊 - 優化外觀 */}
-                    <div className="glass-card p-6 rounded-3xl relative overflow-hidden">
+                    <div className="glass-card p-4 md:p-6 rounded-3xl relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full blur-[60px] -z-10 pointer-events-none"></div>
-                        <h2 className="text-2xl font-title text-blue-400 mb-6 flex items-center gap-3 drop-shadow-md">
+                        <h2 className="text-xl md:text-2xl font-title text-blue-400 mb-6 flex items-center gap-3 drop-shadow-md">
                             <div className="p-2 bg-blue-500/10 rounded-xl"><FileText size={22} /></div>
                             新增選股日誌
                         </h2>
                         
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-5 mb-8 relative z-10">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-5 mb-8 relative z-10">
                             <div>
-                                <label className="block text-sm font-medium text-slate-400 mb-1.5 ml-1">記錄日期</label>
-                                <input type="date" value={date} onChange={e => setDate(e.target.value)} className="w-full input-styled rounded-xl p-3 font-mono-num text-slate-200" />
+                                <label className="block text-xs md:text-sm font-medium text-slate-400 mb-1.5 ml-1">記錄日期</label>
+                                <input type="date" value={date} onChange={e => setDate(e.target.value)} className="w-full input-styled rounded-xl p-2.5 md:p-3 font-mono-num text-slate-200" />
                             </div>
                             <div className="relative">
-                                <label className="block text-sm font-medium text-slate-400 mb-1.5 ml-1">股票代號</label>
-                                <div className="flex gap-2">
+                                <label className="block text-xs md:text-sm font-medium text-slate-400 mb-1.5 ml-1">股票代號</label>
+                                <div className="relative w-full h-auto">
                                     <input 
                                         type="text" 
                                         list="stock-ids-list"
@@ -1053,13 +1044,13 @@
                                         onChange={handleStockIdChange} 
                                         onKeyDown={e => { if (e.key === 'Enter') handleAddLog(); }}
                                         placeholder="例如: 2330" 
-                                        className={`w-full input-styled rounded-xl p-3 font-mono-num ${isForbiddenStock ? 'border-red-500 text-red-400 bg-red-900/10' : 'text-slate-200'}`} 
+                                        className={`w-full input-styled rounded-xl py-2.5 md:py-3 pl-3 pr-16 font-mono-num ${isForbiddenStock ? 'border-red-500 text-red-400 bg-red-900/10' : 'text-slate-200'}`} 
                                     />
                                 </div>
                             </div>
-                            <div className="col-span-2 relative">
-                                <label className="block text-sm font-medium text-slate-400 mb-1.5 ml-1">對應股票名稱 (支援反查)</label>
-                                <div className="relative h-[50px]">
+                            <div className="col-span-1 sm:col-span-2 relative">
+                                <label className="block text-xs md:text-sm font-medium text-slate-400 mb-1.5 ml-1">對應股票名稱 (支援反查)</label>
+                                <div className="relative w-full h-auto">
                                     <input 
                                         type="text" 
                                         list="stock-names-list"
@@ -1067,13 +1058,13 @@
                                         onChange={handleStockNameChange}
                                         onKeyDown={e => { if (e.key === 'Enter') handleAddLog(); }}
                                         placeholder="輸入股名自動帶出代號..." 
-                                        className={`w-full h-full input-styled rounded-xl p-3 ${isForbiddenStock ? 'border-red-500 text-red-400 bg-red-900/10' : (isUnknownStock ? 'border-amber-500/50 text-slate-200' : 'text-emerald-400 font-medium tracking-wide')}`} 
+                                        className={`w-full input-styled rounded-xl py-2.5 md:py-3 pl-3 pr-24 ${isForbiddenStock ? 'border-red-500 text-red-400 bg-red-900/10' : (isUnknownStock ? 'border-amber-500/50 text-slate-200' : 'text-emerald-400 font-medium tracking-wide')}`} 
                                     />
                                     {isUnknownStock && !isForbiddenStock && stockName && (
-                                        <span className="absolute right-3 top-3 text-xs text-amber-400 bg-amber-400/10 px-2.5 py-1 rounded-md font-medium">✨ 新標的送出將自動記憶</span>
+                                        <span className="hidden sm:inline-block absolute right-2 top-1/2 -translate-y-1/2 text-[10px] md:text-xs text-amber-400 bg-amber-400/10 px-2 py-1 rounded-md font-medium">✨ 自動記憶</span>
                                     )}
                                     {isForbiddenStock && (
-                                        <span className="absolute right-3 top-2.5 text-xs text-red-200 bg-red-600 px-3 py-1 rounded-md font-bold shadow-[0_0_10px_rgba(220,38,38,0.5)] animate-pulse">嚴禁買入</span>
+                                        <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] md:text-xs text-red-200 bg-red-600 px-2 py-1 md:px-3 rounded-md font-bold shadow-[0_0_10px_rgba(220,38,38,0.5)] animate-pulse whitespace-nowrap">嚴禁買入</span>
                                     )}
                                 </div>
                                 {stockIdsDatalist}
@@ -1087,26 +1078,26 @@
                                 <Filter size={16} className="text-slate-500" />
                                 主力策略模組 (選填)
                             </label>
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3">
                                 {STRATEGIES.map(s => (
                                     <button 
                                         key={s.id}
                                         onClick={() => handleStrategySelect(s.id)}
-                                        className={`flex items-center justify-center gap-2 p-3 rounded-xl border transition-all duration-300 ${selectedStrategy === s.id ? `bg-gradient-to-r ${s.color} border-transparent text-white shadow-lg transform scale-[1.02]` : 'bg-slate-800/40 border-slate-700/60 text-slate-400 hover:bg-slate-800 hover:border-slate-500 hover:text-slate-200'}`}
+                                        className={`flex items-center justify-center gap-1 md:gap-2 p-2.5 md:p-3 rounded-xl border transition-all duration-300 ${selectedStrategy === s.id ? `bg-gradient-to-r ${s.color} border-transparent text-white shadow-lg transform scale-[1.02]` : 'bg-slate-800/40 border-slate-700/60 text-slate-400 hover:bg-slate-800 hover:border-slate-500 hover:text-slate-200'}`}
                                     >
-                                        <s.icon size={18} className={selectedStrategy === s.id ? "opacity-100" : "opacity-70"} />
-                                        <span className="font-bold tracking-wide">{s.label}</span>
+                                        <s.icon size={16} className={selectedStrategy === s.id ? "opacity-100" : "opacity-70"} />
+                                        <span className="font-bold tracking-wide text-sm">{s.label}</span>
                                     </button>
                                 ))}
                             </div>
                             
                             {selectedStrategy && SUB_TAGS[selectedStrategy] && (
-                                <div className="mt-4 p-5 bg-slate-900/60 rounded-2xl border border-slate-700/50 animate-fade-in-down shadow-inner">
+                                <div className="mt-4 p-4 md:p-5 bg-slate-900/60 rounded-2xl border border-slate-700/50 animate-fade-in-down shadow-inner">
                                     <div className="flex justify-between items-center mb-3">
-                                        <label className="block text-xs font-bold tracking-widest text-slate-500 uppercase">進階技術/籌碼特徵 (單選)</label>
+                                        <label className="block text-[10px] md:text-xs font-bold tracking-widest text-slate-500 uppercase">進階技術/籌碼特徵 (單選)</label>
                                         {selectedSubTags.length > 0 && (
-                                            <button onClick={() => setSelectedSubTags([])} className="text-[11px] font-bold text-slate-400 hover:text-white transition bg-slate-800 hover:bg-slate-700 px-3 py-1 rounded-lg flex items-center gap-1">
-                                                <X size={12} /> 清空選擇
+                                            <button onClick={() => setSelectedSubTags([])} className="text-[10px] md:text-[11px] font-bold text-slate-400 hover:text-white transition bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded-lg flex items-center gap-1 shrink-0">
+                                                <X size={12} /> 清空
                                             </button>
                                         )}
                                     </div>
@@ -1118,7 +1109,7 @@
                                                 <button
                                                     key={tag}
                                                     onClick={() => toggleSubTag(tag)}
-                                                    className={`px-3.5 py-1.5 rounded-xl text-xs font-bold tracking-wide transition-all duration-300 border ${
+                                                    className={`px-3 py-1.5 rounded-xl text-xs font-bold tracking-wide transition-all duration-300 border ${
                                                         isSelected 
                                                             ? `bg-gradient-to-r ${bgGradient} text-white border-transparent shadow-[0_0_12px_rgba(255,255,255,0.15)] transform scale-105` 
                                                             : 'bg-slate-800/80 border-slate-700 text-slate-400 hover:border-slate-500 hover:text-slate-200'
@@ -1133,19 +1124,19 @@
                             )}
                         </div>
 
-                        {/* 底部操作列 - 按鈕視覺優化 */}
-                        <div className="flex flex-col md:flex-row justify-between items-center border-t border-slate-800/80 pt-6 gap-4 relative z-10">
-                            <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-                                <label className="cursor-pointer bg-slate-800 hover:bg-slate-700 text-sm font-medium text-slate-200 px-4 py-2.5 rounded-xl flex items-center gap-2 transition border border-slate-700/50 shadow-sm">
+                        {/* 底部操作列 - 響應式優化 */}
+                        <div className="flex flex-col xl:flex-row justify-between items-center border-t border-slate-800/80 pt-6 gap-4 relative z-10">
+                            <div className="flex flex-col md:flex-row items-center gap-3 w-full xl:w-auto">
+                                <label className="w-full md:w-auto cursor-pointer bg-slate-800 hover:bg-slate-700 text-sm font-medium text-slate-200 px-4 py-2.5 rounded-xl flex items-center justify-center gap-2 transition border border-slate-700/50 shadow-sm shrink-0">
                                     <Upload size={16} className="text-blue-400" />
                                     <span>更新 EPS / 股期</span>
                                     <input type="file" accept=".csv, .xlsx, .xls" onChange={handleEpsImport} className="hidden" />
                                 </label>
 
-                                <div className="flex items-center gap-2 bg-slate-800/80 rounded-xl p-1 relative md:ml-2" ref={copyDropdownRef}>
+                                <div className="flex flex-col xl:flex-row items-center gap-2 bg-slate-800/80 rounded-xl p-2 relative w-full xl:w-auto md:ml-2" ref={copyDropdownRef}>
                                     <button 
                                         onClick={() => setIsCopyDropdownOpen(!isCopyDropdownOpen)}
-                                        className={`bg-slate-900 border ${copySubTags.length > 0 ? 'border-blue-500/50 text-blue-400' : 'border-slate-700 text-slate-300'} rounded-lg px-4 py-1.5 text-sm font-medium outline-none flex items-center gap-2 transition-colors`}
+                                        className={`w-full xl:w-auto bg-slate-900 border ${copySubTags.length > 0 ? 'border-blue-500/50 text-blue-400' : 'border-slate-700 text-slate-300'} rounded-lg px-4 py-2 text-sm font-medium outline-none flex items-center justify-center gap-2 transition-colors shrink-0`}
                                     >
                                         <Filter size={14} />
                                         {copySubTags.length === 0 ? '全部標籤匯出' : `已篩選 ${copySubTags.length} 項`}
@@ -1153,7 +1144,7 @@
                                     </button>
 
                                     {isCopyDropdownOpen && (
-                                        <div className="absolute bottom-full mb-3 left-0 w-80 bg-slate-800 border border-slate-600 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.5)] p-5 z-50 flex flex-col gap-4 max-h-[400px] overflow-y-auto animate-fade-in-up custom-scrollbar">
+                                        <div className="absolute bottom-full left-0 mb-2 w-full xl:w-80 bg-slate-800 border border-slate-600 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.5)] p-5 z-50 flex flex-col gap-4 max-h-[400px] overflow-y-auto animate-fade-in-up custom-scrollbar">
                                             <div className="flex justify-between items-center border-b border-slate-700 pb-3">
                                                 <span className="text-sm font-bold text-slate-200">自訂匯出標籤</span>
                                                 <button onClick={() => setCopySubTags([])} className="text-xs font-bold text-blue-400 hover:text-blue-300 bg-blue-500/10 hover:bg-blue-500/20 px-3 py-1.5 rounded-lg transition">清除篩選</button>
@@ -1194,39 +1185,39 @@
                                         </div>
                                     )}
 
-                                    <div className="flex items-center gap-1 border-l border-slate-700/50 pl-2 ml-1">
-                                        <button onClick={() => copyLogs('time')} className={`text-sm text-white flex items-center gap-1.5 transition px-3 py-1.5 rounded-lg font-medium ${copySuccess === 'time' ? 'bg-green-600 shadow-[0_0_10px_rgba(22,163,74,0.3)]' : 'hover:bg-slate-700'}`} title="今日純文字：依輸入時間順序">
+                                    <div className="flex flex-wrap justify-center items-center gap-2 xl:border-l border-slate-700/50 xl:pl-4 w-full xl:w-auto mt-2 xl:mt-0 shrink-0">
+                                        <button onClick={() => copyLogs('time')} className={`text-xs md:text-sm text-white flex items-center justify-center w-full sm:w-auto gap-1.5 transition px-3 py-2 rounded-lg font-medium shadow-sm ${copySuccess === 'time' ? 'bg-green-600 shadow-[0_0_10px_rgba(22,163,74,0.3)]' : 'hover:bg-slate-700'}`} title="今日純文字：依輸入時間順序">
                                             {copySuccess === 'time' ? <CheckCircle size={14} /> : <ClipboardCopy size={14} className="text-blue-400" />} <span>依時間</span>
                                         </button>
-                                        <button onClick={() => copyLogs('strategy')} className={`text-sm text-white flex items-center gap-1.5 transition px-3 py-1.5 rounded-lg font-medium ${copySuccess === 'strategy' ? 'bg-green-600 shadow-[0_0_10px_rgba(22,163,74,0.3)]' : 'hover:bg-slate-700'}`} title="今日純文字：依策略群組排序">
+                                        <button onClick={() => copyLogs('strategy')} className={`text-xs md:text-sm text-white flex items-center justify-center w-full sm:w-auto gap-1.5 transition px-3 py-2 rounded-lg font-medium shadow-sm ${copySuccess === 'strategy' ? 'bg-green-600 shadow-[0_0_10px_rgba(22,163,74,0.3)]' : 'hover:bg-slate-700'}`} title="今日純文字：依策略群組排序">
                                             {copySuccess === 'strategy' ? <CheckCircle size={14} /> : <ClipboardCopy size={14} className="text-indigo-400" />} <span>依策略</span>
                                         </button>
-                                        <button onClick={() => copyLogs('score')} className={`text-sm text-white flex items-center gap-1.5 transition px-3 py-1.5 rounded-lg font-medium ${copySuccess === 'score' ? 'bg-green-600 shadow-[0_0_10px_rgba(22,163,74,0.3)]' : 'hover:bg-slate-700'}`} title="今日純文字：依標籤分數高低">
+                                        <button onClick={() => copyLogs('score')} className={`text-xs md:text-sm text-white flex items-center justify-center w-full sm:w-auto gap-1.5 transition px-3 py-2 rounded-lg font-medium shadow-sm ${copySuccess === 'score' ? 'bg-green-600 shadow-[0_0_10px_rgba(22,163,74,0.3)]' : 'hover:bg-slate-700'}`} title="今日純文字：依標籤分數高低">
                                             {copySuccess === 'score' ? <CheckCircle size={14} /> : <Star size={14} className="text-rose-400" />} <span>依分數</span>
                                         </button>
-                                        <button onClick={() => copyLogs('score-futures')} className={`text-sm text-white flex items-center gap-1.5 transition px-3 py-1.5 rounded-lg font-medium ${copySuccess === 'score-futures' ? 'bg-green-600 shadow-[0_0_10px_rgba(22,163,74,0.3)]' : 'hover:bg-slate-700'}`} title="今日純文字：僅有股期且依分數排序">
+                                        <button onClick={() => copyLogs('score-futures')} className={`text-xs md:text-sm text-white flex items-center justify-center w-full sm:w-auto gap-1.5 transition px-3 py-2 rounded-lg font-medium shadow-sm ${copySuccess === 'score-futures' ? 'bg-green-600 shadow-[0_0_10px_rgba(22,163,74,0.3)]' : 'hover:bg-slate-700'}`} title="今日純文字：僅有股期且依分數排序">
                                             {copySuccess === 'score-futures' ? <CheckCircle size={14} /> : <Star size={14} className="text-fuchsia-400" />} <span>股期+分數</span>
                                         </button>
-                                        <button onClick={() => copyLogs('growth')} className={`text-sm text-white flex items-center gap-1.5 transition px-3 py-1.5 rounded-lg font-medium ${copySuccess === 'growth' ? 'bg-green-600 shadow-[0_0_10px_rgba(22,163,74,0.3)]' : 'hover:bg-slate-700'}`} title="今日純文字：依 EPS 成長率高低">
+                                        <button onClick={() => copyLogs('growth')} className={`text-xs md:text-sm text-white flex items-center justify-center w-full sm:w-auto gap-1.5 transition px-3 py-2 rounded-lg font-medium shadow-sm ${copySuccess === 'growth' ? 'bg-green-600 shadow-[0_0_10px_rgba(22,163,74,0.3)]' : 'hover:bg-slate-700'}`} title="今日純文字：依 EPS 成長率高低">
                                             {copySuccess === 'growth' ? <CheckCircle size={14} /> : <TrendingUp size={14} className="text-teal-400" />} <span>依成長率</span>
                                         </button>
                                     </div>
                                 </div>
                             </div>
                             
-                            <button onClick={handleAddLog} className="w-full md:w-auto bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white px-8 py-3 rounded-xl font-bold tracking-wider flex items-center justify-center gap-2 shadow-[0_4px_15px_rgba(59,130,246,0.3)] transition-all transform hover:-translate-y-0.5 focus:ring-4 focus:ring-blue-500/30 outline-none">
+                            <button onClick={handleAddLog} className="w-full xl:w-auto bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white px-8 py-3.5 rounded-xl font-bold tracking-wider flex items-center justify-center gap-2 shadow-[0_4px_15px_rgba(59,130,246,0.3)] transition-all transform hover:-translate-y-0.5 focus:ring-4 focus:ring-blue-500/30 outline-none shrink-0 mt-4 xl:mt-0">
                                 <PlusCircle size={20} /> 正式寫入日誌
                             </button>
                         </div>
                     </div>
 
                     {/* 資料表格 - 優化視覺層次 */}
-                    <div className="glass-card rounded-3xl overflow-hidden">
-                        <div className="overflow-x-auto custom-scrollbar">
-                            <table className="w-full text-left border-collapse">
+                    <div className="glass-card rounded-3xl overflow-hidden shadow-lg">
+                        <div className="overflow-x-auto custom-scrollbar pb-2">
+                            <table className="w-full text-left border-collapse min-w-[800px]">
                                 <thead>
                                     <tr className="bg-slate-900/80 text-slate-400 text-sm tracking-wider border-b border-slate-700">
-                                        <th className="p-4 font-bold align-top min-w-[120px]">
+                                        <th className="p-4 font-bold align-top min-w-[120px] whitespace-nowrap">
                                             <div className="mb-2 flex items-center gap-1.5 cursor-pointer hover:text-blue-400 transition select-none" onClick={() => handleJournalSort('date')}>日期 <SortIcon sortKey="date" currentSort={journalSort} /></div>
                                             <input type="date" value={journalFilters.date} onChange={e => setJournalFilters({...journalFilters, date: e.target.value})} className="w-full bg-slate-950 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-xs font-mono-num outline-none focus:border-blue-500 transition" />
                                         </th>
@@ -1243,13 +1234,13 @@
                                                 </select>
                                             </div>
                                         </th>
-                                        <th className="p-4 font-bold font-mono-num align-top min-w-[100px]">
+                                        <th className="p-4 font-bold font-mono-num align-top min-w-[90px] whitespace-nowrap">
                                             <div className="mb-2 flex items-center gap-1.5 cursor-pointer hover:text-blue-400 transition select-none" onClick={() => handleJournalSort('eps25')}>25' EPS <SortIcon sortKey="eps25" currentSort={journalSort} /></div>
                                         </th>
-                                        <th className="p-4 font-bold font-mono-num align-top min-w-[100px]">
+                                        <th className="p-4 font-bold font-mono-num align-top min-w-[90px] whitespace-nowrap">
                                             <div className="mb-2 flex items-center gap-1.5 cursor-pointer hover:text-blue-400 transition select-none" onClick={() => handleJournalSort('eps26')}>26' EPS(預) <SortIcon sortKey="eps26" currentSort={journalSort} /></div>
                                         </th>
-                                        <th className="p-4 font-bold font-mono-num align-top whitespace-nowrap min-w-[130px]">
+                                        <th className="p-4 font-bold font-mono-num align-top whitespace-nowrap min-w-[120px]">
                                             <div className="mb-2 flex items-center gap-1.5 cursor-pointer hover:text-blue-400 transition select-none" onClick={() => handleJournalSort('growth')}>EPS 成長率 <SortIcon sortKey="growth" currentSort={journalSort} /></div>
                                             <select value={journalFilters.growth} onChange={e => setJournalFilters({...journalFilters, growth: e.target.value})} className="w-full bg-slate-950 border border-slate-700/80 rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-500 transition text-slate-300">
                                                 <option value="all">不限</option>
@@ -1298,7 +1289,7 @@
                                                     <div className="flex items-center flex-wrap gap-y-1">
                                                         <FuturesBadge hasFutures={hasFutures} />
                                                         <span className="font-mono-num font-black text-lg text-slate-200 mr-2 tracking-wide">{log.stockId}</span>
-                                                        <span className="text-blue-300 font-bold text-base">{log.name}</span>
+                                                        <span className="text-blue-300 font-bold text-base whitespace-nowrap">{log.name}</span>
                                                     </div>
                                                 </td>
                                                 <td className={`p-4 font-mono-num font-bold text-base ${getTwStockColor(eps.eps25)}`}>{eps.eps25}</td>
@@ -1320,7 +1311,7 @@
                                                                         className={`group/tag cursor-pointer inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold tracking-wide bg-gradient-to-r ${SUB_TAG_COLORS[t] || stratForTag?.color || 'from-slate-600 to-slate-700'} text-white shadow-sm hover:shadow-md transition-all relative overflow-hidden`}
                                                                         title="點擊移除標籤"
                                                                     >
-                                                                        <span className="relative z-10 group-hover/tag:mr-4 transition-all">{t}</span>
+                                                                        <span className="relative z-10 group-hover/tag:mr-4 transition-all whitespace-nowrap">{t}</span>
                                                                         <X size={12} className="absolute right-2 opacity-0 group-hover/tag:opacity-100 transition-opacity z-10 font-black" />
                                                                         <div className="absolute inset-0 bg-black/20 opacity-0 group-hover/tag:opacity-100 transition-opacity"></div>
                                                                     </span>
@@ -1341,7 +1332,7 @@
                                                                         className={`group/tag cursor-pointer inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold tracking-wide bg-gradient-to-r ${s.color} text-white shadow-sm hover:shadow-md transition-all relative overflow-hidden opacity-90`}
                                                                         title="點擊移除主策略"
                                                                     >
-                                                                        <span className="relative z-10 flex items-center gap-1 group-hover/tag:mr-4 transition-all">{s.emoji} {s.label}</span>
+                                                                        <span className="relative z-10 flex items-center gap-1 group-hover/tag:mr-4 transition-all whitespace-nowrap">{s.emoji} {s.label}</span>
                                                                         <X size={12} className="absolute right-2 opacity-0 group-hover/tag:opacity-100 transition-opacity z-10 font-black" />
                                                                         <div className="absolute inset-0 bg-black/20 opacity-0 group-hover/tag:opacity-100 transition-opacity"></div>
                                                                     </span>
@@ -1354,11 +1345,11 @@
                                                     </div>
                                                 </td>
                                                 <td className="p-4">
-                                                    <div className="flex justify-center items-center gap-1.5">
+                                                    <div className="flex justify-center items-center gap-1.5 flex-wrap">
                                                         <button onClick={() => onAiDiagnose(log)} className="p-2 rounded-xl bg-purple-500/10 text-purple-400 hover:bg-purple-500 hover:text-white transition-all group/btn shadow-[0_0_10px_rgba(168,85,247,0)] hover:shadow-[0_0_15px_rgba(168,85,247,0.5)]" title="✨ AI 個股診斷">
                                                             <Sparkles size={18} className="group-hover/btn:animate-pulse" />
                                                         </button>
-                                                        <div className="w-[1px] h-6 bg-slate-700/50 mx-1"></div>
+                                                        <div className="w-[1px] h-6 bg-slate-700/50 mx-1 hidden sm:block"></div>
                                                         <button onClick={() => togglePlan(log.id)} className={`p-2 rounded-xl transition-all ${log.inPlan ? 'bg-blue-500/20 text-blue-400 shadow-[0_0_10px_rgba(59,130,246,0.3)] border border-blue-500/30' : 'bg-slate-800 text-slate-400 hover:bg-blue-500/10 hover:text-blue-400 border border-transparent'}`} title={log.inPlan ? '移出規劃清單' : '加入規劃清單'}>
                                                             <Target size={18} />
                                                         </button>
@@ -1552,52 +1543,52 @@
 
             return (
                 <div className="animate-fade-in-up space-y-6">
-                    <div className="glass-card p-6 rounded-3xl relative overflow-hidden">
+                    <div className="glass-card p-4 md:p-6 rounded-3xl relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full blur-[60px] -z-10 pointer-events-none"></div>
-                        <h2 className="text-2xl font-title text-indigo-400 mb-6 flex items-center gap-3 drop-shadow-md">
+                        <h2 className="text-xl md:text-2xl font-title text-indigo-400 mb-6 flex items-center gap-3 drop-shadow-md">
                             <div className="p-2 bg-indigo-500/10 rounded-xl"><Calculator size={22} /></div>
                             大盤/個股支撐壓力計算機
                         </h2>
                         
-                        <div className="grid grid-cols-2 md:grid-cols-6 gap-5 mb-8 relative z-10">
-                            <div>
-                                <label className="block text-sm font-medium text-slate-400 mb-1.5 ml-1">預測盤別</label>
-                                <select value={session} onChange={e=>setSession(e.target.value)} className="w-full input-styled rounded-xl p-3 text-slate-200">
+                        <div className="grid grid-cols-2 md:grid-cols-6 gap-4 md:gap-5 mb-8 relative z-10">
+                            <div className="col-span-2 md:col-span-1">
+                                <label className="block text-xs md:text-sm font-medium text-slate-400 mb-1.5 ml-1">預測盤別</label>
+                                <select value={session} onChange={e=>setSession(e.target.value)} className="w-full input-styled rounded-xl p-2.5 md:p-3 text-slate-200">
                                     <option>日盤</option>
                                     <option>夜盤</option>
                                     <option>全盤</option>
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-slate-400 mb-1.5 ml-1">最高價 (H)</label>
-                                <input type="number" step="any" value={h} onChange={e=>setH(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') calculate(); }} className="w-full input-styled rounded-xl p-3 font-mono-num text-blue-300 font-bold" />
+                                <label className="block text-xs md:text-sm font-medium text-slate-400 mb-1.5 ml-1">最高價 (H)</label>
+                                <input type="number" step="any" value={h} onChange={e=>setH(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') calculate(); }} className="w-full input-styled rounded-xl p-2.5 md:p-3 font-mono-num text-blue-300 font-bold" />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-slate-400 mb-1.5 ml-1">最低價 (L)</label>
-                                <input type="number" step="any" value={l} onChange={e=>setL(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') calculate(); }} className="w-full input-styled rounded-xl p-3 font-mono-num text-blue-300 font-bold" />
+                                <label className="block text-xs md:text-sm font-medium text-slate-400 mb-1.5 ml-1">最低價 (L)</label>
+                                <input type="number" step="any" value={l} onChange={e=>setL(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') calculate(); }} className="w-full input-styled rounded-xl p-2.5 md:p-3 font-mono-num text-blue-300 font-bold" />
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium text-slate-400 mb-1.5 ml-1">收盤價 (C)</label>
-                                <input type="number" step="any" value={c} onChange={e=>setC(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') calculate(); }} className="w-full input-styled rounded-xl p-3 font-mono-num text-blue-300 font-bold" />
+                            <div className="col-span-2 md:col-span-1">
+                                <label className="block text-xs md:text-sm font-medium text-slate-400 mb-1.5 ml-1">收盤價 (C)</label>
+                                <input type="number" step="any" value={c} onChange={e=>setC(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') calculate(); }} className="w-full input-styled rounded-xl p-2.5 md:p-3 font-mono-num text-blue-300 font-bold" />
                             </div>
-                            <div className="relative">
-                                <label className="block text-sm font-medium text-slate-400 mb-1.5 ml-1">股號/代號 (選填)</label>
-                                <input type="text" list="calc-stock-ids-list" value={stockId} onChange={handleStockIdChange} onKeyDown={e => { if (e.key === 'Enter') calculate(); }} placeholder="如: TX00" className="w-full input-styled rounded-xl p-3 font-mono-num text-slate-200" />
+                            <div className="relative col-span-2 md:col-span-1">
+                                <label className="block text-xs md:text-sm font-medium text-slate-400 mb-1.5 ml-1">股號/代號 (選填)</label>
+                                <input type="text" list="calc-stock-ids-list" value={stockId} onChange={handleStockIdChange} onKeyDown={e => { if (e.key === 'Enter') calculate(); }} placeholder="如: TX00" className="w-full input-styled rounded-xl p-2.5 md:p-3 font-mono-num text-slate-200" />
                             </div>
-                            <div className="relative">
-                                <label className="block text-sm font-medium text-slate-400 mb-1.5 ml-1">名稱 (選填)</label>
-                                <input type="text" list="calc-stock-names-list" value={stockName} onChange={handleStockNameChange} onKeyDown={e => { if (e.key === 'Enter') calculate(); }} placeholder="如: 台指期" className={`w-full input-styled rounded-xl p-3 ${stockMap[stockId] ? 'text-emerald-400 font-medium' : 'text-slate-200'}`} />
+                            <div className="relative col-span-2 md:col-span-1">
+                                <label className="block text-xs md:text-sm font-medium text-slate-400 mb-1.5 ml-1">名稱 (選填)</label>
+                                <input type="text" list="calc-stock-names-list" value={stockName} onChange={handleStockNameChange} onKeyDown={e => { if (e.key === 'Enter') calculate(); }} placeholder="如: 台指期" className={`w-full input-styled rounded-xl p-2.5 md:p-3 ${stockMap[stockId] ? 'text-emerald-400 font-medium' : 'text-slate-200'}`} />
                                 {stockIdsDatalist}
                                 {stockNamesDatalist}
                             </div>
                         </div>
 
-                        <div className="flex gap-4 relative z-10">
-                            <button onClick={calculate} className="bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white px-8 py-3.5 rounded-xl font-bold tracking-wider flex-1 shadow-[0_4px_15px_rgba(99,102,241,0.3)] transition-all transform hover:-translate-y-0.5 outline-none focus:ring-4 focus:ring-indigo-500/30">
+                        <div className="flex flex-col sm:flex-row gap-3 md:gap-4 relative z-10">
+                            <button onClick={calculate} className="w-full md:w-auto bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white px-8 py-3.5 rounded-xl font-bold tracking-wider flex-1 shadow-[0_4px_15px_rgba(99,102,241,0.3)] transition-all transform hover:-translate-y-0.5 outline-none focus:ring-4 focus:ring-indigo-500/30">
                                 🚀 開始精算關鍵點位
                             </button>
                             {results && (
-                                <button onClick={saveHistory} className="bg-slate-800 hover:bg-emerald-600 text-emerald-400 hover:text-white px-8 py-3.5 rounded-xl font-bold flex items-center gap-2 transition-all border border-emerald-500/30 hover:border-transparent hover:shadow-[0_4px_15px_rgba(16,185,129,0.3)] outline-none focus:ring-4 focus:ring-emerald-500/30">
+                                <button onClick={saveHistory} className="w-full md:w-auto bg-slate-800 hover:bg-emerald-600 text-emerald-400 hover:text-white px-8 py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all border border-emerald-500/30 hover:border-transparent hover:shadow-[0_4px_15px_rgba(16,185,129,0.3)] outline-none focus:ring-4 focus:ring-emerald-500/30">
                                     <Save size={20} /> 儲存至紀錄
                                 </button>
                             )}
@@ -1657,7 +1648,7 @@
                                     <ColorRow label="S2 (0.618)" value={results.fibo.S2} type="S" />
                                     <ColorRow label="S3 (1.0)" value={results.fibo.S3} type="S" />
                                 </div>
-                                <button onClick={() => copySystem('Fibonacci', results.fibo)} className="mt-4 w-full py-2 bg-slate-800 hover:bg-slate-700 text-sm rounded-lg flex justify-center items-center gap-2 transition text-slate-300">
+                                <button onClick={() => copySystem('Fibonacci', results.fibo)} className="w-full py-3 bg-amber-600/10 hover:bg-amber-600/20 text-amber-400 border border-amber-500/20 rounded-xl font-bold tracking-wide flex justify-center items-center gap-2 transition-all group-hover:shadow-[0_0_15px_rgba(245,158,11,0.15)] relative z-10">
                                     <ClipboardCopy size={16} /> 複製 (Fibo)
                                 </button>
                             </div>
@@ -1665,19 +1656,19 @@
                     )}
 
                     <div className="glass-card rounded-3xl overflow-hidden mt-8">
-                        <div className="p-5 border-b border-slate-700 bg-slate-900/60 flex justify-between items-center">
-                            <h3 className="text-lg font-bold text-slate-200 flex items-center gap-2">
+                        <div className="p-4 md:p-5 border-b border-slate-700 bg-slate-900/60 flex justify-between items-center">
+                            <h3 className="text-base md:text-lg font-bold text-slate-200 flex items-center gap-2">
                                 <Save size={20} className="text-slate-400" /> 計算紀錄庫
                             </h3>
                         </div>
-                        <div className="overflow-x-auto custom-scrollbar">
-                            <table className="w-full text-left border-collapse">
+                        <div className="overflow-x-auto custom-scrollbar pb-2">
+                            <table className="w-full text-left border-collapse min-w-[700px]">
                                 <thead>
                                     <tr className="bg-slate-900/40 text-slate-400 text-sm border-b border-slate-700/80">
                                         <th className="p-4 font-bold min-w-[120px]">日期</th>
-                                        <th className="p-4 font-bold">預測盤別</th>
+                                        <th className="p-4 font-bold min-w-[100px]">預測盤別</th>
                                         <th className="p-4 font-bold min-w-[150px]">標的</th>
-                                        <th className="p-4 font-bold font-mono-num tracking-widest text-slate-500">H / L / C</th>
+                                        <th className="p-4 font-bold font-mono-num tracking-widest text-slate-500 min-w-[120px]">H / L / C</th>
                                         <th className="p-4 font-bold text-center min-w-[150px]">操作選項</th>
                                     </tr>
                                 </thead>
@@ -1689,22 +1680,22 @@
                                             <tr className="table-row-hover">
                                                 <td className="p-4 font-mono-num text-sm text-slate-300">{rec.date}</td>
                                                 <td className="p-4">
-                                                    <span className="bg-slate-800 border border-slate-700 px-2.5 py-1 rounded-md text-xs font-bold text-slate-300 tracking-wider shadow-sm">{rec.session}</span>
+                                                    <span className="bg-slate-800 border border-slate-700 px-2.5 py-1 rounded-md text-xs font-bold text-slate-300 tracking-wider shadow-sm whitespace-nowrap">{rec.session}</span>
                                                 </td>
                                                 <td className="p-4">
-                                                    <div className="flex items-center">
+                                                    <div className="flex items-center flex-wrap gap-1">
                                                         <FuturesBadge hasFutures={hasFutures} />
                                                         <span className="font-mono-num font-bold text-white mr-1.5">{rec.stockId}</span> 
-                                                        <span className="text-blue-300 font-medium">{rec.name}</span>
+                                                        <span className="text-blue-300 font-medium whitespace-nowrap">{rec.name}</span>
                                                     </div>
                                                 </td>
-                                                <td className="p-4 text-sm font-mono-num font-bold text-slate-400">
+                                                <td className="p-4 text-sm font-mono-num font-bold text-slate-400 whitespace-nowrap">
                                                     <span className="text-red-400/80">{rec.inputs.h}</span> <span className="mx-1 opacity-50">/</span>
                                                     <span className="text-emerald-400/80">{rec.inputs.l}</span> <span className="mx-1 opacity-50">/</span>
                                                     <span className="text-blue-400/80">{rec.inputs.c}</span>
                                                 </td>
                                                 <td className="p-4 text-center">
-                                                    <div className="flex justify-center gap-2">
+                                                    <div className="flex justify-center gap-2 flex-wrap">
                                                         <button onClick={() => setExpandedRowId(expandedRowId === rec.id ? null : rec.id)} className={`p-2 rounded-xl transition ${expandedRowId === rec.id ? 'bg-blue-600 text-white shadow-md' : 'bg-slate-800 text-blue-400 hover:bg-blue-500/20 border border-transparent'}`} title="展開/收起數據明細"><Eye size={18} /></button>
                                                         <button onClick={() => { setH(rec.inputs.h); setL(rec.inputs.l); setC(rec.inputs.c); setSession(rec.session); setStockId(rec.stockId); setStockName(rec.name); }} className="p-2 rounded-xl bg-slate-800 text-emerald-400 hover:bg-emerald-500/20 transition" title="重新載入參數至計算機"><Upload size={18} /></button>
                                                         <button onClick={() => setCalcHistory(calcHistory.filter(h => h.id !== rec.id))} className="p-2 rounded-xl bg-slate-800 text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition" title="刪除此紀錄"><Trash2 size={18} /></button>
@@ -1713,34 +1704,34 @@
                                             </tr>
                                             {expandedRowId === rec.id && (
                                                 <tr className="bg-slate-900/80 border-l-4 border-blue-500 animate-fade-in-down shadow-inner">
-                                                    <td colSpan="5" className="p-6">
-                                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                                    <td colSpan="5" className="p-4 md:p-6">
+                                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
                                                             {/* CDP 詳細 */}
-                                                            <div className="bg-slate-950 p-5 rounded-2xl border border-slate-800">
+                                                            <div className="bg-slate-950 p-4 md:p-5 rounded-2xl border border-slate-800 overflow-x-auto custom-scrollbar">
                                                                 <div className="flex justify-between items-center mb-4 border-b border-slate-800 pb-2">
                                                                     <span className="text-sm font-bold text-blue-400 tracking-wider">CDP 數據矩陣</span>
                                                                     <button onClick={()=>copySystem('CDP', rec.results.cdp, rec)} className="text-xs text-slate-500 hover:text-white flex items-center gap-1 bg-slate-900 px-2 py-1 rounded transition"><ClipboardCopy size={12}/> 複製</button>
                                                                 </div>
-                                                                <div className="grid grid-cols-5 text-sm text-center">
-                                                                    <div className="flex flex-col gap-1"><div className="text-slate-500 text-xs font-bold">AH</div><div className="text-red-400 font-mono-num font-black">{rec.results.cdp.AH}</div></div>
-                                                                    <div className="flex flex-col gap-1 border-l border-slate-800"><div className="text-slate-500 text-xs font-bold">NH</div><div className="text-red-400 font-mono-num font-black">{rec.results.cdp.NH}</div></div>
-                                                                    <div className="flex flex-col gap-1 border-l border-slate-800 bg-yellow-500/5 rounded-md py-1"><div className="text-slate-500 text-xs font-bold">CDP</div><div className="text-yellow-400 font-mono-num font-black drop-shadow-[0_0_5px_rgba(250,204,21,0.5)]">{rec.results.cdp.CDP}</div></div>
-                                                                    <div className="flex flex-col gap-1 border-l border-slate-800"><div className="text-slate-500 text-xs font-bold">NL</div><div className="text-emerald-400 font-mono-num font-black">{rec.results.cdp.NL}</div></div>
-                                                                    <div className="flex flex-col gap-1 border-l border-slate-800"><div className="text-slate-500 text-xs font-bold">AL</div><div className="text-emerald-400 font-mono-num font-black">{rec.results.cdp.AL}</div></div>
+                                                                <div className="grid grid-cols-5 text-xs md:text-sm text-center min-w-[300px]">
+                                                                    <div className="flex flex-col gap-1"><div className="text-slate-500 text-[10px] md:text-xs font-bold">AH</div><div className="text-red-400 font-mono-num font-black">{rec.results.cdp.AH}</div></div>
+                                                                    <div className="flex flex-col gap-1 border-l border-slate-800"><div className="text-slate-500 text-[10px] md:text-xs font-bold">NH</div><div className="text-red-400 font-mono-num font-black">{rec.results.cdp.NH}</div></div>
+                                                                    <div className="flex flex-col gap-1 border-l border-slate-800 bg-yellow-500/5 rounded-md py-1"><div className="text-slate-500 text-[10px] md:text-xs font-bold">CDP</div><div className="text-yellow-400 font-mono-num font-black drop-shadow-[0_0_5px_rgba(250,204,21,0.5)]">{rec.results.cdp.CDP}</div></div>
+                                                                    <div className="flex flex-col gap-1 border-l border-slate-800"><div className="text-slate-500 text-[10px] md:text-xs font-bold">NL</div><div className="text-emerald-400 font-mono-num font-black">{rec.results.cdp.NL}</div></div>
+                                                                    <div className="flex flex-col gap-1 border-l border-slate-800"><div className="text-slate-500 text-[10px] md:text-xs font-bold">AL</div><div className="text-emerald-400 font-mono-num font-black">{rec.results.cdp.AL}</div></div>
                                                                 </div>
                                                             </div>
                                                             {/* Pivot 詳細 */}
-                                                            <div className="bg-slate-950 p-5 rounded-2xl border border-slate-800">
+                                                            <div className="bg-slate-950 p-4 md:p-5 rounded-2xl border border-slate-800 overflow-x-auto custom-scrollbar">
                                                                 <div className="flex justify-between items-center mb-4 border-b border-slate-800 pb-2">
                                                                     <span className="text-sm font-bold text-purple-400 tracking-wider">Pivot 數據矩陣</span>
                                                                     <button onClick={()=>copySystem('Pivot', rec.results.pivot, rec)} className="text-xs text-slate-500 hover:text-white flex items-center gap-1 bg-slate-900 px-2 py-1 rounded transition"><ClipboardCopy size={12}/> 複製</button>
                                                                 </div>
-                                                                <div className="grid grid-cols-5 text-sm text-center">
-                                                                    <div className="flex flex-col gap-1"><div className="text-slate-500 text-xs font-bold">R2</div><div className="text-red-400 font-mono-num font-black">{rec.results.pivot.R2}</div></div>
-                                                                    <div className="flex flex-col gap-1 border-l border-slate-800"><div className="text-slate-500 text-xs font-bold">R1</div><div className="text-red-400 font-mono-num font-black">{rec.results.pivot.R1}</div></div>
-                                                                    <div className="flex flex-col gap-1 border-l border-slate-800 bg-yellow-500/5 rounded-md py-1"><div className="text-slate-500 text-xs font-bold">P</div><div className="text-yellow-400 font-mono-num font-black drop-shadow-[0_0_5px_rgba(250,204,21,0.5)]">{rec.results.pivot.P}</div></div>
-                                                                    <div className="flex flex-col gap-1 border-l border-slate-800"><div className="text-slate-500 text-xs font-bold">S1</div><div className="text-emerald-400 font-mono-num font-black">{rec.results.pivot.S1}</div></div>
-                                                                    <div className="flex flex-col gap-1 border-l border-slate-800"><div className="text-slate-500 text-xs font-bold">S2</div><div className="text-emerald-400 font-mono-num font-black">{rec.results.pivot.S2}</div></div>
+                                                                <div className="grid grid-cols-5 text-xs md:text-sm text-center min-w-[300px]">
+                                                                    <div className="flex flex-col gap-1"><div className="text-slate-500 text-[10px] md:text-xs font-bold">R2</div><div className="text-red-400 font-mono-num font-black">{rec.results.pivot.R2}</div></div>
+                                                                    <div className="flex flex-col gap-1 border-l border-slate-800"><div className="text-slate-500 text-[10px] md:text-xs font-bold">R1</div><div className="text-red-400 font-mono-num font-black">{rec.results.pivot.R1}</div></div>
+                                                                    <div className="flex flex-col gap-1 border-l border-slate-800 bg-yellow-500/5 rounded-md py-1"><div className="text-slate-500 text-[10px] md:text-xs font-bold">P</div><div className="text-yellow-400 font-mono-num font-black drop-shadow-[0_0_5px_rgba(250,204,21,0.5)]">{rec.results.pivot.P}</div></div>
+                                                                    <div className="flex flex-col gap-1 border-l border-slate-800"><div className="text-slate-500 text-[10px] md:text-xs font-bold">S1</div><div className="text-emerald-400 font-mono-num font-black">{rec.results.pivot.S1}</div></div>
+                                                                    <div className="flex flex-col gap-1 border-l border-slate-800"><div className="text-slate-500 text-[10px] md:text-xs font-bold">S2</div><div className="text-emerald-400 font-mono-num font-black">{rec.results.pivot.S2}</div></div>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -2040,11 +2031,11 @@
             };
 
             const StatCard = ({ title, value, unit, color }) => (
-                <div className="glass-card p-6 rounded-3xl flex flex-col justify-center relative overflow-hidden group">
-                    <div className={`absolute -right-10 -bottom-10 w-32 h-32 bg-${color}-500/10 rounded-full blur-[40px] group-hover:bg-${color}-500/20 transition-all`}></div>
-                    <div className={`text-${color}-300/80 text-sm mb-2 font-bold tracking-wide uppercase`}>{title}</div>
-                    <div className={`text-4xl font-black font-mono-num text-${color}-400 drop-shadow-sm`}>
-                        {value} <span className="text-base font-bold opacity-60 ml-1">{unit}</span>
+                <div className="glass-card p-5 md:p-6 rounded-3xl flex flex-col justify-center relative overflow-hidden group">
+                    <div className={`absolute -right-10 -bottom-10 w-24 md:w-32 h-24 md:h-32 bg-${color}-500/10 rounded-full blur-[40px] group-hover:bg-${color}-500/20 transition-all`}></div>
+                    <div className={`text-${color}-300/80 text-xs md:text-sm mb-1.5 md:mb-2 font-bold tracking-wide uppercase`}>{title}</div>
+                    <div className={`text-2xl md:text-4xl font-black font-mono-num text-${color}-400 drop-shadow-sm`}>
+                        {value} <span className="text-sm md:text-base font-bold opacity-60 ml-1">{unit}</span>
                     </div>
                 </div>
             );
@@ -2053,19 +2044,19 @@
                 <div className="animate-fade-in-up space-y-8">
                     {/* Dashboard 頂部區塊 */}
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-2 gap-4">
-                        <h2 className="text-3xl font-title text-emerald-400 flex items-center gap-3 drop-shadow-md">
-                            <div className="p-2 bg-emerald-500/10 rounded-xl"><LayoutDashboard size={28} /></div>
+                        <h2 className="text-2xl md:text-3xl font-title text-emerald-400 flex items-center gap-3 drop-shadow-md">
+                            <div className="p-2 bg-emerald-500/10 rounded-xl"><LayoutDashboard size={24} className="md:w-7 md:h-7" /></div>
                             交易績效儀表板
                         </h2>
-                        <div className="bg-slate-900/80 border border-slate-700/80 p-1.5 rounded-xl flex items-center shadow-inner">
-                            <select value={filterDate} onChange={e=>setFilterDate(e.target.value)} className="bg-transparent border-none rounded-lg px-3 py-1.5 text-sm font-bold outline-none text-slate-300 focus:ring-0 cursor-pointer">
+                        <div className="bg-slate-900/80 border border-slate-700/80 p-1.5 rounded-xl flex items-center shadow-inner w-full md:w-auto">
+                            <select value={filterDate} onChange={e=>setFilterDate(e.target.value)} className="w-full bg-transparent border-none rounded-lg px-3 py-1.5 text-sm font-bold outline-none text-slate-300 focus:ring-0 cursor-pointer">
                                 <option value="all">📊 檢視全部歷史紀錄</option>
                                 <option value="month">📅 僅檢視近一個月</option>
                             </select>
                         </div>
                     </div>
                     
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5">
                         <StatCard title="總發動交易" value={stats.totalTrades} unit="筆" color="blue" />
                         <StatCard title="已平倉結算" value={stats.closedTrades} unit="筆" color="indigo" />
                         <StatCard title="整體勝率" value={stats.winRate} unit="%" color="emerald" />
@@ -2073,31 +2064,33 @@
                     </div>
 
                     {/* 新增規劃標的區塊 */}
-                    <div className="glass-card p-6 rounded-3xl relative overflow-hidden mt-8">
+                    <div className="glass-card p-4 md:p-6 rounded-3xl relative overflow-hidden mt-8">
                         <div className="absolute top-0 left-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-[60px] -z-10 pointer-events-none"></div>
-                        <h3 className="text-xl font-bold text-slate-200 mb-6 flex items-center gap-2">
-                            <Target size={22} className="text-emerald-400" /> 快速建立交易計畫
+                        <h3 className="text-lg md:text-xl font-bold text-slate-200 mb-5 md:mb-6 flex items-center gap-2">
+                            <Target size={20} className="text-emerald-400 md:w-6 md:h-6" /> 快速建立交易計畫
                         </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-5 relative z-10">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-5 relative z-10">
                             <div>
-                                <label className="block text-sm font-medium text-slate-400 mb-1.5 ml-1">規劃日期</label>
-                                <input type="date" value={planDate} onChange={e => setPlanDate(e.target.value)} className="w-full input-styled rounded-xl p-3 font-mono-num text-slate-200" />
+                                <label className="block text-xs md:text-sm font-medium text-slate-400 mb-1.5 ml-1">規劃日期</label>
+                                <input type="date" value={planDate} onChange={e => setPlanDate(e.target.value)} className="w-full input-styled rounded-xl p-2.5 md:p-3 font-mono-num text-slate-200" />
                             </div>
                             <div className="relative">
-                                <label className="block text-sm font-medium text-slate-400 mb-1.5 ml-1">股票代號</label>
-                                <input type="text" list="plan-stock-ids-list" value={planStockId} onChange={handleStockIdChange} onKeyDown={e => { if (e.key === 'Enter') handleAddIndependentPlan(); }} placeholder="輸入股號/搜尋" className={`w-full input-styled rounded-xl p-3 font-mono-num ${isForbiddenStock ? 'border-red-500 text-red-400 bg-red-900/10' : 'text-white'}`} />
+                                <label className="block text-xs md:text-sm font-medium text-slate-400 mb-1.5 ml-1">股票代號</label>
+                                <input type="text" list="plan-stock-ids-list" value={planStockId} onChange={handleStockIdChange} onKeyDown={e => { if (e.key === 'Enter') handleAddIndependentPlan(); }} placeholder="輸入股號/搜尋" className={`w-full input-styled rounded-xl p-2.5 md:p-3 font-mono-num ${isForbiddenStock ? 'border-red-500 text-red-400 bg-red-900/10' : 'text-white'}`} />
                             </div>
-                            <div className="relative">
-                                <label className="block text-sm font-medium text-slate-400 mb-1.5 ml-1">名稱 (可反查代號)</label>
-                                <input type="text" list="plan-stock-names-list" value={planStockName} onChange={handleStockNameChange} onKeyDown={e => { if (e.key === 'Enter') handleAddIndependentPlan(); }} placeholder="輸入名稱自動帶入..." className={`w-full input-styled rounded-xl p-3 ${isForbiddenStock ? 'border-red-500 text-red-400 bg-red-900/10' : (isUnknownStock ? 'border-amber-500/50 text-slate-200' : 'text-emerald-400 font-medium')}`} />
+                            <div className="col-span-1 sm:col-span-2 relative">
+                                <label className="block text-xs md:text-sm font-medium text-slate-400 mb-1.5 ml-1">名稱 (可反查代號)</label>
+                                <div className="relative w-full h-auto">
+                                    <input type="text" list="plan-stock-names-list" value={planStockName} onChange={handleStockNameChange} onKeyDown={e => { if (e.key === 'Enter') handleAddIndependentPlan(); }} placeholder="輸入名稱自動帶入..." className={`w-full input-styled rounded-xl py-2.5 md:py-3 pl-3 pr-20 ${isForbiddenStock ? 'border-red-500 text-red-400 bg-red-900/10' : (isUnknownStock ? 'border-amber-500/50 text-slate-200' : 'text-emerald-400 font-medium')}`} />
+                                    {isForbiddenStock && (
+                                        <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] md:text-xs text-red-200 bg-red-600 px-2 md:px-3 py-1 rounded font-bold uppercase tracking-wider animate-pulse whitespace-nowrap">嚴禁買入</span>
+                                    )}
+                                </div>
                                 {stockIdsDatalist}
                                 {stockNamesDatalist}
-                                {isForbiddenStock && (
-                                    <span className="absolute right-3 top-[38px] text-[10px] text-red-200 bg-red-600 px-2 py-0.5 rounded font-bold uppercase tracking-wider animate-pulse">嚴禁買入</span>
-                                )}
                             </div>
-                            <div className="flex items-end">
-                                <button onClick={handleAddIndependentPlan} className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl p-3 font-bold flex items-center justify-center gap-2 shadow-[0_4px_15px_rgba(16,185,129,0.3)] transition-all transform hover:-translate-y-0.5 outline-none focus:ring-4 focus:ring-emerald-500/30">
+                            <div className="col-span-1 sm:col-span-2 md:col-span-4 flex items-end">
+                                <button onClick={handleAddIndependentPlan} className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl p-3 md:p-3.5 font-bold tracking-wider flex items-center justify-center gap-2 shadow-[0_4px_15px_rgba(16,185,129,0.3)] transition-all transform hover:-translate-y-0.5 outline-none focus:ring-4 focus:ring-emerald-500/30">
                                     <PlusCircle size={18} /> 加入規劃白板
                                 </button>
                             </div>
@@ -2106,7 +2099,7 @@
 
                     {/* 規劃清單表格 */}
                     <div className="glass-card rounded-3xl overflow-hidden mt-8">
-                        <div className="overflow-x-auto custom-scrollbar">
+                        <div className="overflow-x-auto custom-scrollbar pb-2">
                             <table className="w-full text-left border-collapse min-w-[1000px]">
                                 <thead>
                                     <tr className="bg-slate-900/80 text-slate-400 text-sm tracking-wider border-b border-slate-700">
@@ -2131,13 +2124,13 @@
                                                 </div>
                                             </div>
                                         </th>
-                                        <th className="p-4 align-top"><div className="mb-2 flex items-center gap-1.5 font-bold cursor-pointer hover:text-blue-400 transition select-none" onClick={() => handlePlanSort('entry')}>進場點 <SortIcon sortKey="entry" currentSort={planSort} /></div></th>
-                                        <th className="p-4 align-top"><div className="mb-2 flex items-center gap-1.5 font-bold cursor-pointer hover:text-red-400 transition select-none" onClick={() => handlePlanSort('sl')}>防守停損 <SortIcon sortKey="sl" currentSort={planSort} /></div></th>
-                                        <th className="p-4 align-top"><div className="mb-2 flex items-center gap-1.5 font-bold cursor-pointer hover:text-emerald-400 transition select-none" onClick={() => handlePlanSort('exit')}>市場現價 / 出場 <SortIcon sortKey="exit" currentSort={planSort} /></div></th>
-                                        <th className="p-4 align-top"><div className="mb-2 flex items-center gap-1.5 font-bold cursor-pointer hover:text-blue-400 transition select-none" onClick={() => handlePlanSort('shares')}>佈局張數 <SortIcon sortKey="shares" currentSort={planSort} /></div></th>
-                                        <th className="p-4 align-top"><div className="mb-2 flex items-center gap-1.5 font-bold cursor-pointer hover:text-purple-400 transition select-none" onClick={() => handlePlanSort('rr')}>風報比 <SortIcon sortKey="rr" currentSort={planSort} /></div></th>
-                                        <th className="p-4 align-top"><div className="mb-2 flex items-center gap-1.5 font-bold cursor-pointer hover:text-yellow-400 transition select-none" onClick={() => handlePlanSort('pnl')}>損益評估 (TWD) <SortIcon sortKey="pnl" currentSort={planSort} /></div></th>
-                                        <th className="p-4 text-center align-top min-w-[150px]">
+                                        <th className="p-4 align-top whitespace-nowrap"><div className="mb-2 flex items-center gap-1.5 font-bold cursor-pointer hover:text-blue-400 transition select-none" onClick={() => handlePlanSort('entry')}>進場點 <SortIcon sortKey="entry" currentSort={planSort} /></div></th>
+                                        <th className="p-4 align-top whitespace-nowrap"><div className="mb-2 flex items-center gap-1.5 font-bold cursor-pointer hover:text-red-400 transition select-none" onClick={() => handlePlanSort('sl')}>防守停損 <SortIcon sortKey="sl" currentSort={planSort} /></div></th>
+                                        <th className="p-4 align-top whitespace-nowrap"><div className="mb-2 flex items-center gap-1.5 font-bold cursor-pointer hover:text-emerald-400 transition select-none" onClick={() => handlePlanSort('exit')}>市場現價 / 出場 <SortIcon sortKey="exit" currentSort={planSort} /></div></th>
+                                        <th className="p-4 align-top whitespace-nowrap"><div className="mb-2 flex items-center gap-1.5 font-bold cursor-pointer hover:text-blue-400 transition select-none" onClick={() => handlePlanSort('shares')}>佈局張數 <SortIcon sortKey="shares" currentSort={planSort} /></div></th>
+                                        <th className="p-4 align-top whitespace-nowrap"><div className="mb-2 flex items-center gap-1.5 font-bold cursor-pointer hover:text-purple-400 transition select-none" onClick={() => handlePlanSort('rr')}>風報比 <SortIcon sortKey="rr" currentSort={planSort} /></div></th>
+                                        <th className="p-4 align-top whitespace-nowrap"><div className="mb-2 flex items-center gap-1.5 font-bold cursor-pointer hover:text-yellow-400 transition select-none" onClick={() => handlePlanSort('pnl')}>損益評估 (TWD) <SortIcon sortKey="pnl" currentSort={planSort} /></div></th>
+                                        <th className="p-4 text-center align-top min-w-[160px]">
                                             <div className="mb-3 font-bold text-slate-300">策略操作</div>
                                             <button onClick={() => { setPlanFilters({stock: '', status: 'all', futures: 'all'}); setPlanSort({key: 'id', direction: 'desc'}); }} className="text-xs font-bold text-slate-500 hover:text-emerald-400 bg-slate-800/50 hover:bg-slate-800 px-3 py-1.5 rounded-lg transition border border-slate-700/50 w-full">清除篩選</button>
                                         </th>
@@ -2164,20 +2157,20 @@
                                             <React.Fragment key={log.id}>
                                                 <tr className={`table-row-hover ${hasFutures ? 'bg-fuchsia-900/5 hover:bg-fuchsia-900/10' : ''} ${isOpen ? 'bg-blue-900/5 shadow-[inset_3px_0_0_0_#3b82f6]' : (p.entry && p.exit ? 'opacity-70' : '')}`}>
                                                     <td className="p-4">
-                                                        <div className="font-bold text-white flex items-center mb-1.5">
+                                                        <div className="font-bold text-white flex items-center mb-1.5 flex-wrap gap-1">
                                                             <FuturesBadge hasFutures={hasFutures} />
-                                                            <span className="font-mono-num text-lg mr-1.5">{log.stockId}</span>
-                                                            <span className="text-emerald-300 font-medium">{log.name}</span>
+                                                            <span className="font-mono-num text-lg mr-1">{log.stockId}</span>
+                                                            <span className="text-emerald-300 font-medium whitespace-nowrap">{log.name}</span>
                                                         </div>
                                                         <div className="flex">
                                                             {isOpen ? (
-                                                                <span className="bg-blue-500/20 text-blue-400 px-2.5 py-1 rounded-lg text-xs font-bold tracking-widest flex items-center gap-1.5 border border-blue-500/30">
+                                                                <span className="bg-blue-500/20 text-blue-400 px-2.5 py-1 rounded-lg text-xs font-bold tracking-widest flex items-center gap-1.5 border border-blue-500/30 whitespace-nowrap">
                                                                     <span className="w-2 h-2 bg-blue-400 rounded-full animate-pulse shadow-[0_0_8px_#60a5fa]"></span> 實戰持倉中
                                                                 </span>
                                                             ) : p.entry ? (
-                                                                <span className="bg-slate-800 text-slate-400 px-2.5 py-1 rounded-lg text-xs font-bold tracking-widest border border-slate-700/50">已結算平倉</span>
+                                                                <span className="bg-slate-800 text-slate-400 px-2.5 py-1 rounded-lg text-xs font-bold tracking-widest border border-slate-700/50 whitespace-nowrap">已結算平倉</span>
                                                             ) : (
-                                                                <span className="bg-slate-800/80 text-slate-500 px-2.5 py-1 rounded-lg text-xs font-bold tracking-widest border border-slate-700/50 border-dashed">沙盤推演規劃中</span>
+                                                                <span className="bg-slate-800/80 text-slate-500 px-2.5 py-1 rounded-lg text-xs font-bold tracking-widest border border-slate-700/50 border-dashed whitespace-nowrap">沙盤推演規劃中</span>
                                                             )}
                                                         </div>
                                                     </td>
@@ -2186,7 +2179,7 @@
                                                     <td className="p-4 font-mono-num">
                                                         {isOpen ? (
                                                             <div className="relative w-28">
-                                                                <input type="number" step="any" placeholder="輸入盤中價" value={p.currentPrice || ''} onChange={(e) => updatePlan(log.id, 'currentPrice', e.target.value)} className="w-full bg-slate-900 border border-slate-600 rounded-xl px-3 py-2 text-base font-black text-emerald-400 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition shadow-inner" />
+                                                                <input type="number" step="any" placeholder="盤中價" value={p.currentPrice || ''} onChange={(e) => updatePlan(log.id, 'currentPrice', e.target.value)} className="w-full bg-slate-900 border border-slate-600 rounded-xl px-2 py-2 text-sm font-black text-emerald-400 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition shadow-inner" />
                                                             </div>
                                                         ) : (
                                                             <span className="font-black text-lg text-slate-300">{p.exit || '-'}</span>
@@ -2196,17 +2189,17 @@
                                                     <td className="p-4 font-mono-num font-black text-lg text-purple-400">{calculateRR(p)}</td>
                                                     <td className="p-4 font-mono-num">
                                                         {pnlValue !== null ? (
-                                                            <div className={`text-xl font-black px-3 py-1 rounded-xl inline-block ${pnlValue > 0 ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20' : pnlValue < 0 ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'text-slate-400 bg-slate-800 border border-slate-700'}`}>
+                                                            <div className={`text-lg md:text-xl font-black px-2 md:px-3 py-1 rounded-xl inline-block ${pnlValue > 0 ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20' : pnlValue < 0 ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'text-slate-400 bg-slate-800 border border-slate-700'}`}>
                                                                 {pnlValue > 0 ? '+' : ''}{Math.round(pnlValue).toLocaleString()}
                                                             </div>
                                                         ) : <span className="text-slate-500 text-lg">-</span>}
                                                     </td>
                                                     <td className="p-4 text-center">
-                                                        <div className="flex justify-center items-center gap-2">
-                                                            <button onClick={() => onAiReview(log, pnlValue, calculateRR(p))} className="p-2.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 hover:bg-purple-500 hover:text-white transition-all group/btn shadow-[0_0_10px_rgba(168,85,247,0)] hover:shadow-[0_0_15px_rgba(168,85,247,0.5)]" title={isOpen ? "✨ AI 持倉盤中健診" : "✨ AI 盤後深度檢討"}>
-                                                                <Sparkles size={18} className="group-hover/btn:animate-pulse" />
+                                                        <div className="flex justify-center items-center gap-1.5 md:gap-2 flex-wrap">
+                                                            <button onClick={() => onAiReview(log, pnlValue, calculateRR(p))} className="p-2 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 hover:bg-purple-500 hover:text-white transition-all group/btn shadow-[0_0_10px_rgba(168,85,247,0)] hover:shadow-[0_0_15px_rgba(168,85,247,0.5)]" title={isOpen ? "✨ AI 持倉盤中健診" : "✨ AI 盤後深度檢討"}>
+                                                                <Sparkles size={16} className="md:w-[18px] md:h-[18px] group-hover/btn:animate-pulse" />
                                                             </button>
-                                                            <button onClick={() => setEditingId(isEditing ? null : log.id)} className={`px-4 py-2.5 rounded-xl text-sm font-bold tracking-wider transition-all shadow-sm ${isEditing ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-blue-900/50' : 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700/80'}`}>
+                                                            <button onClick={() => setEditingId(isEditing ? null : log.id)} className={`px-3 md:px-4 py-2 rounded-xl text-xs md:text-sm font-bold tracking-wider transition-all shadow-sm ${isEditing ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-blue-900/50' : 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700/80'}`}>
                                                                 {isEditing ? '儲存' : '編輯'}
                                                             </button>
                                                             <button onClick={() => setConfirm({ 
@@ -2214,48 +2207,48 @@
                                                                 action: () => {
                                                                     setLogs(logs.map(l => l.id === log.id ? { ...l, inPlan: false, plan: { ...l.plan, entry: '', stopLoss: '', exit: '' } } : l));
                                                                 }
-                                                            })} className="p-2.5 text-slate-500 hover:text-red-400 hover:bg-red-500/20 rounded-xl transition" title="從儀表板中移除">
+                                                            })} className="p-2 text-slate-500 hover:text-red-400 hover:bg-red-500/20 rounded-xl transition" title="從儀表板中移除">
                                                                 <X size={18} />
                                                             </button>
                                                         </div>
                                                     </td>
                                                 </tr>
                                                 
-                                                {/* 展開編輯區塊優化 */}
+                                                {/* 展開編輯區塊優化 - 解決重疊問題 */}
                                                 {isEditing && (
                                                     <tr className="bg-slate-900/90 border-l-4 border-blue-500 shadow-[inset_0_4px_10px_rgba(0,0,0,0.2)]">
-                                                        <td colSpan="8" className="p-8">
-                                                            <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+                                                        <td colSpan="8" className="p-4 md:p-8">
+                                                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 md:gap-6">
                                                                 <div>
                                                                     <label className="block text-xs font-bold tracking-widest text-slate-500 mb-2 uppercase">規劃進場價</label>
-                                                                    <input type="number" step="any" value={p.entry || ''} onChange={e => updatePlan(log.id, 'entry', e.target.value)} className="w-full input-styled rounded-xl p-3 text-base font-mono-num font-bold text-white" />
+                                                                    <input type="number" step="any" value={p.entry || ''} onChange={e => updatePlan(log.id, 'entry', e.target.value)} className="w-full input-styled rounded-xl p-2.5 md:p-3 text-sm md:text-base font-mono-num font-bold text-white" />
                                                                 </div>
                                                                 <div>
-                                                                    <label className="block text-xs font-bold tracking-widest text-slate-500 mb-2 uppercase flex justify-between items-center">
-                                                                        防守停損價 <span className="text-[10px] bg-red-900/30 text-red-400 px-1.5 py-0.5 rounded">自動95折參考</span>
+                                                                    <label className="block text-[10px] md:text-xs font-bold tracking-widest text-slate-500 mb-2 uppercase flex justify-between items-center">
+                                                                        防守停損價 <span className="text-[9px] bg-red-900/30 text-red-400 px-1.5 py-0.5 rounded">自動95折</span>
                                                                     </label>
-                                                                    <input type="number" step="any" value={p.stopLoss || ''} onChange={e => updatePlan(log.id, 'stopLoss', e.target.value)} placeholder={p.entry ? (parseFloat(p.entry) * 0.95).toFixed(2) : ''} className="w-full input-styled rounded-xl p-3 text-base font-mono-num font-bold text-red-400 focus:border-red-500" />
+                                                                    <input type="number" step="any" value={p.stopLoss || ''} onChange={e => updatePlan(log.id, 'stopLoss', e.target.value)} placeholder={p.entry ? (parseFloat(p.entry) * 0.95).toFixed(2) : ''} className="w-full input-styled rounded-xl p-2.5 md:p-3 text-sm md:text-base font-mono-num font-bold text-red-400 focus:border-red-500" />
                                                                 </div>
                                                                 <div>
                                                                     <label className="block text-xs font-bold tracking-widest text-slate-500 mb-2 uppercase">移動停利線</label>
-                                                                    <input type="number" step="any" value={p.trailing || ''} onChange={e => updatePlan(log.id, 'trailing', e.target.value)} className="w-full input-styled rounded-xl p-3 text-base font-mono-num font-bold text-yellow-400 focus:border-yellow-500" />
+                                                                    <input type="number" step="any" value={p.trailing || ''} onChange={e => updatePlan(log.id, 'trailing', e.target.value)} className="w-full input-styled rounded-xl p-2.5 md:p-3 text-sm md:text-base font-mono-num font-bold text-yellow-400 focus:border-yellow-500" />
                                                                 </div>
                                                                 <div>
                                                                     <label className="block text-xs font-bold tracking-widest text-slate-500 mb-2 uppercase">目標出場價</label>
-                                                                    <input type="number" step="any" value={p.exit || ''} onChange={e => updatePlan(log.id, 'exit', e.target.value)} className="w-full input-styled rounded-xl p-3 text-base font-mono-num font-bold text-emerald-400 focus:border-emerald-500" />
+                                                                    <input type="number" step="any" value={p.exit || ''} onChange={e => updatePlan(log.id, 'exit', e.target.value)} className="w-full input-styled rounded-xl p-2.5 md:p-3 text-sm md:text-base font-mono-num font-bold text-emerald-400 focus:border-emerald-500" />
                                                                 </div>
-                                                                <div>
+                                                                <div className="sm:col-span-2 md:col-span-1">
                                                                     <label className="block text-xs font-bold tracking-widest text-slate-500 mb-2 uppercase">預計佈局張數</label>
-                                                                    <input type="number" value={p.shares || ''} onChange={e => updatePlan(log.id, 'shares', e.target.value)} className="w-full input-styled rounded-xl p-3 text-base font-mono-num font-bold text-white" />
+                                                                    <input type="number" value={p.shares || ''} onChange={e => updatePlan(log.id, 'shares', e.target.value)} className="w-full input-styled rounded-xl p-2.5 md:p-3 text-sm md:text-base font-mono-num font-bold text-white" />
                                                                 </div>
                                                                 
-                                                                <div className="col-span-2 md:col-span-5 mt-4 pt-6 border-t border-slate-800/80">
-                                                                    <span className="text-xs font-bold tracking-widest text-slate-500 mb-4 block uppercase flex items-center gap-2"><Zap size={14} className="text-purple-400" /> 權證/槓桿擴充設定</span>
-                                                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-                                                                        <input type="text" placeholder="權證代號" value={p.warrantCode || ''} onChange={e => updatePlan(log.id, 'warrantCode', e.target.value)} className="w-full input-styled rounded-xl p-3 text-sm font-mono-num" />
-                                                                        <input type="number" step="any" placeholder="買進成本" value={p.warrantEntry || ''} onChange={e => updatePlan(log.id, 'warrantEntry', e.target.value)} className="w-full input-styled rounded-xl p-3 text-sm font-mono-num text-purple-300 focus:border-purple-500" />
-                                                                        <input type="number" step="any" placeholder="賣出結算" value={p.warrantExit || ''} onChange={e => updatePlan(log.id, 'warrantExit', e.target.value)} className="w-full input-styled rounded-xl p-3 text-sm font-mono-num text-emerald-300 focus:border-emerald-500" />
-                                                                        <input type="number" placeholder="持有張數" value={p.warrantShares || ''} onChange={e => updatePlan(log.id, 'warrantShares', e.target.value)} className="w-full input-styled rounded-xl p-3 text-sm font-mono-num" />
+                                                                <div className="col-span-1 sm:col-span-2 md:col-span-5 mt-2 md:mt-4 pt-4 border-t border-slate-800/80">
+                                                                    <span className="text-xs font-bold tracking-widest text-slate-500 mb-4 flex items-center gap-2 uppercase"><Zap size={14} className="text-purple-400" /> 權證/槓桿擴充設定</span>
+                                                                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 md:gap-5">
+                                                                        <input type="text" placeholder="權證代號" value={p.warrantCode || ''} onChange={e => updatePlan(log.id, 'warrantCode', e.target.value)} className="w-full input-styled rounded-xl p-2.5 md:p-3 text-sm font-mono-num" />
+                                                                        <input type="number" step="any" placeholder="買進成本" value={p.warrantEntry || ''} onChange={e => updatePlan(log.id, 'warrantEntry', e.target.value)} className="w-full input-styled rounded-xl p-2.5 md:p-3 text-sm font-mono-num text-purple-300 focus:border-purple-500" />
+                                                                        <input type="number" step="any" placeholder="賣出結算" value={p.warrantExit || ''} onChange={e => updatePlan(log.id, 'warrantExit', e.target.value)} className="w-full input-styled rounded-xl p-2.5 md:p-3 text-sm font-mono-num text-emerald-300 focus:border-emerald-500" />
+                                                                        <input type="number" placeholder="持有張數" value={p.warrantShares || ''} onChange={e => updatePlan(log.id, 'warrantShares', e.target.value)} className="w-full input-styled rounded-xl p-2.5 md:p-3 text-sm font-mono-num" />
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -2439,21 +2432,21 @@
             return (
                 <div className="animate-fade-in-up space-y-6">
                     <div className="flex justify-between items-end mb-4">
-                        <h2 className="text-3xl font-title text-amber-400 flex items-center gap-3 drop-shadow-md">
-                            <div className="p-2 bg-amber-500/10 rounded-xl"><Star fill="currentColor" size={28} /></div> 
+                        <h2 className="text-2xl md:text-3xl font-title text-amber-400 flex items-center gap-3 drop-shadow-md">
+                            <div className="p-2 bg-amber-500/10 rounded-xl"><Star fill="currentColor" size={24} className="md:w-7 md:h-7" /></div> 
                             專屬自選追蹤池
                         </h2>
-                        <span className="text-sm font-bold bg-slate-800 border border-slate-700 px-4 py-2 rounded-xl text-slate-300 shadow-inner">
-                            目前強勢關注 <span className="text-amber-400 text-lg mx-1">{filteredWatchlistLogs.length}</span> 檔標的
+                        <span className="text-xs md:text-sm font-bold bg-slate-800 border border-slate-700 px-3 md:px-4 py-2 rounded-xl text-slate-300 shadow-inner">
+                            目前強勢關注 <span className="text-amber-400 text-base md:text-lg mx-1">{filteredWatchlistLogs.length}</span> 檔標的
                         </span>
                     </div>
 
                     <div className="glass-card rounded-3xl overflow-hidden shadow-lg mt-8">
-                        <div className="overflow-x-auto custom-scrollbar">
-                            <table className="w-full text-left border-collapse">
+                        <div className="overflow-x-auto custom-scrollbar pb-2">
+                            <table className="w-full text-left border-collapse min-w-[800px]">
                                 <thead>
                                     <tr className="bg-slate-900/80 text-slate-400 text-sm tracking-wider border-b border-slate-700">
-                                        <th className="p-4 font-bold align-top min-w-[120px]">
+                                        <th className="p-4 font-bold align-top min-w-[120px] whitespace-nowrap">
                                             <div className="mb-2 flex items-center gap-1.5 cursor-pointer hover:text-amber-400 transition select-none" onClick={() => handleWatchlistSort('date')}>建檔日 <SortIcon sortKey="date" currentSort={watchlistSort} /></div>
                                             <input type="date" value={watchlistFilters.date} onChange={e => setWatchlistFilters({...watchlistFilters, date: e.target.value})} className="w-full bg-slate-950 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-xs font-mono-num outline-none focus:border-amber-500 transition" />
                                         </th>
@@ -2470,13 +2463,13 @@
                                                 </select>
                                             </div>
                                         </th>
-                                        <th className="p-4 font-bold font-mono-num align-top min-w-[100px]">
+                                        <th className="p-4 font-bold font-mono-num align-top min-w-[90px] whitespace-nowrap">
                                             <div className="mb-2 flex items-center gap-1.5 cursor-pointer hover:text-amber-400 transition select-none" onClick={() => handleWatchlistSort('eps25')}>25' EPS <SortIcon sortKey="eps25" currentSort={watchlistSort} /></div>
                                         </th>
-                                        <th className="p-4 font-bold font-mono-num align-top min-w-[100px]">
+                                        <th className="p-4 font-bold font-mono-num align-top min-w-[90px] whitespace-nowrap">
                                             <div className="mb-2 flex items-center gap-1.5 cursor-pointer hover:text-amber-400 transition select-none" onClick={() => handleWatchlistSort('eps26')}>26' EPS(預) <SortIcon sortKey="eps26" currentSort={watchlistSort} /></div>
                                         </th>
-                                        <th className="p-4 font-bold font-mono-num align-top whitespace-nowrap min-w-[130px]">
+                                        <th className="p-4 font-bold font-mono-num align-top whitespace-nowrap min-w-[120px]">
                                             <div className="mb-2 flex items-center gap-1.5 cursor-pointer hover:text-amber-400 transition select-none" onClick={() => handleWatchlistSort('growth')}>EPS 成長率 <SortIcon sortKey="growth" currentSort={watchlistSort} /></div>
                                             <select value={watchlistFilters.growth} onChange={e => setWatchlistFilters({...watchlistFilters, growth: e.target.value})} className="w-full bg-slate-950 border border-slate-700/80 rounded-lg px-2 py-1.5 text-xs outline-none focus:border-amber-500 transition text-slate-300">
                                                 <option value="all">不限</option>
@@ -2525,7 +2518,7 @@
                                                     <div className="flex items-center flex-wrap gap-y-1">
                                                         <FuturesBadge hasFutures={hasFutures} />
                                                         <span className="font-mono-num font-black text-lg text-slate-200 mr-2 tracking-wide">{log.stockId}</span>
-                                                        <span className="text-amber-300 font-bold text-base">{log.name}</span>
+                                                        <span className="text-amber-300 font-bold text-base whitespace-nowrap">{log.name}</span>
                                                     </div>
                                                 </td>
                                                 <td className={`p-4 font-mono-num font-bold text-base ${getTwStockColor(eps.eps25)}`}>{eps.eps25}</td>
@@ -2547,7 +2540,7 @@
                                                                         className={`group/tag cursor-pointer inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold tracking-wide bg-gradient-to-r ${SUB_TAG_COLORS[t] || stratForTag?.color || 'from-slate-600 to-slate-700'} text-white shadow-sm hover:shadow-md transition-all relative overflow-hidden`}
                                                                         title="點擊移除標籤"
                                                                     >
-                                                                        <span className="relative z-10 group-hover/tag:mr-4 transition-all">{t}</span>
+                                                                        <span className="relative z-10 group-hover/tag:mr-4 transition-all whitespace-nowrap">{t}</span>
                                                                         <X size={12} className="absolute right-2 opacity-0 group-hover/tag:opacity-100 transition-opacity z-10 font-black" />
                                                                         <div className="absolute inset-0 bg-black/20 opacity-0 group-hover/tag:opacity-100 transition-opacity"></div>
                                                                     </span>
@@ -2568,7 +2561,7 @@
                                                                         className={`group/tag cursor-pointer inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold tracking-wide bg-gradient-to-r ${s.color} text-white shadow-sm hover:shadow-md transition-all relative overflow-hidden opacity-90`}
                                                                         title="點擊移除主策略"
                                                                     >
-                                                                        <span className="relative z-10 flex items-center gap-1 group-hover/tag:mr-4 transition-all">{s.emoji} {s.label}</span>
+                                                                        <span className="relative z-10 flex items-center gap-1 group-hover/tag:mr-4 transition-all whitespace-nowrap">{s.emoji} {s.label}</span>
                                                                         <X size={12} className="absolute right-2 opacity-0 group-hover/tag:opacity-100 transition-opacity z-10 font-black" />
                                                                         <div className="absolute inset-0 bg-black/20 opacity-0 group-hover/tag:opacity-100 transition-opacity"></div>
                                                                     </span>
@@ -2581,18 +2574,18 @@
                                                     </div>
                                                 </td>
                                                 <td className="p-4">
-                                                    <div className="flex justify-center items-center gap-1.5">
-                                                        <button onClick={() => onAiDiagnose(log)} className="p-2 rounded-xl bg-purple-500/10 text-purple-400 hover:bg-purple-500 hover:text-white transition-all group/btn shadow-[0_0_10px_rgba(168,85,247,0)] hover:shadow-[0_0_15px_rgba(168,85,247,0.5)]" title="✨ AI 深度評估">
+                                                    <div className="flex justify-center items-center gap-1.5 flex-wrap">
+                                                        <button onClick={() => onAiDiagnose(log)} className="p-2 rounded-xl bg-purple-500/10 text-purple-400 hover:bg-purple-500 hover:text-white transition-all group/btn shadow-[0_0_10px_rgba(168,85,247,0)] hover:shadow-[0_0_15px_rgba(168,85,247,0.5)]" title="✨ AI 個股診斷">
                                                             <Sparkles size={18} className="group-hover/btn:animate-pulse" />
                                                         </button>
-                                                        <div className="w-[1px] h-6 bg-slate-700/50 mx-1"></div>
-                                                        <button onClick={() => togglePlan(log.id)} className={`p-2 rounded-xl transition-all ${log.inPlan ? 'bg-blue-500/20 text-blue-400 shadow-[0_0_10px_rgba(59,130,246,0.3)] border border-blue-500/30' : 'bg-slate-800 text-slate-400 hover:bg-blue-500/10 hover:text-blue-400 border border-transparent'}`} title={log.inPlan ? '移出實戰規劃' : '啟動實戰規劃'}>
+                                                        <div className="w-[1px] h-6 bg-slate-700/50 mx-1 hidden sm:block"></div>
+                                                        <button onClick={() => togglePlan(log.id)} className={`p-2 rounded-xl transition-all ${log.inPlan ? 'bg-blue-500/20 text-blue-400 shadow-[0_0_10px_rgba(59,130,246,0.3)] border border-blue-500/30' : 'bg-slate-800 text-slate-400 hover:bg-blue-500/10 hover:text-blue-400 border border-transparent'}`} title={log.inPlan ? '移出規劃清單' : '加入規劃清單'}>
                                                             <Target size={18} />
                                                         </button>
-                                                        <button onClick={() => toggleStar(log.id)} className={`p-2 rounded-xl transition-all ${log.starred ? 'bg-amber-500/20 text-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.3)] border border-amber-500/30' : 'bg-slate-800 text-slate-400 hover:bg-amber-500/10 hover:text-amber-400 border border-transparent'}`} title="取消關注">
+                                                        <button onClick={() => toggleStar(log.id)} className={`p-2 rounded-xl transition-all ${log.starred ? 'bg-amber-500/20 text-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.3)] border border-amber-500/30' : 'bg-slate-800 text-slate-400 hover:bg-amber-500/10 hover:text-amber-400 border border-transparent'}`} title={log.starred ? '取消追蹤' : '加入追蹤'}>
                                                             <Star fill={log.starred ? "currentColor" : "none"} size={18} />
                                                         </button>
-                                                        <button onClick={() => setConfirm({ show: true, action: () => deleteLog(log.id) })} className="p-2 rounded-xl bg-slate-800 text-slate-500 hover:bg-red-500/10 hover:text-red-400 transition-colors" title="刪除檔案">
+                                                        <button onClick={() => setConfirm({ show: true, action: () => deleteLog(log.id) })} className="p-2 rounded-xl bg-slate-800 text-slate-500 hover:bg-red-500/10 hover:text-red-400 transition-colors" title="刪除紀錄">
                                                             <Trash2 size={18} />
                                                         </button>
                                                     </div>
@@ -2613,7 +2606,8 @@
                             </table>
                         </div>
                     </div>
-                    
+
+                    <AlertModal isOpen={alert.show} message={alert.msg} onClose={() => setAlert({ show: false, msg: '' })} />
                     <ConfirmModal isOpen={confirm.show} title="確認刪除" message="您確定要徹底刪除這筆關注紀錄嗎？此動作無法復原。" 
                         onConfirm={() => { confirm.action(); setConfirm({ show: false, action: null }); }} 
                         onCancel={() => setConfirm({ show: false, action: null })} />
@@ -2682,41 +2676,41 @@
 
             return (
                 <div className="animate-fade-in-up space-y-6">
-                    <div className="glass-card p-8 rounded-3xl relative overflow-hidden border-red-900/50 shadow-[0_0_30px_rgba(220,38,38,0.1)]">
+                    <div className="glass-card p-6 md:p-8 rounded-3xl relative overflow-hidden border-red-900/50 shadow-[0_0_30px_rgba(220,38,38,0.1)]">
                         <div className="absolute -right-10 -top-10 text-red-500/5 -z-10 pointer-events-none">
                             <Ban size={300} />
                         </div>
-                        <h2 className="text-3xl font-title text-red-500 mb-3 flex items-center gap-3 relative z-10 drop-shadow-md">
-                            <div className="p-2 bg-red-500/10 rounded-xl"><Ban size={28} /></div> 
+                        <h2 className="text-2xl md:text-3xl font-title text-red-500 mb-3 flex items-center gap-3 relative z-10 drop-shadow-md">
+                            <div className="p-2 bg-red-500/10 rounded-xl"><Ban size={24} className="md:w-7 md:h-7" /></div> 
                             佳佳持股 ‧ 絕對隔離區
                         </h2>
-                        <p className="text-slate-400 text-sm mb-8 relative z-10 font-medium tracking-wide">將高風險或特定股票加入此清單後，系統將在全域操作中進行強制攔截，以最高規格保護您的資金安全。</p>
+                        <p className="text-slate-400 text-xs md:text-sm mb-6 md:mb-8 relative z-10 font-medium tracking-wide">將高風險或特定股票加入此清單後，系統將在全域操作中進行強制攔截，以最高規格保護您的資金安全。</p>
                         
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-5 mb-2 relative z-10">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-5 mb-2 relative z-10">
                             <div className="relative">
-                                <label className="block text-sm font-bold text-red-400/80 mb-1.5 ml-1">輸入鎖定股號</label>
+                                <label className="block text-xs md:text-sm font-bold text-red-400/80 mb-1.5 ml-1">輸入鎖定股號</label>
                                 <input 
                                     type="text" 
                                     value={stockId} 
                                     onChange={handleStockIdChange} 
                                     onKeyDown={e => { if (e.key === 'Enter') handleAdd(); }}
                                     placeholder="e.g. 2317" 
-                                    className="w-full input-styled border-red-900/50 focus:border-red-500 rounded-xl p-3 font-mono-num transition text-white focus:shadow-[0_0_0_2px_rgba(239,68,68,0.2)]" 
+                                    className="w-full input-styled border-red-900/50 focus:border-red-500 rounded-xl p-2.5 md:p-3 font-mono-num transition text-white focus:shadow-[0_0_0_2px_rgba(239,68,68,0.2)]" 
                                 />
                             </div>
-                            <div className="col-span-2 relative">
-                                <label className="block text-sm font-bold text-red-400/80 mb-1.5 ml-1">對應股票名稱 (可反查)</label>
+                            <div className="col-span-1 sm:col-span-2 relative">
+                                <label className="block text-xs md:text-sm font-bold text-red-400/80 mb-1.5 ml-1">對應股票名稱 (可反查)</label>
                                 <input 
                                     type="text" 
                                     value={stockName} 
                                     onChange={handleStockNameChange}
                                     onKeyDown={e => { if (e.key === 'Enter') handleAdd(); }}
                                     placeholder="輸入股名自動鎖定代號..." 
-                                    className="w-full input-styled border-red-900/50 focus:border-red-500 rounded-xl p-3 transition text-white focus:shadow-[0_0_0_2px_rgba(239,68,68,0.2)]" 
+                                    className="w-full input-styled border-red-900/50 focus:border-red-500 rounded-xl p-2.5 md:p-3 transition text-white focus:shadow-[0_0_0_2px_rgba(239,68,68,0.2)]" 
                                 />
                             </div>
-                            <div className="flex items-end">
-                                <button onClick={handleAdd} className="w-full bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white p-3 rounded-xl font-black tracking-widest flex items-center justify-center gap-2 transition shadow-[0_4px_15px_rgba(220,38,38,0.3)] transform hover:-translate-y-0.5 outline-none focus:ring-4 focus:ring-red-500/30">
+                            <div className="col-span-1 sm:col-span-2 md:col-span-1 flex items-end mt-2 md:mt-0">
+                                <button onClick={handleAdd} className="w-full bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white p-3 md:p-3.5 rounded-xl font-black tracking-widest flex items-center justify-center gap-2 transition shadow-[0_4px_15px_rgba(220,38,38,0.3)] transform hover:-translate-y-0.5 outline-none focus:ring-4 focus:ring-red-500/30">
                                     <Ban size={18} /> 執行封鎖
                                 </button>
                             </div>
@@ -2724,20 +2718,20 @@
                     </div>
 
                     <div className="glass-card rounded-3xl overflow-hidden mt-8">
-                        <div className="p-5 border-b border-red-900/50 bg-red-950/20 flex justify-between items-center">
-                            <h3 className="font-bold text-red-400 text-lg flex items-center gap-2">
+                        <div className="p-4 md:p-5 border-b border-red-900/50 bg-red-950/20 flex justify-between items-center">
+                            <h3 className="font-bold text-red-400 text-base md:text-lg flex items-center gap-2">
                                 <ShieldAlert size={20} /> 目前防護名單 (總計 {forbiddenStocks.length} 檔)
                             </h3>
                         </div>
-                        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-0">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-0">
                             {forbiddenStocks.map(f => (
-                                <div key={f.id} className="p-5 border-r border-b border-slate-800/50 hover:bg-red-950/30 flex justify-between items-center group transition-colors">
+                                <div key={f.id} className="p-4 md:p-5 border-r border-b border-slate-800/50 hover:bg-red-950/30 flex justify-between items-center group transition-colors">
                                     <div className="flex flex-col gap-1">
-                                        <div className="font-bold text-slate-400 font-mono-num text-xs tracking-wider">{f.id}</div>
-                                        <div className="font-black text-red-400 text-xl tracking-wide">{f.name}</div>
+                                        <div className="font-bold text-slate-400 font-mono-num text-[10px] md:text-xs tracking-wider">{f.id}</div>
+                                        <div className="font-black text-red-400 text-lg md:text-xl tracking-wide">{f.name}</div>
                                     </div>
-                                    <button onClick={() => handleDelete(f.id)} className="text-slate-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition p-2 bg-red-500/5 hover:bg-red-500/20 rounded-xl" title="解除封鎖">
-                                        <Trash2 size={18} />
+                                    <button onClick={() => handleDelete(f.id)} className="text-slate-600 hover:text-red-400 md:opacity-0 group-hover:opacity-100 transition p-2 bg-red-500/5 hover:bg-red-500/20 rounded-xl" title="解除封鎖">
+                                        <Trash2 size={16} className="md:w-[18px] md:h-[18px]" />
                                     </button>
                                 </div>
                             ))}
@@ -3013,34 +3007,34 @@
                  return (
                      <div className="min-h-screen flex flex-col items-center justify-center bg-[#050A15] text-blue-400">
                           <CloudCog size={64} className="animate-spin mb-6" />
-                          <h2 className="text-2xl font-bold tracking-widest animate-pulse">系統初始化中，正在與雲端同步連線...</h2>
+                          <h2 className="text-xl md:text-2xl font-bold tracking-widest animate-pulse px-4 text-center">系統初始化中，正在與雲端同步連線...</h2>
                      </div>
                  )
             }
 
             return (
                 <div className="min-h-screen pb-20 selection:bg-blue-500/30">
-                    {/* Header - 視覺美化 */}
+                    {/* Header - 響應式佈局調整 */}
                     <header className="bg-[#050A15]/80 backdrop-blur-xl border-b border-slate-800/80 sticky top-0 z-40 shadow-[0_4px_30px_rgba(0,0,0,0.5)]">
-                        <div className="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
-                            <div className="flex items-center gap-4 group">
-                                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-[0_0_20px_rgba(59,130,246,0.4)] group-hover:shadow-[0_0_25px_rgba(59,130,246,0.6)] transition-all transform group-hover:scale-105">
-                                    <TrendingUp size={24} className="text-white" />
+                        <div className="max-w-7xl mx-auto px-4 min-h-[5rem] py-3 flex flex-col md:flex-row items-center justify-between gap-3 md:gap-4">
+                            <div className="flex items-center gap-3 md:gap-4 group w-full md:w-auto justify-center md:justify-start">
+                                <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-[0_0_20px_rgba(59,130,246,0.4)] group-hover:shadow-[0_0_25px_rgba(59,130,246,0.6)] transition-all transform group-hover:scale-105 shrink-0">
+                                    <TrendingUp className="w-5 h-5 md:w-6 md:h-6 text-white" />
                                 </div>
-                                <h1 className="text-3xl font-title tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-emerald-400 drop-shadow-sm flex items-center gap-2">
-                                    萊恩交易手札 <span className="flex items-center gap-1 text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-1 rounded-full border border-emerald-500/30"><CloudLightning size={12} /> 雲端連線中</span>
+                                <h1 className="text-xl md:text-3xl font-title tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-emerald-400 drop-shadow-sm flex items-center gap-2">
+                                    萊恩交易手札 <span className="flex items-center gap-1 text-[9px] md:text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 md:py-1 rounded-full border border-emerald-500/30 shrink-0"><CloudLightning size={12} /> <span className="hidden sm:inline">雲端連線中</span></span>
                                 </h1>
                             </div>
                             
-                            <div className="flex items-center gap-4">
-                                <label className="cursor-pointer flex items-center gap-2 text-sm font-bold text-slate-300 hover:text-white transition-all bg-slate-800/50 hover:bg-slate-700/80 px-4 py-2 rounded-xl border border-slate-700/80 shadow-inner hover:shadow-[0_0_15px_rgba(255,255,255,0.1)]">
-                                    <Upload size={16} className="text-blue-400" /> 匯入備份
+                            <div className="flex flex-wrap items-center justify-center gap-2 w-full md:w-auto">
+                                <label className="cursor-pointer flex items-center gap-1.5 md:gap-2 text-xs md:text-sm font-bold text-slate-300 hover:text-white transition-all bg-slate-800/50 hover:bg-slate-700/80 px-3 md:px-4 py-2 rounded-xl border border-slate-700/80 shadow-inner hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] shrink-0">
+                                    <Upload size={14} className="md:w-4 md:h-4 text-blue-400" /> 匯入
                                     <input type="file" accept=".xlsx, .xls" onChange={handleImportData} className="hidden" />
                                 </label>
-                                <button onClick={handleExportData} className="flex items-center gap-2 text-sm font-bold text-slate-300 hover:text-white transition-all bg-slate-800/50 hover:bg-slate-700/80 px-4 py-2 rounded-xl border border-slate-700/80 shadow-inner hover:shadow-[0_0_15px_rgba(255,255,255,0.1)]">
-                                    <Download size={16} className="text-emerald-400" /> 匯出備份
+                                <button onClick={handleExportData} className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm font-bold text-slate-300 hover:text-white transition-all bg-slate-800/50 hover:bg-slate-700/80 px-3 md:px-4 py-2 rounded-xl border border-slate-700/80 shadow-inner hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] shrink-0">
+                                    <Download size={14} className="md:w-4 md:h-4 text-emerald-400" /> 匯出
                                 </button>
-                                <div className="w-[1px] h-6 bg-slate-700/80 mx-1"></div>
+                                <div className="w-[1px] h-5 md:h-6 bg-slate-700/80 mx-0.5 md:mx-1 hidden sm:block"></div>
                                 <button onClick={() => {
                                     const currentKey = window.localStorage.getItem('ryan_gemini_api_key') || '';
                                     const key = window.prompt('【獨立網頁版專屬】\n請輸入您的 Google Gemini API Key 以啟用 AI 教練功能：\n(金鑰將安全地儲存於您的瀏覽器本地端，不會外洩)', currentKey);
@@ -3049,34 +3043,34 @@
                                         alert('🔑 API 金鑰已成功儲存！AI 功能已為您準備就緒。');
                                         window.location.reload(); // 重新載入以套用金鑰
                                     }
-                                }} className="flex items-center gap-2 text-sm font-bold text-slate-300 hover:text-white transition-all bg-purple-900/20 hover:bg-purple-900/40 px-4 py-2 rounded-xl border border-purple-700/50 shadow-inner hover:shadow-[0_0_15px_rgba(168,85,247,0.2)]">
-                                    <Key size={16} className="text-purple-400" /> AI 金鑰
+                                }} className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm font-bold text-slate-300 hover:text-white transition-all bg-purple-900/20 hover:bg-purple-900/40 px-3 md:px-4 py-2 rounded-xl border border-purple-700/50 shadow-inner hover:shadow-[0_0_15px_rgba(168,85,247,0.2)] shrink-0">
+                                    <Key size={14} className="md:w-4 md:h-4 text-purple-400" /> 金鑰
                                 </button>
                             </div>
                         </div>
                         
-                        {/* Tabs - 導覽列優化 */}
-                        <div className="max-w-7xl mx-auto px-4 flex flex-wrap gap-x-2 gap-y-2 text-sm font-bold pb-3 mt-1">
-                            <button onClick={() => setActiveTab('journal')} className={`py-2 px-4 rounded-lg whitespace-nowrap transition-all duration-300 flex items-center gap-2 ${activeTab === 'journal' ? 'bg-blue-600/20 text-blue-400 shadow-[inset_0_-2px_0_0_#3b82f6]' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}>
-                                <FileText size={16} /> <span className="tracking-widest">選股日誌</span>
+                        {/* Tabs - 響應式優化 */}
+                        <div className="max-w-7xl mx-auto px-2 md:px-4 flex flex-nowrap md:flex-wrap gap-x-1 md:gap-x-2 gap-y-1.5 text-xs md:text-sm font-bold pb-3 mt-1 md:mt-0 overflow-x-auto custom-scrollbar">
+                            <button onClick={() => setActiveTab('journal')} className={`shrink-0 py-1.5 md:py-2 px-3 md:px-4 rounded-lg transition-all duration-300 flex items-center gap-1.5 md:gap-2 ${activeTab === 'journal' ? 'bg-blue-600/20 text-blue-400 shadow-[inset_0_-2px_0_0_#3b82f6]' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}>
+                                <FileText size={14} className="md:w-4 md:h-4" /> <span className="tracking-widest">選股日誌</span>
                             </button>
-                            <button onClick={() => setActiveTab('calculator')} className={`py-2 px-4 rounded-lg whitespace-nowrap transition-all duration-300 flex items-center gap-2 ${activeTab === 'calculator' ? 'bg-indigo-600/20 text-indigo-400 shadow-[inset_0_-2px_0_0_#6366f1]' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}>
-                                <Calculator size={16} /> <span className="tracking-widest">支撐壓力計算</span>
+                            <button onClick={() => setActiveTab('calculator')} className={`shrink-0 py-1.5 md:py-2 px-3 md:px-4 rounded-lg transition-all duration-300 flex items-center gap-1.5 md:gap-2 ${activeTab === 'calculator' ? 'bg-indigo-600/20 text-indigo-400 shadow-[inset_0_-2px_0_0_#6366f1]' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}>
+                                <Calculator size={14} className="md:w-4 md:h-4" /> <span className="tracking-widest">支撐壓力</span>
                             </button>
-                            <button onClick={() => setActiveTab('plan')} className={`py-2 px-4 rounded-lg whitespace-nowrap transition-all duration-300 flex items-center gap-2 ${activeTab === 'plan' ? 'bg-emerald-600/20 text-emerald-400 shadow-[inset_0_-2px_0_0_#10b981]' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}>
-                                <LayoutDashboard size={16} /> <span className="tracking-widest">交易儀表板</span>
+                            <button onClick={() => setActiveTab('plan')} className={`shrink-0 py-1.5 md:py-2 px-3 md:px-4 rounded-lg transition-all duration-300 flex items-center gap-1.5 md:gap-2 ${activeTab === 'plan' ? 'bg-emerald-600/20 text-emerald-400 shadow-[inset_0_-2px_0_0_#10b981]' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}>
+                                <LayoutDashboard size={14} className="md:w-4 md:h-4" /> <span className="tracking-widest">交易規劃</span>
                             </button>
-                            <button onClick={() => setActiveTab('watchlist')} className={`py-2 px-4 rounded-lg whitespace-nowrap transition-all duration-300 flex items-center gap-2 ${activeTab === 'watchlist' ? 'bg-amber-600/20 text-amber-400 shadow-[inset_0_-2px_0_0_#f59e0b]' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}>
-                                <Star size={16} /> <span className="tracking-widest">自選追蹤池</span>
+                            <button onClick={() => setActiveTab('watchlist')} className={`shrink-0 py-1.5 md:py-2 px-3 md:px-4 rounded-lg transition-all duration-300 flex items-center gap-1.5 md:gap-2 ${activeTab === 'watchlist' ? 'bg-amber-600/20 text-amber-400 shadow-[inset_0_-2px_0_0_#f59e0b]' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}>
+                                <Star size={14} className="md:w-4 md:h-4" /> <span className="tracking-widest">自選追蹤</span>
                             </button>
-                            <div className="flex-1"></div> {/* Push the last tab to the right */}
-                            <button onClick={() => setActiveTab('forbidden')} className={`py-2 px-4 rounded-lg whitespace-nowrap transition-all duration-300 flex items-center gap-2 ${activeTab === 'forbidden' ? 'bg-red-600/20 text-red-400 shadow-[inset_0_-2px_0_0_#ef4444]' : 'text-slate-400 hover:text-red-400/80 hover:bg-red-900/10'}`}>
-                                <Ban size={16} /> <span className="tracking-widest">嚴禁買入防護網</span>
+                            <div className="flex-1 hidden md:block"></div> 
+                            <button onClick={() => setActiveTab('forbidden')} className={`shrink-0 py-1.5 md:py-2 px-3 md:px-4 rounded-lg transition-all duration-300 flex items-center gap-1.5 md:gap-2 ${activeTab === 'forbidden' ? 'bg-red-600/20 text-red-400 shadow-[inset_0_-2px_0_0_#ef4444]' : 'text-slate-400 hover:text-red-400/80 hover:bg-red-900/10'}`}>
+                                <Ban size={14} className="md:w-4 md:h-4" /> <span className="tracking-widest">防護網</span>
                             </button>
                         </div>
                     </header>
 
-                    <main className="max-w-7xl mx-auto px-4 mt-8">
+                    <main className="max-w-7xl mx-auto px-4 mt-6 md:mt-8">
                         {activeTab === 'journal' && (
                             <StockJournal logs={logs} setLogs={setLogs} epsData={epsData} setEpsData={setEpsData} customStocks={customStocks} setCustomStocks={setCustomStocks} stockMap={stockMap} forbiddenStocks={forbiddenStocks} onAiDiagnose={handleAiDiagnose} />
                         )}
