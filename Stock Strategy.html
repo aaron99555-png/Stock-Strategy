@@ -44,7 +44,7 @@
                 <div class="flex items-center gap-3">
                     <div class="bg-blue-600/20 p-2 rounded-lg"><i class="fa-solid fa-chart-line text-blue-500 text-xl"></i></div>
                     <span class="font-bold text-xl tracking-wider text-white hidden sm:block">萊恩選股手札</span>
-                    <span id="auth-status" class="ml-2 text-xs bg-yellow-600/90 text-white px-2.5 py-1 rounded-full font-medium tracking-wide shadow-sm"><i class="fa-solid fa-spinner fa-spin mr-1"></i>連線中</span>
+                    <span id="auth-status" class="ml-2 text-xs bg-gray-600 text-white px-2.5 py-1 rounded-full font-medium tracking-wide shadow-sm flex items-center"><i class="fa-solid fa-laptop mr-1.5"></i>單機模式</span>
                 </div>
                 <!-- Desktop Nav -->
                 <div class="hidden md:flex flex-1 justify-center space-x-2">
@@ -55,11 +55,8 @@
                 </div>
                 <!-- Tools -->
                 <div class="flex items-center gap-2">
-                    <button id="btn-sync-modal" class="text-sm bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg transition shadow-sm border border-transparent flex items-center font-medium"><i class="fa-solid fa-cloud-arrow-up mr-1.5"></i>跨裝置同步</button>
-                    
-                    <!-- 備份按鈕 -->
-                    <button id="btn-import-backup" class="text-sm bg-gray-700 hover:bg-gray-600 text-gray-200 px-3 py-1.5 rounded-lg transition shadow-sm hidden sm:block" title="匯入備份 (單機檔)"><i class="fa-solid fa-upload"></i></button>
-                    <button id="btn-export-backup" class="text-sm bg-gray-700 hover:bg-gray-600 text-gray-200 px-3 py-1.5 rounded-lg transition shadow-sm hidden sm:block" title="匯出備份 (單機檔)"><i class="fa-solid fa-download"></i></button>
+                    <button id="btn-import-backup" class="text-sm bg-gray-700 hover:bg-blue-600 text-gray-200 px-3 py-1.5 rounded-lg transition shadow-sm flex items-center" title="匯入備份 (還原資料)"><i class="fa-solid fa-upload sm:mr-1.5"></i><span class="hidden sm:inline">匯入</span></button>
+                    <button id="btn-export-backup" class="text-sm bg-gray-700 hover:bg-green-600 text-gray-200 px-3 py-1.5 rounded-lg transition shadow-sm flex items-center" title="匯出備份 (儲存資料)"><i class="fa-solid fa-download sm:mr-1.5"></i><span class="hidden sm:inline">匯出</span></button>
                     <input type="file" id="backup-file" accept=".xlsx" class="hidden">
                 </div>
             </div>
@@ -85,7 +82,7 @@
                 <div class="bg-gray-800 rounded-xl p-5 sm:p-6 border-t-4 border-blue-500 shadow-xl lg:col-span-3 flex flex-col gap-4">
                     <div class="flex justify-between items-center border-b border-gray-700/50 pb-3">
                         <h2 class="font-bold text-blue-400 flex items-center text-xl"><div class="bg-blue-500/20 p-1.5 rounded mr-2"><i class="fa-solid fa-pen-to-square"></i></div> 新增條件</h2>
-                        <div class="text-xs text-gray-400 bg-gray-700/50 px-2 py-1 rounded">雲端即時同步．同標的自動合併</div>
+                        <div class="text-xs text-gray-400 bg-gray-700/50 px-2 py-1 rounded">當日同標的將自動合併</div>
                     </div>
                     
                     <form id="journal-form" class="flex flex-col gap-4">
@@ -154,7 +151,7 @@
                         </div>
                         
                         <div class="flex justify-end mt-1">
-                            <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-6 rounded-lg transition text-sm w-full sm:w-auto shadow-lg shadow-blue-900/20"><i class="fa-solid fa-cloud-arrow-up mr-2"></i>同步儲存</button>
+                            <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-6 rounded-lg transition text-sm w-full sm:w-auto shadow-lg shadow-blue-900/20"><i class="fa-solid fa-plus mr-2"></i>儲存條件</button>
                         </div>
                     </form>
                 </div>
@@ -163,7 +160,7 @@
                 <div class="bg-gray-800 rounded-xl p-5 border-t-4 border-gray-600 shadow-xl lg:col-span-1 flex flex-col justify-between">
                     <div>
                         <h2 class="font-bold text-gray-300 flex items-center mb-3 text-xl"><div class="bg-gray-700 p-1.5 rounded mr-2"><i class="fa-solid fa-database"></i></div> 個股資料庫</h2>
-                        <p class="text-xs text-gray-400 mb-4 leading-relaxed bg-gray-900/50 p-3 rounded-lg border border-gray-700/50">匯入包含 EPS 與股期資訊的 Excel。系統將自動將資料上傳至您的 <span class="text-blue-400 font-bold">ryanstcokdata</span> 雲端資料庫。</p>
+                        <p class="text-xs text-gray-400 mb-4 leading-relaxed bg-gray-900/50 p-3 rounded-lg border border-gray-700/50">匯入包含 EPS 與股期資訊的 Excel。系統將自動更新數值至智能搜尋中。</p>
                         <input type="file" id="excel-upload" accept=".xlsx, .xls" class="block w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-gray-700 file:text-white file:font-medium file:cursor-pointer hover:file:bg-gray-600 transition cursor-pointer shadow-sm">
                     </div>
                 </div>
@@ -461,21 +458,6 @@
 
     </main>
 
-    <!-- Sync Modal -->
-    <div id="sync-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center z-[60] hidden">
-        <div class="bg-gray-800 rounded-xl p-6 border border-gray-700 w-[340px] shadow-2xl">
-            <h3 class="font-bold mb-3 text-white text-xl border-b border-gray-700 pb-3 flex items-center"><i class="fa-solid fa-cloud-arrow-up text-blue-400 mr-2 text-2xl"></i>跨裝置雲端同步</h3>
-            <p class="text-sm text-gray-300 mb-5 leading-relaxed bg-blue-900/20 p-3 rounded-lg border border-blue-800/30">請輸入您的專屬「同步碼」(例如: 手機號碼或自訂英文名)。只要在不同裝置輸入相同代碼，即可連線同步所有資料！</p>
-            <div class="mb-5">
-                <input type="text" id="sync-key-input" placeholder="請輸入自訂同步碼" class="w-full bg-gray-700/80 border border-gray-600 rounded-lg px-4 py-2.5 text-white text-base focus:outline-none focus:ring-2 focus:ring-blue-500 transition shadow-inner font-medium tracking-wider">
-            </div>
-            <div class="flex gap-3">
-                <button id="btn-save-sync" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-2.5 rounded-lg text-sm font-bold transition shadow-lg shadow-blue-900/20">載入 / 建立連線</button>
-            </div>
-            <button id="btn-cancel-sync" class="w-full mt-3 bg-transparent hover:bg-gray-700 text-gray-400 hover:text-white py-2.5 rounded-lg text-sm transition">關閉</button>
-        </div>
-    </div>
-
     <!-- Toast -->
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-3 pointer-events-none"></div>
 
@@ -500,60 +482,21 @@
     <datalist id="stock-codes-list"></datalist>
     <datalist id="stock-names-list"></datalist>
 
-    <!-- Firebase SDK & Logic -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, doc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot, query, serverTimestamp, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // ============================================================================
-        // 您的專屬 Firebase 設定 (ryanstcokdata)
-        // ============================================================================
-        const myFirebaseConfig = {
-            apiKey: "請在此填入您的_API_KEY", // 🔥 必填：請至 Firebase 後台「專案設定」複製 Web API 金鑰
-            authDomain: "ryanstcokdata.firebaseapp.com",
-            databaseURL: "https://ryanstcokdata-default-rtdb.firebaseio.com",
-            projectId: "ryanstcokdata",
-            storageBucket: "ryanstcokdata.appspot.com",
-            messagingSenderId: "請在此填入您的_SENDER_ID", // 🔥 必填
-            appId: "請在此填入您的_APP_ID" // 🔥 必填
-        };
-        
-        // 優先使用您的自訂資料庫，若未設定 API Key 則退回預覽環境資料庫
-        let firebaseConfig;
-        if (typeof __firebase_config !== 'undefined' && myFirebaseConfig.apiKey === "請在此填入您的_API_KEY") {
-            firebaseConfig = JSON.parse(__firebase_config);
-        } else {
-            firebaseConfig = myFirebaseConfig;
-        }
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'ryan-stock-journal';
-        let currentUser = null;
-
-        // 同步碼連線邏輯
-        const getCollectionPath = (colName) => {
-            const syncKey = localStorage.getItem('ryan_sync_key');
-            if (syncKey && syncKey.trim() !== '') return collection(db, 'artifacts', appId, 'public', 'data', `${colName}_${syncKey}`);
-            return collection(db, 'artifacts', appId, 'users', currentUser.uid, colName);
-        };
-        const getDocPath = (colName, docId) => {
-            const syncKey = localStorage.getItem('ryan_sync_key');
-            if (syncKey && syncKey.trim() !== '') return doc(db, 'artifacts', appId, 'public', 'data', `${colName}_${syncKey}`, docId);
-            return doc(db, 'artifacts', appId, 'users', currentUser.uid, colName, docId);
-        };
-
+    <!-- Local App Logic (No Firebase) -->
+    <script>
+        // 本機記憶體狀態 (儲存於單次網頁工作階段)
         const state = {
             journals: [], plans: [], epsData: {}, codeToName: {}, nameToCode: {},
             filters: { start: '', end: '', futuresOnly: false, tags: [], minScore: 0 },
             sortConfig: { key: 'date', asc: false }
         };
 
-        let unsubJournal = null, unsubPlan = null, unsubEps = null;
-
         const twStocks = { "2330": "台積電", "2317": "鴻海", "2454": "聯發科", "2382": "廣達", "2603": "長榮" };
+        Object.entries(twStocks).forEach(([c,n]) => {
+            state.codeToName[c] = n;
+            state.nameToCode[n] = c;
+        });
+
         const tagStyles = {
             "披荊斬棘": "bg-red-900/40 text-red-300 border-red-800", "破繭而出": "bg-rose-900/40 text-rose-300 border-rose-800", 
             "月來越好": "bg-orange-900/40 text-orange-300 border-orange-800", "季不可失": "bg-amber-900/40 text-amber-300 border-amber-800", 
@@ -565,6 +508,7 @@
         };
 
         const getToday = () => new Date().toISOString().split('T')[0];
+        const generateId = () => Date.now().toString(36) + Math.random().toString(36).substr(2);
 
         function showToast(msg, type = 'success') {
             const c = document.getElementById('toast-container');
@@ -594,49 +538,27 @@
                 futures: e.futures === '●' || journalItem?.futures === '●'
             };
         };
+        
         const getScore = (tags, epsInfo) => {
             let score = tags && Array.isArray(tags) ? tags.length : 0;
             if (epsInfo && epsInfo.eps2026 !== null && epsInfo.eps2025 !== null && epsInfo.eps2026 > epsInfo.eps2025) score += 1;
             return score;
         };
 
-        // UI 同步狀態更新
-        const updateSyncStatusUI = () => {
-            const key = localStorage.getItem('ryan_sync_key');
-            const btn = document.getElementById('btn-sync-modal');
-            if(key) {
-                btn.innerHTML = `<i class="fa-solid fa-cloud text-green-300 mr-1.5"></i>已連線: ${key}`;
-                btn.classList.add('bg-green-900/50', 'border-green-500/50', 'text-green-300');
-                btn.classList.remove('bg-blue-600', 'border-transparent', 'text-white');
-            } else {
-                btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-1.5"></i>跨裝置同步`;
-                btn.classList.remove('bg-green-900/50', 'border-green-500/50', 'text-green-300');
-                btn.classList.add('bg-blue-600', 'border-transparent', 'text-white');
+        // 更新智能下拉選單 (Auto-Complete Datalist)
+        const updateDatalists = () => {
+            const codesList = document.getElementById('stock-codes-list');
+            const namesList = document.getElementById('stock-names-list');
+            if(codesList && namesList) {
+                let codesHtml = '', namesHtml = '';
+                for (const [code, name] of Object.entries(state.codeToName)) {
+                    codesHtml += `<option value="${code}">${name}</option>`;
+                    namesHtml += `<option value="${name}">${code}</option>`;
+                }
+                codesList.innerHTML = codesHtml;
+                namesList.innerHTML = namesHtml;
             }
         };
-
-        // Sync Modal 互動
-        const syncModal = document.getElementById('sync-modal');
-        const syncInput = document.getElementById('sync-key-input');
-        
-        document.getElementById('btn-sync-modal').addEventListener('click', () => {
-            syncInput.value = localStorage.getItem('ryan_sync_key') || '';
-            syncModal.classList.remove('hidden');
-        });
-        document.getElementById('btn-cancel-sync').addEventListener('click', () => syncModal.classList.add('hidden'));
-        document.getElementById('btn-save-sync').addEventListener('click', () => {
-            const key = syncInput.value.trim();
-            if(key) {
-                localStorage.setItem('ryan_sync_key', key);
-                showToast('已綁定同步碼，正在載入雲端資料...');
-            } else {
-                localStorage.removeItem('ryan_sync_key');
-                showToast('已切換為本地單機模式');
-            }
-            syncModal.classList.add('hidden');
-            updateSyncStatusUI();
-            if(currentUser) setupListeners(currentUser); // 重新連線監聽
-        });
 
         // Nav
         document.querySelectorAll('.nav-btn, .nav-btn-mobile').forEach(btn => {
@@ -660,7 +582,7 @@
             });
         });
 
-        // Backup Export/Import
+        // Backup Export/Import (Single Machine)
         document.getElementById('btn-export-backup').addEventListener('click', () => {
             if(state.journals.length === 0 && state.plans.length === 0) return showToast('無資料可匯出', 'error');
             const wb = XLSX.utils.book_new();
@@ -670,42 +592,41 @@
             XLSX.writeFile(wb, `萊恩手札備份_${getToday()}.xlsx`);
             showToast('備份已下載');
         });
+        
         document.getElementById('btn-import-backup').addEventListener('click', () => document.getElementById('backup-file').click());
-        document.getElementById('backup-file').addEventListener('change', async (e) => {
-            const file = e.target.files[0]; if(!file || !currentUser) return;
+        document.getElementById('backup-file').addEventListener('change', (e) => {
+            const file = e.target.files[0]; if(!file) return;
             const reader = new FileReader();
-            reader.onload = async (event) => {
+            reader.onload = (event) => {
                 try {
                     const data = new Uint8Array(event.target.result);
                     const wb = XLSX.read(data, {type: 'array'});
                     let total = 0;
                     if(wb.SheetNames.includes('Journals')) {
                         const jRows = XLSX.utils.sheet_to_json(wb.Sheets['Journals']);
-                        const batch = writeBatch(db);
                         jRows.forEach(r => {
                             if(!r.id) return;
-                            const payload = {...r, updatedAt: serverTimestamp()};
-                            try { payload.tags = JSON.parse(r.tags); } catch(e){ payload.tags=[]; }
-                            delete payload.createdAt; 
-                            batch.set(getDocPath('journals', r.id), payload, {merge: true});
+                            try { r.tags = JSON.parse(r.tags); } catch(e){ r.tags=[]; }
+                            const idx = state.journals.findIndex(j => j.id === r.id);
+                            if(idx !== -1) Object.assign(state.journals[idx], r, { updatedAt: Date.now() });
+                            else state.journals.push({ ...r, updatedAt: Date.now() });
                             total++;
                         });
-                        await batch.commit();
                     }
                     if(wb.SheetNames.includes('Plans')) {
                         const pRows = XLSX.utils.sheet_to_json(wb.Sheets['Plans']);
-                        const batch = writeBatch(db);
                         pRows.forEach(r => {
                             if(!r.id) return;
-                            const payload = {...r, updatedAt: serverTimestamp()};
-                            delete payload.createdAt;
-                            batch.set(getDocPath('plans', r.id), payload, {merge: true});
+                            const idx = state.plans.findIndex(p => p.id === r.id);
+                            if(idx !== -1) Object.assign(state.plans[idx], r, { updatedAt: Date.now() });
+                            else state.plans.push({ ...r, updatedAt: Date.now() });
                             total++;
                         });
-                        await batch.commit();
+                        state.plans.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
                     }
+                    processAndRenderJournals(); renderFavorites(); renderPlans();
                     showToast(`成功匯入還原 ${total} 筆資料`);
-                } catch(err) { showToast('匯入失敗', 'error'); }
+                } catch(err) { showToast('匯入失敗，格式錯誤', 'error'); }
                 e.target.value = '';
             };
             reader.readAsArrayBuffer(file);
@@ -769,52 +690,73 @@
             });
         });
 
-        document.getElementById('journal-form').addEventListener('submit', async (e) => {
+        // 加入條件 (Journal)
+        document.getElementById('journal-form').addEventListener('submit', (e) => {
             e.preventDefault();
-            if(!currentUser) return showToast('尚未登入', 'error');
             const code = codeInput.value.trim(), date = document.getElementById('j-date').value, name = nameInput.value.trim(), notes = document.getElementById('j-notes').value.trim();
             const tagInput = document.querySelector('.tag-input:checked');
             const tag = tagInput ? tagInput.value : null;
             const docId = `${code}_${date}`;
-            const existing = state.journals.find(j => j.id === docId);
-            let tags = existing?.tags || [];
-            if(tag && !tags.includes(tag)) tags.push(tag);
+            
+            const existingIdx = state.journals.findIndex(j => j.id === docId);
+            let tags = [];
             let mergedNotes = notes;
-            if(existing && existing.notes) mergedNotes = notes ? `${existing.notes} / ${notes}` : existing.notes;
+            let isFavorite = false;
+            let createdAt = Date.now();
 
-            try {
-                const payload = { date, code, name, tags, notes: mergedNotes, updatedAt: serverTimestamp() };
-                if(!existing) { payload.isFavorite = false; payload.createdAt = serverTimestamp(); }
-                await setDoc(getDocPath('journals', docId), payload, { merge: true });
-                showToast('已儲存至條件');
-                codeInput.value=''; nameInput.value=''; document.getElementById('j-notes').value=''; 
-                previewDiv.classList.add('hidden');
-                codeInput.focus();
-            } catch(e) { showToast('儲存失敗', 'error'); }
+            if (existingIdx !== -1) {
+                const existing = state.journals[existingIdx];
+                tags = existing.tags || [];
+                if(tag && !tags.includes(tag)) tags.push(tag);
+                mergedNotes = notes ? (existing.notes ? `${existing.notes} / ${notes}` : notes) : existing.notes;
+                isFavorite = existing.isFavorite || false;
+                createdAt = existing.createdAt || Date.now();
+
+                state.journals[existingIdx] = { ...existing, date, code, name, tags, notes: mergedNotes, updatedAt: Date.now() };
+            } else {
+                if(tag) tags.push(tag);
+                state.journals.push({ id: docId, date, code, name, tags, notes: mergedNotes, isFavorite, createdAt, updatedAt: Date.now() });
+            }
+
+            showToast('已儲存至條件');
+            codeInput.value=''; nameInput.value=''; document.getElementById('j-notes').value=''; 
+            previewDiv.classList.add('hidden');
+            codeInput.focus();
+            
+            processAndRenderJournals();
+            if(document.getElementById('module-favorites').classList.contains('active')) renderFavorites();
         });
 
+        // 匯入 Excel 到記憶體 EPS 資料庫
         document.getElementById('excel-upload').addEventListener('change', (e) => {
-            const f = e.target.files[0]; if(!f || !currentUser) return;
+            const f = e.target.files[0]; if(!f) return;
             showToast('解析資料庫...');
             const reader = new FileReader();
-            reader.onload = async (ev) => {
+            reader.onload = (ev) => {
                 try {
                     const wb = XLSX.read(new Uint8Array(ev.target.result), {type: 'array'});
                     const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header:1});
-                    let chunks=[], cur=[];
+                    let count = 0;
                     for(let i=1; i<rows.length; i++) {
                         if(!rows[i] || rows[i].length<2) continue;
                         const c = String(rows[i][0]).trim(); if(!c) continue;
-                        cur.push({ code: c, name: String(rows[i][1]||'').trim(), eps2025: parseFloat(rows[i][2])||null, eps2026: parseFloat(rows[i][3])||null, epsGrowth: parseFloat(rows[i][4])||null, futures: String(rows[i][5]||'').trim(), updatedAt: serverTimestamp() });
-                        if(cur.length>=400) { chunks.push(cur); cur=[]; }
+                        const n = String(rows[i][1]||'').trim();
+                        
+                        state.epsData[c] = {
+                            code: c, name: n, 
+                            eps2025: parseFloat(rows[i][2])||null, eps2026: parseFloat(rows[i][3])||null, 
+                            epsGrowth: parseFloat(rows[i][4])||null, futures: String(rows[i][5]||'').trim(), 
+                            updatedAt: Date.now() 
+                        };
+                        if (n) {
+                            state.codeToName[c] = n;
+                            state.nameToCode[n] = c;
+                        }
+                        count++;
                     }
-                    if(cur.length>0) chunks.push(cur);
-                    for(const ch of chunks) {
-                        const batch = writeBatch(db);
-                        ch.forEach(item => batch.set(getDocPath('eps_data', item.code), item, {merge:true}));
-                        await batch.commit();
-                    }
-                    showToast(`更新完成，匯入 ${chunks.reduce((a,b)=>a+b.length,0)} 筆資料`);
+                    updateDatalists();
+                    processAndRenderJournals(); renderFavorites(); renderPlans();
+                    showToast(`更新完成，載入 ${count} 筆資料`);
                     e.target.value='';
                 } catch(err) { showToast('格式錯誤','error'); }
             };
@@ -854,7 +796,6 @@
             }
         });
 
-        // 綁定小格子打勾事件
         document.querySelectorAll('.filter-tag-cb').forEach(cb => {
             cb.addEventListener('change', (e) => {
                 const val = e.target.value;
@@ -963,15 +904,16 @@
                 tbody.appendChild(tr);
             });
 
-            tbody.querySelectorAll('.tag-remove-btn').forEach(b => b.addEventListener('click', async(e)=>{
-                if(!currentUser) return;
+            tbody.querySelectorAll('.tag-remove-btn').forEach(b => b.addEventListener('click', (e)=>{
                 const id = e.currentTarget.dataset.id;
                 const tagToRemove = e.currentTarget.dataset.tag;
                 const j = state.journals.find(x => x.id === id);
                 if(j && j.tags) {
-                    const newTags = j.tags.filter(t => t !== tagToRemove);
-                    await updateDoc(getDocPath('journals', id), {tags: newTags});
+                    j.tags = j.tags.filter(t => t !== tagToRemove);
+                    j.updatedAt = Date.now();
                     showToast(`已移除標籤: ${tagToRemove}`);
+                    processAndRenderJournals();
+                    if(document.getElementById('module-favorites').classList.contains('active')) renderFavorites();
                 }
             }));
             
@@ -983,15 +925,21 @@
                 showToast('已代入股號，請完成規劃設定');
             }));
 
-            tbody.querySelectorAll('.del-btn').forEach(b => b.addEventListener('click', async(e)=>{
-                if(currentUser) await deleteDoc(getDocPath('journals', e.currentTarget.dataset.id));
+            tbody.querySelectorAll('.del-btn').forEach(b => b.addEventListener('click', (e)=>{
+                state.journals = state.journals.filter(j => j.id !== e.currentTarget.dataset.id);
+                processAndRenderJournals();
             }));
-            tbody.querySelectorAll('.fav-toggle-btn').forEach(b => b.addEventListener('click', async(e)=>{
-                if(!currentUser) return;
+            
+            tbody.querySelectorAll('.fav-toggle-btn').forEach(b => b.addEventListener('click', (e)=>{
                 const id = e.currentTarget.dataset.id;
-                const isFav = e.currentTarget.dataset.fav === 'true';
-                await updateDoc(getDocPath('journals', id), {isFavorite: !isFav});
-                showToast(isFav?'已移除追蹤':'已加入追蹤');
+                const j = state.journals.find(x => x.id === id);
+                if(j) {
+                    j.isFavorite = !j.isFavorite;
+                    j.updatedAt = Date.now();
+                    showToast(j.isFavorite?'已加入追蹤':'已移除追蹤');
+                    processAndRenderJournals();
+                    if(document.getElementById('module-favorites').classList.contains('active')) renderFavorites();
+                }
             }));
         };
 
@@ -1105,28 +1053,40 @@
         // Module 3: Plan
         const pEntry = document.getElementById('p-entry'), pStop = document.getElementById('p-stop');
         pEntry.addEventListener('input', e => { const v = parseFloat(e.target.value); if(!isNaN(v)) pStop.value = (v*0.95).toFixed(2); });
-        document.getElementById('plan-form').addEventListener('submit', async(e)=>{
-            e.preventDefault(); if(!currentUser) return;
+        document.getElementById('plan-form').addEventListener('submit', (e)=>{
+            e.preventDefault();
             const stock = document.getElementById('p-stock').value.trim(), qty = parseInt(document.getElementById('p-qty').value)||1;
-            try {
-                await addDoc(getCollectionPath('plans'), {
-                    stock, qty, entry: parseFloat(pEntry.value), stop: parseFloat(pStop.value), target: parseFloat(document.getElementById('p-target').value)||null, note: document.getElementById('p-note').value.trim(), status: '持倉中', pnl: 0, createdAt: serverTimestamp()
-                });
-                showToast('計畫建立成功'); e.target.reset();
-            } catch(e) { showToast('建立失敗','error'); }
+            
+            state.plans.push({
+                id: generateId(),
+                stock, qty, entry: parseFloat(pEntry.value), stop: parseFloat(pStop.value), target: parseFloat(document.getElementById('p-target').value)||null, note: document.getElementById('p-note').value.trim(), status: '持倉中', pnl: 0, createdAt: Date.now(), updatedAt: Date.now()
+            });
+            state.plans.sort((a,b) => b.createdAt - a.createdAt);
+            showToast('計畫建立成功'); 
+            e.target.reset();
+            renderPlans();
         });
 
         window.openCloseModal = (id, def) => { document.getElementById('modal-plan-id').value=id; document.getElementById('modal-exit-price').value=def||''; document.getElementById('close-plan-modal').classList.remove('hidden'); };
-        window.deletePlan = async (id) => { if(currentUser) await deleteDoc(getDocPath('plans', id)); };
+        window.deletePlan = (id) => { 
+            state.plans = state.plans.filter(p => p.id !== id);
+            renderPlans();
+            showToast('規劃已刪除'); 
+        };
         document.getElementById('btn-cancel-modal').addEventListener('click', ()=>document.getElementById('close-plan-modal').classList.add('hidden'));
         
-        const closeTrade = async(status) => {
+        const closeTrade = (status) => {
             const id = document.getElementById('modal-plan-id').value, ex = parseFloat(document.getElementById('modal-exit-price').value);
             if(isNaN(ex)) return showToast('無效金額','error');
             const p = state.plans.find(x=>x.id===id); if(!p) return;
             const pnl = Math.round((ex - p.entry)*p.qty*1000);
-            await updateDoc(getDocPath('plans', id), {status, exitPrice:ex, pnl});
-            document.getElementById('close-plan-modal').classList.add('hidden'); showToast(`結算損益: $${pnl}`);
+            p.status = status;
+            p.exitPrice = ex;
+            p.pnl = pnl;
+            p.updatedAt = Date.now();
+            document.getElementById('close-plan-modal').classList.add('hidden'); 
+            renderPlans();
+            showToast(`結算損益: $${pnl}`);
         };
         document.getElementById('btn-win').addEventListener('click', ()=>closeTrade('已停利'));
         document.getElementById('btn-loss').addEventListener('click', ()=>closeTrade('已停損'));
@@ -1163,61 +1123,12 @@
             document.getElementById('stat-pnl').className = `text-2xl font-bold ${pnlColor}`;
         }
 
-        // DB Listeners
-        const setupListeners = (u) => {
-            if(unsubEps) unsubEps();
-            if(unsubJournal) unsubJournal();
-            if(unsubPlan) unsubPlan();
-
-            unsubEps = onSnapshot(getCollectionPath('eps_data'), s => {
-                state.epsData = {}; state.codeToName={...twStocks}; state.nameToCode={}; Object.entries(twStocks).forEach(([c,n])=>state.nameToCode[n]=c);
-                s.forEach(d => { const dt=d.data(); state.epsData[d.id]=dt; if(dt.name){ state.codeToName[d.id]=dt.name; state.nameToCode[dt.name]=d.id; } });
-                
-                // 更新智能下拉選單 (Auto-Complete Datalist)
-                const codesList = document.getElementById('stock-codes-list');
-                const namesList = document.getElementById('stock-names-list');
-                if(codesList && namesList) {
-                    let codesHtml = '', namesHtml = '';
-                    for (const [code, name] of Object.entries(state.codeToName)) {
-                        codesHtml += `<option value="${code}">${name}</option>`;
-                        namesHtml += `<option value="${name}">${code}</option>`;
-                    }
-                    codesList.innerHTML = codesHtml;
-                    namesList.innerHTML = namesHtml;
-                }
-
-                processAndRenderJournals(); renderFavorites(); renderPlans();
-            });
-            unsubJournal = onSnapshot(query(getCollectionPath('journals')), s => {
-                state.journals = []; s.forEach(d => state.journals.push({id: d.id, ...d.data()}));
-                processAndRenderJournals(); if(document.getElementById('module-favorites').classList.contains('active')) renderFavorites();
-            });
-            unsubPlan = onSnapshot(query(getCollectionPath('plans')), s => {
-                state.plans = []; s.forEach(d => state.plans.push({id: d.id, ...d.data()}));
-                state.plans.sort((a,b)=>(b.createdAt?.toMillis()||0)-(a.createdAt?.toMillis()||0)); renderPlans();
-            });
-        };
-
-        const initAuth = async() => {
-            try { if(typeof __initial_auth_token!=='undefined' && __initial_auth_token) await signInWithCustomToken(auth, __initial_auth_token); else await signInAnonymously(auth); } catch(e) { document.getElementById('auth-status').innerHTML=`<i class="fa-solid fa-triangle-exclamation"></i>`; }
-        };
-
+        // 初始化
         document.addEventListener('DOMContentLoaded', () => {
-            initAuth();
-            updateSyncStatusUI();
-            onAuthStateChanged(auth, u => {
-                currentUser = u;
-                const st = document.getElementById('auth-status');
-                if(u){ 
-                    st.innerHTML=`<i class="fa-solid fa-cloud text-green-400 mr-1"></i>已同步`; 
-                    st.className="ml-2 text-xs bg-gray-700 border border-gray-600 px-2.5 py-1 rounded-full shadow-sm font-medium tracking-wide"; 
-                    setupListeners(u); 
-                }
-                else { 
-                    st.innerHTML=`<i class="fa-solid fa-triangle-exclamation mr-1"></i>未登入`; 
-                    st.className="ml-2 text-xs bg-red-600 px-2.5 py-1 rounded-full shadow-sm font-medium tracking-wide"; 
-                }
-            });
+            updateDatalists();
+            processAndRenderJournals();
+            renderFavorites();
+            renderPlans();
         });
     </script>
 </body>
