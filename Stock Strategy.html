@@ -1053,7 +1053,7 @@
                     });
                 }
                 else if(mode === 'futures') {
-                    const fData = data.filter(j => getEpsInfo(j.code,j).futures);
+                    const fData = data.filter(j => getEpsInfo(j.code,j).futures).sort((a,b)=>getScore(b.tags, getEpsInfo(b.code, b))-getScore(a.tags, getEpsInfo(a.code, a)));
                     fData.forEach(j => text += `- [期] ${j.code} ${j.name}\n`);
                 }
                 else if(mode === 'futures_score') {
