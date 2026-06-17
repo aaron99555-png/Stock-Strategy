@@ -124,6 +124,7 @@
                                     <label class="cursor-pointer"><input type="checkbox" value="月來越好" class="hidden tag-input"><div class="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-600 text-gray-300 hover:bg-gray-700 transition" data-color="#f97316">月來越好</div></label>
                                     <label class="cursor-pointer"><input type="checkbox" value="季不可失" class="hidden tag-input"><div class="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-600 text-gray-300 hover:bg-gray-700 transition" data-color="#f59e0b">季不可失</div></label>
                                     <label class="cursor-pointer"><input type="checkbox" value="創新高" class="hidden tag-input"><div class="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-600 text-gray-300 hover:bg-gray-700 transition" data-color="#eab308">創新高</div></label>
+                                    <label class="cursor-pointer"><input type="checkbox" value="守株待兔" class="hidden tag-input"><div class="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-600 text-gray-300 hover:bg-gray-700 transition" data-color="#a3e635">守株待兔</div></label>
                                 </div>
                             </div>
 
@@ -208,6 +209,7 @@
                                     <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-700/50 p-1.5 rounded transition"><input type="checkbox" value="月來越好" class="filter-tag-cb w-3.5 h-3.5 accent-blue-500 cursor-pointer"><span class="text-xs text-gray-300">月來越好</span></label>
                                     <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-700/50 p-1.5 rounded transition"><input type="checkbox" value="季不可失" class="filter-tag-cb w-3.5 h-3.5 accent-blue-500 cursor-pointer"><span class="text-xs text-gray-300">季不可失</span></label>
                                     <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-700/50 p-1.5 rounded transition"><input type="checkbox" value="創新高" class="filter-tag-cb w-3.5 h-3.5 accent-blue-500 cursor-pointer"><span class="text-xs text-gray-300">創新高</span></label>
+                                    <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-700/50 p-1.5 rounded transition"><input type="checkbox" value="守株待兔" class="filter-tag-cb w-3.5 h-3.5 accent-blue-500 cursor-pointer"><span class="text-xs text-gray-300">守株待兔</span></label>
                                 </div>
                                 <div class="text-[10px] font-bold text-gray-400 border-b border-gray-700 pb-1 mb-1.5">💰 量價與籌碼</div>
                                 <div class="grid grid-cols-2 gap-1 mb-3">
@@ -500,7 +502,7 @@
         const tagStyles = {
             "披荊斬棘": "bg-red-900/40 text-red-300 border-red-800", "破繭而出": "bg-rose-900/40 text-rose-300 border-rose-800", 
             "月來越好": "bg-orange-900/40 text-orange-300 border-orange-800", "季不可失": "bg-amber-900/40 text-amber-300 border-amber-800", 
-            "創新高": "bg-yellow-900/40 text-yellow-300 border-yellow-800", "量價齊揚": "bg-green-900/40 text-green-300 border-green-800", 
+            "創新高": "bg-yellow-900/40 text-yellow-300 border-yellow-800", "守株待兔": "bg-lime-900/40 text-lime-300 border-lime-800", "量價齊揚": "bg-green-900/40 text-green-300 border-green-800", 
             "高成交值": "bg-teal-900/40 text-teal-300 border-teal-800", "法人加持": "bg-indigo-900/40 text-indigo-300 border-indigo-800", 
             "籌碼集中": "bg-purple-900/40 text-purple-300 border-purple-800", "主力連買": "bg-fuchsia-900/40 text-fuchsia-300 border-fuchsia-800",
             "OBV突破": "bg-emerald-900/40 text-emerald-300 border-emerald-800", "MACD突破": "bg-cyan-900/40 text-cyan-300 border-cyan-800", 
@@ -976,7 +978,7 @@
                     const sm = {};
                     data.forEach(j => { if(j.tags) j.tags.forEach(t => { if(!sm[t]) sm[t]=[]; sm[t].push(j); }); });
                     
-                    const strategyOrder = ['破繭而出', '月來越好', '季不可失', '量價齊揚', 'OBV突破'];
+                    const strategyOrder = ['破繭而出', '月來越好', '季不可失', '守株待兔', '量價齊揚', 'OBV突破'];
                     const sortedKeys = Object.keys(sm).sort((a, b) => {
                         const idxA = strategyOrder.indexOf(a);
                         const idxB = strategyOrder.indexOf(b);
@@ -996,7 +998,9 @@
                     data.sort((a,b)=>getScore(b.tags, getEpsInfo(b.code, b))-getScore(a.tags, getEpsInfo(a.code, a)));
                     data.forEach(j => {
                         const shortTags = j.tags?.length > 0 ? ` ${j.tags.map(t=>t[0]).join('')}` : '';
-                        text += `- ${j.code} ${j.name} [${getScore(j.tags, getEpsInfo(j.code, j))}分]${shortTags}\n`;
+                        const g = getEpsInfo(j.code,j).epsGrowth;
+                        const gStr = g !== null ? (g * 100).toFixed(2) + '%' : '無';
+                        text += `- ${j.code} ${j.name} [${getScore(j.tags, getEpsInfo(j.code, j))}分]${shortTags} (成長: ${gStr})\n`;
                     });
                 }
                 else if(mode === 'eps') {
@@ -1014,7 +1018,9 @@
                     const fData = data.filter(j => getEpsInfo(j.code,j).futures).sort((a,b)=>getScore(b.tags, getEpsInfo(b.code, b))-getScore(a.tags, getEpsInfo(a.code, a)));
                     fData.forEach(j => {
                         const shortTags = j.tags?.length > 0 ? ` ${j.tags.map(t=>t[0]).join('')}` : '';
-                        text += `- [期] ${j.code} ${j.name} [${getScore(j.tags, getEpsInfo(j.code, j))}分]${shortTags}\n`;
+                        const g = getEpsInfo(j.code,j).epsGrowth;
+                        const gStr = g !== null ? (g * 100).toFixed(2) + '%' : '無';
+                        text += `- [期] ${j.code} ${j.name} [${getScore(j.tags, getEpsInfo(j.code, j))}分]${shortTags} (成長: ${gStr})\n`;
                     });
                 }
                 executeCopy(text.trim() + copyFootnote);
