@@ -44,7 +44,7 @@
                 <div class="flex items-center gap-3">
                     <div class="bg-blue-600/20 p-2 rounded-lg"><i class="fa-solid fa-chart-line text-blue-500 text-xl"></i></div>
                     <span class="font-bold text-xl tracking-wider text-white hidden sm:block">萊恩選股手札</span>
-                    <span id="auth-status" class="ml-2 text-xs bg-gray-600 text-white px-2.5 py-1 rounded-full font-medium tracking-wide shadow-sm flex items-center"><i class="fa-solid fa-laptop mr-1.5"></i>單機模式</span>
+                    <span id="auth-status" class="ml-2 text-xs bg-green-600/90 text-white px-2.5 py-1 rounded-full font-medium tracking-wide shadow-sm flex items-center"><i class="fa-solid fa-floppy-disk mr-1.5"></i>已開啟記憶功能</span>
                 </div>
                 <!-- Desktop Nav -->
                 <div class="hidden md:flex flex-1 justify-center space-x-2">
@@ -161,7 +161,7 @@
                 <div class="bg-gray-800 rounded-xl p-5 border-t-4 border-gray-600 shadow-xl lg:col-span-1 flex flex-col justify-between">
                     <div>
                         <h2 class="font-bold text-gray-300 flex items-center mb-3 text-xl"><div class="bg-gray-700 p-1.5 rounded mr-2"><i class="fa-solid fa-database"></i></div> 個股資料庫</h2>
-                        <p class="text-xs text-gray-400 mb-4 leading-relaxed bg-gray-900/50 p-3 rounded-lg border border-gray-700/50">匯入包含 EPS 與股期資訊的 Excel。系統將自動更新數值至智能搜尋中。</p>
+                        <p class="text-xs text-gray-400 mb-4 leading-relaxed bg-gray-900/50 p-3 rounded-lg border border-gray-700/50">匯入包含 EPS 與股期資訊的 Excel。系統將自動更新數值至智能搜尋中並儲存於本地。</p>
                         <input type="file" id="excel-upload" accept=".xlsx, .xls" class="block w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-gray-700 file:text-white file:font-medium file:cursor-pointer hover:file:bg-gray-600 transition cursor-pointer shadow-sm">
                     </div>
                 </div>
@@ -486,18 +486,39 @@
 
     <!-- Local App Logic (No Firebase) -->
     <script>
-        // 本機記憶體狀態 (儲存於單次網頁工作階段)
-        const state = {
+        const LOCAL_STORAGE_KEY = 'ryan_stock_data_v1';
+
+        // 本機記憶體狀態
+        let state = {
             journals: [], plans: [], epsData: {}, codeToName: {}, nameToCode: {},
             filters: { start: '', end: '', futuresOnly: false, tags: [], minScore: 0 },
             sortConfig: { key: 'date', asc: false }
         };
 
-        const twStocks = { "2330": "台積電", "2317": "鴻海", "2454": "聯發科", "2382": "廣達", "2603": "長榮" };
-        Object.entries(twStocks).forEach(([c,n]) => {
-            state.codeToName[c] = n;
-            state.nameToCode[n] = c;
-        });
+        // 載入本地記憶
+        function loadData() {
+            const savedData = localStorage.getItem(LOCAL_STORAGE_KEY);
+            if (savedData) {
+                try {
+                    const parsed = JSON.parse(savedData);
+                    state = { ...state, ...parsed };
+                } catch (e) {
+                    console.error("無法載入本地資料", e);
+                }
+            } else {
+                // 如果沒有記憶，載入預設台股資料
+                const twStocks = { "2330": "台積電", "2317": "鴻海", "2454": "聯發科", "2382": "廣達", "2603": "長榮" };
+                Object.entries(twStocks).forEach(([c,n]) => {
+                    state.codeToName[c] = n;
+                    state.nameToCode[n] = c;
+                });
+            }
+        }
+
+        // 儲存本地記憶
+        function saveData() {
+            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
+        }
 
         const tagStyles = {
             "披荊斬棘": "bg-red-900/40 text-red-300 border-red-800", "破繭而出": "bg-rose-900/40 text-rose-300 border-rose-800", 
@@ -633,6 +654,7 @@
                         state.plans.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
                     }
                     processAndRenderJournals(); renderFavorites(); renderPlans();
+                    saveData();
                     showToast(`成功匯入還原 ${total} 筆資料`);
                 } catch(err) { showToast('匯入失敗，格式錯誤', 'error'); }
                 e.target.value = '';
@@ -641,10 +663,6 @@
         });
 
         // Setup Forms & Interactions
-        document.getElementById('j-date').value = getToday();
-        document.getElementById('filter-start').value = getToday();
-        document.getElementById('filter-end').value = getToday();
-
         const codeInput = document.getElementById('j-code'), nameInput = document.getElementById('j-name');
         const previewDiv = document.getElementById('j-preview');
 
@@ -733,6 +751,7 @@
             
             processAndRenderJournals();
             if(document.getElementById('module-favorites').classList.contains('active')) renderFavorites();
+            saveData();
         });
 
         // 匯入 Excel 到記憶體 EPS 資料庫
@@ -764,6 +783,7 @@
                     }
                     updateDatalists();
                     processAndRenderJournals(); renderFavorites(); renderPlans();
+                    saveData();
                     showToast(`更新完成，載入 ${count} 筆資料`);
                     e.target.value='';
                 } catch(err) { showToast('格式錯誤','error'); }
@@ -778,6 +798,7 @@
                 state.sortConfig.key = key;
                 processAndRenderJournals();
                 if(document.getElementById('module-favorites').classList.contains('active')) renderFavorites();
+                saveData();
             });
         });
 
@@ -788,6 +809,7 @@
                 state.filters.futuresOnly = document.getElementById('filter-futures').checked;
                 state.filters.minScore = parseInt(document.getElementById('filter-score').value) || 0;
                 processAndRenderJournals();
+                saveData();
             });
         });
 
@@ -814,6 +836,7 @@
                 }
                 renderFilterTags();
                 processAndRenderJournals();
+                saveData();
             });
         });
 
@@ -823,6 +846,7 @@
             if (cb) cb.checked = false;
             renderFilterTags(); 
             processAndRenderJournals();
+            saveData();
         };
 
         function renderFilterTags() {
@@ -922,6 +946,7 @@
                     showToast(`已移除標籤: ${tagToRemove}`);
                     processAndRenderJournals();
                     if(document.getElementById('module-favorites').classList.contains('active')) renderFavorites();
+                    saveData();
                 }
             }));
             
@@ -936,6 +961,7 @@
             tbody.querySelectorAll('.del-btn').forEach(b => b.addEventListener('click', (e)=>{
                 state.journals = state.journals.filter(j => j.id !== e.currentTarget.dataset.id);
                 processAndRenderJournals();
+                saveData();
             }));
             
             tbody.querySelectorAll('.fav-toggle-btn').forEach(b => b.addEventListener('click', (e)=>{
@@ -947,6 +973,7 @@
                     showToast(j.isFavorite?'已加入追蹤':'已移除追蹤');
                     processAndRenderJournals();
                     if(document.getElementById('module-favorites').classList.contains('active')) renderFavorites();
+                    saveData();
                 }
             }));
         };
@@ -1077,12 +1104,14 @@
             showToast('計畫建立成功'); 
             e.target.reset();
             renderPlans();
+            saveData();
         });
 
         window.openCloseModal = (id, def) => { document.getElementById('modal-plan-id').value=id; document.getElementById('modal-exit-price').value=def||''; document.getElementById('close-plan-modal').classList.remove('hidden'); };
         window.deletePlan = (id) => { 
             state.plans = state.plans.filter(p => p.id !== id);
             renderPlans();
+            saveData();
             showToast('規劃已刪除'); 
         };
         document.getElementById('btn-cancel-modal').addEventListener('click', ()=>document.getElementById('close-plan-modal').classList.add('hidden'));
@@ -1098,6 +1127,7 @@
             p.updatedAt = Date.now();
             document.getElementById('close-plan-modal').classList.add('hidden'); 
             renderPlans();
+            saveData();
             showToast(`結算損益: $${pnl}`);
         };
         document.getElementById('btn-win').addEventListener('click', ()=>closeTrade('已停利'));
@@ -1137,6 +1167,26 @@
 
         // 初始化
         document.addEventListener('DOMContentLoaded', () => {
+            // 1. 優先從本機 LocalStorage 載入歷史資料
+            loadData();
+
+            // 2. 恢復篩選日期的預設值或歷史狀態
+            document.getElementById('j-date').value = getToday();
+            document.getElementById('filter-start').value = state.filters.start || getToday();
+            document.getElementById('filter-end').value = state.filters.end || getToday();
+            document.getElementById('filter-futures').checked = state.filters.futuresOnly || false;
+            document.getElementById('filter-score').value = state.filters.minScore || 0;
+            
+            // 恢復視覺上的標籤打勾狀態
+            if (state.filters.tags && state.filters.tags.length > 0) {
+                state.filters.tags.forEach(t => {
+                    const cb = document.querySelector(`.filter-tag-cb[value="${t}"]`);
+                    if (cb) cb.checked = true;
+                });
+            }
+            renderFilterTags();
+
+            // 3. 更新畫面與列表
             updateDatalists();
             processAndRenderJournals();
             renderFavorites();
