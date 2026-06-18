@@ -473,7 +473,7 @@
     <div id="sync-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center z-[60] hidden">
         <div class="bg-gray-800 rounded-xl p-6 border border-gray-700 w-[340px] shadow-2xl">
             <h3 class="font-bold mb-3 text-white text-xl border-b border-gray-700 pb-3 flex items-center"><i class="fa-solid fa-cloud-arrow-up text-blue-400 mr-2 text-2xl"></i>跨裝置雲端同步</h3>
-            <p class="text-sm text-gray-300 mb-5 leading-relaxed bg-blue-900/20 p-3 rounded-lg border border-blue-800/30">請輸入您的專屬「同步碼」(例如: 手機號碼或自訂英文名)。只要在不同裝置輸入相同代碼，即可連線同步所有資料！</p>
+            <p class="text-sm text-gray-300 mb-5 leading-relaxed bg-blue-900/20 p-3 rounded-lg border border-blue-800/30">請輸入您的專屬「同步碼」(例如: 手機號碼或自訂英文名)。只要在不同裝置輸入相同代碼，即可透過 REST API 連線同步所有資料！</p>
             <div class="mb-5">
                 <input type="text" id="sync-key-input" placeholder="請輸入自訂同步碼" class="w-full bg-gray-700/80 border border-gray-600 rounded-lg px-4 py-2.5 text-white text-base focus:outline-none focus:ring-2 focus:ring-blue-500 transition shadow-inner font-medium tracking-wider">
             </div>
@@ -487,13 +487,13 @@
     <!-- 缺少 Firebase 設定的警告 -->
     <div id="config-warning-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex justify-center items-center z-[70] hidden">
         <div class="bg-gray-800 rounded-xl p-6 border border-red-500 shadow-2xl max-w-md w-full mx-4">
-            <h3 class="font-bold mb-3 text-red-400 text-xl flex items-center"><i class="fa-solid fa-triangle-exclamation mr-2"></i>缺少 Firebase 金鑰</h3>
-            <p class="text-sm text-gray-300 mb-4 leading-relaxed">系統偵測到您可能尚未填寫專屬的 <span class="text-white font-bold">API Key</span>，或尚未在 Firebase 開啟「匿名登入」權限，導致無法成功連線至雲端。</p>
+            <h3 class="font-bold mb-3 text-red-400 text-xl flex items-center"><i class="fa-solid fa-triangle-exclamation mr-2"></i>資料庫權限不足</h3>
+            <p class="text-sm text-gray-300 mb-4 leading-relaxed">系統嘗試連線至雲端時遭到拒絕。因為我們目前使用無 API Key 的 REST 連線方式，您必須將資料庫設為公開。</p>
             <ol class="text-sm text-gray-400 list-decimal list-inside space-y-2 mb-5">
-                <li>請至 Firebase 控制台打開您的 <span class="text-blue-400">stockstrategy-492a1</span> 專案。</li>
-                <li>前往「專案設定 > 一般 > 網頁應用程式」。</li>
-                <li>將您的 <code class="bg-gray-700 px-1 rounded text-pink-300">apiKey</code> 填入此 HTML 檔案第 470 行左右的 <code class="text-blue-300">myFirebaseConfig</code> 設定區塊中。</li>
-                <li>請確認在 Firebase 左側選單已啟用 <b>Authentication (匿名登入)</b> 與 <b>Firestore Database</b>。</li>
+                <li>前往 Firebase 控制台，開啟 <span class="text-blue-400">Realtime Database</span> 頁面。</li>
+                <li>點擊上方的「規則 (Rules)」標籤。</li>
+                <li>將規則修改為允許讀寫：<br><code class="block bg-gray-900 p-2 mt-2 rounded text-green-300">{<br>&nbsp;&nbsp;"rules": {<br>&nbsp;&nbsp;&nbsp;&nbsp;".read": true,<br>&nbsp;&nbsp;&nbsp;&nbsp;".write": true<br>&nbsp;&nbsp;}<br>}</code></li>
+                <li>點擊「發布」，重新整理網頁即可成功連線！</li>
             </ol>
             <button id="btn-close-config-warning" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-2.5 rounded-lg transition">我知道了，我會去設定</button>
         </div>
@@ -523,39 +523,20 @@
     <datalist id="stock-codes-list"></datalist>
     <datalist id="stock-names-list"></datalist>
 
-    <!-- Firebase SDK & App Logic -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, doc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot, query, serverTimestamp, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
+    <!-- Cloud Sync App Logic (No Firebase SDK needed) -->
+    <script>
         // ============================================================================
-        // 🛑 【重要】您的專屬 Firebase 設定
-        // 您提供的是資料庫 URL，請務必填寫 apiKey 才能讓雲端功能運作！
-        // 取得方式：Firebase 後台 -> 專案設定 -> 一般 -> 網頁應用程式 (SDK 設定)
+        // 🛑 【重要】無 API Key 之 Firebase REST API 設定
+        // 確保您的 Realtime Database 規則已設定為 .read: true 及 .write: true
         // ============================================================================
-        const myFirebaseConfig = {
-            apiKey: "請在此填寫您的_API_KEY", // <--- ⚠️ 這裡最重要，沒有它無法連線！
-            authDomain: "stockstrategy-492a1.firebaseapp.com",
-            databaseURL: "https://stockstrategy-492a1-default-rtdb.firebaseio.com",
-            projectId: "stockstrategy-492a1",
-            storageBucket: "stockstrategy-492a1.appspot.com",
-            messagingSenderId: "請在此填寫您的_SENDER_ID",
-            appId: "請在此填寫您的_APP_ID"
-        };
-        
-        let firebaseConfig;
-        if (typeof __firebase_config !== 'undefined' && myFirebaseConfig.apiKey.includes("請在此填寫")) {
-            firebaseConfig = JSON.parse(__firebase_config);
-        } else {
-            firebaseConfig = myFirebaseConfig;
-        }
+        const DB_URL = "https://stockstrategy-492a1-default-rtdb.firebaseio.com";
+        const LOCAL_STORAGE_KEY = 'ryan_stock_data_v1';
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'stockstrategy-492a1';
-        let currentUser = null;
+        // 取得當前使用的同步碼 (若無則使用預設本地帳號)
+        const getSyncKey = () => localStorage.getItem('ryan_sync_key') || 'default_local_user';
+        const isCloudMode = () => !!localStorage.getItem('ryan_sync_key');
+
+        let cloudSyncInterval = null;
 
         // 本機記憶體狀態
         let state = {
@@ -563,6 +544,99 @@
             filters: { start: '', end: '', futuresOnly: false, excludeNegativeGrowth: false, tags: [], minScore: 0 },
             sortConfig: { key: 'date', asc: false }
         };
+
+        // 載入本地記憶 (做為雲端載入前的預設呈現)
+        function loadLocalData() {
+            const savedData = localStorage.getItem(LOCAL_STORAGE_KEY);
+            if (savedData) {
+                try {
+                    const parsed = JSON.parse(savedData);
+                    state = { ...state, ...parsed };
+                } catch (e) { console.error("無法載入本地資料", e); }
+            } else {
+                const twStocks = { "2330": "台積電", "2317": "鴻海", "2454": "聯發科", "2382": "廣達", "2603": "長榮" };
+                Object.entries(twStocks).forEach(([c,n]) => { state.codeToName[c] = n; state.nameToCode[n] = c; });
+            }
+        }
+
+        function saveLocalData() {
+            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
+        }
+
+        // ============================================================================
+        // 雲端 REST API 操作函數
+        // ============================================================================
+        async function loadFromCloud() {
+            if (!isCloudMode()) return;
+            const key = getSyncKey();
+            try {
+                const res = await fetch(`${DB_URL}/data/${key}.json`);
+                if (res.status === 401) {
+                    document.getElementById('config-warning-modal').classList.remove('hidden');
+                    return;
+                }
+                const data = await res.json();
+                if (data) {
+                    state.journals = data.journals ? Object.values(data.journals) : [];
+                    state.plans = data.plans ? Object.values(data.plans) : [];
+                    state.epsData = data.epsData || {};
+                    
+                    Object.values(state.epsData).forEach(dt => {
+                        if(dt.name) {
+                            state.codeToName[dt.code] = dt.name;
+                            state.nameToCode[dt.name] = dt.code;
+                        }
+                    });
+                } else {
+                    state.journals = [];
+                    state.plans = [];
+                }
+                
+                updateDatalists();
+                processAndRenderJournals();
+                renderFavorites();
+                renderPlans();
+                saveLocalData();
+            } catch (e) {
+                console.error("雲端讀取失敗", e);
+            }
+        }
+
+        async function putDataToCloud(path, payload) {
+            if (!isCloudMode()) return;
+            const key = getSyncKey();
+            try {
+                await fetch(`${DB_URL}/data/${key}/${path}.json`, {
+                    method: 'PUT',
+                    body: JSON.stringify(payload)
+                });
+            } catch (e) { console.error("雲端寫入失敗", e); }
+        }
+
+        async function patchDataToCloud(path, payload) {
+            if (!isCloudMode()) return;
+            const key = getSyncKey();
+            try {
+                await fetch(`${DB_URL}/data/${key}/${path}.json`, {
+                    method: 'PATCH',
+                    body: JSON.stringify(payload)
+                });
+            } catch (e) { console.error("雲端更新失敗", e); }
+        }
+
+        async function deleteDataFromCloud(path) {
+            if (!isCloudMode()) return;
+            const key = getSyncKey();
+            try {
+                await fetch(`${DB_URL}/data/${key}/${path}.json`, {
+                    method: 'DELETE'
+                });
+            } catch (e) { console.error("雲端刪除失敗", e); }
+        }
+
+        // ============================================================================
+        // 核心邏輯設定
+        // ============================================================================
 
         const tagStyles = {
             "披荊斬棘": "bg-red-900/40 text-red-300 border-red-800", "破繭而出": "bg-rose-900/40 text-rose-300 border-rose-800", 
@@ -616,7 +690,6 @@
             return score;
         };
 
-        // 更新智能下拉選單 (Auto-Complete Datalist)
         const updateDatalists = () => {
             const codesList = document.getElementById('stock-codes-list');
             const namesList = document.getElementById('stock-names-list');
@@ -631,75 +704,30 @@
             }
         };
 
-        // ============================================================================
-        // Firebase 同步碼與路徑邏輯
-        // ============================================================================
-        const getCollectionPath = (colName) => {
-            const syncKey = localStorage.getItem('ryan_sync_key');
-            if (syncKey && syncKey.trim() !== '') return collection(db, 'artifacts', appId, 'public', 'data', `${colName}_${syncKey}`);
-            return collection(db, 'artifacts', appId, 'users', currentUser.uid, colName);
-        };
-        const getDocPath = (colName, docId) => {
-            const syncKey = localStorage.getItem('ryan_sync_key');
-            if (syncKey && syncKey.trim() !== '') return doc(db, 'artifacts', appId, 'public', 'data', `${colName}_${syncKey}`, docId);
-            return doc(db, 'artifacts', appId, 'users', currentUser.uid, colName, docId);
-        };
-
-        let unsubJournal = null, unsubPlan = null, unsubEps = null;
-
-        const setupListeners = (u) => {
-            if(unsubEps) unsubEps();
-            if(unsubJournal) unsubJournal();
-            if(unsubPlan) unsubPlan();
-
-            // 預設台股資料庫
-            const twStocks = { "2330": "台積電", "2317": "鴻海", "2454": "聯發科", "2382": "廣達", "2603": "長榮" };
-
-            unsubEps = onSnapshot(getCollectionPath('eps_data'), s => {
-                state.epsData = {}; state.codeToName={...twStocks}; state.nameToCode={}; 
-                Object.entries(twStocks).forEach(([c,n])=>state.nameToCode[n]=c);
-                
-                s.forEach(d => { 
-                    const dt=d.data(); 
-                    state.epsData[d.id]=dt; 
-                    if(dt.name){ 
-                        state.codeToName[d.id]=dt.name; 
-                        state.nameToCode[dt.name]=d.id; 
-                    } 
-                });
-                
-                updateDatalists();
-                processAndRenderJournals(); renderFavorites(); renderPlans();
-            }, (error) => {
-                console.error("EPS 監聽失敗:", error);
-            });
-
-            unsubJournal = onSnapshot(query(getCollectionPath('journals')), s => {
-                state.journals = []; 
-                s.forEach(d => state.journals.push({id: d.id, ...d.data()}));
-                processAndRenderJournals(); 
-                if(document.getElementById('module-favorites').classList.contains('active')) renderFavorites();
-            });
-
-            unsubPlan = onSnapshot(query(getCollectionPath('plans')), s => {
-                state.plans = []; 
-                s.forEach(d => state.plans.push({id: d.id, ...d.data()}));
-                state.plans.sort((a,b)=>(b.createdAt?.toMillis()||0)-(a.createdAt?.toMillis()||0)); 
-                renderPlans();
-            });
-        };
-
         const updateSyncStatusUI = () => {
             const key = localStorage.getItem('ryan_sync_key');
             const btn = document.getElementById('btn-sync-modal');
+            const st = document.getElementById('auth-status');
             if(key) {
                 btn.innerHTML = `<i class="fa-solid fa-cloud text-green-300 mr-1.5"></i>已連線: ${key}`;
                 btn.classList.add('bg-green-900/50', 'border-green-500/50', 'text-green-300');
                 btn.classList.remove('bg-blue-600', 'border-transparent', 'text-white');
+                
+                st.innerHTML=`<i class="fa-solid fa-cloud text-green-400 mr-1.5"></i>已同步雲端`; 
+                st.className="ml-2 text-xs bg-gray-700 border border-gray-600 px-2.5 py-1 rounded-full shadow-sm font-medium tracking-wide flex items-center"; 
+                
+                // 啟動 5 秒一次的雲端對齊
+                if(cloudSyncInterval) clearInterval(cloudSyncInterval);
+                cloudSyncInterval = setInterval(loadFromCloud, 5000);
             } else {
                 btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-1.5"></i>跨裝置同步`;
                 btn.classList.remove('bg-green-900/50', 'border-green-500/50', 'text-green-300');
                 btn.classList.add('bg-blue-600', 'border-transparent', 'text-white');
+                
+                st.innerHTML=`<i class="fa-solid fa-floppy-disk mr-1.5"></i>本機記憶模式`; 
+                st.className="ml-2 text-xs bg-gray-600 text-white px-2.5 py-1 rounded-full shadow-sm font-medium tracking-wide flex items-center"; 
+                
+                if(cloudSyncInterval) clearInterval(cloudSyncInterval);
             }
         };
 
@@ -712,21 +740,20 @@
             syncModal.classList.remove('hidden');
         });
         document.getElementById('btn-cancel-sync').addEventListener('click', () => syncModal.classList.add('hidden'));
-        document.getElementById('btn-save-sync').addEventListener('click', () => {
+        document.getElementById('btn-save-sync').addEventListener('click', async () => {
             const key = syncInput.value.trim();
             if(key) {
                 localStorage.setItem('ryan_sync_key', key);
                 showToast('已綁定同步碼，正在載入雲端資料...');
+                await loadFromCloud();
             } else {
                 localStorage.removeItem('ryan_sync_key');
                 showToast('已切換為本地驗證模式');
             }
             syncModal.classList.add('hidden');
             updateSyncStatusUI();
-            if(currentUser) setupListeners(currentUser);
         });
 
-        // 關閉缺少設定警告
         document.getElementById('btn-close-config-warning').addEventListener('click', () => {
             document.getElementById('config-warning-modal').classList.add('hidden');
         });
@@ -766,38 +793,39 @@
         
         document.getElementById('btn-import-backup').addEventListener('click', () => document.getElementById('backup-file').click());
         document.getElementById('backup-file').addEventListener('change', async (e) => {
-            const file = e.target.files[0]; if(!file || !currentUser) return;
+            const file = e.target.files[0]; if(!file) return;
             const reader = new FileReader();
             reader.onload = async (event) => {
                 try {
                     const data = new Uint8Array(event.target.result);
                     const wb = XLSX.read(data, {type: 'array'});
                     let total = 0;
+                    
                     if(wb.SheetNames.includes('Journals')) {
                         const jRows = XLSX.utils.sheet_to_json(wb.Sheets['Journals']);
-                        const batch = writeBatch(db);
-                        jRows.forEach(r => {
-                            if(!r.id) return;
-                            const payload = {...r, updatedAt: serverTimestamp()};
+                        for(const r of jRows) {
+                            if(!r.id) continue;
+                            const payload = {...r, updatedAt: Date.now()};
                             try { payload.tags = JSON.parse(r.tags); } catch(err){ payload.tags=[]; }
-                            delete payload.createdAt; 
-                            batch.set(getDocPath('journals', r.id), payload, {merge: true});
+                            const idx = state.journals.findIndex(j => j.id === r.id);
+                            if(idx !== -1) state.journals[idx] = payload; else state.journals.push(payload);
+                            await putDataToCloud(`journals/${r.id}`, payload);
                             total++;
-                        });
-                        await batch.commit();
+                        }
                     }
                     if(wb.SheetNames.includes('Plans')) {
                         const pRows = XLSX.utils.sheet_to_json(wb.Sheets['Plans']);
-                        const batch = writeBatch(db);
-                        pRows.forEach(r => {
-                            if(!r.id) return;
-                            const payload = {...r, updatedAt: serverTimestamp()};
-                            delete payload.createdAt;
-                            batch.set(getDocPath('plans', r.id), payload, {merge: true});
+                        for(const r of pRows) {
+                            if(!r.id) continue;
+                            const payload = {...r, updatedAt: Date.now()};
+                            const idx = state.plans.findIndex(p => p.id === r.id);
+                            if(idx !== -1) state.plans[idx] = payload; else state.plans.push(payload);
+                            await putDataToCloud(`plans/${r.id}`, payload);
                             total++;
-                        });
-                        await batch.commit();
+                        }
                     }
+                    saveLocalData();
+                    processAndRenderJournals(); renderFavorites(); renderPlans();
                     showToast(`成功匯入還原 ${total} 筆資料`);
                 } catch(err) { showToast('匯入失敗，格式錯誤', 'error'); }
                 e.target.value = '';
@@ -859,55 +887,77 @@
             });
         });
 
-        // 加入條件 (Journal) 到 Firestore
+        // 加入條件 (Journal) 
         document.getElementById('journal-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            if(!currentUser) return showToast('尚未登入，無法儲存', 'error');
             const code = codeInput.value.trim(), date = document.getElementById('j-date').value, name = nameInput.value.trim(), notes = document.getElementById('j-notes').value.trim();
             const tagInput = document.querySelector('.tag-input:checked');
             const tag = tagInput ? tagInput.value : null;
             const docId = `${code}_${date}`;
             
-            const existing = state.journals.find(j => j.id === docId);
-            let tags = existing?.tags || [];
-            if(tag && !tags.includes(tag)) tags.push(tag);
+            const existingIdx = state.journals.findIndex(j => j.id === docId);
+            let tags = [];
             let mergedNotes = notes;
-            if(existing && existing.notes) mergedNotes = notes ? `${existing.notes} / ${notes}` : existing.notes;
+            let isFavorite = false;
+            let createdAt = Date.now();
 
-            try {
-                const payload = { date, code, name, tags, notes: mergedNotes, updatedAt: serverTimestamp() };
-                if(!existing) { payload.isFavorite = false; payload.createdAt = serverTimestamp(); }
-                await setDoc(getDocPath('journals', docId), payload, { merge: true });
-                showToast('已儲存至條件');
-                codeInput.value=''; nameInput.value=''; document.getElementById('j-notes').value=''; 
-                previewDiv.classList.add('hidden');
-                codeInput.focus();
-            } catch(err) { showToast('儲存失敗', 'error'); }
+            if (existingIdx !== -1) {
+                const existing = state.journals[existingIdx];
+                tags = existing.tags || [];
+                if(tag && !tags.includes(tag)) tags.push(tag);
+                mergedNotes = notes ? (existing.notes ? `${existing.notes} / ${notes}` : notes) : existing.notes;
+                isFavorite = existing.isFavorite || false;
+                createdAt = existing.createdAt || Date.now();
+            } else {
+                if(tag) tags.push(tag);
+            }
+            
+            const payload = { id: docId, date, code, name, tags, notes: mergedNotes, isFavorite, createdAt, updatedAt: Date.now() };
+            if(existingIdx !== -1) state.journals[existingIdx] = payload; else state.journals.push(payload);
+
+            saveLocalData();
+            processAndRenderJournals();
+            if(document.getElementById('module-favorites').classList.contains('active')) renderFavorites();
+            
+            await putDataToCloud(`journals/${docId}`, payload);
+            
+            showToast('已儲存至條件');
+            codeInput.value=''; nameInput.value=''; document.getElementById('j-notes').value=''; 
+            previewDiv.classList.add('hidden');
+            codeInput.focus();
         });
 
-        // 匯入 Excel 到 Firestore EPS 資料庫
+        // 匯入 Excel 
         document.getElementById('excel-upload').addEventListener('change', (e) => {
-            const f = e.target.files[0]; if(!f || !currentUser) return;
+            const f = e.target.files[0]; if(!f) return;
             showToast('解析資料庫...');
             const reader = new FileReader();
             reader.onload = async (ev) => {
                 try {
                     const wb = XLSX.read(new Uint8Array(ev.target.result), {type: 'array'});
                     const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header:1});
-                    let chunks=[], cur=[];
+                    let count = 0;
+                    const updates = {};
                     for(let i=1; i<rows.length; i++) {
                         if(!rows[i] || rows[i].length<2) continue;
                         const c = String(rows[i][0]).trim(); if(!c) continue;
-                        cur.push({ code: c, name: String(rows[i][1]||'').trim(), eps2025: parseFloat(rows[i][2])||null, eps2026: parseFloat(rows[i][3])||null, epsGrowth: parseFloat(rows[i][4])||null, futures: String(rows[i][5]||'').trim(), updatedAt: serverTimestamp() });
-                        if(cur.length>=400) { chunks.push(cur); cur=[]; }
+                        const n = String(rows[i][1]||'').trim();
+                        
+                        const item = { code: c, name: n, eps2025: parseFloat(rows[i][2])||null, eps2026: parseFloat(rows[i][3])||null, epsGrowth: parseFloat(rows[i][4])||null, futures: String(rows[i][5]||'').trim(), updatedAt: Date.now() };
+                        state.epsData[c] = item;
+                        updates[c] = item;
+                        
+                        if (n) { state.codeToName[c] = n; state.nameToCode[n] = c; }
+                        count++;
                     }
-                    if(cur.length>0) chunks.push(cur);
-                    for(const ch of chunks) {
-                        const batch = writeBatch(db);
-                        ch.forEach(item => batch.set(getDocPath('eps_data', item.code), item, {merge:true}));
-                        await batch.commit();
+                    saveLocalData();
+                    updateDatalists();
+                    processAndRenderJournals(); renderFavorites(); renderPlans();
+                    
+                    if(isCloudMode() && Object.keys(updates).length > 0) {
+                        await patchDataToCloud('epsData', updates);
                     }
-                    showToast(`更新完成，匯入 ${chunks.reduce((a,b)=>a+b.length,0)} 筆資料`);
+                    showToast(`更新完成，匯入 ${count} 筆資料`);
                     e.target.value='';
                 } catch(err) { showToast('格式錯誤','error'); }
             };
@@ -921,6 +971,7 @@
                 state.sortConfig.key = key;
                 processAndRenderJournals();
                 if(document.getElementById('module-favorites').classList.contains('active')) renderFavorites();
+                saveLocalData();
             });
         });
 
@@ -932,6 +983,7 @@
                 state.filters.excludeNegativeGrowth = document.getElementById('filter-exclude-negative-growth').checked;
                 state.filters.minScore = parseInt(document.getElementById('filter-score').value) || 0;
                 processAndRenderJournals();
+                saveLocalData();
             });
         });
 
@@ -958,6 +1010,7 @@
                 }
                 renderFilterTags();
                 processAndRenderJournals();
+                saveLocalData();
             });
         });
 
@@ -967,6 +1020,7 @@
             if (cb) cb.checked = false;
             renderFilterTags(); 
             processAndRenderJournals();
+            saveLocalData();
         };
 
         function renderFilterTags() {
@@ -1059,13 +1113,16 @@
 
             tbody.querySelectorAll('.tag-remove-btn').forEach(async b => {
                 b.addEventListener('click', async (e)=>{
-                    if(!currentUser) return;
                     const id = e.currentTarget.dataset.id;
                     const tagToRemove = e.currentTarget.dataset.tag;
                     const j = state.journals.find(x => x.id === id);
                     if(j && j.tags) {
-                        const newTags = j.tags.filter(t => t !== tagToRemove);
-                        await updateDoc(getDocPath('journals', id), {tags: newTags});
+                        j.tags = j.tags.filter(t => t !== tagToRemove);
+                        j.updatedAt = Date.now();
+                        saveLocalData();
+                        processAndRenderJournals();
+                        if(document.getElementById('module-favorites').classList.contains('active')) renderFavorites();
+                        await putDataToCloud(`journals/${id}`, j);
                         showToast(`已移除標籤: ${tagToRemove}`);
                     }
                 });
@@ -1080,15 +1137,25 @@
             }));
 
             tbody.querySelectorAll('.del-btn').forEach(b => b.addEventListener('click', async(e)=>{
-                if(currentUser) await deleteDoc(getDocPath('journals', e.currentTarget.dataset.id));
+                const id = e.currentTarget.dataset.id;
+                state.journals = state.journals.filter(j => j.id !== id);
+                saveLocalData();
+                processAndRenderJournals();
+                await deleteDataFromCloud(`journals/${id}`);
             }));
             
             tbody.querySelectorAll('.fav-toggle-btn').forEach(b => b.addEventListener('click', async(e)=>{
-                if(!currentUser) return;
                 const id = e.currentTarget.dataset.id;
-                const isFav = e.currentTarget.dataset.fav === 'true';
-                await updateDoc(getDocPath('journals', id), {isFavorite: !isFav});
-                showToast(isFav?'已移除追蹤':'已加入追蹤');
+                const j = state.journals.find(x => x.id === id);
+                if(j) {
+                    j.isFavorite = !j.isFavorite;
+                    j.updatedAt = Date.now();
+                    saveLocalData();
+                    processAndRenderJournals();
+                    if(document.getElementById('module-favorites').classList.contains('active')) renderFavorites();
+                    await putDataToCloud(`journals/${id}`, j);
+                    showToast(j.isFavorite?'已加入追蹤':'已移除追蹤');
+                }
             }));
         };
 
@@ -1209,36 +1276,51 @@
         
         document.getElementById('plan-form').addEventListener('submit', async(e)=>{
             e.preventDefault();
-            if(!currentUser) return showToast('尚未登入，無法儲存', 'error');
+            const id = generateId();
             const stock = document.getElementById('p-stock').value.trim(), qty = parseInt(document.getElementById('p-qty').value)||1;
-            try {
-                await addDoc(getCollectionPath('plans'), {
-                    stock, qty, entry: parseFloat(pEntry.value), stop: parseFloat(pStop.value), target: parseFloat(document.getElementById('p-target').value)||null, note: document.getElementById('p-note').value.trim(), status: '持倉中', pnl: 0, createdAt: serverTimestamp()
-                });
-                showToast('計畫建立成功'); 
-                e.target.reset();
-            } catch(err) { showToast('建立失敗', 'error'); }
+            
+            const payload = {
+                id, stock, qty, entry: parseFloat(pEntry.value), stop: parseFloat(pStop.value), target: parseFloat(document.getElementById('p-target').value)||null, note: document.getElementById('p-note').value.trim(), status: '持倉中', pnl: 0, createdAt: Date.now(), updatedAt: Date.now()
+            };
+
+            state.plans.push(payload);
+            state.plans.sort((a,b) => b.createdAt - a.createdAt);
+            saveLocalData();
+            renderPlans();
+
+            await putDataToCloud(`plans/${id}`, payload);
+
+            showToast('計畫建立成功'); 
+            e.target.reset();
         });
 
         window.openCloseModal = (id, def) => { document.getElementById('modal-plan-id').value=id; document.getElementById('modal-exit-price').value=def||''; document.getElementById('close-plan-modal').classList.remove('hidden'); };
         
         window.deletePlan = async (id) => { 
-            if(currentUser) {
-                await deleteDoc(getDocPath('plans', id));
-                showToast('規劃已刪除'); 
-            }
+            state.plans = state.plans.filter(p => p.id !== id);
+            saveLocalData();
+            renderPlans();
+            await deleteDataFromCloud(`plans/${id}`);
+            showToast('規劃已刪除'); 
         };
 
         document.getElementById('btn-cancel-modal').addEventListener('click', ()=>document.getElementById('close-plan-modal').classList.add('hidden'));
         
         const closeTrade = async (status) => {
-            if(!currentUser) return;
             const id = document.getElementById('modal-plan-id').value, ex = parseFloat(document.getElementById('modal-exit-price').value);
             if(isNaN(ex)) return showToast('無效金額','error');
             const p = state.plans.find(x=>x.id===id); if(!p) return;
             const pnl = Math.round((ex - p.entry)*p.qty*1000);
             
-            await updateDoc(getDocPath('plans', id), {status, exitPrice:ex, pnl});
+            p.status = status;
+            p.exitPrice = ex;
+            p.pnl = pnl;
+            p.updatedAt = Date.now();
+            
+            saveLocalData();
+            renderPlans();
+            await putDataToCloud(`plans/${id}`, p);
+
             document.getElementById('close-plan-modal').classList.add('hidden'); 
             showToast(`結算損益: $${pnl}`);
         };
@@ -1278,41 +1360,37 @@
         }
 
         // 初始化
-        document.addEventListener('DOMContentLoaded', () => {
-            // 檢查是否缺少 API Key
-            if (typeof __firebase_config === 'undefined' && firebaseConfig.apiKey.includes("請在此填寫")) {
-                document.getElementById('config-warning-modal').classList.remove('hidden');
-            }
+        document.addEventListener('DOMContentLoaded', async () => {
+            // 1. 優先從本機 LocalStorage 載入歷史資料
+            loadLocalData();
 
-            // 恢復篩選日期的預設值或歷史狀態
+            // 2. 恢復篩選日期的預設值或歷史狀態
             document.getElementById('j-date').value = getToday();
-            document.getElementById('filter-start').value = getToday();
-            document.getElementById('filter-end').value = getToday();
+            document.getElementById('filter-start').value = state.filters.start || getToday();
+            document.getElementById('filter-end').value = state.filters.end || getToday();
+            document.getElementById('filter-futures').checked = state.filters.futuresOnly || false;
+            document.getElementById('filter-exclude-negative-growth').checked = state.filters.excludeNegativeGrowth || false;
+            document.getElementById('filter-score').value = state.filters.minScore || 0;
             
-            // 啟動匿名登入
-            signInAnonymously(auth).catch((error) => {
-                console.error("Auth Error:", error);
-                const st = document.getElementById('auth-status');
-                st.innerHTML=`<i class="fa-solid fa-triangle-exclamation mr-1.5"></i>連線遭拒`; 
-                st.className="ml-2 text-xs bg-red-600 px-2.5 py-1 rounded-full shadow-sm font-medium tracking-wide flex items-center";
-                showToast('無法連線：請確定您的 Firebase 已啟用「匿名登入」且金鑰正確。', 'error');
-            });
+            if (state.filters.tags && state.filters.tags.length > 0) {
+                state.filters.tags.forEach(t => {
+                    const cb = document.querySelector(`.filter-tag-cb[value="${t}"]`);
+                    if (cb) cb.checked = true;
+                });
+            }
+            renderFilterTags();
 
-            onAuthStateChanged(auth, u => {
-                currentUser = u;
-                const st = document.getElementById('auth-status');
-                if(u){ 
-                    st.innerHTML=`<i class="fa-solid fa-cloud text-green-400 mr-1.5"></i>已同步雲端`; 
-                    st.className="ml-2 text-xs bg-gray-700 border border-gray-600 px-2.5 py-1 rounded-full shadow-sm font-medium tracking-wide flex items-center"; 
-                    setupListeners(u); 
-                }
-                else { 
-                    st.innerHTML=`<i class="fa-solid fa-triangle-exclamation mr-1.5"></i>未登入`; 
-                    st.className="ml-2 text-xs bg-red-600 px-2.5 py-1 rounded-full shadow-sm font-medium tracking-wide flex items-center"; 
-                }
-            });
-            
+            // 3. 更新畫面與列表
+            updateDatalists();
+            processAndRenderJournals();
+            renderFavorites();
+            renderPlans();
+
+            // 4. 若有同步碼則開啟雲端同步機制
             updateSyncStatusUI();
+            if(isCloudMode()) {
+                await loadFromCloud();
+            }
         });
     </script>
 </body>
