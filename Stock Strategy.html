@@ -44,7 +44,7 @@
                 <div class="flex items-center gap-3">
                     <div class="bg-blue-600/20 p-2 rounded-lg"><i class="fa-solid fa-chart-line text-blue-500 text-xl"></i></div>
                     <span class="font-bold text-xl tracking-wider text-white hidden sm:block">萊恩飆股起漲手札</span>
-                    <span id="auth-status" class="ml-2 text-xs bg-yellow-600/90 text-white px-2.5 py-1 rounded-full font-medium tracking-wide shadow-sm flex items-center"><i class="fa-solid fa-spinner fa-spin mr-1.5"></i>連線中</span>
+                    <span id="auth-status" class="ml-2 w-7 h-7 bg-gray-800 border border-gray-600 rounded-full shadow-sm flex items-center justify-center cursor-help" title="連線中"><i class="fa-solid fa-spinner fa-spin text-yellow-500 text-xs"></i></span>
                 </div>
                 <!-- Desktop Nav -->
                 <div class="hidden md:flex flex-1 justify-center space-x-2">
@@ -164,7 +164,7 @@
                 <div class="bg-gray-800 rounded-xl p-5 border-t-4 border-gray-600 shadow-xl lg:col-span-1 flex flex-col justify-between">
                     <div>
                         <h2 class="font-bold text-gray-300 flex items-center mb-3 text-xl"><div class="bg-gray-700 p-1.5 rounded mr-2"><i class="fa-solid fa-database"></i></div> 個股資料庫</h2>
-                        <p class="text-xs text-gray-400 mb-4 leading-relaxed bg-gray-900/50 p-3 rounded-lg border border-gray-700/50">匯入包含 EPS 與股期資訊的 Excel。系統將自動將資料上傳至雲端資料庫。</p>
+                        <p class="text-xs text-gray-400 mb-4 leading-relaxed bg-gray-900/50 p-3 rounded-lg border border-gray-700/50">匯入包含 EPS 與股期資訊的 Excel。系統將自動更新數值至智能搜尋中並儲存於本地。</p>
                         <input type="file" id="excel-upload" accept=".xlsx, .xls" class="block w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-gray-700 file:text-white file:font-medium file:cursor-pointer hover:file:bg-gray-600 transition cursor-pointer shadow-sm">
                     </div>
                 </div>
@@ -499,6 +499,15 @@
         </div>
     </div>
 
+    <!-- 複製預覽視窗 (僅電腦版顯示) -->
+    <div id="copy-preview-modal" class="fixed right-6 bottom-24 z-[100] w-80 lg:w-96 bg-gray-800 border border-gray-600 rounded-xl shadow-2xl flex-col max-h-[70vh] hidden">
+        <div class="flex justify-between items-center p-3 border-b border-gray-700 bg-gray-900 rounded-t-xl">
+            <h3 class="text-sm font-bold text-blue-400 flex items-center"><i class="fa-solid fa-eye mr-2"></i>複製內容預覽</h3>
+            <button id="btn-close-preview" class="text-gray-400 hover:text-red-400 transition p-1"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="p-4 overflow-y-auto text-xs text-gray-300 font-mono whitespace-pre-wrap leading-relaxed" id="copy-preview-content"></div>
+    </div>
+
     <!-- Toast -->
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-3 pointer-events-none"></div>
 
@@ -648,7 +657,11 @@
             "KD金叉": "bg-blue-900/40 text-blue-300 border-blue-800", "RSI強勢": "bg-sky-900/40 text-sky-300 border-sky-800", "均線多頭": "bg-pink-900/40 text-pink-300 border-pink-800"
         };
 
-        const getToday = () => new Date().toISOString().split('T')[0];
+        // 修正：取得準確的本地時區當日日期 (解決過午夜可能出現的 UTC 時差問題)
+        const getToday = () => {
+            const d = new Date();
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        };
         const generateId = () => Date.now().toString(36) + Math.random().toString(36).substr(2);
 
         function showToast(msg, type = 'success') {
@@ -709,12 +722,12 @@
             const btn = document.getElementById('btn-sync-modal');
             const st = document.getElementById('auth-status');
             if(key) {
-                btn.innerHTML = `<i class="fa-solid fa-cloud text-green-300 mr-1.5"></i>已連線: ${key}`;
+                btn.innerHTML = `<i class="fa-solid fa-cloud text-green-300 mr-1.5" title="已連線"></i>${key}`;
                 btn.classList.add('bg-green-900/50', 'border-green-500/50', 'text-green-300');
                 btn.classList.remove('bg-blue-600', 'border-transparent', 'text-white');
                 
-                st.innerHTML=`<i class="fa-solid fa-cloud text-green-400 mr-1.5"></i>已同步雲端`; 
-                st.className="ml-2 text-xs bg-gray-700 border border-gray-600 px-2.5 py-1 rounded-full shadow-sm font-medium tracking-wide flex items-center"; 
+                st.innerHTML=`<i class="fa-solid fa-cloud text-green-400 text-sm" title="已同步雲端"></i>`; 
+                st.className="ml-2 w-7 h-7 bg-gray-700 border border-gray-600 rounded-full shadow-sm flex items-center justify-center cursor-help"; 
                 
                 // 啟動 5 秒一次的雲端對齊
                 if(cloudSyncInterval) clearInterval(cloudSyncInterval);
@@ -724,8 +737,8 @@
                 btn.classList.remove('bg-green-900/50', 'border-green-500/50', 'text-green-300');
                 btn.classList.add('bg-blue-600', 'border-transparent', 'text-white');
                 
-                st.innerHTML=`<i class="fa-solid fa-floppy-disk mr-1.5"></i>本機記憶模式`; 
-                st.className="ml-2 text-xs bg-gray-600 text-white px-2.5 py-1 rounded-full shadow-sm font-medium tracking-wide flex items-center"; 
+                st.innerHTML=`<i class="fa-solid fa-floppy-disk text-gray-400 text-sm" title="本機記憶模式"></i>`; 
+                st.className="ml-2 w-7 h-7 bg-gray-700 border border-gray-600 rounded-full shadow-sm flex items-center justify-center cursor-help"; 
                 
                 if(cloudSyncInterval) clearInterval(cloudSyncInterval);
             }
@@ -756,6 +769,28 @@
 
         document.getElementById('btn-close-config-warning').addEventListener('click', () => {
             document.getElementById('config-warning-modal').classList.add('hidden');
+        });
+
+        // 複製預覽視窗互動
+        const showPreview = (text) => {
+            // 螢幕寬度 >= 1024px (lg breakpoint) 才顯示預覽視窗
+            if (window.innerWidth >= 1024) {
+                const modal = document.getElementById('copy-preview-modal');
+                const content = document.getElementById('copy-preview-content');
+                if (modal && content) {
+                    content.textContent = text;
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                }
+            }
+        };
+
+        document.getElementById('btn-close-preview').addEventListener('click', () => {
+            const modal = document.getElementById('copy-preview-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
         });
 
         // Nav
@@ -1165,12 +1200,25 @@
         const copyFootnote = `\n\n-------------------\n⚠️ 停損是紀律，停利是藝術。\n⚠️ 位階決定勝率，部位決定存活。`;
 
         const executeCopy = (text) => {
-            if(navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(()=>showToast('複製成功')).catch(()=>fallbackCopy(text));
-            else fallbackCopy(text);
+            if(navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showToast('複製成功');
+                    showPreview(text);
+                }).catch(()=> {
+                    fallbackCopy(text);
+                });
+            } else {
+                fallbackCopy(text);
+            }
         };
+
         const fallbackCopy = (text) => {
             const t = document.createElement("textarea"); t.value = text; t.style.position="fixed"; document.body.appendChild(t); t.focus(); t.select();
-            try { document.execCommand('copy'); showToast('複製成功'); } catch(e) { showToast('複製失敗','error'); } document.body.removeChild(t);
+            try { 
+                document.execCommand('copy'); 
+                showToast('複製成功'); 
+                showPreview(text);
+            } catch(e) { showToast('複製失敗','error'); } document.body.removeChild(t);
         };
 
         document.querySelectorAll('.btn-copy').forEach(btn => {
@@ -1364,10 +1412,15 @@
             // 1. 優先從本機 LocalStorage 載入歷史資料
             loadLocalData();
 
-            // 2. 恢復篩選日期的預設值或歷史狀態
-            document.getElementById('j-date').value = getToday();
-            document.getElementById('filter-start').value = state.filters.start || getToday();
-            document.getElementById('filter-end').value = state.filters.end || getToday();
+            // 2. 日期與篩選區間一律強制預設為即時(今日)日期
+            const todayDate = getToday();
+            document.getElementById('j-date').value = todayDate;
+            state.filters.start = todayDate;
+            state.filters.end = todayDate;
+            document.getElementById('filter-start').value = todayDate;
+            document.getElementById('filter-end').value = todayDate;
+            
+            // 載入其他過濾狀態
             document.getElementById('filter-futures').checked = state.filters.futuresOnly || false;
             document.getElementById('filter-exclude-negative-growth').checked = state.filters.excludeNegativeGrowth || false;
             document.getElementById('filter-score').value = state.filters.minScore || 0;
