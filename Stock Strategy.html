@@ -187,6 +187,12 @@
                             <span class="text-sm text-purple-400 font-medium">僅含股期</span>
                         </label>
 
+                        <!-- 新增：排除負成長選項 -->
+                        <label class="flex items-center gap-2 cursor-pointer bg-gray-900/50 rounded-lg px-3 py-2 border border-gray-700/50 transition hover:bg-gray-800">
+                            <input type="checkbox" id="filter-exclude-negative-growth" class="rounded border-gray-600 text-green-500 focus:ring-green-500 w-4 h-4">
+                            <span class="text-sm text-green-400 font-medium">排除負成長</span>
+                        </label>
+
                         <select id="filter-score" class="bg-gray-900/50 text-white text-sm border border-gray-700/50 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none transition hover:bg-gray-800">
                             <option value="0">分數不限</option>
                             <option value="1">1分(含)以上</option>
@@ -491,7 +497,7 @@
         // 本機記憶體狀態
         let state = {
             journals: [], plans: [], epsData: {}, codeToName: {}, nameToCode: {},
-            filters: { start: '', end: '', futuresOnly: false, tags: [], minScore: 0 },
+            filters: { start: '', end: '', futuresOnly: false, excludeNegativeGrowth: false, tags: [], minScore: 0 },
             sortConfig: { key: 'date', asc: false }
         };
 
@@ -802,11 +808,12 @@
             });
         });
 
-        ['filter-start', 'filter-end', 'filter-futures', 'filter-score'].forEach(id => {
+        ['filter-start', 'filter-end', 'filter-futures', 'filter-exclude-negative-growth', 'filter-score'].forEach(id => {
             document.getElementById(id).addEventListener('change', () => {
                 state.filters.start = document.getElementById('filter-start').value;
                 state.filters.end = document.getElementById('filter-end').value;
                 state.filters.futuresOnly = document.getElementById('filter-futures').checked;
+                state.filters.excludeNegativeGrowth = document.getElementById('filter-exclude-negative-growth').checked;
                 state.filters.minScore = parseInt(document.getElementById('filter-score').value) || 0;
                 processAndRenderJournals();
                 saveData();
@@ -855,7 +862,7 @@
         }
 
         const getFilteredAndSortedData = (dataList) => {
-            const { start, end, futuresOnly, tags, minScore } = state.filters;
+            const { start, end, futuresOnly, excludeNegativeGrowth, tags, minScore } = state.filters;
             const { key, asc } = state.sortConfig;
             
             let filtered = dataList.filter(j => {
@@ -863,6 +870,7 @@
                 if(end && j.date > end) return false;
                 const epsInfo = getEpsInfo(j.code, j);
                 if(futuresOnly && !epsInfo.futures) return false;
+                if(excludeNegativeGrowth && epsInfo.epsGrowth !== null && epsInfo.epsGrowth < 0) return false;
                 if(minScore > 0 && getScore(j.tags, epsInfo) < minScore) return false;
                 if(tags.length > 0) {
                     const hasAll = tags.every(t => j.tags && j.tags.includes(t));
@@ -1175,6 +1183,7 @@
             document.getElementById('filter-start').value = state.filters.start || getToday();
             document.getElementById('filter-end').value = state.filters.end || getToday();
             document.getElementById('filter-futures').checked = state.filters.futuresOnly || false;
+            document.getElementById('filter-exclude-negative-growth').checked = state.filters.excludeNegativeGrowth || false;
             document.getElementById('filter-score').value = state.filters.minScore || 0;
             
             // 恢復視覺上的標籤打勾狀態
