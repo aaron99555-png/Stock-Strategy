@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>萊恩選股手札 - 跨裝置交易決策系統</title>
+    <title>萊恩飆股起漲手札 - 跨裝置交易決策系統</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -43,7 +43,7 @@
                 <!-- Logo -->
                 <div class="flex items-center gap-3">
                     <div class="bg-blue-600/20 p-2 rounded-lg"><i class="fa-solid fa-chart-line text-blue-500 text-xl"></i></div>
-                    <span class="font-bold text-xl tracking-wider text-white hidden sm:block">萊恩選股手札</span>
+                    <span class="font-bold text-xl tracking-wider text-white hidden sm:block">萊恩飆股起漲手札</span>
                     <span id="auth-status" class="ml-2 text-xs bg-yellow-600/90 text-white px-2.5 py-1 rounded-full font-medium tracking-wide shadow-sm flex items-center"><i class="fa-solid fa-spinner fa-spin mr-1.5"></i>連線中</span>
                 </div>
                 <!-- Desktop Nav -->
@@ -787,7 +787,7 @@
             const jData = state.journals.map(j => ({ ...j, tags: JSON.stringify(j.tags||[]) }));
             XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(jData), "Journals");
             XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(state.plans), "Plans");
-            XLSX.writeFile(wb, `萊恩手札備份_${getToday()}.xlsx`);
+            XLSX.writeFile(wb, `萊恩飆股起漲手札備份_${getToday()}.xlsx`);
             showToast('備份已下載');
         });
         
