@@ -239,6 +239,11 @@
                             </div>
                         </div>
                         <div id="filter-tags-display" class="flex flex-wrap gap-1.5 w-full xl:w-auto"></div>
+                        
+                        <!-- 清除篩選按鈕 -->
+                        <button type="button" id="btn-clear-filters" class="text-xs bg-gray-700 hover:bg-red-600 text-gray-300 hover:text-white border border-gray-600 hover:border-red-500 px-3 py-2 rounded-lg transition shadow-sm flex items-center ml-auto xl:ml-0">
+                            <i class="fa-solid fa-eraser mr-1.5"></i>清除篩選
+                        </button>
                     </div>
 
                     <!-- Copy Zone -->
@@ -1010,6 +1015,7 @@
             });
         });
 
+        // 綁定篩選條件變更事件
         ['filter-start', 'filter-end', 'filter-futures', 'filter-exclude-negative-growth', 'filter-score'].forEach(id => {
             document.getElementById(id).addEventListener('change', () => {
                 state.filters.start = document.getElementById('filter-start').value;
@@ -1020,6 +1026,34 @@
                 processAndRenderJournals();
                 saveLocalData();
             });
+        });
+
+        // 清除篩選按鈕邏輯
+        document.getElementById('btn-clear-filters').addEventListener('click', () => {
+            const todayDate = getToday();
+            
+            // 重置狀態
+            state.filters.start = todayDate;
+            state.filters.end = todayDate;
+            state.filters.futuresOnly = false;
+            state.filters.excludeNegativeGrowth = false;
+            state.filters.minScore = 0;
+            state.filters.tags = [];
+
+            // 重置畫面 UI
+            document.getElementById('filter-start').value = todayDate;
+            document.getElementById('filter-end').value = todayDate;
+            document.getElementById('filter-futures').checked = false;
+            document.getElementById('filter-exclude-negative-growth').checked = false;
+            document.getElementById('filter-score').value = "0";
+            
+            document.querySelectorAll('.filter-tag-cb').forEach(cb => cb.checked = false);
+
+            // 更新畫面與存檔
+            renderFilterTags();
+            processAndRenderJournals();
+            saveLocalData();
+            showToast('已清除篩選條件');
         });
 
         // 打勾面板開關邏輯
@@ -1197,7 +1231,7 @@
         function processAndRenderJournals() { renderTableRows(getFilteredAndSortedData(state.journals), 'journal-table-body', 'journal-empty'); }
         function renderFavorites() { renderTableRows(state.journals.filter(j=>j.isFavorite), 'fav-table-body', 'fav-empty', true); }
 
-        const copyFootnote = `\n\n-------------------\n⚠️ 停損是紀律，停利是藝術。\n⚠️ 位階決定勝率，部位決定存活。`;
+        const copyFootnote = `\n\n-------------------\n⚠️ 停損是紀律，停利是藝術。\n⚠️ 位階決定勝率，部位決定存活。\n⚠️ 趨勢-族群-題材-位階-動能-風控`;
 
         const executeCopy = (text) => {
             if(navigator.clipboard && window.isSecureContext) {
