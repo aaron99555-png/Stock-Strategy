@@ -543,7 +543,13 @@
         
         const getScore = (tags, epsInfo) => {
             let score = tags && Array.isArray(tags) ? tags.length : 0;
-            if (epsInfo && epsInfo.eps2026 !== null && epsInfo.eps2025 !== null && epsInfo.eps2026 > epsInfo.eps2025) score += 1;
+            
+            // 成長率為正數 且 預估26年EPS為正數，雙條件同時符合再 +1分
+            if (epsInfo && epsInfo.epsGrowth !== null && epsInfo.eps2026 !== null) {
+                if (epsInfo.epsGrowth > 0 && epsInfo.eps2026 > 0) {
+                    score += 1;
+                }
+            }
             return score;
         };
 
