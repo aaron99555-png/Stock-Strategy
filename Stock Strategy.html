@@ -1000,7 +1000,7 @@
                         const shortTags = j.tags?.length > 0 ? ` ${j.tags.map(t=>t[0]).join('')}` : '';
                         const g = getEpsInfo(j.code,j).epsGrowth;
                         const gStr = g !== null ? (g * 100).toFixed(2) + '%' : '無';
-                        text += `- ${j.code} ${j.name} [${getScore(j.tags, getEpsInfo(j.code, j))}分]${shortTags} (成長: ${gStr})\n`;
+                        text += `- ${j.code} ${j.name} [${getScore(j.tags, getEpsInfo(j.code, j))}分] (預成長: ${gStr})${shortTags}\n`;
                     });
                 }
                 else if(mode === 'eps') {
@@ -1020,7 +1020,7 @@
                         const shortTags = j.tags?.length > 0 ? ` ${j.tags.map(t=>t[0]).join('')}` : '';
                         const g = getEpsInfo(j.code,j).epsGrowth;
                         const gStr = g !== null ? (g * 100).toFixed(2) + '%' : '無';
-                        text += `- [期] ${j.code} ${j.name} [${getScore(j.tags, getEpsInfo(j.code, j))}分]${shortTags} (成長: ${gStr})\n`;
+                        text += `- [期] ${j.code} ${j.name} [${getScore(j.tags, getEpsInfo(j.code, j))}分] (預成長: ${gStr})${shortTags}\n`;
                     });
                 }
                 executeCopy(text.trim() + copyFootnote);
