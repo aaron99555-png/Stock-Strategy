@@ -127,6 +127,7 @@
                                     <label class="cursor-pointer"><input type="checkbox" value="月來越好" class="hidden tag-input"><div class="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-600 text-gray-300 hover:bg-gray-700 transition" data-color="#f97316">月來越好</div></label>
                                     <label class="cursor-pointer"><input type="checkbox" value="季不可失" class="hidden tag-input"><div class="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-600 text-gray-300 hover:bg-gray-700 transition" data-color="#f59e0b">季不可失</div></label>
                                     <label class="cursor-pointer"><input type="checkbox" value="守株待兔" class="hidden tag-input"><div class="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-600 text-gray-300 hover:bg-gray-700 transition" data-color="#a3e635">守株待兔</div></label>
+                                    <label class="cursor-pointer"><input type="checkbox" value="特別追蹤" class="hidden tag-input"><div class="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-600 text-gray-300 hover:bg-gray-700 transition" data-color="#8b5cf6">特別追蹤</div></label>
                                 </div>
                             </div>
 
@@ -214,6 +215,7 @@
                                     <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-700/50 p-1.5 rounded transition"><input type="checkbox" value="月來越好" class="filter-tag-cb w-3.5 h-3.5 accent-blue-500 cursor-pointer"><span class="text-xs text-gray-300">月來越好</span></label>
                                     <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-700/50 p-1.5 rounded transition"><input type="checkbox" value="季不可失" class="filter-tag-cb w-3.5 h-3.5 accent-blue-500 cursor-pointer"><span class="text-xs text-gray-300">季不可失</span></label>
                                     <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-700/50 p-1.5 rounded transition"><input type="checkbox" value="守株待兔" class="filter-tag-cb w-3.5 h-3.5 accent-blue-500 cursor-pointer"><span class="text-xs text-gray-300">守株待兔</span></label>
+                                    <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-700/50 p-1.5 rounded transition"><input type="checkbox" value="特別追蹤" class="filter-tag-cb w-3.5 h-3.5 accent-blue-500 cursor-pointer"><span class="text-xs text-gray-300">特別追蹤</span></label>
                                 </div>
                                 <div class="text-[10px] font-bold text-gray-400 border-b border-gray-700 pb-1 mb-1.5">💰 量價與籌碼</div>
                                 <div class="grid grid-cols-2 gap-1 mb-3">
@@ -643,7 +645,7 @@
         const tagStyles = {
             "披荊斬棘": "bg-red-900/40 text-red-300 border-red-800", "破繭而出": "bg-rose-900/40 text-rose-300 border-rose-800", 
             "月來越好": "bg-orange-900/40 text-orange-300 border-orange-800", "季不可失": "bg-amber-900/40 text-amber-300 border-amber-800", 
-            "守株待兔": "bg-lime-900/40 text-lime-300 border-lime-800", "量價齊揚": "bg-green-900/40 text-green-300 border-green-800", 
+            "守株待兔": "bg-lime-900/40 text-lime-300 border-lime-800", "特別追蹤": "bg-violet-900/40 text-violet-300 border-violet-800", "量價齊揚": "bg-green-900/40 text-green-300 border-green-800", 
             "高成交值": "bg-teal-900/40 text-teal-300 border-teal-800", "法人加持": "bg-indigo-900/40 text-indigo-300 border-indigo-800", 
             "籌碼集中": "bg-purple-900/40 text-purple-300 border-purple-800", 
             "OBV突破": "bg-emerald-900/40 text-emerald-300 border-emerald-800", "MACD突破": "bg-cyan-900/40 text-cyan-300 border-cyan-800", 
@@ -1138,20 +1140,13 @@
                 const tagsHtml = (item.tags || []).map(t => `<span class="inline-block text-[11px] font-medium px-2 py-0.5 rounded-md mr-1 mb-1 border cursor-pointer hover:opacity-60 transition tag-remove-btn ${tagStyles[t]||"bg-gray-800 text-gray-300 border-gray-600"}" data-id="${item.id}" data-tag="${t}" title="點擊移除此標籤">${t} <i class="fa-solid fa-xmark ml-1 opacity-70"></i></span>`).join('');
                 const score = getScore(item.tags, ei);
                 
-                let actionHtml = '';
-                if(isFavoriteContext) {
-                    actionHtml = `
-                        <button class="mr-2 hover:scale-110 add-plan-btn text-green-500 bg-gray-800 p-1.5 rounded-lg" data-code="${item.code}" title="加入交易規劃"><i class="fa-solid fa-chess-knight"></i></button>
-                        <button class="text-gray-400 hover:text-red-400 fav-toggle-btn bg-gray-800 p-1.5 rounded-lg" data-id="${item.id}" data-fav="true" title="取消追蹤"><i class="fa-solid fa-star-slash"></i></button>
-                    `;
-                } else {
-                    const favColor = item.isFavorite ? 'text-yellow-400' : 'text-gray-500 hover:text-yellow-400';
-                    actionHtml = `
-                        <button class="mr-1 hover:scale-110 add-plan-btn text-green-500 bg-gray-800 p-1.5 rounded-lg" data-code="${item.code}" title="加入交易規劃"><i class="fa-solid fa-chess-knight"></i></button>
-                        <button class="mr-1 hover:scale-110 fav-toggle-btn ${favColor} bg-gray-800 p-1.5 rounded-lg transition" data-id="${item.id}" data-fav="${!!item.isFavorite}" title="追蹤"><i class="fa-solid fa-star"></i></button>
-                        <button class="text-gray-500 hover:text-red-400 del-btn bg-gray-800 p-1.5 rounded-lg transition" data-id="${item.id}" title="刪除"><i class="fa-solid fa-trash"></i></button>
-                    `;
-                }
+                // 統一所有列表的操作按鈕 (追蹤清單與主日誌一致)
+                const favColor = item.isFavorite ? 'text-yellow-400' : 'text-gray-500 hover:text-yellow-400';
+                const actionHtml = `
+                    <button class="mr-1 hover:scale-110 add-plan-btn text-green-500 bg-gray-800 p-1.5 rounded-lg transition" data-code="${item.code}" title="加入交易規劃"><i class="fa-solid fa-chess-knight"></i></button>
+                    <button class="mr-1 hover:scale-110 fav-toggle-btn ${favColor} bg-gray-800 p-1.5 rounded-lg transition" data-id="${item.id}" title="${item.isFavorite ? '取消追蹤' : '加入追蹤'}"><i class="fa-solid fa-star"></i></button>
+                    <button class="text-gray-500 hover:text-red-400 del-btn bg-gray-800 p-1.5 rounded-lg transition" data-id="${item.id}" title="完全刪除紀錄"><i class="fa-solid fa-trash"></i></button>
+                `;
 
                 tr.innerHTML = `
                     <td class="py-3 px-3 sm:px-4 text-white">${item.date}</td>
@@ -1198,7 +1193,9 @@
                 state.journals = state.journals.filter(j => j.id !== id);
                 saveLocalData();
                 processAndRenderJournals();
+                if(document.getElementById('module-favorites').classList.contains('active')) renderFavorites();
                 await deleteDataFromCloud(`journals/${id}`);
+                showToast('紀錄已刪除');
             }));
             
             tbody.querySelectorAll('.fav-toggle-btn').forEach(b => b.addEventListener('click', async(e)=>{
@@ -1211,7 +1208,7 @@
                     processAndRenderJournals();
                     if(document.getElementById('module-favorites').classList.contains('active')) renderFavorites();
                     await putDataToCloud(`journals/${id}`, j);
-                    showToast(j.isFavorite?'已加入追蹤':'已移除追蹤');
+                    showToast(j.isFavorite?'已加入追蹤':'已取消追蹤');
                 }
             }));
         };
@@ -1262,7 +1259,7 @@
                     const sm = {};
                     data.forEach(j => { if(j.tags) j.tags.forEach(t => { if(!sm[t]) sm[t]=[]; sm[t].push(j); }); });
                     
-                    const strategyOrder = ['破繭而出', '月來越好', '季不可失', '守株待兔', '量價齊揚', 'OBV突破'];
+                    const strategyOrder = ['破繭而出', '月來越好', '季不可失', '守株待兔', '特別追蹤', '量價齊揚', 'OBV突破'];
                     const sortedKeys = Object.keys(sm).sort((a, b) => {
                         const idxA = strategyOrder.indexOf(a);
                         const idxB = strategyOrder.indexOf(b);
