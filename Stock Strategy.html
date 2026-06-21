@@ -27,8 +27,8 @@
         .tw-green { color: #22c55e; }
         
         /* 排序游標與平滑過渡 */
-        .sortable { cursor: pointer; user-select: none; transition: color 0.2s; }
-        .sortable:hover { color: #fff; }
+        .sortable, .plan-sortable { cursor: pointer; user-select: none; transition: color 0.2s; }
+        .sortable:hover, .plan-sortable:hover { color: #fff; }
         
         /* 表格優化 */
         th, td { vertical-align: middle; }
@@ -268,7 +268,7 @@
                             <tr>
                                 <th class="py-3 px-3 sm:px-4 sortable hover:bg-gray-700 transition" data-sort="date">日期 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
                                 <th class="py-3 px-3 sm:px-4 sortable hover:bg-gray-700 transition" data-sort="code">代號 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
-                                <th class="py-3 px-3 sm:px-4">股名</th>
+                                <th class="py-3 px-3 sm:px-4 sortable hover:bg-gray-700 transition" data-sort="name">股名 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
                                 <th class="py-3 px-2 sm:px-3 text-right sortable hover:bg-gray-700 transition" data-sort="eps2025">25 EPS <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
                                 <th class="py-3 px-2 sm:px-3 text-right sortable hover:bg-gray-700 transition" data-sort="eps2026">預26 EPS <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
                                 <th class="py-3 px-3 sm:px-4 text-right sortable hover:bg-gray-700 transition" data-sort="epsGrowth">成長率 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
@@ -434,7 +434,15 @@
                 <div class="overflow-x-auto rounded-b-xl w-full">
                     <table class="min-w-full text-left text-sm whitespace-nowrap table-auto w-full">
                         <thead class="bg-gray-900 text-gray-400 border-b border-gray-700 font-medium">
-                            <tr><th class="py-3 px-3 sm:px-4">標的</th><th class="py-3 px-3 sm:px-4">部位</th><th class="py-3 px-3 sm:px-4">進場價</th><th class="py-3 px-3 sm:px-4 tw-red">停利目標</th><th class="py-3 px-3 sm:px-4 tw-green">停損防守</th><th class="py-3 px-3 sm:px-4">狀態</th><th class="py-3 px-3 sm:px-4">操作/結算</th></tr>
+                            <tr>
+                                <th class="py-3 px-3 sm:px-4 plan-sortable hover:bg-gray-700 transition" data-sort="stock">標的 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+                                <th class="py-3 px-3 sm:px-4 plan-sortable hover:bg-gray-700 transition" data-sort="qty">部位 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+                                <th class="py-3 px-3 sm:px-4 plan-sortable hover:bg-gray-700 transition" data-sort="entry">進場價 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+                                <th class="py-3 px-3 sm:px-4 tw-red plan-sortable hover:bg-gray-700 transition" data-sort="target">停利目標 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+                                <th class="py-3 px-3 sm:px-4 tw-green plan-sortable hover:bg-gray-700 transition" data-sort="stop">停損防守 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+                                <th class="py-3 px-3 sm:px-4 plan-sortable hover:bg-gray-700 transition" data-sort="status">狀態 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+                                <th class="py-3 px-3 sm:px-4 text-center">操作/結算</th>
+                            </tr>
                         </thead>
                         <tbody id="plan-table-body" class="divide-y divide-gray-700/50"></tbody>
                     </table>
@@ -455,7 +463,7 @@
                             <tr>
                                 <th class="py-3 px-3 sm:px-4 sortable hover:bg-gray-700 transition" data-sort="date">日期 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
                                 <th class="py-3 px-3 sm:px-4 sortable hover:bg-gray-700 transition" data-sort="code">代號 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
-                                <th class="py-3 px-3 sm:px-4">股名</th>
+                                <th class="py-3 px-3 sm:px-4 sortable hover:bg-gray-700 transition" data-sort="name">股名 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
                                 <th class="py-3 px-2 sm:px-3 text-right sortable hover:bg-gray-700 transition" data-sort="eps2025">25 EPS <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
                                 <th class="py-3 px-2 sm:px-3 text-right sortable hover:bg-gray-700 transition" data-sort="eps2026">預26 EPS <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
                                 <th class="py-3 px-3 sm:px-4 text-right sortable hover:bg-gray-700 transition" data-sort="epsGrowth">成長率 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
@@ -555,7 +563,8 @@
         let state = {
             journals: [], plans: [], epsData: {}, codeToName: {}, nameToCode: {},
             filters: { start: '', end: '', futuresOnly: false, excludeNegativeGrowth: false, tags: [], minScore: 0 },
-            sortConfig: { key: 'date', asc: false }
+            sortConfig: { key: 'date', asc: false },
+            planSortConfig: { key: 'createdAt', asc: false }
         };
 
         // 載入本地記憶 (做為雲端載入前的預設呈現)
@@ -951,6 +960,11 @@
                 if(tag) tags.push(tag);
             }
             
+            // 新增：若選擇「特別追蹤」標籤，自動列入追蹤清單
+            if (tag === '特別追蹤') {
+                isFavorite = true;
+            }
+            
             const payload = { id: docId, date, code, name, tags, notes: mergedNotes, isFavorite, createdAt, updatedAt: Date.now() };
             if(existingIdx !== -1) state.journals[existingIdx] = payload; else state.journals.push(payload);
 
@@ -1010,6 +1024,17 @@
                 state.sortConfig.key = key;
                 processAndRenderJournals();
                 if(document.getElementById('module-favorites').classList.contains('active')) renderFavorites();
+                saveLocalData();
+            });
+        });
+
+        // 交易規劃排序邏輯
+        document.querySelectorAll('.plan-sortable').forEach(th => {
+            th.addEventListener('click', () => {
+                const key = th.dataset.sort;
+                state.planSortConfig.asc = state.planSortConfig.key === key ? !state.planSortConfig.asc : false;
+                state.planSortConfig.key = key;
+                renderPlans();
                 saveLocalData();
             });
         });
@@ -1120,6 +1145,7 @@
                 switch(key) {
                     case 'date': vA = a.date; vB = b.date; break;
                     case 'code': vA = a.code; vB = b.code; break;
+                    case 'name': vA = a.name; vB = b.name; break;
                     case 'eps2025': vA = eA.eps2025 ?? -9999; vB = eB.eps2025 ?? -9999; break;
                     case 'eps2026': vA = eA.eps2026 ?? -9999; vB = eB.eps2026 ?? -9999; break;
                     case 'epsGrowth': vA = eA.epsGrowth ?? -9999; vB = eB.epsGrowth ?? -9999; break;
@@ -1383,7 +1409,6 @@
             };
 
             state.plans.push(payload);
-            state.plans.sort((a,b) => b.createdAt - a.createdAt);
             saveLocalData();
             renderPlans();
 
@@ -1429,7 +1454,29 @@
         function renderPlans() {
             const tb = document.getElementById('plan-table-body'); tb.innerHTML='';
             let cc=0, wc=0, tp=0;
-            state.plans.forEach(i => {
+
+            const sortedPlans = [...state.plans].sort((a, b) => {
+                let vA, vB;
+                switch(state.planSortConfig.key) {
+                    case 'stock': vA = a.stock; vB = b.stock; break;
+                    case 'qty': vA = a.qty; vB = b.qty; break;
+                    case 'entry': vA = a.entry; vB = b.entry; break;
+                    case 'target': vA = a.target || 0; vB = b.target || 0; break;
+                    case 'stop': vA = a.stop; vB = b.stop; break;
+                    case 'status': {
+                        const order = {'持倉中': 1, '已停利': 2, '已停損': 3};
+                        vA = order[a.status] || 99;
+                        vB = order[b.status] || 99;
+                        break;
+                    }
+                    default: vA = a.createdAt; vB = b.createdAt; break;
+                }
+                if(vA === vB) return 0;
+                const res = vA > vB ? 1 : -1;
+                return state.planSortConfig.asc ? res : -res;
+            });
+
+            sortedPlans.forEach(i => {
                 const isC = i.status!=='持倉中'; if(isC){ cc++; if(i.status==='已停利') wc++; tp+=i.pnl||0; }
                 const codeMatch = i.stock.match(/\d{4}/);
                 const isF = codeMatch ? getEpsInfo(codeMatch[0], {}).futures : false;
