@@ -120,6 +120,13 @@
                             <label class="block text-xs text-gray-400 font-medium tracking-wide">策略標籤 <span class="text-gray-500 font-normal">(無點選亦可新增，點擊選取/取消)</span></label>
                             
                             <div>
+                                <div class="text-xs font-bold text-gray-300 border-b border-gray-700/50 pb-1 mb-2">🌟 特別關注</div>
+                                <div class="flex flex-wrap gap-2">
+                                    <label class="cursor-pointer"><input type="checkbox" value="特別追蹤" class="hidden tag-input"><div class="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-600 text-gray-300 hover:bg-gray-700 transition" data-color="#8b5cf6">特別追蹤</div></label>
+                                </div>
+                            </div>
+
+                            <div>
                                 <div class="text-xs font-bold text-gray-300 border-b border-gray-700/50 pb-1 mb-2">🔥 動能與型態</div>
                                 <div class="flex flex-wrap gap-2">
                                     <label class="cursor-pointer"><input type="checkbox" value="披荊斬棘" class="hidden tag-input"><div class="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-600 text-gray-300 hover:bg-gray-700 transition" data-color="#ef4444">披荊斬棘</div></label>
@@ -127,7 +134,6 @@
                                     <label class="cursor-pointer"><input type="checkbox" value="月來越好" class="hidden tag-input"><div class="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-600 text-gray-300 hover:bg-gray-700 transition" data-color="#f97316">月來越好</div></label>
                                     <label class="cursor-pointer"><input type="checkbox" value="季不可失" class="hidden tag-input"><div class="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-600 text-gray-300 hover:bg-gray-700 transition" data-color="#f59e0b">季不可失</div></label>
                                     <label class="cursor-pointer"><input type="checkbox" value="守株待兔" class="hidden tag-input"><div class="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-600 text-gray-300 hover:bg-gray-700 transition" data-color="#a3e635">守株待兔</div></label>
-                                    <label class="cursor-pointer"><input type="checkbox" value="特別追蹤" class="hidden tag-input"><div class="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-600 text-gray-300 hover:bg-gray-700 transition" data-color="#8b5cf6">特別追蹤</div></label>
                                 </div>
                             </div>
 
@@ -208,6 +214,10 @@
                             </button>
                             <!-- 升級為小格子打勾面板 -->
                             <div id="filter-tag-panel" class="absolute left-0 top-full mt-1.5 w-[280px] bg-gray-800 border border-gray-600 rounded-xl shadow-2xl hidden z-50 p-3 max-h-[60vh] overflow-y-auto">
+                                <div class="text-[10px] font-bold text-gray-400 border-b border-gray-700 pb-1 mb-1.5">🌟 特別關注</div>
+                                <div class="grid grid-cols-2 gap-1 mb-3">
+                                    <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-700/50 p-1.5 rounded transition"><input type="checkbox" value="特別追蹤" class="filter-tag-cb w-3.5 h-3.5 accent-blue-500 cursor-pointer"><span class="text-xs text-gray-300">特別追蹤</span></label>
+                                </div>
                                 <div class="text-[10px] font-bold text-gray-400 border-b border-gray-700 pb-1 mb-1.5">🔥 動能與型態</div>
                                 <div class="grid grid-cols-2 gap-1 mb-3">
                                     <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-700/50 p-1.5 rounded transition"><input type="checkbox" value="披荊斬棘" class="filter-tag-cb w-3.5 h-3.5 accent-blue-500 cursor-pointer"><span class="text-xs text-gray-300">披荊斬棘</span></label>
@@ -215,7 +225,6 @@
                                     <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-700/50 p-1.5 rounded transition"><input type="checkbox" value="月來越好" class="filter-tag-cb w-3.5 h-3.5 accent-blue-500 cursor-pointer"><span class="text-xs text-gray-300">月來越好</span></label>
                                     <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-700/50 p-1.5 rounded transition"><input type="checkbox" value="季不可失" class="filter-tag-cb w-3.5 h-3.5 accent-blue-500 cursor-pointer"><span class="text-xs text-gray-300">季不可失</span></label>
                                     <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-700/50 p-1.5 rounded transition"><input type="checkbox" value="守株待兔" class="filter-tag-cb w-3.5 h-3.5 accent-blue-500 cursor-pointer"><span class="text-xs text-gray-300">守株待兔</span></label>
-                                    <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-700/50 p-1.5 rounded transition"><input type="checkbox" value="特別追蹤" class="filter-tag-cb w-3.5 h-3.5 accent-blue-500 cursor-pointer"><span class="text-xs text-gray-300">特別追蹤</span></label>
                                 </div>
                                 <div class="text-[10px] font-bold text-gray-400 border-b border-gray-700 pb-1 mb-1.5">💰 量價與籌碼</div>
                                 <div class="grid grid-cols-2 gap-1 mb-3">
@@ -1454,25 +1463,29 @@
             // 1. 優先從本機 LocalStorage 載入歷史資料
             loadLocalData();
 
-            // 2. 日期與篩選區間一律強制預設為即時(今日)日期
+            // 2. 畫面重新整理後，自動清除所有篩選條件 (恢復預設)
             const todayDate = getToday();
+            
+            // 重置內部狀態
+            state.filters = {
+                start: todayDate,
+                end: todayDate,
+                futuresOnly: false,
+                excludeNegativeGrowth: false,
+                tags: [],
+                minScore: 0
+            };
+            saveLocalData();
+
+            // 重置畫面 UI
             document.getElementById('j-date').value = todayDate;
-            state.filters.start = todayDate;
-            state.filters.end = todayDate;
             document.getElementById('filter-start').value = todayDate;
             document.getElementById('filter-end').value = todayDate;
+            document.getElementById('filter-futures').checked = false;
+            document.getElementById('filter-exclude-negative-growth').checked = false;
+            document.getElementById('filter-score').value = "0";
             
-            // 載入其他過濾狀態
-            document.getElementById('filter-futures').checked = state.filters.futuresOnly || false;
-            document.getElementById('filter-exclude-negative-growth').checked = state.filters.excludeNegativeGrowth || false;
-            document.getElementById('filter-score').value = state.filters.minScore || 0;
-            
-            if (state.filters.tags && state.filters.tags.length > 0) {
-                state.filters.tags.forEach(t => {
-                    const cb = document.querySelector(`.filter-tag-cb[value="${t}"]`);
-                    if (cb) cb.checked = true;
-                });
-            }
+            document.querySelectorAll('.filter-tag-cb').forEach(cb => cb.checked = false);
             renderFilterTags();
 
             // 3. 更新畫面與列表
