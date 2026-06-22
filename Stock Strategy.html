@@ -563,8 +563,8 @@
         let state = {
             journals: [], plans: [], epsData: {}, codeToName: {}, nameToCode: {},
             filters: { start: '', end: '', futuresOnly: false, excludeNegativeGrowth: false, tags: [], minScore: 0 },
-            sortConfig: { key: 'date', asc: false },
-            planSortConfig: { key: 'createdAt', asc: false }
+            sortConfig: { key: 'createdAt', asc: true },
+            planSortConfig: { key: 'createdAt', asc: true }
         };
 
         // 載入本地記憶 (做為雲端載入前的預設呈現)
@@ -1063,6 +1063,7 @@
             state.filters.excludeNegativeGrowth = false;
             state.filters.minScore = 0;
             state.filters.tags = [];
+            state.sortConfig = { key: 'createdAt', asc: true };
 
             // 重置畫面 UI
             document.getElementById('filter-start').value = todayDate;
@@ -1077,7 +1078,7 @@
             renderFilterTags();
             processAndRenderJournals();
             saveLocalData();
-            showToast('已清除篩選條件');
+            showToast('已清除篩選條件與排序');
         });
 
         // 打勾面板開關邏輯
@@ -1143,6 +1144,7 @@
                 let vA, vB;
                 const eA = getEpsInfo(a.code, a), eB = getEpsInfo(b.code, b);
                 switch(key) {
+                    case 'createdAt': vA = a.createdAt || 0; vB = b.createdAt || 0; break;
                     case 'date': vA = a.date; vB = b.date; break;
                     case 'code': vA = a.code; vB = b.code; break;
                     case 'name': vA = a.name; vB = b.name; break;
@@ -1150,9 +1152,11 @@
                     case 'eps2026': vA = eA.eps2026 ?? -9999; vB = eB.eps2026 ?? -9999; break;
                     case 'epsGrowth': vA = eA.epsGrowth ?? -9999; vB = eB.epsGrowth ?? -9999; break;
                     case 'score': vA = getScore(a.tags, eA); vB = getScore(b.tags, eB); break;
-                    default: vA = a.date; vB = b.date;
+                    default: vA = a.createdAt || 0; vB = b.createdAt || 0; break;
                 }
-                if(vA === vB) return 0;
+                if(vA === vB) {
+                    return (a.createdAt || 0) - (b.createdAt || 0);
+                }
                 const res = vA > vB ? 1 : -1;
                 return asc ? res : -res;
             });
@@ -1284,7 +1288,11 @@
                 let text = `| ${getToday()} 多重篩選漏斗 |\n\n`;
 
                 if(mode === 'time') {
-                    data.sort((a,b)=>new Date(a.date)-new Date(b.date));
+                    data.sort((a,b) => {
+                        const d = new Date(a.date) - new Date(b.date);
+                        if(d !== 0) return d;
+                        return (a.createdAt || 0) - (b.createdAt || 0);
+                    });
                     data.forEach(j => {
                         const shortTags = j.tags?.length > 0 ? ` [${j.tags.map(t=>t[0]).join('')}]` : '';
                         text += `- ${j.code} ${j.name} (${getScore(j.tags, getEpsInfo(j.code, j))})${shortTags}\n`;
@@ -1458,6 +1466,7 @@
             const sortedPlans = [...state.plans].sort((a, b) => {
                 let vA, vB;
                 switch(state.planSortConfig.key) {
+                    case 'createdAt': vA = a.createdAt || 0; vB = b.createdAt || 0; break;
                     case 'stock': vA = a.stock; vB = b.stock; break;
                     case 'qty': vA = a.qty; vB = b.qty; break;
                     case 'entry': vA = a.entry; vB = b.entry; break;
@@ -1469,9 +1478,11 @@
                         vB = order[b.status] || 99;
                         break;
                     }
-                    default: vA = a.createdAt; vB = b.createdAt; break;
+                    default: vA = a.createdAt || 0; vB = b.createdAt || 0; break;
                 }
-                if(vA === vB) return 0;
+                if(vA === vB) {
+                    return (a.createdAt || 0) - (b.createdAt || 0);
+                }
                 const res = vA > vB ? 1 : -1;
                 return state.planSortConfig.asc ? res : -res;
             });
@@ -1522,6 +1533,8 @@
                 tags: [],
                 minScore: 0
             };
+            state.sortConfig = { key: 'createdAt', asc: true };
+            state.planSortConfig = { key: 'createdAt', asc: true };
             saveLocalData();
 
             // 重置畫面 UI
