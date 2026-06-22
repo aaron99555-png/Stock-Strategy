@@ -974,10 +974,10 @@
             
             await putDataToCloud(`journals/${docId}`, payload);
             
-            showToast('已儲存至條件');
+            // 移除原本的 showToast('已儲存至條件'); 讓輸入更順暢
             codeInput.value=''; nameInput.value=''; document.getElementById('j-notes').value=''; 
             previewDiv.classList.add('hidden');
-            codeInput.focus();
+            codeInput.focus(); // 確保送出後游標立刻回到代號欄位
         });
 
         // 匯入 Excel 
