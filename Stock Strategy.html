@@ -563,8 +563,8 @@
         let state = {
             journals: [], plans: [], epsData: {}, codeToName: {}, nameToCode: {},
             filters: { start: '', end: '', futuresOnly: false, excludeNegativeGrowth: false, tags: [], minScore: 0 },
-            sortConfig: { key: 'createdAt', asc: true },
-            planSortConfig: { key: 'createdAt', asc: true }
+            sortConfig: { key: 'createdAt', asc: false },
+            planSortConfig: { key: 'createdAt', asc: false }
         };
 
         // 載入本地記憶 (做為雲端載入前的預設呈現)
@@ -1063,7 +1063,7 @@
             state.filters.excludeNegativeGrowth = false;
             state.filters.minScore = 0;
             state.filters.tags = [];
-            state.sortConfig = { key: 'createdAt', asc: true };
+            state.sortConfig = { key: 'createdAt', asc: false };
 
             // 重置畫面 UI
             document.getElementById('filter-start').value = todayDate;
@@ -1533,8 +1533,8 @@
                 tags: [],
                 minScore: 0
             };
-            state.sortConfig = { key: 'createdAt', asc: true };
-            state.planSortConfig = { key: 'createdAt', asc: true };
+            state.sortConfig = { key: 'createdAt', asc: false };
+            state.planSortConfig = { key: 'createdAt', asc: false };
             saveLocalData();
 
             // 重置畫面 UI
