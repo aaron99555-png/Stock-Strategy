@@ -946,7 +946,7 @@
             const existingIdx = state.journals.findIndex(j => j.id === docId);
             let tags = [];
             let mergedNotes = notes;
-            let isFavorite = false;
+            let isFavorite = 0;
             let createdAt = Date.now();
 
             if (existingIdx !== -1) {
@@ -954,15 +954,15 @@
                 tags = existing.tags || [];
                 if(tag && !tags.includes(tag)) tags.push(tag);
                 mergedNotes = notes ? (existing.notes ? `${existing.notes} / ${notes}` : notes) : existing.notes;
-                isFavorite = existing.isFavorite || false;
+                isFavorite = existing.isFavorite === true ? 1 : (parseInt(existing.isFavorite) || 0);
                 createdAt = existing.createdAt || Date.now();
             } else {
                 if(tag) tags.push(tag);
             }
             
-            // 新增：若選擇「特別追蹤」標籤，自動列入追蹤清單
-            if (tag === '特別追蹤') {
-                isFavorite = true;
+            // 新增：若選擇「特別追蹤」標籤，自動列入追蹤清單 (若原本無追蹤則設為一星)
+            if (tag === '特別追蹤' && isFavorite === 0) {
+                isFavorite = 1;
             }
             
             const payload = { id: docId, date, code, name, tags, notes: mergedNotes, isFavorite, createdAt, updatedAt: Date.now() };
@@ -1179,11 +1179,29 @@
                 const tagsHtml = (item.tags || []).map(t => `<span class="inline-block text-[11px] font-medium px-2 py-0.5 rounded-md mr-1 mb-1 border cursor-pointer hover:opacity-60 transition tag-remove-btn ${tagStyles[t]||"bg-gray-800 text-gray-300 border-gray-600"}" data-id="${item.id}" data-tag="${t}" title="點擊移除此標籤">${t} <i class="fa-solid fa-xmark ml-1 opacity-70"></i></span>`).join('');
                 const score = getScore(item.tags, ei);
                 
+                // 追蹤清單等級判斷 (0:無, 1:一星, 2:二星, 3:三星)
+                const favLevel = item.isFavorite === true ? 1 : (parseInt(item.isFavorite) || 0);
+                let favColor = 'text-gray-500 hover:text-yellow-400';
+                let favIcon = '<i class="fa-solid fa-star"></i>';
+                let favTitle = '加入追蹤';
+                
+                if (favLevel === 1) {
+                    favColor = 'text-yellow-400';
+                    favTitle = '一星追蹤 (點擊切換二次追蹤)';
+                } else if (favLevel === 2) {
+                    favColor = 'text-orange-500';
+                    favIcon = '<i class="fa-solid fa-star"></i><span class="ml-1 text-[10px] font-bold leading-none">2</span>';
+                    favTitle = '二次追蹤 (點擊切換三次追蹤)';
+                } else if (favLevel === 3) {
+                    favColor = 'text-red-500';
+                    favIcon = '<i class="fa-solid fa-star"></i><span class="ml-1 text-[10px] font-bold leading-none">3</span>';
+                    favTitle = '三次追蹤 (點擊取消追蹤)';
+                }
+
                 // 統一所有列表的操作按鈕 (追蹤清單與主日誌一致)
-                const favColor = item.isFavorite ? 'text-yellow-400' : 'text-gray-500 hover:text-yellow-400';
                 const actionHtml = `
                     <button class="mr-1 hover:scale-110 add-plan-btn text-green-500 bg-gray-800 p-1.5 rounded-lg transition" data-code="${item.code}" title="加入交易規劃"><i class="fa-solid fa-chess-knight"></i></button>
-                    <button class="mr-1 hover:scale-110 fav-toggle-btn ${favColor} bg-gray-800 p-1.5 rounded-lg transition" data-id="${item.id}" title="${item.isFavorite ? '取消追蹤' : '加入追蹤'}"><i class="fa-solid fa-star"></i></button>
+                    <button class="mr-1 hover:scale-110 fav-toggle-btn ${favColor} bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-id="${item.id}" title="${favTitle}">${favIcon}</button>
                     <button class="text-gray-500 hover:text-red-400 del-btn bg-gray-800 p-1.5 rounded-lg transition" data-id="${item.id}" title="完全刪除紀錄"><i class="fa-solid fa-trash"></i></button>
                 `;
 
@@ -1241,13 +1259,19 @@
                 const id = e.currentTarget.dataset.id;
                 const j = state.journals.find(x => x.id === id);
                 if(j) {
-                    j.isFavorite = !j.isFavorite;
+                    let currentLevel = j.isFavorite === true ? 1 : (parseInt(j.isFavorite) || 0);
+                    let nextLevel = (currentLevel + 1) % 4;
+                    
+                    j.isFavorite = nextLevel;
                     j.updatedAt = Date.now();
+                    
                     saveLocalData();
                     processAndRenderJournals();
                     if(document.getElementById('module-favorites').classList.contains('active')) renderFavorites();
                     await putDataToCloud(`journals/${id}`, j);
-                    showToast(j.isFavorite?'已加入追蹤':'已取消追蹤');
+                    
+                    const msgs = ['已取消追蹤', '已加入一星追蹤', '已升級二次追蹤', '已升級三次追蹤'];
+                    showToast(msgs[nextLevel]);
                 }
             }));
         };
