@@ -564,6 +564,7 @@
             journals: [], plans: [], epsData: {}, codeToName: {}, nameToCode: {},
             filters: { start: '', end: '', futuresOnly: false, excludeNegativeGrowth: false, tags: [], minScore: 0 },
             sortConfig: { key: 'createdAt', asc: false },
+            favSortConfig: { key: 'createdAt', asc: false },
             planSortConfig: { key: 'createdAt', asc: false }
         };
 
@@ -1018,12 +1019,19 @@
         });
 
         document.querySelectorAll('.sortable').forEach(th => {
-            th.addEventListener('click', () => {
+            th.addEventListener('click', (e) => {
+                const isFav = e.currentTarget.closest('#module-favorites') !== null;
+                const configName = isFav ? 'favSortConfig' : 'sortConfig';
                 const key = th.dataset.sort;
-                state.sortConfig.asc = state.sortConfig.key === key ? !state.sortConfig.asc : false;
-                state.sortConfig.key = key;
-                processAndRenderJournals();
-                if(document.getElementById('module-favorites').classList.contains('active')) renderFavorites();
+                
+                state[configName].asc = state[configName].key === key ? !state[configName].asc : false;
+                state[configName].key = key;
+                
+                if (isFav) {
+                    renderFavorites();
+                } else {
+                    processAndRenderJournals();
+                }
                 saveLocalData();
             });
         });
@@ -1064,6 +1072,7 @@
             state.filters.minScore = 0;
             state.filters.tags = [];
             state.sortConfig = { key: 'createdAt', asc: false };
+            state.favSortConfig = { key: 'createdAt', asc: false };
 
             // 重置畫面 UI
             document.getElementById('filter-start').value = todayDate;
@@ -1277,7 +1286,33 @@
         };
 
         function processAndRenderJournals() { renderTableRows(getFilteredAndSortedData(state.journals), 'journal-table-body', 'journal-empty'); }
-        function renderFavorites() { renderTableRows(state.journals.filter(j=>j.isFavorite), 'fav-table-body', 'fav-empty', true); }
+        function renderFavorites() { 
+            let favs = state.journals.filter(j => j.isFavorite);
+            const { key, asc } = state.favSortConfig || { key: 'createdAt', asc: false };
+            
+            favs.sort((a, b) => {
+                let vA, vB;
+                const eA = getEpsInfo(a.code, a), eB = getEpsInfo(b.code, b);
+                switch(key) {
+                    case 'createdAt': vA = a.createdAt || 0; vB = b.createdAt || 0; break;
+                    case 'date': vA = a.date; vB = b.date; break;
+                    case 'code': vA = a.code; vB = b.code; break;
+                    case 'name': vA = a.name; vB = b.name; break;
+                    case 'eps2025': vA = eA.eps2025 ?? -9999; vB = eB.eps2025 ?? -9999; break;
+                    case 'eps2026': vA = eA.eps2026 ?? -9999; vB = eB.eps2026 ?? -9999; break;
+                    case 'epsGrowth': vA = eA.epsGrowth ?? -9999; vB = eB.epsGrowth ?? -9999; break;
+                    case 'score': vA = getScore(a.tags, eA); vB = getScore(b.tags, eB); break;
+                    default: vA = a.createdAt || 0; vB = b.createdAt || 0; break;
+                }
+                if(vA === vB) {
+                    return (a.createdAt || 0) - (b.createdAt || 0);
+                }
+                const res = vA > vB ? 1 : -1;
+                return asc ? res : -res;
+            });
+
+            renderTableRows(favs, 'fav-table-body', 'fav-empty', true); 
+        }
 
         const copyFootnote = `\n\n-------------------\n⚠️ 停損是紀律，停利是藝術。\n⚠️ 位階決定勝率，部位決定存活。\n⚠️ 趨勢-族群-題材-位階-動能-風控`;
 
@@ -1562,6 +1597,7 @@
                 minScore: 0
             };
             state.sortConfig = { key: 'createdAt', asc: false };
+            state.favSortConfig = { key: 'createdAt', asc: false };
             state.planSortConfig = { key: 'createdAt', asc: false };
             saveLocalData();
 
