@@ -708,7 +708,11 @@
         };
         
         const getScore = (tags, epsInfo) => {
-            let score = tags && Array.isArray(tags) ? tags.length : 0;
+            let score = 0;
+            if (tags && Array.isArray(tags)) {
+                // 計算分數時，排除「特別追蹤」標籤
+                score = tags.filter(t => t !== '特別追蹤').length;
+            }
             if (epsInfo && epsInfo.epsGrowth !== null && epsInfo.eps2026 !== null) {
                 if (epsInfo.epsGrowth > 0 && epsInfo.eps2026 > 0) {
                     score += 1;
