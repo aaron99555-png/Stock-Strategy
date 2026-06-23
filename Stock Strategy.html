@@ -1283,7 +1283,11 @@
             btn.addEventListener('click', (e) => {
                 const mode = e.currentTarget.dataset.mode;
                 let data = getFilteredAndSortedData(state.journals);
-                if(data.length===0) return showToast('清單為空','error');
+                
+                // 新增：排除含有「特別追蹤」標籤的資料，不列入複製
+                data = data.filter(j => !(j.tags && j.tags.includes('特別追蹤')));
+
+                if(data.length===0) return showToast('清單為空 (已排除特別追蹤)','error');
                 
                 let text = `| ${getToday()} 多重篩選漏斗 |\n\n`;
 
