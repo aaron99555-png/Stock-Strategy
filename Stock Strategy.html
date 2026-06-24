@@ -261,11 +261,18 @@
                     </div>
                 </div>
 
+                <!-- 批次刪除工具列 (隱藏/顯示) -->
+                <div id="batch-bar-journal" class="hidden bg-red-900/20 border-b border-gray-700/50 p-2 sm:p-3 justify-between items-center transition-all">
+                    <span class="text-xs sm:text-sm text-red-400 font-medium"><i class="fa-solid fa-check-double mr-1.5"></i>已選擇 <span id="batch-count-journal" class="font-bold">0</span> 筆資料</span>
+                    <button onclick="confirmBatchDelete('journal')" class="bg-red-600 hover:bg-red-500 text-white text-xs sm:text-sm font-medium px-3 sm:px-4 py-1.5 rounded-lg transition shadow-sm">批次刪除</button>
+                </div>
+
                 <!-- Table -->
                 <div class="overflow-x-auto flex-grow relative rounded-b-xl w-full">
                     <table class="min-w-full text-left text-sm whitespace-nowrap table-auto w-full">
                         <thead class="bg-gray-900 text-gray-400 sticky top-0 z-10 shadow-sm font-medium">
                             <tr>
+                                <th class="py-3 px-2 sm:px-3 w-8 text-center"><input type="checkbox" class="select-all-cb rounded border-gray-600 bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" data-type="journal"></th>
                                 <th class="py-3 px-3 sm:px-4 sortable hover:bg-gray-700 transition" data-sort="date">日期 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
                                 <th class="py-3 px-3 sm:px-4 sortable hover:bg-gray-700 transition" data-sort="code">代號 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
                                 <th class="py-3 px-3 sm:px-4 sortable hover:bg-gray-700 transition" data-sort="name">股名 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
@@ -431,10 +438,18 @@
                         </div>
                     </form>
                 </div>
+                
+                <!-- 批次刪除工具列 (隱藏/顯示) -->
+                <div id="batch-bar-plan" class="hidden bg-red-900/20 border-b border-gray-700/50 p-2 sm:p-3 justify-between items-center transition-all">
+                    <span class="text-xs sm:text-sm text-red-400 font-medium"><i class="fa-solid fa-check-double mr-1.5"></i>已選擇 <span id="batch-count-plan" class="font-bold">0</span> 筆資料</span>
+                    <button onclick="confirmBatchDelete('plan')" class="bg-red-600 hover:bg-red-500 text-white text-xs sm:text-sm font-medium px-3 sm:px-4 py-1.5 rounded-lg transition shadow-sm">批次刪除</button>
+                </div>
+
                 <div class="overflow-x-auto rounded-b-xl w-full">
                     <table class="min-w-full text-left text-sm whitespace-nowrap table-auto w-full">
                         <thead class="bg-gray-900 text-gray-400 border-b border-gray-700 font-medium">
                             <tr>
+                                <th class="py-3 px-2 sm:px-3 w-8 text-center"><input type="checkbox" class="select-all-cb rounded border-gray-600 bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" data-type="plan"></th>
                                 <th class="py-3 px-3 sm:px-4 plan-sortable hover:bg-gray-700 transition" data-sort="stock">標的 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
                                 <th class="py-3 px-3 sm:px-4 plan-sortable hover:bg-gray-700 transition" data-sort="qty">部位 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
                                 <th class="py-3 px-3 sm:px-4 plan-sortable hover:bg-gray-700 transition" data-sort="entry">進場價 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
@@ -457,10 +472,18 @@
                     <h2 class="font-bold text-yellow-400 text-lg sm:text-xl flex items-center"><div class="bg-yellow-500/20 p-1.5 rounded mr-2"><i class="fa-solid fa-star"></i></div> 追蹤清單</h2>
                     <span class="text-xs sm:text-sm text-gray-400 bg-gray-900/50 px-2 sm:px-3 py-1.5 rounded-lg border border-gray-700/50">點擊清單中的星星即可加入</span>
                 </div>
+                
+                <!-- 批次刪除工具列 (隱藏/顯示) -->
+                <div id="batch-bar-fav" class="hidden bg-red-900/20 border-b border-gray-700/50 p-2 sm:p-3 justify-between items-center transition-all">
+                    <span class="text-xs sm:text-sm text-red-400 font-medium"><i class="fa-solid fa-check-double mr-1.5"></i>已選擇 <span id="batch-count-fav" class="font-bold">0</span> 筆資料</span>
+                    <button onclick="confirmBatchDelete('fav')" class="bg-red-600 hover:bg-red-500 text-white text-xs sm:text-sm font-medium px-3 sm:px-4 py-1.5 rounded-lg transition shadow-sm">批次刪除</button>
+                </div>
+
                 <div class="overflow-x-auto flex-grow relative rounded-b-xl w-full">
                     <table class="min-w-full text-left text-sm whitespace-nowrap table-auto w-full">
                         <thead class="bg-gray-900 text-gray-400 sticky top-0 border-b border-gray-700 font-medium">
                             <tr>
+                                <th class="py-3 px-2 sm:px-3 w-8 text-center"><input type="checkbox" class="select-all-cb rounded border-gray-600 bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" data-type="fav"></th>
                                 <th class="py-3 px-3 sm:px-4 sortable hover:bg-gray-700 transition" data-sort="date">日期 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
                                 <th class="py-3 px-3 sm:px-4 sortable hover:bg-gray-700 transition" data-sort="code">代號 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
                                 <th class="py-3 px-3 sm:px-4 sortable hover:bg-gray-700 transition" data-sort="name">股名 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
@@ -540,6 +563,19 @@
         </div>
     </div>
 
+    <!-- Batch Delete Confirm Modal -->
+    <div id="batch-delete-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center z-[80] hidden">
+        <div class="bg-gray-800 rounded-xl p-6 border border-gray-700 w-[340px] max-w-[90%] shadow-2xl mx-4">
+            <h3 class="font-bold mb-3 text-red-400 text-xl flex items-center"><i class="fa-solid fa-triangle-exclamation mr-2"></i>確認批次刪除</h3>
+            <input type="hidden" id="batch-delete-type">
+            <p id="batch-delete-msg" class="text-sm text-gray-300 mb-5 leading-relaxed bg-red-900/20 p-3 rounded-lg border border-red-800/30"></p>
+            <div class="flex gap-3">
+                <button onclick="executeBatchDelete()" class="flex-1 bg-red-600 hover:bg-red-500 text-white py-2.5 rounded-lg text-sm font-bold transition shadow-lg shadow-red-900/20">確定刪除</button>
+            </div>
+            <button onclick="document.getElementById('batch-delete-modal').classList.add('hidden')" class="w-full mt-3 bg-transparent hover:bg-gray-700 text-gray-400 hover:text-white py-2.5 rounded-lg text-sm transition">取消</button>
+        </div>
+    </div>
+
     <!-- Data Lists for Auto-complete -->
     <datalist id="stock-codes-list"></datalist>
     <datalist id="stock-names-list"></datalist>
@@ -566,6 +602,91 @@
             sortConfig: { key: 'createdAt', asc: false },
             favSortConfig: { key: 'createdAt', asc: false },
             planSortConfig: { key: 'createdAt', asc: false }
+        };
+
+        // 批次選擇狀態追蹤
+        const selectedIds = { journal: new Set(), fav: new Set(), plan: new Set() };
+
+        function updateBatchUI(type) {
+            const bar = document.getElementById(`batch-bar-${type}`);
+            const countSpan = document.getElementById(`batch-count-${type}`);
+            const size = selectedIds[type].size;
+            
+            if (size > 0) {
+                bar.classList.remove('hidden');
+                bar.classList.add('flex');
+                countSpan.textContent = size;
+            } else {
+                bar.classList.add('hidden');
+                bar.classList.remove('flex');
+            }
+
+            // 同步表頭的全選框狀態
+            const selectAllCb = document.querySelector(`.select-all-cb[data-type="${type}"]`);
+            if(selectAllCb) {
+                const totalVisible = document.querySelectorAll(`.row-cb[data-type="${type}"]`).length;
+                selectAllCb.checked = (totalVisible > 0 && size === totalVisible);
+                selectAllCb.indeterminate = (size > 0 && size < totalVisible);
+            }
+        }
+
+        // 監聽全域 Checkbox 事件 (單選 / 全選)
+        document.addEventListener('change', (e) => {
+            if (e.target.classList.contains('select-all-cb')) {
+                const type = e.target.dataset.type;
+                const isChecked = e.target.checked;
+                const rowCbs = document.querySelectorAll(`.row-cb[data-type="${type}"]`);
+                
+                if (isChecked) {
+                    rowCbs.forEach(cb => { cb.checked = true; selectedIds[type].add(cb.value); });
+                } else {
+                    rowCbs.forEach(cb => { cb.checked = false; selectedIds[type].delete(cb.value); });
+                }
+                updateBatchUI(type);
+            } else if (e.target.classList.contains('row-cb')) {
+                const type = e.target.dataset.type;
+                if (e.target.checked) {
+                    selectedIds[type].add(e.target.value);
+                } else {
+                    selectedIds[type].delete(e.target.value);
+                }
+                updateBatchUI(type);
+            }
+        });
+
+        window.confirmBatchDelete = (type) => {
+            document.getElementById('batch-delete-type').value = type;
+            document.getElementById('batch-delete-msg').innerText = `確定要刪除這 ${selectedIds[type].size} 筆資料嗎？刪除後將無法復原。`;
+            document.getElementById('batch-delete-modal').classList.remove('hidden');
+        };
+
+        window.executeBatchDelete = async () => {
+            const type = document.getElementById('batch-delete-type').value;
+            const ids = Array.from(selectedIds[type]);
+            if(ids.length === 0) return;
+
+            // 先從記憶體清除選中狀態
+            selectedIds[type].clear();
+            document.getElementById('batch-delete-modal').classList.add('hidden');
+            
+            // 執行畫面刪除
+            if (type === 'journal' || type === 'fav') {
+                state.journals = state.journals.filter(j => !ids.includes(j.id));
+                saveLocalData();
+                processAndRenderJournals();
+                if(document.getElementById('module-favorites').classList.contains('active')) renderFavorites();
+            } else if (type === 'plan') {
+                state.plans = state.plans.filter(p => !ids.includes(p.id));
+                saveLocalData();
+                renderPlans();
+            }
+
+            showToast(`已批次刪除 ${ids.length} 筆資料`);
+
+            // 背景同步刪除雲端
+            for (const id of ids) {
+                await deleteDataFromCloud(`${type === 'plan' ? 'plans' : 'journals'}/${id}`);
+            }
         };
 
         // 載入本地記憶 (做為雲端載入前的預設呈現)
@@ -1178,7 +1299,9 @@
 
         const renderTableRows = (data, tbodyId, emptyId, isFavoriteContext=false) => {
             const tbody = document.getElementById(tbodyId); const empty = document.getElementById(emptyId);
-            if(data.length === 0) { tbody.innerHTML = ''; empty.classList.remove('hidden'); return; }
+            const listType = isFavoriteContext ? 'fav' : 'journal';
+            
+            if(data.length === 0) { tbody.innerHTML = ''; empty.classList.remove('hidden'); updateBatchUI(listType); return; }
             empty.classList.add('hidden'); tbody.innerHTML = '';
 
             data.forEach(item => {
@@ -1218,7 +1341,10 @@
                     <button class="text-gray-500 hover:text-red-400 del-btn bg-gray-800 p-1.5 rounded-lg transition" data-id="${item.id}" title="完全刪除紀錄"><i class="fa-solid fa-trash"></i></button>
                 `;
 
+                const isChecked = selectedIds[listType].has(item.id) ? 'checked' : '';
+
                 tr.innerHTML = `
+                    <td class="py-3 px-2 sm:px-3 text-center"><input type="checkbox" class="row-cb rounded border-gray-600 bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${item.id}" data-type="${listType}" ${isChecked}></td>
                     <td class="py-3 px-3 sm:px-4 text-white">${item.date}</td>
                     <td class="py-3 px-3 sm:px-4 font-medium text-white">${fBadge}${item.code}</td>
                     <td class="py-3 px-3 sm:px-4 text-white">${item.name}</td>
@@ -1232,6 +1358,9 @@
                 `;
                 tbody.appendChild(tr);
             });
+
+            // 確保每次重新渲染後，更新批次刪除工具列與全選框狀態
+            updateBatchUI(listType);
 
             tbody.querySelectorAll('.tag-remove-btn').forEach(async b => {
                 b.addEventListener('click', async (e)=>{
@@ -1565,7 +1694,10 @@
                 const tr = document.createElement('tr'); 
                 tr.className = `border-b border-gray-700/50 text-white transition text-sm ${fBg} ${isC?'opacity-50':''}`;
                 
+                const isChecked = selectedIds['plan'].has(i.id) ? 'checked' : '';
+
                 tr.innerHTML = `
+                    <td class="py-3 px-2 sm:px-3 text-center"><input type="checkbox" class="row-cb rounded border-gray-600 bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${i.id}" data-type="plan" ${isChecked}></td>
                     <td class="py-3 px-3 sm:px-4 font-medium text-white">${fB}${i.stock}<div class="text-[10px] text-gray-400 mt-0.5">${i.note||''}</div></td>
                     <td class="py-3 px-3 sm:px-4 text-white">${i.qty}</td>
                     <td class="py-3 px-3 sm:px-4 text-white">${i.entry}</td>
@@ -1581,6 +1713,8 @@
             const pnlColor = tp > 0 ? 'tw-red' : (tp < 0 ? 'tw-green' : 'text-white');
             document.getElementById('stat-pnl').textContent = tp.toString(); 
             document.getElementById('stat-pnl').className = `text-2xl font-bold ${pnlColor}`;
+            
+            updateBatchUI('plan');
         }
 
         // 初始化
