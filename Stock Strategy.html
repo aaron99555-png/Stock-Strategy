@@ -7,30 +7,24 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style type="text/tailwindcss">
+        @layer components {
+            /* 效能優化：抽出重複的長類別，減少 HTML 肥大與解析負擔 */
+            .input-base { @apply w-full bg-gray-700/80 border border-gray-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition shadow-inner; }
+            .btn-copy-base { @apply text-xs font-medium px-2.5 py-1.5 rounded-lg transition border; }
+        }
+    </style>
     <style>
-        /* 現代化滾動條 */
         ::-webkit-scrollbar { width: 6px; height: 8px; }
         ::-webkit-scrollbar-track { background: #1f2937; border-radius: 4px; }
         ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
-        
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        
-        @keyframes fadeIn { 
-            from { opacity: 0; transform: translateY(10px); } 
-            to { opacity: 1; transform: translateY(0); } 
-        }
-        
-        /* 台灣股市色彩 */
-        .tw-red { color: #ef4444; }
-        .tw-green { color: #22c55e; }
-        
-        /* 排序游標與平滑過渡 */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .tw-red { color: #ef4444; } .tw-green { color: #22c55e; }
         .sortable, .plan-sortable { cursor: pointer; user-select: none; transition: color 0.2s; }
         .sortable:hover, .plan-sortable:hover { color: #fff; }
-        
-        /* 表格優化 */
         th, td { vertical-align: middle; }
     </style>
 </head>
@@ -40,37 +34,28 @@
     <nav class="bg-gray-800 border-b border-gray-700 shadow-sm sticky top-0 z-50">
         <div class="w-full xl:w-[96%] max-w-[1600px] mx-auto px-3 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16 relative">
-                
-                <!-- 手機版專屬：絕對置中標題 -->
                 <div class="absolute inset-0 flex items-center justify-center pointer-events-none md:hidden z-0">
                     <span class="font-bold text-[15px] sm:text-base tracking-widest text-white">萊恩飆股起漲手札</span>
                 </div>
-
-                <!-- Logo -->
                 <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0 relative z-10">
                     <div class="bg-blue-600/20 p-2 rounded-lg"><i class="fa-solid fa-chart-line text-blue-500 text-lg sm:text-xl"></i></div>
                     <span class="font-bold text-lg sm:text-xl tracking-wider text-white hidden md:block">萊恩飆股起漲手札</span>
-                    <span id="auth-status" class="ml-1 sm:ml-2 w-7 h-7 bg-gray-800 border border-gray-600 rounded-full shadow-sm flex items-center justify-center cursor-help" title="連線中"><i class="fa-solid fa-spinner fa-spin text-yellow-500 text-xs"></i></span>
+                    <span id="auth-status" class="ml-1 sm:ml-2 w-7 h-7 bg-gray-800 border border-gray-600 rounded-full shadow-sm flex items-center justify-center cursor-help"><i class="fa-solid fa-spinner fa-spin text-yellow-500 text-xs"></i></span>
                 </div>
-                <!-- Desktop Nav -->
                 <div class="hidden lg:flex flex-1 justify-center space-x-2 relative z-10">
                     <button class="nav-btn px-4 py-2 rounded-lg font-bold text-blue-400 bg-gray-900 shadow-inner transition text-sm" data-target="module-journal" data-color="blue"><i class="fa-solid fa-book-journal-whills mr-2"></i>選股日誌</button>
                     <button class="nav-btn px-4 py-2 rounded-lg font-bold text-gray-400 hover:text-purple-400 hover:bg-gray-800 transition text-sm" data-target="module-calculator" data-color="purple"><i class="fa-solid fa-calculator mr-2"></i>支撐壓力</button>
                     <button class="nav-btn px-4 py-2 rounded-lg font-bold text-gray-400 hover:text-green-400 hover:bg-gray-800 transition text-sm" data-target="module-plan" data-color="green"><i class="fa-solid fa-chess-knight mr-2"></i>交易規劃</button>
                     <button class="nav-btn px-4 py-2 rounded-lg font-bold text-gray-400 hover:text-yellow-400 hover:bg-gray-800 transition text-sm" data-target="module-favorites" data-color="yellow"><i class="fa-solid fa-star mr-2"></i>追蹤清單</button>
                 </div>
-                <!-- Tools -->
                 <div class="flex items-center gap-1 sm:gap-2 flex-shrink-0 relative z-10">
-                    <!-- 跨裝置同步按鈕 -->
                     <button id="btn-sync-modal" class="text-xs sm:text-sm bg-blue-600 hover:bg-blue-500 text-white px-2.5 sm:px-3 py-1.5 rounded-lg transition shadow-sm border border-transparent flex items-center font-medium"><i class="fa-solid fa-cloud-arrow-up sm:mr-1.5"></i><span class="hidden sm:inline">跨裝置同步</span></button>
-                    
-                    <button id="btn-import-backup" class="text-xs sm:text-sm bg-gray-700 hover:bg-blue-600 text-gray-200 px-2.5 sm:px-3 py-1.5 rounded-lg transition shadow-sm flex items-center" title="匯入備份 (還原資料)"><i class="fa-solid fa-upload sm:mr-1.5"></i><span class="hidden sm:inline">匯入</span></button>
-                    <button id="btn-export-backup" class="text-xs sm:text-sm bg-gray-700 hover:bg-green-600 text-gray-200 px-2.5 sm:px-3 py-1.5 rounded-lg transition shadow-sm flex items-center" title="匯出備份 (儲存資料)"><i class="fa-solid fa-download sm:mr-1.5"></i><span class="hidden sm:inline">匯出</span></button>
+                    <button id="btn-import-backup" class="text-xs sm:text-sm bg-gray-700 hover:bg-blue-600 text-gray-200 px-2.5 sm:px-3 py-1.5 rounded-lg transition shadow-sm flex items-center"><i class="fa-solid fa-upload sm:mr-1.5"></i><span class="hidden sm:inline">匯入</span></button>
+                    <button id="btn-export-backup" class="text-xs sm:text-sm bg-gray-700 hover:bg-green-600 text-gray-200 px-2.5 sm:px-3 py-1.5 rounded-lg transition shadow-sm flex items-center"><i class="fa-solid fa-download sm:mr-1.5"></i><span class="hidden sm:inline">匯出</span></button>
                     <input type="file" id="backup-file" accept=".xlsx" class="hidden">
                 </div>
             </div>
         </div>
-        <!-- Mobile Nav (Scrollable) -->
         <div class="lg:hidden border-t border-gray-700 bg-gray-800/95 backdrop-blur px-2 py-2 flex gap-2 overflow-x-auto scrollbar-hide">
             <button class="nav-btn-mobile flex-shrink-0 px-4 py-2 text-sm font-medium rounded-lg bg-blue-900/50 text-blue-400 border border-blue-500/50 shadow-sm" data-target="module-journal">日誌</button>
             <button class="nav-btn-mobile flex-shrink-0 px-4 py-2 text-sm font-medium rounded-lg text-gray-400 bg-gray-800 hover:bg-gray-700 transition" data-target="module-calculator">支撐壓力</button>
@@ -83,10 +68,7 @@
 
         <!-- Module 1: Stock Journal -->
         <div id="module-journal" class="tab-content active">
-            
-            <!-- 上方：輸入與操作區 -->
             <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-5 mb-6">
-                
                 <!-- 新增條件表單 -->
                 <div class="bg-gray-800 rounded-xl p-4 sm:p-6 border-t-4 border-blue-500 shadow-xl lg:col-span-3 flex flex-col gap-4">
                     <div class="flex justify-between items-center border-b border-gray-700/50 pb-3">
@@ -95,72 +77,29 @@
                     
                     <form id="journal-form" class="flex flex-col gap-4">
                         <div class="grid grid-cols-2 md:grid-cols-6 gap-3 sm:gap-4">
-                            <!-- 日期：手機滿版，平板電腦1格 -->
                             <div class="col-span-2 md:col-span-1">
                                 <label class="block text-xs text-gray-400 mb-1 font-medium">日期</label>
-                                <input type="date" id="j-date" required class="w-full bg-gray-700/80 border border-gray-600 rounded-lg px-3 py-2 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition shadow-inner">
+                                <input type="date" id="j-date" required class="input-base">
                             </div>
-                            <!-- 代號 -->
                             <div class="col-span-1 md:col-span-1">
                                 <label class="block text-xs text-gray-400 mb-1 font-medium">代號</label>
-                                <input type="text" id="j-code" list="stock-codes-list" required placeholder="如: 2330" class="w-full bg-gray-700/80 border border-gray-600 rounded-lg px-3 py-2 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition shadow-inner">
+                                <input type="text" id="j-code" list="stock-codes-list" required placeholder="如: 2330" class="input-base" autocomplete="off">
                             </div>
-                            <!-- 股名 -->
                             <div class="col-span-1 md:col-span-1">
                                 <label class="block text-xs text-gray-400 mb-1 font-medium">股名</label>
-                                <input type="text" id="j-name" list="stock-names-list" required placeholder="自動帶入" class="w-full bg-gray-700/80 border border-gray-600 rounded-lg px-3 py-2 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition shadow-inner">
+                                <input type="text" id="j-name" list="stock-names-list" required placeholder="自動帶入" class="input-base">
                             </div>
-                            <!-- 備註：填滿剩下所有空間 -->
                             <div class="col-span-2 md:col-span-3">
                                 <label class="block text-xs text-gray-400 mb-1 font-medium">備註紀錄</label>
-                                <input type="text" id="j-notes" placeholder="可自訂筆記..." class="w-full bg-gray-700/80 border border-gray-600 rounded-lg px-3 py-2 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition shadow-inner">
+                                <input type="text" id="j-notes" placeholder="可自訂筆記..." class="input-base">
                             </div>
-                            <!-- 動態資料庫連動預覽區塊 -->
-                            <div id="j-preview" class="col-span-2 md:col-span-6 bg-gray-900/60 p-3 rounded-lg border border-gray-600/50 hidden flex-wrap items-center gap-x-4 gap-y-2 shadow-inner mt-1">
-                            </div>
+                            <div id="j-preview" class="col-span-2 md:col-span-6 bg-gray-900/60 p-3 rounded-lg border border-gray-600/50 hidden flex-wrap items-center gap-x-4 gap-y-2 shadow-inner mt-1"></div>
                         </div>
 
-                        <!-- 策略標籤 -->
+                        <!-- 策略標籤 (由 JS 動態生成，大幅減輕 HTML 肥大) -->
                         <div class="bg-gray-900/40 p-4 rounded-xl border border-gray-700/50 flex flex-col gap-3 shadow-inner">
                             <label class="block text-xs text-gray-400 font-medium tracking-wide">策略標籤 <span class="text-gray-500 font-normal">(無點選亦可新增，點擊選取/取消)</span></label>
-                            
-                            <div>
-                                <div class="text-xs font-bold text-gray-300 border-b border-gray-700/50 pb-1 mb-2">🌟 特別關注</div>
-                                <div class="flex flex-wrap gap-2">
-                                    <label class="cursor-pointer"><input type="checkbox" value="特別追蹤" class="hidden tag-input"><div class="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-600 text-gray-300 hover:bg-gray-700 transition" data-color="#8b5cf6">特別追蹤</div></label>
-                                </div>
-                            </div>
-
-                            <div>
-                                <div class="text-xs font-bold text-gray-300 border-b border-gray-700/50 pb-1 mb-2">🔥 動能與型態</div>
-                                <div class="flex flex-wrap gap-2">
-                                    <label class="cursor-pointer"><input type="checkbox" value="披荊斬棘" class="hidden tag-input"><div class="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-600 text-gray-300 hover:bg-gray-700 transition" data-color="#ef4444">披荊斬棘</div></label>
-                                    <label class="cursor-pointer"><input type="checkbox" value="破繭而出" class="hidden tag-input"><div class="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-600 text-gray-300 hover:bg-gray-700 transition" data-color="#f43f5e">破繭而出</div></label>
-                                    <label class="cursor-pointer"><input type="checkbox" value="月來越好" class="hidden tag-input"><div class="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-600 text-gray-300 hover:bg-gray-700 transition" data-color="#f97316">月來越好</div></label>
-                                    <label class="cursor-pointer"><input type="checkbox" value="季不可失" class="hidden tag-input"><div class="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-600 text-gray-300 hover:bg-gray-700 transition" data-color="#f59e0b">季不可失</div></label>
-                                    <label class="cursor-pointer"><input type="checkbox" value="守株待兔" class="hidden tag-input"><div class="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-600 text-gray-300 hover:bg-gray-700 transition" data-color="#a3e635">守株待兔</div></label>
-                                </div>
-                            </div>
-
-                            <div>
-                                <div class="text-xs font-bold text-gray-300 border-b border-gray-700/50 pb-1 mb-2">💰 量價與籌碼</div>
-                                <div class="flex flex-wrap gap-2">
-                                    <label class="cursor-pointer"><input type="checkbox" value="量價齊揚" class="hidden tag-input"><div class="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-600 text-gray-300 hover:bg-gray-700 transition" data-color="#22c55e">量價齊揚</div></label>
-                                    <label class="cursor-pointer"><input type="checkbox" value="高成交值" class="hidden tag-input"><div class="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-600 text-gray-300 hover:bg-gray-700 transition" data-color="#14b8a6">高成交值</div></label>
-                                    <label class="cursor-pointer"><input type="checkbox" value="法人加持" class="hidden tag-input"><div class="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-600 text-gray-300 hover:bg-gray-700 transition" data-color="#6366f1">法人加持</div></label>
-                                    <label class="cursor-pointer"><input type="checkbox" value="5日籌碼集中" class="hidden tag-input"><div class="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-600 text-gray-300 hover:bg-gray-700 transition" data-color="#a855f7">5日籌碼集中</div></label>
-                                    <label class="cursor-pointer"><input type="checkbox" value="20日籌碼集中" class="hidden tag-input"><div class="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-600 text-gray-300 hover:bg-gray-700 transition" data-color="#c026d3">20日籌碼集中</div></label>
-                                </div>
-                            </div>
-
-                            <div>
-                                <div class="text-xs font-bold text-gray-300 border-b border-gray-700/50 pb-1 mb-2">📈 技術指標</div>
-                                <div class="flex flex-wrap gap-2">
-                                    <label class="cursor-pointer"><input type="checkbox" value="OBV突破" class="hidden tag-input"><div class="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-600 text-gray-300 hover:bg-gray-700 transition" data-color="#10b981">OBV突破</div></label>
-                                    <label class="cursor-pointer"><input type="checkbox" value="MACD突破" class="hidden tag-input"><div class="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-600 text-gray-300 hover:bg-gray-700 transition" data-color="#06b6d4">MACD突破</div></label>
-                                    <label class="cursor-pointer"><input type="checkbox" value="KD金叉" class="hidden tag-input"><div class="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-600 text-gray-300 hover:bg-gray-700 transition" data-color="#3b82f6">KD金叉</div></label>
-                                </div>
-                            </div>
+                            <div id="form-tags-container" class="space-y-3"></div>
                         </div>
                         
                         <div class="flex justify-end mt-1">
@@ -181,11 +120,8 @@
 
             <!-- 下方：過濾與清單 -->
             <div class="bg-gray-800 rounded-xl shadow-xl border-t-4 border-blue-500 flex flex-col h-full min-h-[500px]">
-                
-                <!-- 篩選列 & 複製工具列 -->
                 <div class="p-4 border-b border-gray-700/50 bg-gray-800/80 rounded-t-xl flex flex-col 2xl:flex-row justify-between items-start 2xl:items-center gap-4">
                     
-                    <!-- Filter Zone -->
                     <div class="flex flex-wrap items-center gap-2 sm:gap-3 w-full 2xl:w-auto">
                         <div class="flex items-center bg-gray-900/50 rounded-lg p-1 border border-gray-700/50">
                             <span class="text-xs text-gray-400 px-2"><i class="fa-solid fa-filter mr-1"></i>區間</span>
@@ -198,8 +134,6 @@
                             <input type="checkbox" id="filter-futures" class="rounded border-gray-600 text-sky-500 focus:ring-sky-500 w-3.5 h-3.5 sm:w-4 sm:h-4">
                             <span class="text-xs sm:text-sm text-sky-400 font-medium whitespace-nowrap">僅含股期</span>
                         </label>
-
-                        <!-- 新增：排除負成長選項 -->
                         <label class="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-gray-900/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-700/50 transition hover:bg-gray-800">
                             <input type="checkbox" id="filter-exclude-negative-growth" class="rounded border-gray-600 text-green-500 focus:ring-green-500 w-3.5 h-3.5 sm:w-4 sm:h-4">
                             <span class="text-xs sm:text-sm text-green-400 font-medium whitespace-nowrap">排除負成長</span>
@@ -215,67 +149,35 @@
                         
                         <div class="flex items-center gap-2 w-full md:w-auto relative">
                             <button type="button" id="filter-tag-btn" class="bg-gray-900/50 text-white text-xs sm:text-sm border border-gray-700/50 rounded-lg px-3 py-1.5 sm:py-2 focus:ring-2 focus:ring-blue-500 outline-none transition hover:bg-gray-800 w-full sm:w-auto flex items-center justify-between gap-2 shadow-sm">
-                                <span>+ 篩選策略(可複選)</span>
-                                <i class="fa-solid fa-chevron-down text-[10px] opacity-70"></i>
+                                <span>+ 篩選策略(可複選)</span><i class="fa-solid fa-chevron-down text-[10px] opacity-70"></i>
                             </button>
-                            <!-- 升級為小格子打勾面板 -->
                             <div id="filter-tag-panel" class="absolute left-0 top-full mt-1.5 w-[280px] bg-gray-800 border border-gray-600 rounded-xl shadow-2xl hidden z-50 p-3 max-h-[60vh] overflow-y-auto">
-                                <div class="text-[10px] font-bold text-gray-400 border-b border-gray-700 pb-1 mb-1.5">🌟 特別關注</div>
-                                <div class="grid grid-cols-2 gap-1 mb-3">
-                                    <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-700/50 p-1.5 rounded transition"><input type="checkbox" value="特別追蹤" class="filter-tag-cb w-3.5 h-3.5 accent-blue-500 cursor-pointer"><span class="text-xs text-gray-300">特別追蹤</span></label>
-                                </div>
-                                <div class="text-[10px] font-bold text-gray-400 border-b border-gray-700 pb-1 mb-1.5">🔥 動能與型態</div>
-                                <div class="grid grid-cols-2 gap-1 mb-3">
-                                    <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-700/50 p-1.5 rounded transition"><input type="checkbox" value="披荊斬棘" class="filter-tag-cb w-3.5 h-3.5 accent-blue-500 cursor-pointer"><span class="text-xs text-gray-300">披荊斬棘</span></label>
-                                    <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-700/50 p-1.5 rounded transition"><input type="checkbox" value="破繭而出" class="filter-tag-cb w-3.5 h-3.5 accent-blue-500 cursor-pointer"><span class="text-xs text-gray-300">破繭而出</span></label>
-                                    <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-700/50 p-1.5 rounded transition"><input type="checkbox" value="月來越好" class="filter-tag-cb w-3.5 h-3.5 accent-blue-500 cursor-pointer"><span class="text-xs text-gray-300">月來越好</span></label>
-                                    <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-700/50 p-1.5 rounded transition"><input type="checkbox" value="季不可失" class="filter-tag-cb w-3.5 h-3.5 accent-blue-500 cursor-pointer"><span class="text-xs text-gray-300">季不可失</span></label>
-                                    <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-700/50 p-1.5 rounded transition"><input type="checkbox" value="守株待兔" class="filter-tag-cb w-3.5 h-3.5 accent-blue-500 cursor-pointer"><span class="text-xs text-gray-300">守株待兔</span></label>
-                                </div>
-                                <div class="text-[10px] font-bold text-gray-400 border-b border-gray-700 pb-1 mb-1.5">💰 量價與籌碼</div>
-                                <div class="grid grid-cols-2 gap-1 mb-3">
-                                    <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-700/50 p-1.5 rounded transition"><input type="checkbox" value="量價齊揚" class="filter-tag-cb w-3.5 h-3.5 accent-blue-500 cursor-pointer"><span class="text-xs text-gray-300">量價齊揚</span></label>
-                                    <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-700/50 p-1.5 rounded transition"><input type="checkbox" value="高成交值" class="filter-tag-cb w-3.5 h-3.5 accent-blue-500 cursor-pointer"><span class="text-xs text-gray-300">高成交值</span></label>
-                                    <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-700/50 p-1.5 rounded transition"><input type="checkbox" value="法人加持" class="filter-tag-cb w-3.5 h-3.5 accent-blue-500 cursor-pointer"><span class="text-xs text-gray-300">法人加持</span></label>
-                                    <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-700/50 p-1.5 rounded transition"><input type="checkbox" value="5日籌碼集中" class="filter-tag-cb w-3.5 h-3.5 accent-blue-500 cursor-pointer"><span class="text-xs text-gray-300">5日籌碼集中</span></label>
-                                    <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-700/50 p-1.5 rounded transition"><input type="checkbox" value="20日籌碼集中" class="filter-tag-cb w-3.5 h-3.5 accent-blue-500 cursor-pointer"><span class="text-xs text-gray-300">20日籌碼集中</span></label>
-                                </div>
-                                <div class="text-[10px] font-bold text-gray-400 border-b border-gray-700 pb-1 mb-1.5">📈 技術指標</div>
-                                <div class="grid grid-cols-2 gap-1">
-                                    <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-700/50 p-1.5 rounded transition"><input type="checkbox" value="OBV突破" class="filter-tag-cb w-3.5 h-3.5 accent-blue-500 cursor-pointer"><span class="text-xs text-gray-300">OBV突破</span></label>
-                                    <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-700/50 p-1.5 rounded transition"><input type="checkbox" value="MACD突破" class="filter-tag-cb w-3.5 h-3.5 accent-blue-500 cursor-pointer"><span class="text-xs text-gray-300">MACD突破</span></label>
-                                    <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-700/50 p-1.5 rounded transition"><input type="checkbox" value="KD金叉" class="filter-tag-cb w-3.5 h-3.5 accent-blue-500 cursor-pointer"><span class="text-xs text-gray-300">KD金叉</span></label>
-                                </div>
+                                <div id="filter-tags-container"></div>
                             </div>
                         </div>
                         <div id="filter-tags-display" class="flex flex-wrap gap-1.5 w-full md:w-auto"></div>
-                        
-                        <!-- 清除篩選按鈕 -->
                         <button type="button" id="btn-clear-filters" class="text-xs sm:text-sm bg-gray-700 hover:bg-red-600 text-gray-300 hover:text-white border border-gray-600 hover:border-red-500 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center ml-auto 2xl:ml-0 whitespace-nowrap">
                             <i class="fa-solid fa-eraser mr-1.5"></i><span class="hidden sm:inline">清除篩選</span><span class="sm:hidden">清除</span>
                         </button>
                     </div>
 
-                    <!-- Copy Zone -->
                     <div class="flex flex-wrap gap-1.5 sm:gap-2 w-full 2xl:w-auto justify-start 2xl:justify-end border-t 2xl:border-t-0 border-gray-700 pt-3 2xl:pt-0">
                         <span class="text-xs text-gray-500 mr-1 flex items-center font-medium hidden sm:flex">複製:</span>
-                        <button class="btn-copy text-xs font-medium bg-blue-900/40 hover:bg-blue-600 text-blue-200 border border-blue-700/50 px-2.5 py-1.5 rounded-lg transition" data-mode="time">時間</button>
-                        <button class="btn-copy text-xs font-medium bg-blue-900/40 hover:bg-blue-600 text-blue-200 border border-blue-700/50 px-2.5 py-1.5 rounded-lg transition" data-mode="strategy">策略</button>
-                        <button class="btn-copy text-xs font-medium bg-blue-900/40 hover:bg-blue-600 text-blue-200 border border-blue-700/50 px-2.5 py-1.5 rounded-lg transition" data-mode="score">分數</button>
-                        <button class="btn-copy text-xs font-medium bg-sky-900/40 hover:bg-sky-600 text-sky-200 border border-sky-700/50 px-2.5 py-1.5 rounded-lg transition" data-mode="futures">股期</button>
-                        <button class="btn-copy text-xs font-medium bg-sky-900/40 hover:bg-sky-600 text-sky-200 border border-sky-700/50 px-2.5 py-1.5 rounded-lg transition" data-mode="futures_score">股期分數</button>
-                        <button class="btn-copy text-xs font-medium bg-green-900/40 hover:bg-green-600 text-green-200 border border-green-700/50 px-2.5 py-1.5 rounded-lg transition" data-mode="eps">EPS</button>
-                        <button class="btn-copy text-xs font-medium bg-orange-900/40 hover:bg-orange-600 text-orange-200 border border-orange-700/50 px-2.5 py-1.5 rounded-lg transition" data-mode="chip">籌碼集中</button>
+                        <button class="btn-copy-base bg-blue-900/40 hover:bg-blue-600 text-blue-200 border-blue-700/50 btn-copy" data-mode="time">時間</button>
+                        <button class="btn-copy-base bg-blue-900/40 hover:bg-blue-600 text-blue-200 border-blue-700/50 btn-copy" data-mode="strategy">策略</button>
+                        <button class="btn-copy-base bg-blue-900/40 hover:bg-blue-600 text-blue-200 border-blue-700/50 btn-copy" data-mode="score">分數</button>
+                        <button class="btn-copy-base bg-sky-900/40 hover:bg-sky-600 text-sky-200 border-sky-700/50 btn-copy" data-mode="futures">股期</button>
+                        <button class="btn-copy-base bg-sky-900/40 hover:bg-sky-600 text-sky-200 border-sky-700/50 btn-copy" data-mode="futures_score">股期分數</button>
+                        <button class="btn-copy-base bg-green-900/40 hover:bg-green-600 text-green-200 border-green-700/50 btn-copy" data-mode="eps">EPS</button>
+                        <button class="btn-copy-base bg-orange-900/40 hover:bg-orange-600 text-orange-200 border-orange-700/50 btn-copy" data-mode="chip">籌碼集中</button>
                     </div>
                 </div>
 
-                <!-- 批次刪除工具列 (隱藏/顯示) -->
                 <div id="batch-bar-journal" class="hidden bg-red-900/20 border-b border-gray-700/50 p-2 sm:p-3 justify-between items-center transition-all">
                     <span class="text-xs sm:text-sm text-red-400 font-medium"><i class="fa-solid fa-check-double mr-1.5"></i>已選擇 <span id="batch-count-journal" class="font-bold">0</span> 筆資料</span>
                     <button onclick="confirmBatchDelete('journal')" class="bg-red-600 hover:bg-red-500 text-white text-xs sm:text-sm font-medium px-3 sm:px-4 py-1.5 rounded-lg transition shadow-sm">批次刪除</button>
                 </div>
 
-                <!-- Table -->
                 <div class="overflow-x-auto flex-grow relative rounded-b-xl w-full">
                     <table class="min-w-full text-left text-sm whitespace-nowrap table-auto w-full">
                         <thead class="bg-gray-900 text-gray-400 sticky top-0 z-10 shadow-sm font-medium">
@@ -293,42 +195,23 @@
                                 <th class="py-3 px-3 text-center">操作</th>
                             </tr>
                         </thead>
-                        <tbody id="journal-table-body" class="divide-y divide-gray-700/50">
-                            <!-- Data injected by JS -->
-                        </tbody>
+                        <tbody id="journal-table-body" class="divide-y divide-gray-700/50"></tbody>
                     </table>
                     <div id="journal-empty" class="text-center py-16 text-gray-500 hidden absolute inset-0 flex items-center justify-center bg-gray-800 text-sm">查無符合條件的資料。</div>
                 </div>
             </div>
         </div>
 
-        <!-- Module 2: Support/Resistance Calculator (紫色) -->
+        <!-- Module 2: Support/Resistance Calculator -->
         <div id="module-calculator" class="tab-content">
-            
-            <!-- 上方：輸入數據 -->
             <div class="bg-gray-800 rounded-xl p-4 sm:p-6 shadow-xl border-t-4 border-purple-500 mb-6">
                 <h2 class="font-bold text-purple-400 mb-5 border-b border-gray-700/50 pb-3 text-lg sm:text-xl flex items-center"><div class="bg-purple-500/20 p-1.5 rounded mr-2"><i class="fa-solid fa-calculator"></i></div> 輸入數據</h2>
                 <form id="calc-form" class="grid grid-cols-2 md:grid-cols-5 gap-3 sm:gap-4 lg:gap-5 items-end">
-                    <div class="col-span-1">
-                        <label class="block text-xs sm:text-sm text-gray-400 mb-1 font-medium">代號</label>
-                        <input type="text" id="c-code" list="stock-codes-list" placeholder="選填" class="w-full bg-gray-700/80 border border-gray-600 rounded-lg px-3 sm:px-4 py-2 sm:py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition shadow-inner text-sm sm:text-base">
-                    </div>
-                    <div class="col-span-1">
-                        <label class="block text-xs sm:text-sm text-gray-400 mb-1 font-medium">股名</label>
-                        <input type="text" id="c-name" list="stock-names-list" placeholder="選填" class="w-full bg-gray-700/80 border border-gray-600 rounded-lg px-3 sm:px-4 py-2 sm:py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition shadow-inner text-sm sm:text-base">
-                    </div>
-                    <div class="col-span-1 md:col-span-1">
-                        <label class="block text-xs sm:text-sm text-gray-400 mb-1 font-medium">最高價 (High)</label>
-                        <input type="number" step="0.01" id="c-high" required class="w-full bg-gray-700/80 border border-gray-600 rounded-lg px-3 sm:px-4 py-2 sm:py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition shadow-inner text-sm sm:text-base">
-                    </div>
-                    <div class="col-span-1 md:col-span-1">
-                        <label class="block text-xs sm:text-sm text-gray-400 mb-1 font-medium">最低價 (Low)</label>
-                        <input type="number" step="0.01" id="c-low" required class="w-full bg-gray-700/80 border border-gray-600 rounded-lg px-3 sm:px-4 py-2 sm:py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition shadow-inner text-sm sm:text-base">
-                    </div>
-                    <div class="col-span-2 md:col-span-1">
-                        <label class="block text-xs sm:text-sm text-gray-400 mb-1 font-medium">收盤價 (Close)</label>
-                        <input type="number" step="0.01" id="c-close" required class="w-full bg-gray-700/80 border border-gray-600 rounded-lg px-3 sm:px-4 py-2 sm:py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition shadow-inner text-sm sm:text-base">
-                    </div>
+                    <div class="col-span-1"><label class="block text-xs sm:text-sm text-gray-400 mb-1 font-medium">代號</label><input type="text" id="c-code" list="stock-codes-list" placeholder="選填" class="input-base"></div>
+                    <div class="col-span-1"><label class="block text-xs sm:text-sm text-gray-400 mb-1 font-medium">股名</label><input type="text" id="c-name" list="stock-names-list" placeholder="選填" class="input-base"></div>
+                    <div class="col-span-1 md:col-span-1"><label class="block text-xs sm:text-sm text-gray-400 mb-1 font-medium">最高價 (High)</label><input type="number" step="0.01" id="c-high" required class="input-base"></div>
+                    <div class="col-span-1 md:col-span-1"><label class="block text-xs sm:text-sm text-gray-400 mb-1 font-medium">最低價 (Low)</label><input type="number" step="0.01" id="c-low" required class="input-base"></div>
+                    <div class="col-span-2 md:col-span-1"><label class="block text-xs sm:text-sm text-gray-400 mb-1 font-medium">收盤價 (Close)</label><input type="number" step="0.01" id="c-close" required class="input-base"></div>
                     <div class="col-span-2 md:col-span-5 flex flex-col sm:flex-row gap-2 sm:gap-3 pt-2 lg:pt-1">
                         <button type="submit" class="w-full sm:flex-1 bg-purple-600 hover:bg-purple-500 text-white font-bold py-2 sm:py-2.5 rounded-lg transition shadow-lg shadow-purple-900/20">計算</button>
                         <button type="button" id="btn-copy-calc-all" class="w-full sm:flex-1 bg-transparent hover:bg-gray-700 text-gray-300 py-2 sm:py-2.5 rounded-lg transition border border-gray-600 text-sm"><i class="fa-solid fa-copy mr-2"></i>複製全部結果</button>
@@ -336,15 +219,10 @@
                 </form>
             </div>
 
-            <!-- 下方：三格排列結果 -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                
                 <!-- CDP -->
                 <div class="bg-gray-800 rounded-xl p-4 sm:p-5 border border-gray-700/50 shadow-md relative group">
-                    <div class="flex justify-between items-center mb-4 border-b border-gray-700/50 pb-2">
-                        <h3 class="font-bold text-blue-400 text-base sm:text-lg">CDP 短線當沖</h3>
-                        <button class="btn-copy-calc text-gray-500 hover:text-white bg-gray-700 hover:bg-blue-600 w-7 h-7 sm:w-8 sm:h-8 rounded flex items-center justify-center transition" data-target="cdp"><i class="fa-solid fa-copy"></i></button>
-                    </div>
+                    <div class="flex justify-between items-center mb-4 border-b border-gray-700/50 pb-2"><h3 class="font-bold text-blue-400 text-base sm:text-lg">CDP 短線當沖</h3><button class="btn-copy-calc text-gray-500 hover:text-white bg-gray-700 hover:bg-blue-600 w-7 h-7 sm:w-8 sm:h-8 rounded flex items-center justify-center transition" data-target="cdp"><i class="fa-solid fa-copy"></i></button></div>
                     <div class="space-y-2 sm:space-y-2.5 text-sm" id="res-cdp">
                         <div class="flex justify-between"><span class="text-gray-400">追買(AH)</span><span class="font-bold tw-red" id="cdp-ah">-</span></div>
                         <div class="flex justify-between"><span class="text-gray-400">賣出(NH)</span><span class="font-bold tw-red" id="cdp-nh">-</span></div>
@@ -353,13 +231,9 @@
                         <div class="flex justify-between"><span class="text-gray-400">追賣(AL)</span><span class="font-bold tw-green" id="cdp-al">-</span></div>
                     </div>
                 </div>
-                
                 <!-- Pivot -->
                 <div class="bg-gray-800 rounded-xl p-4 sm:p-5 border border-gray-700/50 shadow-md relative group">
-                    <div class="flex justify-between items-center mb-4 border-b border-gray-700/50 pb-2">
-                        <h3 class="font-bold text-indigo-400 text-base sm:text-lg">Pivot 波段樞軸</h3>
-                        <button class="btn-copy-calc text-gray-500 hover:text-white bg-gray-700 hover:bg-indigo-600 w-7 h-7 sm:w-8 sm:h-8 rounded flex items-center justify-center transition" data-target="pivot"><i class="fa-solid fa-copy"></i></button>
-                    </div>
+                    <div class="flex justify-between items-center mb-4 border-b border-gray-700/50 pb-2"><h3 class="font-bold text-indigo-400 text-base sm:text-lg">Pivot 波段樞軸</h3><button class="btn-copy-calc text-gray-500 hover:text-white bg-gray-700 hover:bg-indigo-600 w-7 h-7 sm:w-8 sm:h-8 rounded flex items-center justify-center transition" data-target="pivot"><i class="fa-solid fa-copy"></i></button></div>
                     <div class="space-y-2 sm:space-y-2.5 text-sm" id="res-pivot">
                         <div class="flex justify-between"><span class="text-gray-400">壓力二(R2)</span><span class="font-bold tw-red" id="pv-r2">-</span></div>
                         <div class="flex justify-between"><span class="text-gray-400">壓力一(R1)</span><span class="font-bold tw-red" id="pv-r1">-</span></div>
@@ -368,13 +242,9 @@
                         <div class="flex justify-between"><span class="text-gray-400">支撐二(S2)</span><span class="font-bold tw-green" id="pv-s2">-</span></div>
                     </div>
                 </div>
-
-                <!-- Fibonacci (直式以符合三格並排版面) -->
+                <!-- Fibonacci -->
                 <div class="bg-gray-800 rounded-xl p-4 sm:p-5 border border-gray-700/50 shadow-md relative group md:col-span-2 lg:col-span-1">
-                    <div class="flex justify-between items-center mb-4 border-b border-gray-700/50 pb-2">
-                        <h3 class="font-bold text-amber-400 text-base sm:text-lg">費波那契回撤</h3>
-                        <button class="btn-copy-calc text-gray-500 hover:text-white bg-gray-700 hover:bg-amber-600 w-7 h-7 sm:w-8 sm:h-8 rounded flex items-center justify-center transition" data-target="fibo"><i class="fa-solid fa-copy"></i></button>
-                    </div>
+                    <div class="flex justify-between items-center mb-4 border-b border-gray-700/50 pb-2"><h3 class="font-bold text-amber-400 text-base sm:text-lg">費波那契回撤</h3><button class="btn-copy-calc text-gray-500 hover:text-white bg-gray-700 hover:bg-amber-600 w-7 h-7 sm:w-8 sm:h-8 rounded flex items-center justify-center transition" data-target="fibo"><i class="fa-solid fa-copy"></i></button></div>
                     <div class="space-y-2 sm:space-y-2.5 text-sm" id="res-fibo">
                         <div class="flex justify-between"><span class="text-gray-400">0.236</span><span class="font-bold text-white" id="fb-236">-</span></div>
                         <div class="flex justify-between"><span class="text-gray-400">0.382</span><span class="font-bold text-white" id="fb-382">-</span></div>
@@ -383,71 +253,31 @@
                         <div class="flex justify-between"><span class="text-gray-400">0.786</span><span class="font-bold text-white" id="fb-786">-</span></div>
                     </div>
                 </div>
-
             </div>
         </div>
 
-        <!-- Module 3: Trading Plan (綠色) -->
+        <!-- Module 3: Trading Plan -->
         <div id="module-plan" class="tab-content">
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-                <div class="bg-gray-800 rounded-xl shadow-md border-l-4 border-blue-500 p-4 sm:p-5 flex items-center">
-                    <div class="bg-blue-500/20 p-3 rounded-full mr-4"><i class="fa-solid fa-chart-pie text-blue-400 text-xl"></i></div>
-                    <div>
-                        <div class="text-sm text-gray-400 font-medium">總交易筆數</div>
-                        <div class="text-2xl font-bold text-white" id="stat-total">0</div>
-                    </div>
-                </div>
-                <div class="bg-gray-800 rounded-xl shadow-md border-l-4 border-green-500 p-4 sm:p-5 flex items-center">
-                    <div class="bg-green-500/20 p-3 rounded-full mr-4"><i class="fa-solid fa-trophy text-green-400 text-xl"></i></div>
-                    <div>
-                        <div class="text-sm text-gray-400 font-medium">勝率</div>
-                        <div class="text-2xl font-bold text-white" id="stat-winrate">0%</div>
-                    </div>
-                </div>
-                <div class="bg-gray-800 rounded-xl shadow-md border-l-4 border-red-500 p-4 sm:p-5 flex items-center">
-                    <div class="bg-red-500/20 p-3 rounded-full mr-4"><i class="fa-solid fa-sack-dollar text-red-400 text-xl"></i></div>
-                    <div>
-                        <div class="text-sm text-gray-400 font-medium">累積總損益</div>
-                        <div class="text-2xl font-bold text-white" id="stat-pnl">$0</div>
-                    </div>
-                </div>
+                <div class="bg-gray-800 rounded-xl shadow-md border-l-4 border-blue-500 p-4 sm:p-5 flex items-center"><div class="bg-blue-500/20 p-3 rounded-full mr-4"><i class="fa-solid fa-chart-pie text-blue-400 text-xl"></i></div><div><div class="text-sm text-gray-400 font-medium">總交易筆數</div><div class="text-2xl font-bold text-white" id="stat-total">0</div></div></div>
+                <div class="bg-gray-800 rounded-xl shadow-md border-l-4 border-green-500 p-4 sm:p-5 flex items-center"><div class="bg-green-500/20 p-3 rounded-full mr-4"><i class="fa-solid fa-trophy text-green-400 text-xl"></i></div><div><div class="text-sm text-gray-400 font-medium">勝率</div><div class="text-2xl font-bold text-white" id="stat-winrate">0%</div></div></div>
+                <div class="bg-gray-800 rounded-xl shadow-md border-l-4 border-red-500 p-4 sm:p-5 flex items-center"><div class="bg-red-500/20 p-3 rounded-full mr-4"><i class="fa-solid fa-sack-dollar text-red-400 text-xl"></i></div><div><div class="text-sm text-gray-400 font-medium">累積總損益</div><div class="text-2xl font-bold text-white" id="stat-pnl">$0</div></div></div>
             </div>
             
             <div class="bg-gray-800 rounded-xl shadow-xl border-t-4 border-green-500 overflow-hidden">
                 <div class="p-4 sm:p-5 bg-gray-800/80 border-b border-gray-700/50">
                     <h2 class="font-bold text-green-400 mb-4 text-lg sm:text-xl flex items-center"><div class="bg-green-500/20 p-1.5 rounded mr-2"><i class="fa-solid fa-chess-knight"></i></div> 新增交易規劃</h2>
                     <form id="plan-form" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 sm:gap-4 items-end">
-                        <div class="col-span-1">
-                            <label class="block text-xs text-gray-400 mb-1 font-medium">標的代號</label>
-                            <input type="text" id="p-stock" list="stock-codes-list" required class="w-full bg-gray-700/80 border border-gray-600 rounded-lg px-2 sm:px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-green-500 transition shadow-inner">
-                        </div>
-                        <div class="col-span-1">
-                            <label class="block text-xs text-gray-400 mb-1 font-medium">張數</label>
-                            <input type="number" id="p-qty" min="1" value="1" required class="w-full bg-gray-700/80 border border-gray-600 rounded-lg px-2 sm:px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-green-500 transition shadow-inner">
-                        </div>
-                        <div class="col-span-1">
-                            <label class="block text-xs text-gray-400 mb-1 font-medium">進場價</label>
-                            <input type="number" step="0.01" id="p-entry" required class="w-full bg-gray-700/80 border border-gray-600 rounded-lg px-2 sm:px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-green-500 transition shadow-inner">
-                        </div>
-                        <div class="col-span-1">
-                            <label class="block text-xs text-gray-400 mb-1 font-medium">停損(95折)</label>
-                            <input type="number" step="0.01" id="p-stop" required class="w-full bg-gray-700/80 border border-gray-600 rounded-lg px-2 sm:px-3 py-2 text-green-400 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 transition shadow-inner font-bold">
-                        </div>
-                        <div class="col-span-1 lg:col-span-1">
-                            <label class="block text-xs text-gray-400 mb-1 font-medium">停利價</label>
-                            <input type="number" step="0.01" id="p-target" class="w-full bg-gray-700/80 border border-gray-600 rounded-lg px-2 sm:px-3 py-2 tw-red text-sm focus:outline-none focus:ring-2 focus:ring-green-500 transition shadow-inner font-bold">
-                        </div>
-                        <div class="col-span-2 sm:col-span-3 lg:col-span-2">
-                            <label class="block text-xs text-gray-400 mb-1 font-medium">權證/備註</label>
-                            <input type="text" id="p-note" placeholder="可選填..." class="w-full bg-gray-700/80 border border-gray-600 rounded-lg px-2 sm:px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-green-500 transition shadow-inner">
-                        </div>
-                        <div class="col-span-2 sm:col-span-4 lg:col-span-1">
-                            <button type="submit" class="w-full bg-green-600 hover:bg-green-500 text-white text-sm font-bold py-2 rounded-lg transition shadow-lg shadow-green-900/20">加入</button>
-                        </div>
+                        <div class="col-span-1"><label class="block text-xs text-gray-400 mb-1 font-medium">標的代號</label><input type="text" id="p-stock" list="stock-codes-list" required class="input-base"></div>
+                        <div class="col-span-1"><label class="block text-xs text-gray-400 mb-1 font-medium">張數</label><input type="number" id="p-qty" min="1" value="1" required class="input-base"></div>
+                        <div class="col-span-1"><label class="block text-xs text-gray-400 mb-1 font-medium">進場價</label><input type="number" step="0.01" id="p-entry" required class="input-base"></div>
+                        <div class="col-span-1"><label class="block text-xs text-gray-400 mb-1 font-medium">停損(95折)</label><input type="number" step="0.01" id="p-stop" required class="input-base text-green-400 font-bold"></div>
+                        <div class="col-span-1 lg:col-span-1"><label class="block text-xs text-gray-400 mb-1 font-medium">停利價</label><input type="number" step="0.01" id="p-target" class="input-base tw-red font-bold"></div>
+                        <div class="col-span-2 sm:col-span-3 lg:col-span-2"><label class="block text-xs text-gray-400 mb-1 font-medium">權證/備註</label><input type="text" id="p-note" placeholder="可選填..." class="input-base"></div>
+                        <div class="col-span-2 sm:col-span-4 lg:col-span-1"><button type="submit" class="w-full bg-green-600 hover:bg-green-500 text-white text-sm font-bold py-2 rounded-lg transition shadow-lg shadow-green-900/20">加入</button></div>
                     </form>
                 </div>
                 
-                <!-- 批次刪除工具列 (隱藏/顯示) -->
                 <div id="batch-bar-plan" class="hidden bg-red-900/20 border-b border-gray-700/50 p-2 sm:p-3 justify-between items-center transition-all">
                     <span class="text-xs sm:text-sm text-red-400 font-medium"><i class="fa-solid fa-check-double mr-1.5"></i>已選擇 <span id="batch-count-plan" class="font-bold">0</span> 筆資料</span>
                     <button onclick="confirmBatchDelete('plan')" class="bg-red-600 hover:bg-red-500 text-white text-xs sm:text-sm font-medium px-3 sm:px-4 py-1.5 rounded-lg transition shadow-sm">批次刪除</button>
@@ -473,7 +303,7 @@
             </div>
         </div>
 
-        <!-- Module 4: Favorites (黃色) -->
+        <!-- Module 4: Favorites -->
         <div id="module-favorites" class="tab-content">
             <div class="bg-gray-800 rounded-xl shadow-xl border-t-4 border-yellow-500 flex flex-col min-h-[500px]">
                 <div class="p-4 border-b border-gray-700/50 bg-gray-800/80 rounded-t-xl flex justify-between items-center">
@@ -481,7 +311,6 @@
                     <span class="text-xs sm:text-sm text-gray-400 bg-gray-900/50 px-2 sm:px-3 py-1.5 rounded-lg border border-gray-700/50">點擊清單中的星星即可加入</span>
                 </div>
                 
-                <!-- 批次刪除工具列 (隱藏/顯示) -->
                 <div id="batch-bar-fav" class="hidden bg-red-900/20 border-b border-gray-700/50 p-2 sm:p-3 justify-between items-center transition-all">
                     <span class="text-xs sm:text-sm text-red-400 font-medium"><i class="fa-solid fa-check-double mr-1.5"></i>已選擇 <span id="batch-count-fav" class="font-bold">0</span> 筆資料</span>
                     <button onclick="confirmBatchDelete('fav')" class="bg-red-600 hover:bg-red-500 text-white text-xs sm:text-sm font-medium px-3 sm:px-4 py-1.5 rounded-lg transition shadow-sm">批次刪除</button>
@@ -509,25 +338,19 @@
                 </div>
             </div>
         </div>
-
     </main>
 
-    <!-- Sync Modal -->
+    <!-- Modals -->
     <div id="sync-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center z-[60] hidden">
         <div class="bg-gray-800 rounded-xl p-6 border border-gray-700 w-[340px] max-w-[90%] shadow-2xl mx-4">
             <h3 class="font-bold mb-3 text-white text-xl border-b border-gray-700 pb-3 flex items-center"><i class="fa-solid fa-cloud-arrow-up text-blue-400 mr-2 text-2xl"></i>跨裝置雲端同步</h3>
             <p class="text-sm text-gray-300 mb-5 leading-relaxed bg-blue-900/20 p-3 rounded-lg border border-blue-800/30">請輸入您的專屬「同步碼」(例如: 手機號碼或自訂英文名)。只要在不同裝置輸入相同代碼，即可透過 REST API 連線同步所有資料！</p>
-            <div class="mb-5">
-                <input type="text" id="sync-key-input" placeholder="請輸入自訂同步碼" class="w-full bg-gray-700/80 border border-gray-600 rounded-lg px-4 py-2.5 text-white text-base focus:outline-none focus:ring-2 focus:ring-blue-500 transition shadow-inner font-medium tracking-wider">
-            </div>
-            <div class="flex gap-3">
-                <button id="btn-save-sync" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-2.5 rounded-lg text-sm font-bold transition shadow-lg shadow-blue-900/20">載入 / 建立連線</button>
-            </div>
+            <div class="mb-5"><input type="text" id="sync-key-input" placeholder="請輸入自訂同步碼" class="input-base font-medium tracking-wider"></div>
+            <div class="flex gap-3"><button id="btn-save-sync" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-2.5 rounded-lg text-sm font-bold transition shadow-lg shadow-blue-900/20">載入 / 建立連線</button></div>
             <button id="btn-cancel-sync" class="w-full mt-3 bg-transparent hover:bg-gray-700 text-gray-400 hover:text-white py-2.5 rounded-lg text-sm transition">關閉</button>
         </div>
     </div>
 
-    <!-- 缺少 Firebase 設定的警告 -->
     <div id="config-warning-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex justify-center items-center z-[70] hidden">
         <div class="bg-gray-800 rounded-xl p-6 border border-red-500 shadow-2xl max-w-md w-full mx-4">
             <h3 class="font-bold mb-3 text-red-400 text-xl flex items-center"><i class="fa-solid fa-triangle-exclamation mr-2"></i>資料庫權限不足</h3>
@@ -542,94 +365,123 @@
         </div>
     </div>
 
-    <!-- 複製預覽視窗 (僅電腦版顯示) -->
     <div id="copy-preview-modal" class="fixed right-6 bottom-24 z-[100] w-80 lg:w-96 bg-gray-800 border border-gray-600 rounded-xl shadow-2xl flex-col max-h-[70vh] hidden">
-        <div class="flex justify-between items-center p-3 border-b border-gray-700 bg-gray-900 rounded-t-xl">
-            <h3 class="text-sm font-bold text-blue-400 flex items-center"><i class="fa-solid fa-eye mr-2"></i>複製內容預覽</h3>
-            <button id="btn-close-preview" class="text-gray-400 hover:text-red-400 transition p-1"><i class="fa-solid fa-xmark"></i></button>
-        </div>
+        <div class="flex justify-between items-center p-3 border-b border-gray-700 bg-gray-900 rounded-t-xl"><h3 class="text-sm font-bold text-blue-400 flex items-center"><i class="fa-solid fa-eye mr-2"></i>複製內容預覽</h3><button id="btn-close-preview" class="text-gray-400 hover:text-red-400 transition p-1"><i class="fa-solid fa-xmark"></i></button></div>
         <div class="p-4 overflow-y-auto text-xs text-gray-300 font-mono whitespace-pre-wrap leading-relaxed" id="copy-preview-content"></div>
     </div>
 
-    <!-- Toast -->
-    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-3 pointer-events-none"></div>
-
-    <!-- Close Plan Modal -->
     <div id="close-plan-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center z-50 hidden">
         <div class="bg-gray-800 rounded-xl p-6 border border-gray-700 w-80 max-w-[90%] shadow-2xl mx-4">
-            <h3 class="font-bold mb-4 text-white text-xl border-b border-gray-700 pb-2">平倉結算</h3>
-            <input type="hidden" id="modal-plan-id">
-            <div class="mb-5">
-                <label class="block text-sm text-gray-400 mb-2 font-medium">實際出場價</label>
-                <input type="number" step="0.01" id="modal-exit-price" class="w-full bg-gray-700/80 border border-gray-600 rounded-lg px-3 py-2 text-white text-base focus:outline-none focus:ring-2 focus:ring-blue-500 transition shadow-inner">
-            </div>
-            <div class="flex gap-3">
-                <button id="btn-win" class="flex-1 bg-red-600 hover:bg-red-500 text-white py-2 rounded-lg text-sm font-medium transition shadow-lg shadow-red-900/20">停利</button>
-                <button id="btn-loss" class="flex-1 bg-green-600 hover:bg-green-500 text-white py-2 rounded-lg text-sm font-medium transition shadow-lg shadow-green-900/20">停損</button>
-            </div>
+            <h3 class="font-bold mb-4 text-white text-xl border-b border-gray-700 pb-2">平倉結算</h3><input type="hidden" id="modal-plan-id">
+            <div class="mb-5"><label class="block text-sm text-gray-400 mb-2 font-medium">實際出場價</label><input type="number" step="0.01" id="modal-exit-price" class="input-base"></div>
+            <div class="flex gap-3"><button id="btn-win" class="flex-1 bg-red-600 hover:bg-red-500 text-white py-2 rounded-lg text-sm font-medium transition shadow-lg shadow-red-900/20">停利</button><button id="btn-loss" class="flex-1 bg-green-600 hover:bg-green-500 text-white py-2 rounded-lg text-sm font-medium transition shadow-lg shadow-green-900/20">停損</button></div>
             <button id="btn-cancel-modal" class="w-full mt-3 bg-transparent hover:bg-gray-700 text-gray-400 hover:text-white py-2 rounded-lg text-sm transition">取消</button>
         </div>
     </div>
 
-    <!-- Batch Delete Confirm Modal -->
     <div id="batch-delete-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center z-[80] hidden">
         <div class="bg-gray-800 rounded-xl p-6 border border-gray-700 w-[340px] max-w-[90%] shadow-2xl mx-4">
             <h3 class="font-bold mb-3 text-red-400 text-xl flex items-center"><i class="fa-solid fa-triangle-exclamation mr-2"></i>確認批次刪除</h3>
             <input type="hidden" id="batch-delete-type">
             <p id="batch-delete-msg" class="text-sm text-gray-300 mb-5 leading-relaxed bg-red-900/20 p-3 rounded-lg border border-red-800/30"></p>
-            <div class="flex gap-3">
-                <button onclick="executeBatchDelete()" class="flex-1 bg-red-600 hover:bg-red-500 text-white py-2.5 rounded-lg text-sm font-bold transition shadow-lg shadow-red-900/20">確定刪除</button>
-            </div>
+            <div class="flex gap-3"><button onclick="executeBatchDelete()" class="flex-1 bg-red-600 hover:bg-red-500 text-white py-2.5 rounded-lg text-sm font-bold transition shadow-lg shadow-red-900/20">確定刪除</button></div>
             <button onclick="document.getElementById('batch-delete-modal').classList.add('hidden')" class="w-full mt-3 bg-transparent hover:bg-gray-700 text-gray-400 hover:text-white py-2.5 rounded-lg text-sm transition">取消</button>
         </div>
     </div>
 
-    <!-- Data Lists for Auto-complete -->
-    <datalist id="stock-codes-list"></datalist>
-    <datalist id="stock-names-list"></datalist>
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-3 pointer-events-none"></div>
+    <datalist id="stock-codes-list"></datalist><datalist id="stock-names-list"></datalist>
 
-    <!-- Cloud Sync App Logic (No Firebase SDK needed) -->
     <script>
-        // ============================================================================
-        // 🛑 【重要】無 API Key 之 Firebase REST API 設定
-        // 確保您的 Realtime Database 規則已設定為 .read: true 及 .write: true
-        // ============================================================================
         const DB_URL = "https://stockstrategy-492a1-default-rtdb.firebaseio.com";
         const LOCAL_STORAGE_KEY = 'ryan_stock_data_v1';
-
-        // 取得當前使用的同步碼 (若無則使用預設本地帳號)
         const getSyncKey = () => localStorage.getItem('ryan_sync_key') || 'default_local_user';
         const isCloudMode = () => !!localStorage.getItem('ryan_sync_key');
-
         let cloudSyncInterval = null;
 
-        // 本機記憶體狀態
         let state = {
             journals: [], plans: [], epsData: {}, codeToName: {}, nameToCode: {},
             filters: { start: '', end: '', futuresOnly: false, excludeNegativeGrowth: false, tags: [], minScore: 0 },
-            sortConfig: { key: 'createdAt', asc: false },
-            favSortConfig: { key: 'createdAt', asc: false },
-            planSortConfig: { key: 'createdAt', asc: false }
+            sortConfig: { key: 'createdAt', asc: false }, favSortConfig: { key: 'createdAt', asc: false }, planSortConfig: { key: 'createdAt', asc: false }
         };
-
-        // 批次選擇狀態追蹤
         const selectedIds = { journal: new Set(), fav: new Set(), plan: new Set() };
 
-        function updateBatchUI(type) {
-            const bar = document.getElementById(`batch-bar-${type}`);
-            const countSpan = document.getElementById(`batch-count-${type}`);
-            const size = selectedIds[type].size;
-            
-            if (size > 0) {
-                bar.classList.remove('hidden');
-                bar.classList.add('flex');
-                countSpan.textContent = size;
-            } else {
-                bar.classList.add('hidden');
-                bar.classList.remove('flex');
-            }
+        // ============================================================================
+        // [效能瘦身核心] 資料驅動生成策略標籤，取代幾百行冗長的 HTML
+        // ============================================================================
+        const TAG_CATEGORIES = [
+            { title: "🌟 特別關注", tags: [{ name: "特別追蹤", color: "#8b5cf6", style: "bg-violet-900/40 text-violet-300 border-violet-800" }] },
+            { title: "🔥 動能與型態", tags: [
+                { name: "披荊斬棘", color: "#ef4444", style: "bg-red-900/40 text-red-300 border-red-800" },
+                { name: "破繭而出", color: "#f43f5e", style: "bg-rose-900/40 text-rose-300 border-rose-800" },
+                { name: "月來越好", color: "#f97316", style: "bg-orange-900/40 text-orange-300 border-orange-800" },
+                { name: "季不可失", color: "#f59e0b", style: "bg-amber-900/40 text-amber-300 border-amber-800" },
+                { name: "守株待兔", color: "#a3e635", style: "bg-lime-900/40 text-lime-300 border-lime-800" }
+            ]},
+            { title: "💰 量價與籌碼", tags: [
+                { name: "量價齊揚", color: "#22c55e", style: "bg-green-900/40 text-green-300 border-green-800" },
+                { name: "高成交值", color: "#14b8a6", style: "bg-teal-900/40 text-teal-300 border-teal-800" },
+                { name: "法人加持", color: "#6366f1", style: "bg-indigo-900/40 text-indigo-300 border-indigo-800" },
+                { name: "5日籌碼集中", color: "#a855f7", style: "bg-purple-900/40 text-purple-300 border-purple-800" },
+                { name: "20日籌碼集中", color: "#c026d3", style: "bg-fuchsia-900/40 text-fuchsia-300 border-fuchsia-800" }
+            ]},
+            { title: "📈 技術指標", tags: [
+                { name: "OBV突破", color: "#10b981", style: "bg-emerald-900/40 text-emerald-300 border-emerald-800" },
+                { name: "MACD突破", color: "#06b6d4", style: "bg-cyan-900/40 text-cyan-300 border-cyan-800" },
+                { name: "KD金叉", color: "#3b82f6", style: "bg-blue-900/40 text-blue-300 border-blue-800" }
+            ]}
+        ];
 
-            // 同步表頭的全選框狀態
+        const tagStyles = {};
+        TAG_CATEGORIES.forEach(cat => cat.tags.forEach(t => tagStyles[t.name] = t.style));
+
+        function renderDynamicTags() {
+            const formContainer = document.getElementById('form-tags-container');
+            const filterContainer = document.getElementById('filter-tags-container');
+            if(!formContainer || !filterContainer) return;
+
+            formContainer.innerHTML = TAG_CATEGORIES.map(cat => `
+                <div><div class="text-xs font-bold text-gray-300 border-b border-gray-700/50 pb-1 mb-2">${cat.title}</div>
+                <div class="flex flex-wrap gap-2">${cat.tags.map(t => `<label class="cursor-pointer"><input type="checkbox" value="${t.name}" class="hidden tag-input"><div class="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-600 text-gray-300 hover:bg-gray-700 transition" data-color="${t.color}">${t.name}</div></label>`).join('')}</div></div>
+            `).join('');
+
+            filterContainer.innerHTML = TAG_CATEGORIES.map(cat => `
+                <div class="text-[10px] font-bold text-gray-400 border-b border-gray-700 pb-1 mb-1.5 mt-2 first:mt-0">${cat.title}</div>
+                <div class="grid grid-cols-2 gap-1 mb-1">${cat.tags.map(t => `<label class="flex items-center gap-2 cursor-pointer hover:bg-gray-700/50 p-1.5 rounded transition"><input type="checkbox" value="${t.name}" class="filter-tag-cb w-3.5 h-3.5 accent-blue-500 cursor-pointer"><span class="text-xs text-gray-300">${t.name}</span></label>`).join('')}</div>
+            `).join('');
+
+            // Bind Tag Input Events
+            document.querySelectorAll('.tag-input').forEach(cb => {
+                cb.addEventListener('click', function() {
+                    const isChecked = this.checked;
+                    document.querySelectorAll('.tag-input').forEach(o => { o.checked = false; o.nextElementSibling.style.cssText = ''; });
+                    if(isChecked) {
+                        this.checked = true;
+                        this.nextElementSibling.style.backgroundColor = this.nextElementSibling.dataset.color;
+                        this.nextElementSibling.style.borderColor = this.nextElementSibling.dataset.color;
+                        this.nextElementSibling.style.color = '#fff';
+                    }
+                });
+            });
+
+            // Bind Filter Input Events
+            document.querySelectorAll('.filter-tag-cb').forEach(cb => {
+                cb.addEventListener('change', (e) => {
+                    const val = e.target.value;
+                    if (e.target.checked) { if (!state.filters.tags.includes(val)) state.filters.tags.push(val); } 
+                    else { state.filters.tags = state.filters.tags.filter(t => t !== val); }
+                    renderFilterTags(); processAndRenderJournals(); saveLocalData();
+                });
+            });
+        }
+
+        // ============================================================================
+
+        function updateBatchUI(type) {
+            const bar = document.getElementById(`batch-bar-${type}`), countSpan = document.getElementById(`batch-count-${type}`);
+            const size = selectedIds[type].size;
+            if (size > 0) { bar.classList.remove('hidden'); bar.classList.add('flex'); countSpan.textContent = size; } 
+            else { bar.classList.add('hidden'); bar.classList.remove('flex'); }
             const selectAllCb = document.querySelector(`.select-all-cb[data-type="${type}"]`);
             if(selectAllCb) {
                 const totalVisible = document.querySelectorAll(`.row-cb[data-type="${type}"]`).length;
@@ -638,26 +490,14 @@
             }
         }
 
-        // 監聽全域 Checkbox 事件 (單選 / 全選)
         document.addEventListener('change', (e) => {
             if (e.target.classList.contains('select-all-cb')) {
-                const type = e.target.dataset.type;
-                const isChecked = e.target.checked;
-                const rowCbs = document.querySelectorAll(`.row-cb[data-type="${type}"]`);
-                
-                if (isChecked) {
-                    rowCbs.forEach(cb => { cb.checked = true; selectedIds[type].add(cb.value); });
-                } else {
-                    rowCbs.forEach(cb => { cb.checked = false; selectedIds[type].delete(cb.value); });
-                }
+                const type = e.target.dataset.type, isChecked = e.target.checked;
+                document.querySelectorAll(`.row-cb[data-type="${type}"]`).forEach(cb => { cb.checked = isChecked; isChecked ? selectedIds[type].add(cb.value) : selectedIds[type].delete(cb.value); });
                 updateBatchUI(type);
             } else if (e.target.classList.contains('row-cb')) {
                 const type = e.target.dataset.type;
-                if (e.target.checked) {
-                    selectedIds[type].add(e.target.value);
-                } else {
-                    selectedIds[type].delete(e.target.value);
-                }
+                e.target.checked ? selectedIds[type].add(e.target.value) : selectedIds[type].delete(e.target.value);
                 updateBatchUI(type);
             }
         });
@@ -669,309 +509,136 @@
         };
 
         window.executeBatchDelete = async () => {
-            const type = document.getElementById('batch-delete-type').value;
-            const ids = Array.from(selectedIds[type]);
+            const type = document.getElementById('batch-delete-type').value, ids = Array.from(selectedIds[type]);
             if(ids.length === 0) return;
-
-            // 先從記憶體清除選中狀態
-            selectedIds[type].clear();
-            document.getElementById('batch-delete-modal').classList.add('hidden');
+            selectedIds[type].clear(); document.getElementById('batch-delete-modal').classList.add('hidden');
             
-            // 執行畫面刪除
-            if (type === 'journal' || type === 'fav') {
-                state.journals = state.journals.filter(j => !ids.includes(j.id));
-                saveLocalData();
-                processAndRenderJournals();
-                if(document.getElementById('module-favorites').classList.contains('active')) renderFavorites();
-            } else if (type === 'plan') {
-                state.plans = state.plans.filter(p => !ids.includes(p.id));
-                saveLocalData();
-                renderPlans();
-            }
-
+            if (type === 'journal' || type === 'fav') { state.journals = state.journals.filter(j => !ids.includes(j.id)); saveLocalData(); processAndRenderJournals(); if(document.getElementById('module-favorites').classList.contains('active')) renderFavorites(); } 
+            else if (type === 'plan') { state.plans = state.plans.filter(p => !ids.includes(p.id)); saveLocalData(); renderPlans(); }
             showToast(`已批次刪除 ${ids.length} 筆資料`);
-
-            // 背景同步刪除雲端
-            for (const id of ids) {
-                await deleteDataFromCloud(`${type === 'plan' ? 'plans' : 'journals'}/${id}`);
-            }
+            for (const id of ids) await deleteDataFromCloud(`${type === 'plan' ? 'plans' : 'journals'}/${id}`);
         };
 
-        // 載入本地記憶 (做為雲端載入前的預設呈現)
         function loadLocalData() {
             const savedData = localStorage.getItem(LOCAL_STORAGE_KEY);
-            if (savedData) {
-                try {
-                    const parsed = JSON.parse(savedData);
-                    state = { ...state, ...parsed };
-                } catch (e) { console.error("無法載入本地資料", e); }
-            } else {
+            if (savedData) { try { state = { ...state, ...JSON.parse(savedData) }; } catch (e) { } } 
+            else {
                 const twStocks = { "2330": "台積電", "2317": "鴻海", "2454": "聯發科", "2382": "廣達", "2603": "長榮" };
                 Object.entries(twStocks).forEach(([c,n]) => { state.codeToName[c] = n; state.nameToCode[n] = c; });
             }
         }
+        function saveLocalData() { localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state)); }
 
-        function saveLocalData() {
-            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
-        }
-
-        // ============================================================================
-        // 雲端 REST API 操作函數
-        // ============================================================================
         async function loadFromCloud() {
             if (!isCloudMode()) return;
-            const key = getSyncKey();
             try {
-                const res = await fetch(`${DB_URL}/data/${key}.json`);
-                if (res.status === 401) {
-                    document.getElementById('config-warning-modal').classList.remove('hidden');
-                    return;
-                }
+                const res = await fetch(`${DB_URL}/data/${getSyncKey()}.json`);
+                if (res.status === 401) return document.getElementById('config-warning-modal').classList.remove('hidden');
                 const data = await res.json();
                 if (data) {
                     state.journals = data.journals ? Object.values(data.journals) : [];
                     state.plans = data.plans ? Object.values(data.plans) : [];
                     state.epsData = data.epsData || {};
-                    
-                    Object.values(state.epsData).forEach(dt => {
-                        if(dt.name) {
-                            state.codeToName[dt.code] = dt.name;
-                            state.nameToCode[dt.name] = dt.code;
-                        }
-                    });
-                } else {
-                    state.journals = [];
-                    state.plans = [];
-                }
-                
-                updateDatalists();
-                processAndRenderJournals();
-                renderFavorites();
-                renderPlans();
-                saveLocalData();
-            } catch (e) {
-                console.error("雲端讀取失敗", e);
-            }
+                    Object.values(state.epsData).forEach(dt => { if(dt.name) { state.codeToName[dt.code] = dt.name; state.nameToCode[dt.name] = dt.code; } });
+                } else { state.journals = []; state.plans = []; }
+                updateDatalists(); processAndRenderJournals(); renderFavorites(); renderPlans(); saveLocalData();
+            } catch (e) { }
         }
 
-        async function putDataToCloud(path, payload) {
-            if (!isCloudMode()) return;
-            const key = getSyncKey();
-            try {
-                await fetch(`${DB_URL}/data/${key}/${path}.json`, {
-                    method: 'PUT',
-                    body: JSON.stringify(payload)
-                });
-            } catch (e) { console.error("雲端寫入失敗", e); }
-        }
+        async function putDataToCloud(path, payload) { if (isCloudMode()) await fetch(`${DB_URL}/data/${getSyncKey()}/${path}.json`, { method: 'PUT', body: JSON.stringify(payload) }); }
+        async function patchDataToCloud(path, payload) { if (isCloudMode()) await fetch(`${DB_URL}/data/${getSyncKey()}/${path}.json`, { method: 'PATCH', body: JSON.stringify(payload) }); }
+        async function deleteDataFromCloud(path) { if (isCloudMode()) await fetch(`${DB_URL}/data/${getSyncKey()}/${path}.json`, { method: 'DELETE' }); }
 
-        async function patchDataToCloud(path, payload) {
-            if (!isCloudMode()) return;
-            const key = getSyncKey();
-            try {
-                await fetch(`${DB_URL}/data/${key}/${path}.json`, {
-                    method: 'PATCH',
-                    body: JSON.stringify(payload)
-                });
-            } catch (e) { console.error("雲端更新失敗", e); }
-        }
-
-        async function deleteDataFromCloud(path) {
-            if (!isCloudMode()) return;
-            const key = getSyncKey();
-            try {
-                await fetch(`${DB_URL}/data/${key}/${path}.json`, {
-                    method: 'DELETE'
-                });
-            } catch (e) { console.error("雲端刪除失敗", e); }
-        }
-
-        // ============================================================================
-        // 核心邏輯設定
-        // ============================================================================
-
-        const tagStyles = {
-            "披荊斬棘": "bg-red-900/40 text-red-300 border-red-800", "破繭而出": "bg-rose-900/40 text-rose-300 border-rose-800", 
-            "月來越好": "bg-orange-900/40 text-orange-300 border-orange-800", "季不可失": "bg-amber-900/40 text-amber-300 border-amber-800", 
-            "守株待兔": "bg-lime-900/40 text-lime-300 border-lime-800", "特別追蹤": "bg-violet-900/40 text-violet-300 border-violet-800", "量價齊揚": "bg-green-900/40 text-green-300 border-green-800", 
-            "高成交值": "bg-teal-900/40 text-teal-300 border-teal-800", "法人加持": "bg-indigo-900/40 text-indigo-300 border-indigo-800", 
-            "5日籌碼集中": "bg-purple-900/40 text-purple-300 border-purple-800",
-            "20日籌碼集中": "bg-fuchsia-900/40 text-fuchsia-300 border-fuchsia-800", 
-            "OBV突破": "bg-emerald-900/40 text-emerald-300 border-emerald-800", "MACD突破": "bg-cyan-900/40 text-cyan-300 border-cyan-800", 
-            "KD金叉": "bg-blue-900/40 text-blue-300 border-blue-800"
-        };
-
-        // 取得準確的本地時區當日日期
-        const getToday = () => {
-            const d = new Date();
-            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-        };
+        const getToday = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
         const generateId = () => Date.now().toString(36) + Math.random().toString(36).substr(2);
 
         function showToast(msg, type = 'success') {
-            const c = document.getElementById('toast-container');
-            const el = document.createElement('div');
+            const c = document.getElementById('toast-container'), el = document.createElement('div');
             el.className = `${type === 'success' ? 'bg-green-600' : 'bg-red-600'} text-white px-4 py-3 rounded-lg shadow-xl flex items-center text-sm font-medium transform transition-all duration-300 translate-y-5 opacity-0 z-50`;
             el.innerHTML = `<i class="fa-solid ${type==='success'?'fa-check-circle':'fa-exclamation-circle'} mr-2 text-lg"></i>${msg}`;
-            c.appendChild(el);
-            setTimeout(() => el.classList.remove('translate-y-5', 'opacity-0'), 10);
+            c.appendChild(el); setTimeout(() => el.classList.remove('translate-y-5', 'opacity-0'), 10);
             setTimeout(() => { el.classList.add('translate-y-5', 'opacity-0'); setTimeout(()=>el.remove(),300); }, 2500);
         }
 
         const formatNumColor = (val, isPercent = false) => {
-            if (val === null || val === undefined || val === '-' || val === '') return '<span class="text-white">-</span>';
-            const num = parseFloat(val);
-            if (isNaN(num)) return '<span class="text-white">-</span>';
-            const colorCls = num > 0 ? 'tw-red' : (num < 0 ? 'tw-green' : 'text-white');
-            const displayStr = isPercent ? (num * 100).toFixed(2) + '%' : num.toString();
-            return `<span class="font-bold ${colorCls}">${displayStr}</span>`;
+            if (val == null || val === '-' || val === '') return '<span class="text-white">-</span>';
+            const num = parseFloat(val); if (isNaN(num)) return '<span class="text-white">-</span>';
+            return `<span class="font-bold ${num > 0 ? 'tw-red' : (num < 0 ? 'tw-green' : 'text-white')}">${isPercent ? (num * 100).toFixed(2) + '%' : num.toString()}</span>`;
         };
 
-        const getEpsInfo = (code, journalItem) => {
+        const getEpsInfo = (code, jItem) => {
             const e = state.epsData[code] || {};
-            return {
-                eps2025: e.eps2025 ?? journalItem?.eps2025 ?? null,
-                eps2026: e.eps2026 ?? journalItem?.eps2026 ?? null,
-                epsGrowth: e.epsGrowth ?? journalItem?.epsGrowth ?? null,
-                futures: e.futures === '●' || journalItem?.futures === '●'
-            };
+            return { eps2025: e.eps2025 ?? jItem?.eps2025 ?? null, eps2026: e.eps2026 ?? jItem?.eps2026 ?? null, epsGrowth: e.epsGrowth ?? jItem?.epsGrowth ?? null, futures: e.futures === '●' || jItem?.futures === '●' };
         };
         
-        const getScore = (tags, epsInfo) => {
-            let score = 0;
-            if (tags && Array.isArray(tags)) {
-                // 計算分數時，排除「特別追蹤」標籤
-                score = tags.filter(t => t !== '特別追蹤').length;
-            }
-            if (epsInfo && epsInfo.epsGrowth !== null && epsInfo.eps2026 !== null) {
-                if (epsInfo.epsGrowth > 0 && epsInfo.eps2026 > 0) {
-                    score += 1;
-                }
-            }
-            return score;
-        };
+        const getScore = (tags, eps) => { let s = 0; if (tags) s = tags.filter(t => t !== '特別追蹤').length; if (eps && eps.epsGrowth > 0 && eps.eps2026 > 0) s += 1; return s; };
 
         const updateDatalists = () => {
-            const codesList = document.getElementById('stock-codes-list');
-            const namesList = document.getElementById('stock-names-list');
-            if(codesList && namesList) {
-                let codesHtml = '', namesHtml = '';
-                for (const [code, name] of Object.entries(state.codeToName)) {
-                    codesHtml += `<option value="${code}">${name}</option>`;
-                    namesHtml += `<option value="${name}">${code}</option>`;
-                }
-                codesList.innerHTML = codesHtml;
-                namesList.innerHTML = namesHtml;
+            const cList = document.getElementById('stock-codes-list'), nList = document.getElementById('stock-names-list');
+            if(cList && nList) {
+                let cH = '', nH = '';
+                for (const [c, n] of Object.entries(state.codeToName)) { cH += `<option value="${c}">${n}</option>`; nH += `<option value="${n}">${c}</option>`; }
+                cList.innerHTML = cH; nList.innerHTML = nH;
             }
         };
 
         const updateSyncStatusUI = () => {
-            const key = localStorage.getItem('ryan_sync_key');
-            const btn = document.getElementById('btn-sync-modal');
-            const st = document.getElementById('auth-status');
+            const key = localStorage.getItem('ryan_sync_key'), btn = document.getElementById('btn-sync-modal'), st = document.getElementById('auth-status');
             if(key) {
-                btn.innerHTML = `<i class="fa-solid fa-cloud text-green-300 sm:mr-1.5" title="已連線"></i><span class="hidden sm:inline">${key}</span>`;
-                btn.classList.add('bg-green-900/50', 'border-green-500/50', 'text-green-300');
-                btn.classList.remove('bg-blue-600', 'border-transparent', 'text-white');
-                
-                st.innerHTML=`<i class="fa-solid fa-cloud text-green-400 text-sm" title="已同步雲端"></i>`; 
-                st.className="ml-1 sm:ml-2 w-7 h-7 bg-gray-700 border border-gray-600 rounded-full shadow-sm flex items-center justify-center cursor-help"; 
-                
-                // 啟動 5 秒一次的雲端對齊
-                if(cloudSyncInterval) clearInterval(cloudSyncInterval);
-                cloudSyncInterval = setInterval(loadFromCloud, 5000);
+                btn.innerHTML = `<i class="fa-solid fa-cloud text-green-300 sm:mr-1.5"></i><span class="hidden sm:inline">${key}</span>`;
+                btn.className = "text-xs sm:text-sm bg-green-900/50 border-green-500/50 text-green-300 px-2.5 sm:px-3 py-1.5 rounded-lg transition shadow-sm border flex items-center font-medium";
+                st.innerHTML=`<i class="fa-solid fa-cloud text-green-400 text-sm"></i>`; 
+                if(cloudSyncInterval) clearInterval(cloudSyncInterval); cloudSyncInterval = setInterval(loadFromCloud, 5000);
             } else {
                 btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up sm:mr-1.5"></i><span class="hidden sm:inline">跨裝置同步</span>`;
-                btn.classList.remove('bg-green-900/50', 'border-green-500/50', 'text-green-300');
-                btn.classList.add('bg-blue-600', 'border-transparent', 'text-white');
-                
-                st.innerHTML=`<i class="fa-solid fa-floppy-disk text-gray-400 text-sm" title="本機記憶模式"></i>`; 
-                st.className="ml-1 sm:ml-2 w-7 h-7 bg-gray-700 border border-gray-600 rounded-full shadow-sm flex items-center justify-center cursor-help"; 
-                
+                btn.className = "text-xs sm:text-sm bg-blue-600 hover:bg-blue-500 text-white px-2.5 sm:px-3 py-1.5 rounded-lg transition shadow-sm border border-transparent flex items-center font-medium";
+                st.innerHTML=`<i class="fa-solid fa-floppy-disk text-gray-400 text-sm"></i>`; 
                 if(cloudSyncInterval) clearInterval(cloudSyncInterval);
             }
         };
 
-        // Sync Modal 互動
-        const syncModal = document.getElementById('sync-modal');
-        const syncInput = document.getElementById('sync-key-input');
-        
-        document.getElementById('btn-sync-modal').addEventListener('click', () => {
-            syncInput.value = localStorage.getItem('ryan_sync_key') || '';
-            syncModal.classList.remove('hidden');
-        });
+        const syncModal = document.getElementById('sync-modal'), syncInput = document.getElementById('sync-key-input');
+        document.getElementById('btn-sync-modal').addEventListener('click', () => { syncInput.value = localStorage.getItem('ryan_sync_key') || ''; syncModal.classList.remove('hidden'); });
         document.getElementById('btn-cancel-sync').addEventListener('click', () => syncModal.classList.add('hidden'));
         document.getElementById('btn-save-sync').addEventListener('click', async () => {
             const key = syncInput.value.trim();
-            if(key) {
-                localStorage.setItem('ryan_sync_key', key);
-                showToast('已綁定同步碼，正在載入雲端資料...');
-                await loadFromCloud();
-            } else {
-                localStorage.removeItem('ryan_sync_key');
-                showToast('已切換為本地驗證模式');
-            }
-            syncModal.classList.add('hidden');
-            updateSyncStatusUI();
+            if(key) { localStorage.setItem('ryan_sync_key', key); showToast('已綁定同步碼，正在載入雲端資料...'); await loadFromCloud(); } 
+            else { localStorage.removeItem('ryan_sync_key'); showToast('已切換為本地驗證模式'); }
+            syncModal.classList.add('hidden'); updateSyncStatusUI();
         });
+        document.getElementById('btn-close-config-warning').addEventListener('click', () => document.getElementById('config-warning-modal').classList.add('hidden'));
 
-        document.getElementById('btn-close-config-warning').addEventListener('click', () => {
-            document.getElementById('config-warning-modal').classList.add('hidden');
-        });
-
-        // 複製預覽視窗互動
         const showPreview = (text) => {
-            // 螢幕寬度 >= 1024px (lg breakpoint) 才顯示預覽視窗
             if (window.innerWidth >= 1024) {
-                const modal = document.getElementById('copy-preview-modal');
-                const content = document.getElementById('copy-preview-content');
-                if (modal && content) {
-                    content.textContent = text;
-                    modal.classList.remove('hidden');
-                    modal.classList.add('flex');
-                }
+                const modal = document.getElementById('copy-preview-modal'), content = document.getElementById('copy-preview-content');
+                if (modal && content) { content.textContent = text; modal.classList.remove('hidden'); modal.classList.add('flex'); }
             }
         };
+        document.getElementById('btn-close-preview').addEventListener('click', () => { document.getElementById('copy-preview-modal').classList.add('hidden'); document.getElementById('copy-preview-modal').classList.remove('flex'); });
 
-        document.getElementById('btn-close-preview').addEventListener('click', () => {
-            const modal = document.getElementById('copy-preview-modal');
-            if (modal) {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-            }
-        });
-
-        // Nav
         document.querySelectorAll('.nav-btn, .nav-btn-mobile').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                const targetId = e.currentTarget.dataset.target;
-                const color = e.currentTarget.dataset.color || 'blue';
-                
+                const tid = e.currentTarget.dataset.target, color = e.currentTarget.dataset.color || 'blue';
                 document.querySelectorAll('.nav-btn').forEach(b => {
                     b.className = `nav-btn px-4 py-2 rounded-lg font-bold transition border-b-2 border-transparent text-gray-400 hover:text-${b.dataset.color}-400 hover:bg-gray-800 text-sm`;
-                    if(b.dataset.target === targetId) b.className = `nav-btn px-4 py-2 rounded-lg font-bold transition border-b-2 text-${color}-400 bg-gray-900 border-${color}-500 shadow-inner text-sm`;
+                    if(b.dataset.target === tid) b.className = `nav-btn px-4 py-2 rounded-lg font-bold transition border-b-2 text-${color}-400 bg-gray-900 border-${color}-500 shadow-inner text-sm`;
                 });
                 document.querySelectorAll('.nav-btn-mobile').forEach(b => {
                     b.className = `nav-btn-mobile flex-shrink-0 px-4 py-2 text-sm font-medium rounded-lg text-gray-400 bg-gray-800 hover:bg-gray-700 transition`;
-                    if(b.dataset.target === targetId) b.className = `nav-btn-mobile flex-shrink-0 px-4 py-2 text-sm font-medium rounded-lg bg-${color}-900/50 text-${color}-400 border border-${color}-500/50 shadow-sm`;
+                    if(b.dataset.target === tid) b.className = `nav-btn-mobile flex-shrink-0 px-4 py-2 text-sm font-medium rounded-lg bg-${color}-900/50 text-${color}-400 border border-${color}-500/50 shadow-sm`;
                 });
-
-                document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === targetId));
-                
-                if(targetId === 'module-favorites') renderFavorites();
-                if(targetId === 'module-journal') processAndRenderJournals();
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === tid));
+                if(tid === 'module-favorites') renderFavorites();
+                if(tid === 'module-journal') processAndRenderJournals();
             });
         });
 
-        // Backup Export/Import
         document.getElementById('btn-export-backup').addEventListener('click', () => {
             if(state.journals.length === 0 && state.plans.length === 0) return showToast('無資料可匯出', 'error');
             const wb = XLSX.utils.book_new();
-            const jData = state.journals.map(j => ({ ...j, tags: JSON.stringify(j.tags||[]) }));
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(jData), "Journals");
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(state.journals.map(j => ({ ...j, tags: JSON.stringify(j.tags||[]) }))), "Journals");
             XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(state.plans), "Plans");
-            XLSX.writeFile(wb, `萊恩飆股起漲手札備份_${getToday()}.xlsx`);
-            showToast('備份已下載');
+            XLSX.writeFile(wb, `萊恩飆股起漲手札備份_${getToday()}.xlsx`); showToast('備份已下載');
         });
         
         document.getElementById('btn-import-backup').addEventListener('click', () => document.getElementById('backup-file').click());
@@ -980,173 +647,80 @@
             const reader = new FileReader();
             reader.onload = async (event) => {
                 try {
-                    const data = new Uint8Array(event.target.result);
-                    const wb = XLSX.read(data, {type: 'array'});
-                    let total = 0;
-                    
+                    const wb = XLSX.read(new Uint8Array(event.target.result), {type: 'array'}); let total = 0;
                     if(wb.SheetNames.includes('Journals')) {
-                        const jRows = XLSX.utils.sheet_to_json(wb.Sheets['Journals']);
-                        for(const r of jRows) {
-                            if(!r.id) continue;
-                            const payload = {...r, updatedAt: Date.now()};
-                            try { payload.tags = JSON.parse(r.tags); } catch(err){ payload.tags=[]; }
-                            const idx = state.journals.findIndex(j => j.id === r.id);
-                            if(idx !== -1) state.journals[idx] = payload; else state.journals.push(payload);
-                            await putDataToCloud(`journals/${r.id}`, payload);
-                            total++;
-                        }
+                        XLSX.utils.sheet_to_json(wb.Sheets['Journals']).forEach(async r => {
+                            if(!r.id) return; const p = {...r, updatedAt: Date.now()}; try { p.tags = JSON.parse(r.tags); } catch(err){ p.tags=[]; }
+                            const idx = state.journals.findIndex(j => j.id === r.id); idx !== -1 ? state.journals[idx] = p : state.journals.push(p);
+                            await putDataToCloud(`journals/${r.id}`, p); total++;
+                        });
                     }
                     if(wb.SheetNames.includes('Plans')) {
-                        const pRows = XLSX.utils.sheet_to_json(wb.Sheets['Plans']);
-                        for(const r of pRows) {
-                            if(!r.id) continue;
-                            const payload = {...r, updatedAt: Date.now()};
-                            const idx = state.plans.findIndex(p => p.id === r.id);
-                            if(idx !== -1) state.plans[idx] = payload; else state.plans.push(payload);
-                            await putDataToCloud(`plans/${r.id}`, payload);
-                            total++;
-                        }
+                        XLSX.utils.sheet_to_json(wb.Sheets['Plans']).forEach(async r => {
+                            if(!r.id) return; const p = {...r, updatedAt: Date.now()};
+                            const idx = state.plans.findIndex(x => x.id === r.id); idx !== -1 ? state.plans[idx] = p : state.plans.push(p);
+                            await putDataToCloud(`plans/${r.id}`, p); total++;
+                        });
                     }
-                    saveLocalData();
-                    processAndRenderJournals(); renderFavorites(); renderPlans();
-                    showToast(`成功匯入還原 ${total} 筆資料`);
+                    saveLocalData(); processAndRenderJournals(); renderFavorites(); renderPlans(); showToast(`成功匯入還原 ${total} 筆資料`);
                 } catch(err) { showToast('匯入失敗，格式錯誤', 'error'); }
                 e.target.value = '';
             };
             reader.readAsArrayBuffer(file);
         });
 
-        // Setup Forms & Interactions
-        const codeInput = document.getElementById('j-code'), nameInput = document.getElementById('j-name');
-        const previewDiv = document.getElementById('j-preview');
-
+        const codeInput = document.getElementById('j-code'), nameInput = document.getElementById('j-name'), previewDiv = document.getElementById('j-preview');
         const updatePreview = (code) => {
-            if(!code || !state.epsData[code]) {
-                previewDiv.classList.add('hidden');
-                return;
-            }
-            const data = state.epsData[code];
-            previewDiv.classList.remove('hidden');
-            const g = data.epsGrowth !== null && data.epsGrowth !== undefined ? formatNumColor(data.epsGrowth, true) : '<span class="text-white">-</span>';
-            const e25 = formatNumColor(data.eps2025);
-            const e26 = formatNumColor(data.eps2026);
-            const fBadge = data.futures === '●' ? '<span class="bg-sky-600 text-white text-[10px] px-1.5 py-0.5 rounded align-middle shadow-sm font-medium ml-1">期</span>' : '';
-            
-            previewDiv.innerHTML = `
-                <span class="text-blue-400 font-bold flex items-center"><i class="fa-solid fa-link mr-1.5"></i>已套用資料庫</span>
-                <div class="flex flex-wrap items-center gap-3 text-sm ml-2">
-                    <span><span class="text-gray-400 text-xs mr-1">25 EPS:</span>${e25}</span>
-                    <span><span class="text-gray-400 text-xs mr-1">預26 EPS:</span>${e26}</span>
-                    <span><span class="text-gray-400 text-xs mr-1">成長率:</span>${g}</span>
-                    ${fBadge}
-                </div>
-            `;
+            if(!code || !state.epsData[code]) return previewDiv.classList.add('hidden');
+            const data = state.epsData[code]; previewDiv.classList.remove('hidden');
+            previewDiv.innerHTML = `<span class="text-blue-400 font-bold flex items-center"><i class="fa-solid fa-link mr-1.5"></i>已套用資料庫</span><div class="flex flex-wrap items-center gap-3 text-sm ml-2"><span><span class="text-gray-400 text-xs mr-1">25 EPS:</span>${formatNumColor(data.eps2025)}</span><span><span class="text-gray-400 text-xs mr-1">預26 EPS:</span>${formatNumColor(data.eps2026)}</span><span><span class="text-gray-400 text-xs mr-1">成長率:</span>${data.epsGrowth != null ? formatNumColor(data.epsGrowth, true) : '<span class="text-white">-</span>'}</span>${data.futures === '●' ? '<span class="bg-sky-600 text-white text-[10px] px-1.5 py-0.5 rounded ml-1">期</span>' : ''}</div>`;
         };
+        codeInput.addEventListener('input', (e) => { const v = e.target.value.trim(); if(state.codeToName[v]) nameInput.value = state.codeToName[v]; updatePreview(v); });
+        nameInput.addEventListener('input', (e) => { const v = e.target.value.trim(); if(state.nameToCode[v]) codeInput.value = state.nameToCode[v]; updatePreview(state.nameToCode[v]); });
 
-        codeInput.addEventListener('input', (e) => { 
-            const val = e.target.value.trim();
-            const n = state.codeToName[val]; 
-            if(n) nameInput.value = n; 
-            updatePreview(val);
-        });
-        
-        nameInput.addEventListener('input', (e) => { 
-            const val = e.target.value.trim();
-            const c = state.nameToCode[val]; 
-            if(c) codeInput.value = c; 
-            updatePreview(c);
-        });
-
-        document.querySelectorAll('.tag-input').forEach(cb => {
-            cb.addEventListener('click', function() {
-                const isChecked = this.checked;
-                document.querySelectorAll('.tag-input').forEach(o => { o.checked = false; o.nextElementSibling.style.cssText = ''; });
-                if(isChecked) {
-                    this.checked = true;
-                    this.nextElementSibling.style.backgroundColor = this.nextElementSibling.dataset.color;
-                    this.nextElementSibling.style.borderColor = this.nextElementSibling.dataset.color;
-                    this.nextElementSibling.style.color = '#fff';
-                }
-            });
-        });
-
-        // 加入條件 (Journal) 
         document.getElementById('journal-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const code = codeInput.value.trim(), date = document.getElementById('j-date').value, name = nameInput.value.trim(), notes = document.getElementById('j-notes').value.trim();
-            const tagInput = document.querySelector('.tag-input:checked');
-            const tag = tagInput ? tagInput.value : null;
-            const docId = `${code}_${date}`;
+            const tagInput = document.querySelector('.tag-input:checked'), tag = tagInput ? tagInput.value : null, docId = `${code}_${date}`;
             
             const existingIdx = state.journals.findIndex(j => j.id === docId);
-            let tags = [];
-            let mergedNotes = notes;
-            let isFavorite = 0;
-            let createdAt = Date.now();
+            let tags = [], mergedNotes = notes, isFavorite = 0, createdAt = Date.now();
 
             if (existingIdx !== -1) {
-                const existing = state.journals[existingIdx];
-                tags = existing.tags || [];
+                const ex = state.journals[existingIdx]; tags = ex.tags || [];
                 if(tag && !tags.includes(tag)) tags.push(tag);
-                mergedNotes = notes ? (existing.notes ? `${existing.notes} / ${notes}` : notes) : existing.notes;
-                isFavorite = existing.isFavorite === true ? 1 : (parseInt(existing.isFavorite) || 0);
-                createdAt = existing.createdAt || Date.now();
-            } else {
-                if(tag) tags.push(tag);
-            }
+                mergedNotes = notes ? (ex.notes ? `${ex.notes} / ${notes}` : notes) : ex.notes;
+                isFavorite = ex.isFavorite === true ? 1 : (parseInt(ex.isFavorite) || 0); createdAt = ex.createdAt || Date.now();
+            } else if(tag) tags.push(tag);
             
-            // 新增：若選擇「特別追蹤」標籤，自動列入追蹤清單 (若原本無追蹤則設為一星)
-            if (tag === '特別追蹤' && isFavorite === 0) {
-                isFavorite = 1;
-            }
+            if (tag === '特別追蹤' && isFavorite === 0) isFavorite = 1;
             
             const payload = { id: docId, date, code, name, tags, notes: mergedNotes, isFavorite, createdAt, updatedAt: Date.now() };
-            if(existingIdx !== -1) state.journals[existingIdx] = payload; else state.journals.push(payload);
+            existingIdx !== -1 ? state.journals[existingIdx] = payload : state.journals.push(payload);
 
-            saveLocalData();
-            processAndRenderJournals();
-            if(document.getElementById('module-favorites').classList.contains('active')) renderFavorites();
-            
+            saveLocalData(); processAndRenderJournals(); if(document.getElementById('module-favorites').classList.contains('active')) renderFavorites();
             await putDataToCloud(`journals/${docId}`, payload);
             
-            // 移除原本的 showToast('已儲存至條件'); 讓輸入更順暢
-            codeInput.value=''; nameInput.value=''; document.getElementById('j-notes').value=''; 
-            previewDiv.classList.add('hidden');
-            codeInput.focus(); // 確保送出後游標立刻回到代號欄位
+            codeInput.value=''; nameInput.value=''; document.getElementById('j-notes').value=''; previewDiv.classList.add('hidden'); codeInput.focus();
         });
 
-        // 匯入 Excel 
         document.getElementById('excel-upload').addEventListener('change', (e) => {
-            const f = e.target.files[0]; if(!f) return;
-            showToast('解析資料庫...');
+            const f = e.target.files[0]; if(!f) return; showToast('解析資料庫...');
             const reader = new FileReader();
             reader.onload = async (ev) => {
                 try {
-                    const wb = XLSX.read(new Uint8Array(ev.target.result), {type: 'array'});
-                    const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header:1});
-                    let count = 0;
-                    const updates = {};
+                    const wb = XLSX.read(new Uint8Array(ev.target.result), {type: 'array'}), rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header:1});
+                    let count = 0; const updates = {};
                     for(let i=1; i<rows.length; i++) {
                         if(!rows[i] || rows[i].length<2) continue;
-                        const c = String(rows[i][0]).trim(); if(!c) continue;
-                        const n = String(rows[i][1]||'').trim();
-                        
+                        const c = String(rows[i][0]).trim(); if(!c) continue; const n = String(rows[i][1]||'').trim();
                         const item = { code: c, name: n, eps2025: parseFloat(rows[i][2])||null, eps2026: parseFloat(rows[i][3])||null, epsGrowth: parseFloat(rows[i][4])||null, futures: String(rows[i][5]||'').trim(), updatedAt: Date.now() };
-                        state.epsData[c] = item;
-                        updates[c] = item;
-                        
-                        if (n) { state.codeToName[c] = n; state.nameToCode[n] = c; }
-                        count++;
+                        state.epsData[c] = item; updates[c] = item;
+                        if (n) { state.codeToName[c] = n; state.nameToCode[n] = c; } count++;
                     }
-                    saveLocalData();
-                    updateDatalists();
-                    processAndRenderJournals(); renderFavorites(); renderPlans();
-                    
-                    if(isCloudMode() && Object.keys(updates).length > 0) {
-                        await patchDataToCloud('epsData', updates);
-                    }
-                    showToast(`更新完成，匯入 ${count} 筆資料`);
-                    e.target.value='';
+                    saveLocalData(); updateDatalists(); processAndRenderJournals(); renderFavorites(); renderPlans();
+                    if(isCloudMode() && Object.keys(updates).length > 0) await patchDataToCloud('epsData', updates);
+                    showToast(`更新完成，匯入 ${count} 筆資料`); e.target.value='';
                 } catch(err) { showToast('格式錯誤','error'); }
             };
             reader.readAsArrayBuffer(f);
@@ -1154,675 +728,287 @@
 
         document.querySelectorAll('.sortable').forEach(th => {
             th.addEventListener('click', (e) => {
-                const isFav = e.currentTarget.closest('#module-favorites') !== null;
-                const configName = isFav ? 'favSortConfig' : 'sortConfig';
-                const key = th.dataset.sort;
-                
-                state[configName].asc = state[configName].key === key ? !state[configName].asc : false;
-                state[configName].key = key;
-                
-                if (isFav) {
-                    renderFavorites();
-                } else {
-                    processAndRenderJournals();
-                }
-                saveLocalData();
+                const isFav = e.currentTarget.closest('#module-favorites') !== null, configName = isFav ? 'favSortConfig' : 'sortConfig', key = th.dataset.sort;
+                state[configName].asc = state[configName].key === key ? !state[configName].asc : false; state[configName].key = key;
+                isFav ? renderFavorites() : processAndRenderJournals(); saveLocalData();
             });
         });
 
-        // 交易規劃排序邏輯
         document.querySelectorAll('.plan-sortable').forEach(th => {
             th.addEventListener('click', () => {
-                const key = th.dataset.sort;
-                state.planSortConfig.asc = state.planSortConfig.key === key ? !state.planSortConfig.asc : false;
-                state.planSortConfig.key = key;
-                renderPlans();
-                saveLocalData();
+                const key = th.dataset.sort; state.planSortConfig.asc = state.planSortConfig.key === key ? !state.planSortConfig.asc : false; state.planSortConfig.key = key;
+                renderPlans(); saveLocalData();
             });
         });
 
-        // 綁定篩選條件變更事件
         ['filter-start', 'filter-end', 'filter-futures', 'filter-exclude-negative-growth', 'filter-score'].forEach(id => {
             document.getElementById(id).addEventListener('change', () => {
-                state.filters.start = document.getElementById('filter-start').value;
-                state.filters.end = document.getElementById('filter-end').value;
-                state.filters.futuresOnly = document.getElementById('filter-futures').checked;
-                state.filters.excludeNegativeGrowth = document.getElementById('filter-exclude-negative-growth').checked;
-                state.filters.minScore = parseInt(document.getElementById('filter-score').value) || 0;
-                processAndRenderJournals();
-                saveLocalData();
+                state.filters.start = document.getElementById('filter-start').value; state.filters.end = document.getElementById('filter-end').value;
+                state.filters.futuresOnly = document.getElementById('filter-futures').checked; state.filters.excludeNegativeGrowth = document.getElementById('filter-exclude-negative-growth').checked;
+                state.filters.minScore = parseInt(document.getElementById('filter-score').value) || 0; processAndRenderJournals(); saveLocalData();
             });
         });
 
-        // 清除篩選按鈕邏輯
         document.getElementById('btn-clear-filters').addEventListener('click', () => {
-            const todayDate = getToday();
-            
-            // 重置狀態
-            state.filters.start = todayDate;
-            state.filters.end = todayDate;
-            state.filters.futuresOnly = false;
-            state.filters.excludeNegativeGrowth = false;
-            state.filters.minScore = 0;
-            state.filters.tags = [];
-            state.sortConfig = { key: 'createdAt', asc: false };
-            state.favSortConfig = { key: 'createdAt', asc: false };
-
-            // 重置畫面 UI
-            document.getElementById('filter-start').value = todayDate;
-            document.getElementById('filter-end').value = todayDate;
-            document.getElementById('filter-futures').checked = false;
-            document.getElementById('filter-exclude-negative-growth').checked = false;
-            document.getElementById('filter-score').value = "0";
-            
+            const today = getToday();
+            state.filters = { start: today, end: today, futuresOnly: false, excludeNegativeGrowth: false, minScore: 0, tags: [] };
+            state.sortConfig = { key: 'createdAt', asc: false }; state.favSortConfig = { key: 'createdAt', asc: false };
+            document.getElementById('filter-start').value = today; document.getElementById('filter-end').value = today;
+            document.getElementById('filter-futures').checked = false; document.getElementById('filter-exclude-negative-growth').checked = false; document.getElementById('filter-score').value = "0";
             document.querySelectorAll('.filter-tag-cb').forEach(cb => cb.checked = false);
-
-            // 更新畫面與存檔
-            renderFilterTags();
-            processAndRenderJournals();
-            saveLocalData();
-            showToast('已清除篩選條件與排序');
+            renderFilterTags(); processAndRenderJournals(); saveLocalData(); showToast('已清除篩選條件與排序');
         });
 
-        // 打勾面板開關邏輯
-        const filterTagBtn = document.getElementById('filter-tag-btn');
-        const filterTagPanel = document.getElementById('filter-tag-panel');
-        filterTagBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            filterTagPanel.classList.toggle('hidden');
-        });
-        document.addEventListener('click', (e) => {
-            if(!filterTagPanel.contains(e.target) && e.target !== filterTagBtn) {
-                filterTagPanel.classList.add('hidden');
-            }
-        });
-
-        document.querySelectorAll('.filter-tag-cb').forEach(cb => {
-            cb.addEventListener('change', (e) => {
-                const val = e.target.value;
-                if (e.target.checked) {
-                    if (!state.filters.tags.includes(val)) state.filters.tags.push(val);
-                } else {
-                    state.filters.tags = state.filters.tags.filter(t => t !== val);
-                }
-                renderFilterTags();
-                processAndRenderJournals();
-                saveLocalData();
-            });
-        });
+        const filterTagBtn = document.getElementById('filter-tag-btn'), filterTagPanel = document.getElementById('filter-tag-panel');
+        filterTagBtn.addEventListener('click', (e) => { e.stopPropagation(); filterTagPanel.classList.toggle('hidden'); });
+        document.addEventListener('click', (e) => { if(!filterTagPanel.contains(e.target) && e.target !== filterTagBtn) filterTagPanel.classList.add('hidden'); });
 
         window.removeFilterTag = (tag) => {
             state.filters.tags = state.filters.tags.filter(t => t !== tag);
-            const cb = document.querySelector(`.filter-tag-cb[value="${tag}"]`);
-            if (cb) cb.checked = false;
-            renderFilterTags(); 
-            processAndRenderJournals();
-            saveLocalData();
+            const cb = document.querySelector(`.filter-tag-cb[value="${tag}"]`); if (cb) cb.checked = false;
+            renderFilterTags(); processAndRenderJournals(); saveLocalData();
         };
 
         function renderFilterTags() {
-            const container = document.getElementById('filter-tags-display');
-            container.innerHTML = state.filters.tags.map(t => `<span class="bg-blue-900/60 text-blue-200 text-xs px-2 py-1 rounded-lg flex items-center cursor-pointer hover:bg-red-800/80 transition" onclick="removeFilterTag('${t}')">${t} <i class="fa-solid fa-xmark ml-1.5 opacity-70"></i></span>`).join('');
+            document.getElementById('filter-tags-display').innerHTML = state.filters.tags.map(t => `<span class="bg-blue-900/60 text-blue-200 text-xs px-2 py-1 rounded-lg flex items-center cursor-pointer hover:bg-red-800/80 transition" onclick="removeFilterTag('${t}')">${t} <i class="fa-solid fa-xmark ml-1.5 opacity-70"></i></span>`).join('');
         }
 
         const getFilteredAndSortedData = (dataList) => {
-            const { start, end, futuresOnly, excludeNegativeGrowth, tags, minScore } = state.filters;
-            const { key, asc } = state.sortConfig;
-            
+            const { start, end, futuresOnly, excludeNegativeGrowth, tags, minScore } = state.filters, { key, asc } = state.sortConfig;
             let filtered = dataList.filter(j => {
-                if(start && j.date < start) return false;
-                if(end && j.date > end) return false;
-                const epsInfo = getEpsInfo(j.code, j);
-                if(futuresOnly && !epsInfo.futures) return false;
-                if(excludeNegativeGrowth && epsInfo.epsGrowth !== null && epsInfo.epsGrowth < 0) return false;
-                if(minScore > 0 && getScore(j.tags, epsInfo) < minScore) return false;
-                if(tags.length > 0) {
-                    const hasAll = tags.every(t => j.tags && j.tags.includes(t));
-                    if(!hasAll) return false;
-                }
+                if(start && j.date < start) return false; if(end && j.date > end) return false;
+                const ei = getEpsInfo(j.code, j);
+                if(futuresOnly && !ei.futures) return false; if(excludeNegativeGrowth && ei.epsGrowth !== null && ei.epsGrowth < 0) return false;
+                if(minScore > 0 && getScore(j.tags, ei) < minScore) return false;
+                if(tags.length > 0 && !tags.every(t => j.tags && j.tags.includes(t))) return false;
                 return true;
             });
-
             filtered.sort((a, b) => {
-                let vA, vB;
-                const eA = getEpsInfo(a.code, a), eB = getEpsInfo(b.code, b);
+                let vA, vB; const eA = getEpsInfo(a.code, a), eB = getEpsInfo(b.code, b);
                 switch(key) {
-                    case 'createdAt': vA = a.createdAt || 0; vB = b.createdAt || 0; break;
-                    case 'date': vA = a.date; vB = b.date; break;
-                    case 'code': vA = a.code; vB = b.code; break;
-                    case 'name': vA = a.name; vB = b.name; break;
-                    case 'eps2025': vA = eA.eps2025 ?? -9999; vB = eB.eps2025 ?? -9999; break;
-                    case 'eps2026': vA = eA.eps2026 ?? -9999; vB = eB.eps2026 ?? -9999; break;
-                    case 'epsGrowth': vA = eA.epsGrowth ?? -9999; vB = eB.epsGrowth ?? -9999; break;
-                    case 'score': vA = getScore(a.tags, eA); vB = getScore(b.tags, eB); break;
-                    default: vA = a.createdAt || 0; vB = b.createdAt || 0; break;
+                    case 'date': vA=a.date; vB=b.date; break; case 'code': vA=a.code; vB=b.code; break; case 'name': vA=a.name; vB=b.name; break;
+                    case 'eps2025': vA=eA.eps2025??-9999; vB=eB.eps2025??-9999; break; case 'eps2026': vA=eA.eps2026??-9999; vB=eB.eps2026??-9999; break;
+                    case 'epsGrowth': vA=eA.epsGrowth??-9999; vB=eB.epsGrowth??-9999; break; case 'score': vA=getScore(a.tags, eA); vB=getScore(b.tags, eB); break;
+                    default: vA=a.createdAt||0; vB=b.createdAt||0; break;
                 }
-                if(vA === vB) {
-                    return (a.createdAt || 0) - (b.createdAt || 0);
-                }
-                const res = vA > vB ? 1 : -1;
-                return asc ? res : -res;
+                if(vA === vB) return (a.createdAt||0) - (b.createdAt||0);
+                return asc ? (vA > vB ? 1 : -1) : (vA > vB ? -1 : 1);
             });
             return filtered;
         };
 
+        // ============================================================================
+        // [效能瘦身核心] Batch DOM Update 渲染表格，改善手機卡頓
+        // ============================================================================
         const renderTableRows = (data, tbodyId, emptyId, isFavoriteContext=false) => {
-            const tbody = document.getElementById(tbodyId); const empty = document.getElementById(emptyId);
-            const listType = isFavoriteContext ? 'fav' : 'journal';
-            
+            const tbody = document.getElementById(tbodyId), empty = document.getElementById(emptyId), listType = isFavoriteContext ? 'fav' : 'journal';
             if(data.length === 0) { tbody.innerHTML = ''; empty.classList.remove('hidden'); updateBatchUI(listType); return; }
-            empty.classList.add('hidden'); tbody.innerHTML = '';
+            empty.classList.add('hidden'); 
 
+            let rowsHtml = '';
             data.forEach(item => {
-                const tr = document.createElement('tr');
                 const ei = getEpsInfo(item.code, item);
-                
-                const rowBgClass = ei.futures ? "bg-sky-900/40 hover:bg-sky-800/50" : "hover:bg-gray-750";
-                tr.className = `transition border-b border-gray-700/50 text-white text-sm ${rowBgClass}`;
-                
-                const fBadge = ei.futures ? '<span class="bg-sky-600 text-white text-[10px] px-1.5 py-0.5 rounded mr-1.5 align-middle shadow-sm font-medium">期</span>' : '';
                 const tagsHtml = (item.tags || []).map(t => `<span class="inline-block text-[11px] font-medium px-2 py-0.5 rounded-md mr-1 mb-1 border cursor-pointer hover:opacity-60 transition tag-remove-btn ${tagStyles[t]||"bg-gray-800 text-gray-300 border-gray-600"}" data-id="${item.id}" data-tag="${t}" title="點擊移除此標籤">${t} <i class="fa-solid fa-xmark ml-1 opacity-70"></i></span>`).join('');
-                const score = getScore(item.tags, ei);
                 
-                // 追蹤清單等級判斷 (0:無, 1:一星, 2:二星, 3:三星)
-                const favLevel = item.isFavorite === true ? 1 : (parseInt(item.isFavorite) || 0);
-                let favColor = 'text-gray-500 hover:text-yellow-400';
-                let favIcon = '<i class="fa-solid fa-star"></i>';
-                let favTitle = '加入追蹤';
-                
-                if (favLevel === 1) {
-                    favColor = 'text-yellow-400';
-                    favTitle = '一星追蹤 (點擊切換二次追蹤)';
-                } else if (favLevel === 2) {
-                    favColor = 'text-orange-500';
-                    favIcon = '<i class="fa-solid fa-star"></i><span class="ml-1 text-[10px] font-bold leading-none">2</span>';
-                    favTitle = '二次追蹤 (點擊切換三次追蹤)';
-                } else if (favLevel === 3) {
-                    favColor = 'text-red-500';
-                    favIcon = '<i class="fa-solid fa-star"></i><span class="ml-1 text-[10px] font-bold leading-none">3</span>';
-                    favTitle = '三次追蹤 (點擊取消追蹤)';
-                }
+                let favLevel = item.isFavorite === true ? 1 : (parseInt(item.isFavorite) || 0), favColor = 'text-gray-500 hover:text-yellow-400', favIcon = '<i class="fa-solid fa-star"></i>', favTitle = '加入追蹤';
+                if (favLevel === 1) { favColor = 'text-yellow-400'; favTitle = '一星追蹤 (點擊切換二次追蹤)'; } 
+                else if (favLevel === 2) { favColor = 'text-orange-500'; favIcon = '<i class="fa-solid fa-star"></i><span class="ml-1 text-[10px] font-bold leading-none">2</span>'; favTitle = '二次追蹤 (點擊切換三次追蹤)'; } 
+                else if (favLevel === 3) { favColor = 'text-red-500'; favIcon = '<i class="fa-solid fa-star"></i><span class="ml-1 text-[10px] font-bold leading-none">3</span>'; favTitle = '三次追蹤 (點擊取消追蹤)'; }
 
-                // 統一所有列表的操作按鈕 (追蹤清單與主日誌一致)
-                const actionHtml = `
-                    <button class="mr-1 hover:scale-110 add-plan-btn text-green-500 bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-code="${item.code}" title="加入交易規劃"><i class="fa-solid fa-chess-knight"></i></button>
-                    <button class="mr-1 hover:scale-110 fav-toggle-btn ${favColor} bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-id="${item.id}" title="${favTitle}">${favIcon}</button>
-                    <button class="text-gray-500 hover:text-red-400 del-btn bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-id="${item.id}" title="完全刪除紀錄"><i class="fa-solid fa-trash"></i></button>
-                `;
-
-                const isChecked = selectedIds[listType].has(item.id) ? 'checked' : '';
-
-                tr.innerHTML = `
-                    <td class="py-3 px-2 sm:px-3 text-center"><input type="checkbox" class="row-cb rounded border-gray-600 bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${item.id}" data-type="${listType}" ${isChecked}></td>
-                    <td class="py-3 px-3 sm:px-4 text-white">${item.date}</td>
-                    <td class="py-3 px-3 sm:px-4 font-medium text-white">${fBadge}${item.code}</td>
-                    <td class="py-3 px-3 sm:px-4 text-white">${item.name}</td>
-                    <td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2025)}</td>
-                    <td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2026)}</td>
-                    <td class="py-3 px-3 sm:px-4 text-right">${formatNumColor(ei.epsGrowth, true)}</td>
-                    <td class="py-3 px-3 sm:px-4 text-center font-bold text-white">${score}</td>
-                    <td class="py-2 px-3 whitespace-normal min-w-[120px] sm:min-w-[140px] lg:max-w-[280px]">${tagsHtml}</td>
-                    ${!isFavoriteContext ? `<td class="py-3 px-3 text-gray-300 max-w-[80px] sm:max-w-[150px] lg:max-w-[250px] xl:max-w-[400px] truncate text-xs w-full" title="${item.notes||''}">${item.notes||''}</td>` : ''}
-                    <td class="py-3 px-3 text-center whitespace-nowrap">${actionHtml}</td>
-                `;
-                tbody.appendChild(tr);
+                rowsHtml += `
+                    <tr class="transition border-b border-gray-700/50 text-white text-sm ${ei.futures ? "bg-sky-900/40 hover:bg-sky-800/50" : "hover:bg-gray-750"}">
+                        <td class="py-3 px-2 sm:px-3 text-center"><input type="checkbox" class="row-cb rounded border-gray-600 bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${item.id}" data-type="${listType}" ${selectedIds[listType].has(item.id) ? 'checked' : ''}></td>
+                        <td class="py-3 px-3 sm:px-4 text-white">${item.date}</td>
+                        <td class="py-3 px-3 sm:px-4 font-medium text-white">${ei.futures ? '<span class="bg-sky-600 text-white text-[10px] px-1.5 py-0.5 rounded mr-1.5 align-middle shadow-sm font-medium">期</span>' : ''}${item.code}</td>
+                        <td class="py-3 px-3 sm:px-4 text-white">${item.name}</td>
+                        <td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2025)}</td>
+                        <td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2026)}</td>
+                        <td class="py-3 px-3 sm:px-4 text-right">${formatNumColor(ei.epsGrowth, true)}</td>
+                        <td class="py-3 px-3 sm:px-4 text-center font-bold text-white">${getScore(item.tags, ei)}</td>
+                        <td class="py-2 px-3 whitespace-normal min-w-[120px] sm:min-w-[140px] lg:max-w-[280px]">${tagsHtml}</td>
+                        ${!isFavoriteContext ? `<td class="py-3 px-3 text-gray-300 max-w-[80px] sm:max-w-[150px] lg:max-w-[250px] xl:max-w-[400px] truncate text-xs w-full" title="${item.notes||''}">${item.notes||''}</td>` : ''}
+                        <td class="py-3 px-3 text-center whitespace-nowrap">
+                            <button class="mr-1 hover:scale-110 add-plan-btn text-green-500 bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-code="${item.code}" title="加入交易規劃"><i class="fa-solid fa-chess-knight"></i></button>
+                            <button class="mr-1 hover:scale-110 fav-toggle-btn ${favColor} bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-id="${item.id}" title="${favTitle}">${favIcon}</button>
+                            <button class="text-gray-500 hover:text-red-400 del-btn bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-id="${item.id}" title="完全刪除紀錄"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>`;
             });
-
-            // 確保每次重新渲染後，更新批次刪除工具列與全選框狀態
+            tbody.innerHTML = rowsHtml;
             updateBatchUI(listType);
 
-            tbody.querySelectorAll('.tag-remove-btn').forEach(async b => {
-                b.addEventListener('click', async (e)=>{
-                    const id = e.currentTarget.dataset.id;
-                    const tagToRemove = e.currentTarget.dataset.tag;
-                    const j = state.journals.find(x => x.id === id);
-                    if(j && j.tags) {
-                        j.tags = j.tags.filter(t => t !== tagToRemove);
-                        j.updatedAt = Date.now();
-                        saveLocalData();
-                        processAndRenderJournals();
-                        if(document.getElementById('module-favorites').classList.contains('active')) renderFavorites();
-                        await putDataToCloud(`journals/${id}`, j);
-                        showToast(`已移除標籤: ${tagToRemove}`);
-                    }
-                });
-            });
-            
+            // 重新綁定事件
+            tbody.querySelectorAll('.tag-remove-btn').forEach(b => b.addEventListener('click', async (e)=>{
+                const id = e.currentTarget.dataset.id, tag = e.currentTarget.dataset.tag, j = state.journals.find(x => x.id === id);
+                if(j && j.tags) { j.tags = j.tags.filter(t => t !== tag); j.updatedAt = Date.now(); saveLocalData(); processAndRenderJournals(); if(document.getElementById('module-favorites').classList.contains('active')) renderFavorites(); await putDataToCloud(`journals/${id}`, j); showToast(`已移除標籤: ${tag}`); }
+            }));
             tbody.querySelectorAll('.add-plan-btn').forEach(b => b.addEventListener('click', (e)=>{
-                const code = e.currentTarget.dataset.code;
-                document.querySelector('[data-target="module-plan"]').click();
-                document.getElementById('p-stock').value = code;
-                document.getElementById('p-entry').focus();
-                showToast('已代入股號，請完成規劃設定');
+                document.querySelector('[data-target="module-plan"]').click(); document.getElementById('p-stock').value = e.currentTarget.dataset.code; document.getElementById('p-entry').focus(); showToast('已代入股號，請完成規劃設定');
             }));
-
             tbody.querySelectorAll('.del-btn').forEach(b => b.addEventListener('click', async(e)=>{
-                const id = e.currentTarget.dataset.id;
-                state.journals = state.journals.filter(j => j.id !== id);
-                saveLocalData();
-                processAndRenderJournals();
-                if(document.getElementById('module-favorites').classList.contains('active')) renderFavorites();
-                await deleteDataFromCloud(`journals/${id}`);
-                showToast('紀錄已刪除');
+                const id = e.currentTarget.dataset.id; state.journals = state.journals.filter(j => j.id !== id); saveLocalData(); processAndRenderJournals(); if(document.getElementById('module-favorites').classList.contains('active')) renderFavorites(); await deleteDataFromCloud(`journals/${id}`); showToast('紀錄已刪除');
             }));
-            
             tbody.querySelectorAll('.fav-toggle-btn').forEach(b => b.addEventListener('click', async(e)=>{
-                const id = e.currentTarget.dataset.id;
-                const j = state.journals.find(x => x.id === id);
+                const id = e.currentTarget.dataset.id, j = state.journals.find(x => x.id === id);
                 if(j) {
-                    let currentLevel = j.isFavorite === true ? 1 : (parseInt(j.isFavorite) || 0);
-                    let nextLevel = (currentLevel + 1) % 4;
-                    
-                    j.isFavorite = nextLevel;
-                    j.updatedAt = Date.now();
-                    
-                    saveLocalData();
-                    processAndRenderJournals();
-                    if(document.getElementById('module-favorites').classList.contains('active')) renderFavorites();
-                    await putDataToCloud(`journals/${id}`, j);
-                    
-                    const msgs = ['已取消追蹤', '已加入一星追蹤', '已升級二次追蹤', '已升級三次追蹤'];
-                    showToast(msgs[nextLevel]);
+                    let next = ((j.isFavorite === true ? 1 : (parseInt(j.isFavorite) || 0)) + 1) % 4; j.isFavorite = next; j.updatedAt = Date.now();
+                    saveLocalData(); processAndRenderJournals(); if(document.getElementById('module-favorites').classList.contains('active')) renderFavorites(); await putDataToCloud(`journals/${id}`, j);
+                    showToast(['已取消追蹤', '已加入一星追蹤', '已升級二次追蹤', '已升級三次追蹤'][next]);
                 }
             }));
         };
 
         function processAndRenderJournals() { renderTableRows(getFilteredAndSortedData(state.journals), 'journal-table-body', 'journal-empty'); }
         function renderFavorites() { 
-            let favs = state.journals.filter(j => j.isFavorite);
-            const { key, asc } = state.favSortConfig || { key: 'createdAt', asc: false };
-            
+            let favs = state.journals.filter(j => j.isFavorite); const { key, asc } = state.favSortConfig || { key: 'createdAt', asc: false };
             favs.sort((a, b) => {
-                let vA, vB;
-                const eA = getEpsInfo(a.code, a), eB = getEpsInfo(b.code, b);
-                switch(key) {
-                    case 'createdAt': vA = a.createdAt || 0; vB = b.createdAt || 0; break;
-                    case 'date': vA = a.date; vB = b.date; break;
-                    case 'code': vA = a.code; vB = b.code; break;
-                    case 'name': vA = a.name; vB = b.name; break;
-                    case 'eps2025': vA = eA.eps2025 ?? -9999; vB = eB.eps2025 ?? -9999; break;
-                    case 'eps2026': vA = eA.eps2026 ?? -9999; vB = eB.eps2026 ?? -9999; break;
-                    case 'epsGrowth': vA = eA.epsGrowth ?? -9999; vB = eB.epsGrowth ?? -9999; break;
-                    case 'score': vA = getScore(a.tags, eA); vB = getScore(b.tags, eB); break;
-                    default: vA = a.createdAt || 0; vB = b.createdAt || 0; break;
-                }
-                if(vA === vB) {
-                    return (a.createdAt || 0) - (b.createdAt || 0);
-                }
-                const res = vA > vB ? 1 : -1;
-                return asc ? res : -res;
+                let vA, vB; const eA = getEpsInfo(a.code, a), eB = getEpsInfo(b.code, b);
+                switch(key) { case 'date': vA=a.date; vB=b.date; break; case 'code': vA=a.code; vB=b.code; break; case 'name': vA=a.name; vB=b.name; break; case 'eps2025': vA=eA.eps2025??-9999; vB=eB.eps2025??-9999; break; case 'eps2026': vA=eA.eps2026??-9999; vB=eB.eps2026??-9999; break; case 'epsGrowth': vA=eA.epsGrowth??-9999; vB=eB.epsGrowth??-9999; break; case 'score': vA=getScore(a.tags, eA); vB=getScore(b.tags, eB); break; default: vA=a.createdAt||0; vB=b.createdAt||0; break; }
+                if(vA === vB) return (a.createdAt||0) - (b.createdAt||0);
+                return asc ? (vA > vB ? 1 : -1) : (vA > vB ? -1 : 1);
             });
-
             renderTableRows(favs, 'fav-table-body', 'fav-empty', true); 
         }
 
         const copyFootnote = `\n\n-------------------\n⚠️ 停損是紀律，停利是藝術。\n⚠️ 位階決定勝率，部位決定存活。\n⚠️ 趨勢-族群-題材-位階-動能-風控`;
-
-        const executeCopy = (text) => {
-            if(navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(text).then(() => {
-                    showToast('複製成功');
-                    showPreview(text);
-                }).catch(()=> {
-                    fallbackCopy(text);
-                });
-            } else {
-                fallbackCopy(text);
-            }
-        };
-
-        const fallbackCopy = (text) => {
-            const t = document.createElement("textarea"); t.value = text; t.style.position="fixed"; document.body.appendChild(t); t.focus(); t.select();
-            try { 
-                document.execCommand('copy'); 
-                showToast('複製成功'); 
-                showPreview(text);
-            } catch(e) { showToast('複製失敗','error'); } document.body.removeChild(t);
-        };
+        const executeCopy = (text) => { if(navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(() => { showToast('複製成功'); showPreview(text); }).catch(()=> fallbackCopy(text)); else fallbackCopy(text); };
+        const fallbackCopy = (text) => { const t = document.createElement("textarea"); t.value = text; t.style.position="fixed"; document.body.appendChild(t); t.focus(); t.select(); try { document.execCommand('copy'); showToast('複製成功'); showPreview(text); } catch(e) { showToast('複製失敗','error'); } document.body.removeChild(t); };
 
         document.querySelectorAll('.btn-copy').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                const mode = e.currentTarget.dataset.mode;
-                let data = getFilteredAndSortedData(state.journals);
-                
-                // 新增：排除含有「特別追蹤」標籤的資料，不列入複製
-                data = data.filter(j => !(j.tags && j.tags.includes('特別追蹤')));
-
+                const mode = e.currentTarget.dataset.mode; let data = getFilteredAndSortedData(state.journals).filter(j => !(j.tags && j.tags.includes('特別追蹤')));
                 if(data.length===0) return showToast('清單為空 (已排除特別追蹤)','error');
                 
-                // 動態產生篩選組合標題
-                let dateStr = state.filters.start === state.filters.end ? state.filters.start : `${state.filters.start.substring(5)}~${state.filters.end.substring(5)}`;
-                let tagStr = state.filters.tags.length > 0 ? ` [${state.filters.tags.join('+')}]` : '';
-                let conditions = [];
-                if(state.filters.futuresOnly) conditions.push('僅股期');
-                if(state.filters.excludeNegativeGrowth) conditions.push('排除負成長');
-                if(state.filters.minScore > 0) conditions.push(`${state.filters.minScore}分以上`);
-                let condStr = conditions.length > 0 ? ` (${conditions.join(', ')})` : '';
-
-                let text = `| ${dateStr} 篩選名單${tagStr}${condStr} |\n\n`;
+                let dStr = state.filters.start === state.filters.end ? state.filters.start : `${state.filters.start.substring(5)}~${state.filters.end.substring(5)}`, tStr = state.filters.tags.length > 0 ? ` [${state.filters.tags.join('+')}]` : '', cond = [];
+                if(state.filters.futuresOnly) cond.push('僅股期'); if(state.filters.excludeNegativeGrowth) cond.push('排除負成長'); if(state.filters.minScore > 0) cond.push(`${state.filters.minScore}分以上`);
+                let cStr = cond.length > 0 ? ` (${cond.join(', ')})` : '', text = `| ${dStr} 篩選名單${tStr}${cStr} |\n\n`;
 
                 if(mode === 'time') {
-                    data.sort((a,b) => {
-                        const d = new Date(a.date) - new Date(b.date);
-                        if(d !== 0) return d;
-                        return (a.createdAt || 0) - (b.createdAt || 0);
-                    });
-                    data.forEach(j => {
-                        let displayTags = j.tags || [];
-                        // 只顯示有被篩選的標籤，讓畫面更聚焦
-                        if (state.filters.tags.length > 0) {
-                            displayTags = displayTags.filter(t => state.filters.tags.includes(t));
-                        } else {
-                            displayTags = displayTags.filter(t => t !== '特別追蹤');
-                        }
-                        const shortTags = displayTags.length > 0 ? ` [${displayTags.map(t=>t[0]).join('')}]` : '';
-                        text += `- ${j.code} ${j.name} (${getScore(j.tags, getEpsInfo(j.code, j))})${shortTags}\n`;
-                    });
+                    data.sort((a,b) => { const d = new Date(a.date) - new Date(b.date); return d !== 0 ? d : (a.createdAt||0) - (b.createdAt||0); });
+                    data.forEach(j => { let tags = (state.filters.tags.length > 0 ? (j.tags||[]).filter(t => state.filters.tags.includes(t)) : (j.tags||[]).filter(t => t !== '特別追蹤')); text += `- ${j.code} ${j.name} (${getScore(j.tags, getEpsInfo(j.code, j))})${tags.length>0?` [${tags.map(t=>t[0]).join('')}]`:''}\n`; });
                 } 
                 else if(mode === 'strategy') {
-                    const sm = {};
-                    data.forEach(j => { 
-                        if(j.tags) {
-                            j.tags.forEach(t => { 
-                                // 若有設定標籤篩選，則只將符合篩選條件的標籤當作群組分類
-                                if (state.filters.tags.length > 0) {
-                                    if (state.filters.tags.includes(t)) {
-                                        if(!sm[t]) sm[t]=[]; sm[t].push(j); 
-                                    }
-                                } else {
-                                    if (t !== '特別追蹤') {
-                                        if(!sm[t]) sm[t]=[]; sm[t].push(j); 
-                                    }
-                                }
-                            }); 
-                        }
-                    });
-                    
-                    const strategyOrder = ['破繭而出', '月來越好', '季不可失', '守株待兔', '量價齊揚', 'OBV突破'];
-                    const sortedKeys = Object.keys(sm).sort((a, b) => {
-                        const idxA = strategyOrder.indexOf(a);
-                        const idxB = strategyOrder.indexOf(b);
-                        if (idxA !== -1 && idxB !== -1) return idxA - idxB;
-                        if (idxA !== -1) return -1;
-                        if (idxB !== -1) return 1;
-                        return a.localeCompare(b);
-                    });
-
-                    for(const s of sortedKeys) {
-                        text += `🎯 [${s}] (共 ${sm[s].length} 檔)\n`;
-                        sm[s].forEach(a => text += `- ${a.code} ${a.name}\n`); 
-                        text += '\n';
-                    }
+                    const sm = {}; data.forEach(j => { if(j.tags) j.tags.forEach(t => { if(state.filters.tags.length>0 ? state.filters.tags.includes(t) : t!=='特別追蹤') { if(!sm[t]) sm[t]=[]; sm[t].push(j); }}); });
+                    const order = ['破繭而出', '月來越好', '季不可失', '守株待兔', '量價齊揚', 'OBV突破'];
+                    Object.keys(sm).sort((a, b) => { const iA = order.indexOf(a), iB = order.indexOf(b); if (iA !== -1 && iB !== -1) return iA - iB; if (iA !== -1) return -1; if (iB !== -1) return 1; return a.localeCompare(b); }).forEach(s => { text += `🎯 [${s}] (共 ${sm[s].length} 檔)\n`; sm[s].forEach(a => text += `- ${a.code} ${a.name}\n`); text += '\n'; });
                 }
                 else if(mode === 'score') {
-                    data.sort((a,b)=>getScore(b.tags, getEpsInfo(b.code, b))-getScore(a.tags, getEpsInfo(a.code, a)));
-                    data.forEach(j => {
-                        let displayTags = j.tags || [];
-                        if (state.filters.tags.length > 0) {
-                            displayTags = displayTags.filter(t => state.filters.tags.includes(t));
-                        } else {
-                            displayTags = displayTags.filter(t => t !== '特別追蹤');
-                        }
-                        const shortTags = displayTags.length > 0 ? ` ${displayTags.map(t=>t[0]).join('')}` : '';
-                        const g = getEpsInfo(j.code,j).epsGrowth;
-                        const gStr = g !== null ? (g * 100).toFixed(2) + '%' : '無';
-                        text += `- ${j.code} ${j.name} [${getScore(j.tags, getEpsInfo(j.code, j))}分] (預成長: ${gStr})${shortTags}\n`;
+                    data.sort((a,b)=>getScore(b.tags, getEpsInfo(b.code, b))-getScore(a.tags, getEpsInfo(a.code, a))).forEach(j => {
+                        let tags = state.filters.tags.length > 0 ? (j.tags||[]).filter(t => state.filters.tags.includes(t)) : (j.tags||[]).filter(t => t !== '特別追蹤');
+                        const g = getEpsInfo(j.code,j).epsGrowth; text += `- ${j.code} ${j.name} [${getScore(j.tags, getEpsInfo(j.code, j))}分] (預成長: ${g!==null?(g*100).toFixed(2)+'%':'無'})${tags.length>0?` ${tags.map(t=>t[0]).join('')}`:''}\n`;
                     });
                 }
-                else if(mode === 'eps') {
-                    data.sort((a,b)=>(getEpsInfo(b.code,b).epsGrowth||-999) - (getEpsInfo(a.code,a).epsGrowth||-999));
-                    data.forEach(j => {
-                        const g = getEpsInfo(j.code,j).epsGrowth;
-                        text += `- ${j.code} ${j.name} (EPS成長: ${g!==null?(g*100).toFixed(2)+'%':'無'})\n`;
-                    });
-                }
-                else if(mode === 'futures') {
-                    const fData = data.filter(j => getEpsInfo(j.code,j).futures);
-                    fData.forEach(j => text += `- [期] ${j.code} ${j.name}\n`);
-                }
+                else if(mode === 'eps') data.sort((a,b)=>(getEpsInfo(b.code,b).epsGrowth||-999) - (getEpsInfo(a.code,a).epsGrowth||-999)).forEach(j => { const g = getEpsInfo(j.code,j).epsGrowth; text += `- ${j.code} ${j.name} (EPS成長: ${g!==null?(g*100).toFixed(2)+'%':'無'})\n`; });
+                else if(mode === 'futures') data.filter(j => getEpsInfo(j.code,j).futures).forEach(j => text += `- [期] ${j.code} ${j.name}\n`);
                 else if(mode === 'futures_score') {
-                    const fData = data.filter(j => getEpsInfo(j.code,j).futures).sort((a,b)=>getScore(b.tags, getEpsInfo(b.code, b))-getScore(a.tags, getEpsInfo(a.code, a)));
-                    fData.forEach(j => {
-                        let displayTags = j.tags || [];
-                        if (state.filters.tags.length > 0) {
-                            displayTags = displayTags.filter(t => state.filters.tags.includes(t));
-                        } else {
-                            displayTags = displayTags.filter(t => t !== '特別追蹤');
-                        }
-                        const shortTags = displayTags.length > 0 ? ` ${displayTags.map(t=>t[0]).join('')}` : '';
-                        const g = getEpsInfo(j.code,j).epsGrowth;
-                        const gStr = g !== null ? (g * 100).toFixed(2) + '%' : '無';
-                        text += `- [期] ${j.code} ${j.name} [${getScore(j.tags, getEpsInfo(j.code, j))}分] (預成長: ${gStr})${shortTags}\n`;
+                    data.filter(j => getEpsInfo(j.code,j).futures).sort((a,b)=>getScore(b.tags, getEpsInfo(b.code, b))-getScore(a.tags, getEpsInfo(a.code, a))).forEach(j => {
+                        let tags = state.filters.tags.length > 0 ? (j.tags||[]).filter(t => state.filters.tags.includes(t)) : (j.tags||[]).filter(t => t !== '特別追蹤');
+                        const g = getEpsInfo(j.code,j).epsGrowth; text += `- [期] ${j.code} ${j.name} [${getScore(j.tags, getEpsInfo(j.code, j))}分] (預成長: ${g!==null?(g*100).toFixed(2)+'%':'無'})${tags.length>0?` ${tags.map(t=>t[0]).join('')}`:''}\n`;
                     });
                 }
                 else if(mode === 'chip') {
-                    const chipData = data.filter(j => j.tags && (j.tags.includes('5日籌碼集中') || j.tags.includes('20日籌碼集中')));
-                    if (chipData.length === 0) return showToast('目前無 5日/20日 籌碼集中標的', 'error');
-                    
-                    text = `| ${dateStr} 籌碼集中名單${condStr} |\n\n`;
-                    chipData.forEach(j => {
-                        let matchingTags = j.tags.filter(t => t === '5日籌碼集中' || t === '20日籌碼集中').join(' + ');
-                        text += `- ${j.code} ${j.name} [${matchingTags}]\n`;
-                    });
+                    const cData = data.filter(j => j.tags && (j.tags.includes('5日籌碼集中') || j.tags.includes('20日籌碼集中')));
+                    if (cData.length === 0) return showToast('目前無 5日/20日 籌碼集中標的', 'error');
+                    text = `| ${dStr} 籌碼集中名單${cStr} |\n\n`; cData.forEach(j => text += `- ${j.code} ${j.name} [${j.tags.filter(t => t === '5日籌碼集中' || t === '20日籌碼集中').join(' + ')}]\n`);
                 }
                 executeCopy(text.trim() + copyFootnote);
             });
         });
 
-        // Module 2: Calculator
+        // Calculator
         const cCodeInput = document.getElementById('c-code'), cNameInput = document.getElementById('c-name');
-
-        cCodeInput.addEventListener('input', (e) => { 
-            const val = e.target.value.trim();
-            const n = state.codeToName[val]; 
-            if(n) cNameInput.value = n; 
-        });
-        
-        cNameInput.addEventListener('input', (e) => { 
-            const val = e.target.value.trim();
-            const c = state.nameToCode[val]; 
-            if(c) cCodeInput.value = c; 
-        });
-
+        cCodeInput.addEventListener('input', (e) => { const v = e.target.value.trim(); if(state.codeToName[v]) cNameInput.value = state.codeToName[v]; });
+        cNameInput.addEventListener('input', (e) => { const v = e.target.value.trim(); if(state.nameToCode[v]) cCodeInput.value = state.nameToCode[v]; });
         document.getElementById('calc-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const h = parseFloat(document.getElementById('c-high').value), l = parseFloat(document.getElementById('c-low').value), c = parseFloat(document.getElementById('c-close').value);
+            e.preventDefault(); const h = parseFloat(document.getElementById('c-high').value), l = parseFloat(document.getElementById('c-low').value), c = parseFloat(document.getElementById('c-close').value);
             if (isNaN(h)||isNaN(l)||isNaN(c)||h<l) return showToast('輸入無效','error');
             const pp = (h+l+c)/3, cdp = (h+l+2*c)/4, diff = h-l;
-            
-            document.getElementById('pv-pp').textContent = pp.toFixed(2);
-            document.getElementById('pv-r1').textContent = ((2*pp)-l).toFixed(2); document.getElementById('pv-r2').textContent = (pp+diff).toFixed(2);
-            document.getElementById('pv-s1').textContent = ((2*pp)-h).toFixed(2); document.getElementById('pv-s2').textContent = (pp-diff).toFixed(2);
-            
-            document.getElementById('cdp-cdp').textContent = cdp.toFixed(2);
-            document.getElementById('cdp-ah').textContent = (cdp+diff).toFixed(2); document.getElementById('cdp-nh').textContent = ((2*cdp)-l).toFixed(2);
-            document.getElementById('cdp-nl').textContent = ((2*cdp)-h).toFixed(2); document.getElementById('cdp-al').textContent = (cdp-diff).toFixed(2);
-            
-            [0.236, 0.382, 0.5, 0.618, 0.786].forEach(f => document.getElementById(`fb-${f.toString().substring(2)}`).textContent = (h - diff*f).toFixed(2));
-            showToast('計算完成');
+            document.getElementById('pv-pp').textContent = pp.toFixed(2); document.getElementById('pv-r1').textContent = ((2*pp)-l).toFixed(2); document.getElementById('pv-r2').textContent = (pp+diff).toFixed(2); document.getElementById('pv-s1').textContent = ((2*pp)-h).toFixed(2); document.getElementById('pv-s2').textContent = (pp-diff).toFixed(2);
+            document.getElementById('cdp-cdp').textContent = cdp.toFixed(2); document.getElementById('cdp-ah').textContent = (cdp+diff).toFixed(2); document.getElementById('cdp-nh').textContent = ((2*cdp)-l).toFixed(2); document.getElementById('cdp-nl').textContent = ((2*cdp)-h).toFixed(2); document.getElementById('cdp-al').textContent = (cdp-diff).toFixed(2);
+            [0.236, 0.382, 0.5, 0.618, 0.786].forEach(f => document.getElementById(`fb-${f.toString().substring(2)}`).textContent = (h - diff*f).toFixed(2)); showToast('計算完成');
         });
-
         const getCalcText = (type) => {
             if(document.getElementById('cdp-cdp').textContent==='-') return null;
-            
-            const code = document.getElementById('c-code').value.trim();
-            const name = document.getElementById('c-name').value.trim();
-            const stockStr = (code || name) ? `${code} ${name}`.trim() : '';
-            
-            const cdpTxt = `[CDP 短線當沖]\n追買(AH): ${document.getElementById('cdp-ah').textContent}\n賣出(NH): ${document.getElementById('cdp-nh').textContent}\n均價(CDP): ${document.getElementById('cdp-cdp').textContent}\n買進(NL):  ${document.getElementById('cdp-nl').textContent}\n追賣(AL):  ${document.getElementById('cdp-al').textContent}`;
-            const pivotTxt = `[Pivot 波段樞軸]\n壓力二(R2): ${document.getElementById('pv-r2').textContent}\n壓力一(R1): ${document.getElementById('pv-r1').textContent}\n樞軸點(PP): ${document.getElementById('pv-pp').textContent}\n支撐一(S1): ${document.getElementById('pv-s1').textContent}\n支撐二(S2): ${document.getElementById('pv-s2').textContent}`;
-            const fiboTxt = `[費波那契回撤]\n0.236: ${document.getElementById('fb-236').textContent}\n0.382: ${document.getElementById('fb-382').textContent}\n0.500: ${document.getElementById('fb-500').textContent}\n0.618: ${document.getElementById('fb-618').textContent}\n0.786: ${document.getElementById('fb-786').textContent}`;
-
-            if(type==='cdp') return (stockStr ? `【${stockStr}】\n` : '') + cdpTxt;
-            if(type==='pivot') return (stockStr ? `【${stockStr}】\n` : '') + pivotTxt;
-            if(type==='fibo') return (stockStr ? `【${stockStr}】\n` : '') + fiboTxt;
-            if(type==='all') return `【支撐壓力計算結果】${stockStr ? ' ' + stockStr : ''}\n高:${document.getElementById('c-high').value} 低:${document.getElementById('c-low').value} 收:${document.getElementById('c-close').value}\n\n${cdpTxt}\n\n${pivotTxt}\n\n${fiboTxt}`;
-        }
+            const c = document.getElementById('c-code').value.trim(), n = document.getElementById('c-name').value.trim(), s = (c||n) ? `${c} ${n}`.trim() : '';
+            const tC = `[CDP 短線當沖]\n追買(AH): ${document.getElementById('cdp-ah').textContent}\n賣出(NH): ${document.getElementById('cdp-nh').textContent}\n均價(CDP): ${document.getElementById('cdp-cdp').textContent}\n買進(NL):  ${document.getElementById('cdp-nl').textContent}\n追賣(AL):  ${document.getElementById('cdp-al').textContent}`;
+            const tP = `[Pivot 波段樞軸]\n壓力二(R2): ${document.getElementById('pv-r2').textContent}\n壓力一(R1): ${document.getElementById('pv-r1').textContent}\n樞軸點(PP): ${document.getElementById('pv-pp').textContent}\n支撐一(S1): ${document.getElementById('pv-s1').textContent}\n支撐二(S2): ${document.getElementById('pv-s2').textContent}`;
+            const tF = `[費波那契回撤]\n0.236: ${document.getElementById('fb-236').textContent}\n0.382: ${document.getElementById('fb-382').textContent}\n0.500: ${document.getElementById('fb-500').textContent}\n0.618: ${document.getElementById('fb-618').textContent}\n0.786: ${document.getElementById('fb-786').textContent}`;
+            if(type==='cdp') return (s ? `【${s}】\n` : '') + tC; if(type==='pivot') return (s ? `【${s}】\n` : '') + tP; if(type==='fibo') return (s ? `【${s}】\n` : '') + tF;
+            if(type==='all') return `【支撐壓力計算結果】${s ? ' ' + s : ''}\n高:${document.getElementById('c-high').value} 低:${document.getElementById('c-low').value} 收:${document.getElementById('c-close').value}\n\n${tC}\n\n${tP}\n\n${tF}`;
+        };
         document.querySelectorAll('.btn-copy-calc').forEach(b => b.addEventListener('click', e => { const t = getCalcText(e.currentTarget.dataset.target); t ? executeCopy(t + copyFootnote) : showToast('請先計算','error'); }));
         document.getElementById('btn-copy-calc-all').addEventListener('click', () => { const t = getCalcText('all'); t ? executeCopy(t + copyFootnote) : showToast('請先計算','error'); });
 
-        // Module 3: Plan
+        // Plan
         const pEntry = document.getElementById('p-entry'), pStop = document.getElementById('p-stop');
         pEntry.addEventListener('input', e => { const v = parseFloat(e.target.value); if(!isNaN(v)) pStop.value = (v*0.95).toFixed(2); });
-        
         document.getElementById('plan-form').addEventListener('submit', async(e)=>{
-            e.preventDefault();
-            const id = generateId();
-            const stock = document.getElementById('p-stock').value.trim(), qty = parseInt(document.getElementById('p-qty').value)||1;
-            
-            const payload = {
-                id, stock, qty, entry: parseFloat(pEntry.value), stop: parseFloat(pStop.value), target: parseFloat(document.getElementById('p-target').value)||null, note: document.getElementById('p-note').value.trim(), status: '持倉中', pnl: 0, createdAt: Date.now(), updatedAt: Date.now()
-            };
-
-            state.plans.push(payload);
-            saveLocalData();
-            renderPlans();
-
-            await putDataToCloud(`plans/${id}`, payload);
-
-            showToast('計畫建立成功'); 
-            e.target.reset();
+            e.preventDefault(); const id = generateId(), stock = document.getElementById('p-stock').value.trim(), qty = parseInt(document.getElementById('p-qty').value)||1;
+            const payload = { id, stock, qty, entry: parseFloat(pEntry.value), stop: parseFloat(pStop.value), target: parseFloat(document.getElementById('p-target').value)||null, note: document.getElementById('p-note').value.trim(), status: '持倉中', pnl: 0, createdAt: Date.now(), updatedAt: Date.now() };
+            state.plans.push(payload); saveLocalData(); renderPlans(); await putDataToCloud(`plans/${id}`, payload); showToast('計畫建立成功'); e.target.reset();
         });
-
         window.openCloseModal = (id, def) => { document.getElementById('modal-plan-id').value=id; document.getElementById('modal-exit-price').value=def||''; document.getElementById('close-plan-modal').classList.remove('hidden'); };
-        
-        window.deletePlan = async (id) => { 
-            state.plans = state.plans.filter(p => p.id !== id);
-            saveLocalData();
-            renderPlans();
-            await deleteDataFromCloud(`plans/${id}`);
-            showToast('規劃已刪除'); 
-        };
-
+        window.deletePlan = async (id) => { state.plans = state.plans.filter(p => p.id !== id); saveLocalData(); renderPlans(); await deleteDataFromCloud(`plans/${id}`); showToast('規劃已刪除'); };
         document.getElementById('btn-cancel-modal').addEventListener('click', ()=>document.getElementById('close-plan-modal').classList.add('hidden'));
         
         const closeTrade = async (status) => {
             const id = document.getElementById('modal-plan-id').value, ex = parseFloat(document.getElementById('modal-exit-price').value);
             if(isNaN(ex)) return showToast('無效金額','error');
             const p = state.plans.find(x=>x.id===id); if(!p) return;
-            const pnl = Math.round((ex - p.entry)*p.qty*1000);
-            
-            p.status = status;
-            p.exitPrice = ex;
-            p.pnl = pnl;
-            p.updatedAt = Date.now();
-            
-            saveLocalData();
-            renderPlans();
-            await putDataToCloud(`plans/${id}`, p);
-
-            document.getElementById('close-plan-modal').classList.add('hidden'); 
-            showToast(`結算損益: $${pnl}`);
+            const pnl = Math.round((ex - p.entry)*p.qty*1000); p.status = status; p.exitPrice = ex; p.pnl = pnl; p.updatedAt = Date.now();
+            saveLocalData(); renderPlans(); await putDataToCloud(`plans/${id}`, p); document.getElementById('close-plan-modal').classList.add('hidden'); showToast(`結算損益: $${pnl}`);
         };
-        document.getElementById('btn-win').addEventListener('click', ()=>closeTrade('已停利'));
-        document.getElementById('btn-loss').addEventListener('click', ()=>closeTrade('已停損'));
+        document.getElementById('btn-win').addEventListener('click', ()=>closeTrade('已停利')); document.getElementById('btn-loss').addEventListener('click', ()=>closeTrade('已停損'));
 
+        // ============================================================================
+        // [效能瘦身核心] Batch DOM Update 渲染表格
+        // ============================================================================
         function renderPlans() {
-            const tb = document.getElementById('plan-table-body'); tb.innerHTML='';
-            let cc=0, wc=0, tp=0;
-
+            const tb = document.getElementById('plan-table-body'); tb.innerHTML=''; let cc=0, wc=0, tp=0, rowsHtml = '';
             const sortedPlans = [...state.plans].sort((a, b) => {
                 let vA, vB;
                 switch(state.planSortConfig.key) {
-                    case 'createdAt': vA = a.createdAt || 0; vB = b.createdAt || 0; break;
-                    case 'stock': vA = a.stock; vB = b.stock; break;
-                    case 'qty': vA = a.qty; vB = b.qty; break;
-                    case 'entry': vA = a.entry; vB = b.entry; break;
-                    case 'target': vA = a.target || 0; vB = b.target || 0; break;
-                    case 'stop': vA = a.stop; vB = b.stop; break;
-                    case 'status': {
-                        const order = {'持倉中': 1, '已停利': 2, '已停損': 3};
-                        vA = order[a.status] || 99;
-                        vB = order[b.status] || 99;
-                        break;
-                    }
-                    default: vA = a.createdAt || 0; vB = b.createdAt || 0; break;
+                    case 'stock': vA=a.stock; vB=b.stock; break; case 'qty': vA=a.qty; vB=b.qty; break; case 'entry': vA=a.entry; vB=b.entry; break; case 'target': vA=a.target||0; vB=b.target||0; break; case 'stop': vA=a.stop; vB=b.stop; break;
+                    case 'status': const o={'持倉中':1, '已停利':2, '已停損':3}; vA=o[a.status]||99; vB=o[b.status]||99; break;
+                    default: vA=a.createdAt||0; vB=b.createdAt||0; break;
                 }
-                if(vA === vB) {
-                    return (a.createdAt || 0) - (b.createdAt || 0);
-                }
-                const res = vA > vB ? 1 : -1;
-                return state.planSortConfig.asc ? res : -res;
+                if(vA === vB) return (a.createdAt||0) - (b.createdAt||0);
+                return state.planSortConfig.asc ? (vA > vB ? 1 : -1) : (vA > vB ? -1 : 1);
             });
 
             sortedPlans.forEach(i => {
                 const isC = i.status!=='持倉中'; if(isC){ cc++; if(i.status==='已停利') wc++; tp+=i.pnl||0; }
-                const codeMatch = i.stock.match(/\d{4}/);
-                const isF = codeMatch ? getEpsInfo(codeMatch[0], {}).futures : false;
-                
-                const fBg = isF ? "bg-sky-900/40 hover:bg-sky-800/50" : "hover:bg-gray-750";
-                const fB = isF ? '<span class="bg-sky-600 text-white text-[10px] px-1.5 py-0.5 rounded mr-1.5 align-middle shadow-sm font-medium">期</span>' : '';
-                
-                const tr = document.createElement('tr'); 
-                tr.className = `border-b border-gray-700/50 text-white transition text-sm ${fBg} ${isC?'opacity-50':''}`;
-                
-                const isChecked = selectedIds['plan'].has(i.id) ? 'checked' : '';
-
-                tr.innerHTML = `
-                    <td class="py-3 px-2 sm:px-3 text-center"><input type="checkbox" class="row-cb rounded border-gray-600 bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${i.id}" data-type="plan" ${isChecked}></td>
-                    <td class="py-3 px-3 sm:px-4 font-medium text-white">${fB}${i.stock}<div class="text-[10px] text-gray-400 mt-0.5">${i.note||''}</div></td>
-                    <td class="py-3 px-3 sm:px-4 text-white">${i.qty}</td>
-                    <td class="py-3 px-3 sm:px-4 text-white">${i.entry}</td>
-                    <td class="py-3 px-3 sm:px-4 tw-red font-bold">${i.target||'-'}</td>
-                    <td class="py-3 px-3 sm:px-4 tw-green font-bold">${i.stop}</td>
-                    <td class="py-3 px-3 sm:px-4"><span class="px-2 py-1 rounded-md text-xs font-medium ${i.status==='持倉中'?'bg-blue-900/80 text-blue-300':(i.status==='已停利'?'bg-red-900/80 text-red-300':'bg-green-900/80 text-green-300')}">${i.status}</span></td>
-                    <td class="py-3 px-3 sm:px-4">${!isC ? `<button onclick="openCloseModal('${i.id}',${i.target||i.entry})" class="text-xs bg-gray-700 hover:bg-gray-600 px-3 py-1.5 rounded-lg text-white transition shadow-sm">結算</button><button onclick="deletePlan('${i.id}')" class="text-gray-500 hover:text-red-400 ml-3 transition p-1"><i class="fa-solid fa-trash"></i></button>` : `${formatNumColor(i.pnl)}<button onclick="deletePlan('${i.id}')" class="text-gray-500 hover:text-red-400 ml-3 transition p-1"><i class="fa-solid fa-trash"></i></button>`}</td>
-                `; tb.appendChild(tr);
+                const codeMatch = i.stock.match(/\d{4}/), isF = codeMatch ? getEpsInfo(codeMatch[0], {}).futures : false;
+                rowsHtml += `
+                    <tr class="border-b border-gray-700/50 text-white transition text-sm ${isF ? "bg-sky-900/40 hover:bg-sky-800/50" : "hover:bg-gray-750"} ${isC?'opacity-50':''}">
+                        <td class="py-3 px-2 sm:px-3 text-center"><input type="checkbox" class="row-cb rounded border-gray-600 bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${i.id}" data-type="plan" ${selectedIds['plan'].has(i.id) ? 'checked' : ''}></td>
+                        <td class="py-3 px-3 sm:px-4 font-medium text-white">${isF ? '<span class="bg-sky-600 text-white text-[10px] px-1.5 py-0.5 rounded mr-1.5 align-middle shadow-sm font-medium">期</span>' : ''}${i.stock}<div class="text-[10px] text-gray-400 mt-0.5">${i.note||''}</div></td>
+                        <td class="py-3 px-3 sm:px-4 text-white">${i.qty}</td><td class="py-3 px-3 sm:px-4 text-white">${i.entry}</td><td class="py-3 px-3 sm:px-4 tw-red font-bold">${i.target||'-'}</td><td class="py-3 px-3 sm:px-4 tw-green font-bold">${i.stop}</td>
+                        <td class="py-3 px-3 sm:px-4"><span class="px-2 py-1 rounded-md text-xs font-medium ${i.status==='持倉中'?'bg-blue-900/80 text-blue-300':(i.status==='已停利'?'bg-red-900/80 text-red-300':'bg-green-900/80 text-green-300')}">${i.status}</span></td>
+                        <td class="py-3 px-3 sm:px-4">${!isC ? `<button onclick="openCloseModal('${i.id}',${i.target||i.entry})" class="text-xs bg-gray-700 hover:bg-gray-600 px-3 py-1.5 rounded-lg text-white transition shadow-sm">結算</button><button onclick="deletePlan('${i.id}')" class="text-gray-500 hover:text-red-400 ml-3 transition p-1"><i class="fa-solid fa-trash"></i></button>` : `${formatNumColor(i.pnl)}<button onclick="deletePlan('${i.id}')" class="text-gray-500 hover:text-red-400 ml-3 transition p-1"><i class="fa-solid fa-trash"></i></button>`}</td>
+                    </tr>`;
             });
-            document.getElementById('stat-total').textContent = cc;
-            document.getElementById('stat-winrate').textContent = cc>0?Math.round((wc/cc)*100)+'%':'0%';
-            
-            const pnlColor = tp > 0 ? 'tw-red' : (tp < 0 ? 'tw-green' : 'text-white');
-            document.getElementById('stat-pnl').textContent = tp.toString(); 
-            document.getElementById('stat-pnl').className = `text-2xl font-bold ${pnlColor}`;
-            
+            tb.innerHTML = rowsHtml;
+            document.getElementById('stat-total').textContent = cc; document.getElementById('stat-winrate').textContent = cc>0?Math.round((wc/cc)*100)+'%':'0%';
+            document.getElementById('stat-pnl').textContent = tp.toString(); document.getElementById('stat-pnl').className = `text-2xl font-bold ${tp > 0 ? 'tw-red' : (tp < 0 ? 'tw-green' : 'text-white')}`;
             updateBatchUI('plan');
         }
 
         // 初始化
         document.addEventListener('DOMContentLoaded', async () => {
-            // 1. 優先從本機 LocalStorage 載入歷史資料
+            renderDynamicTags(); // 執行資料驅動的標籤生成，為 HTML 瘦身
             loadLocalData();
-
-            // 2. 畫面重新整理後，自動清除所有篩選條件 (恢復預設)
-            const todayDate = getToday();
-            
-            // 重置內部狀態
-            state.filters = {
-                start: todayDate,
-                end: todayDate,
-                futuresOnly: false,
-                excludeNegativeGrowth: false,
-                tags: [],
-                minScore: 0
-            };
-            state.sortConfig = { key: 'createdAt', asc: false };
-            state.favSortConfig = { key: 'createdAt', asc: false };
-            state.planSortConfig = { key: 'createdAt', asc: false };
+            const today = getToday();
+            state.filters = { start: today, end: today, futuresOnly: false, excludeNegativeGrowth: false, tags: [], minScore: 0 };
+            state.sortConfig = { key: 'createdAt', asc: false }; state.favSortConfig = { key: 'createdAt', asc: false }; state.planSortConfig = { key: 'createdAt', asc: false };
             saveLocalData();
 
-            // 重置畫面 UI
-            document.getElementById('j-date').value = todayDate;
-            document.getElementById('filter-start').value = todayDate;
-            document.getElementById('filter-end').value = todayDate;
-            document.getElementById('filter-futures').checked = false;
-            document.getElementById('filter-exclude-negative-growth').checked = false;
-            document.getElementById('filter-score').value = "0";
-            
-            document.querySelectorAll('.filter-tag-cb').forEach(cb => cb.checked = false);
-            renderFilterTags();
+            document.getElementById('j-date').value = today; document.getElementById('filter-start').value = today; document.getElementById('filter-end').value = today;
+            document.getElementById('filter-futures').checked = false; document.getElementById('filter-exclude-negative-growth').checked = false; document.getElementById('filter-score').value = "0";
+            document.querySelectorAll('.filter-tag-cb').forEach(cb => cb.checked = false); renderFilterTags();
 
-            // 3. 更新畫面與列表
-            updateDatalists();
-            processAndRenderJournals();
-            renderFavorites();
-            renderPlans();
-
-            // 4. 若有同步碼則開啟雲端同步機制
-            updateSyncStatusUI();
-            if(isCloudMode()) {
-                await loadFromCloud();
-            }
+            updateDatalists(); processAndRenderJournals(); renderFavorites(); renderPlans();
+            updateSyncStatusUI(); if(isCloudMode()) await loadFromCloud();
         });
     </script>
 </body>
