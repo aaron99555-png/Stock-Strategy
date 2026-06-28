@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>萊恩飆股起漲手札</title>
+    <title>萊恩飆股起漲手札 - 跨裝置交易決策系統</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -91,7 +91,6 @@
                 <div class="bg-gray-800 rounded-xl p-4 sm:p-6 border-t-4 border-blue-500 shadow-xl lg:col-span-3 flex flex-col gap-4">
                     <div class="flex justify-between items-center border-b border-gray-700/50 pb-3">
                         <h2 class="font-bold text-blue-400 flex items-center text-lg sm:text-xl"><div class="bg-blue-500/20 p-1.5 rounded mr-2"><i class="fa-solid fa-pen-to-square"></i></div> 新增條件</h2>
-                        <div class="text-xs text-gray-400 bg-gray-700/50 px-2 py-1 rounded"> </div>
                     </div>
                     
                     <form id="journal-form" class="flex flex-col gap-4">
@@ -149,7 +148,8 @@
                                     <label class="cursor-pointer"><input type="checkbox" value="量價齊揚" class="hidden tag-input"><div class="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-600 text-gray-300 hover:bg-gray-700 transition" data-color="#22c55e">量價齊揚</div></label>
                                     <label class="cursor-pointer"><input type="checkbox" value="高成交值" class="hidden tag-input"><div class="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-600 text-gray-300 hover:bg-gray-700 transition" data-color="#14b8a6">高成交值</div></label>
                                     <label class="cursor-pointer"><input type="checkbox" value="法人加持" class="hidden tag-input"><div class="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-600 text-gray-300 hover:bg-gray-700 transition" data-color="#6366f1">法人加持</div></label>
-                                    <label class="cursor-pointer"><input type="checkbox" value="籌碼集中" class="hidden tag-input"><div class="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-600 text-gray-300 hover:bg-gray-700 transition" data-color="#a855f7">籌碼集中</div></label>
+                                    <label class="cursor-pointer"><input type="checkbox" value="5日籌碼集中" class="hidden tag-input"><div class="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-600 text-gray-300 hover:bg-gray-700 transition" data-color="#a855f7">5日籌碼集中</div></label>
+                                    <label class="cursor-pointer"><input type="checkbox" value="20日籌碼集中" class="hidden tag-input"><div class="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-600 text-gray-300 hover:bg-gray-700 transition" data-color="#c026d3">20日籌碼集中</div></label>
                                 </div>
                             </div>
 
@@ -237,7 +237,8 @@
                                     <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-700/50 p-1.5 rounded transition"><input type="checkbox" value="量價齊揚" class="filter-tag-cb w-3.5 h-3.5 accent-blue-500 cursor-pointer"><span class="text-xs text-gray-300">量價齊揚</span></label>
                                     <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-700/50 p-1.5 rounded transition"><input type="checkbox" value="高成交值" class="filter-tag-cb w-3.5 h-3.5 accent-blue-500 cursor-pointer"><span class="text-xs text-gray-300">高成交值</span></label>
                                     <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-700/50 p-1.5 rounded transition"><input type="checkbox" value="法人加持" class="filter-tag-cb w-3.5 h-3.5 accent-blue-500 cursor-pointer"><span class="text-xs text-gray-300">法人加持</span></label>
-                                    <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-700/50 p-1.5 rounded transition"><input type="checkbox" value="籌碼集中" class="filter-tag-cb w-3.5 h-3.5 accent-blue-500 cursor-pointer"><span class="text-xs text-gray-300">籌碼集中</span></label>
+                                    <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-700/50 p-1.5 rounded transition"><input type="checkbox" value="5日籌碼集中" class="filter-tag-cb w-3.5 h-3.5 accent-blue-500 cursor-pointer"><span class="text-xs text-gray-300">5日籌碼集中</span></label>
+                                    <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-700/50 p-1.5 rounded transition"><input type="checkbox" value="20日籌碼集中" class="filter-tag-cb w-3.5 h-3.5 accent-blue-500 cursor-pointer"><span class="text-xs text-gray-300">20日籌碼集中</span></label>
                                 </div>
                                 <div class="text-[10px] font-bold text-gray-400 border-b border-gray-700 pb-1 mb-1.5">📈 技術指標</div>
                                 <div class="grid grid-cols-2 gap-1">
@@ -264,6 +265,7 @@
                         <button class="btn-copy text-xs font-medium bg-sky-900/40 hover:bg-sky-600 text-sky-200 border border-sky-700/50 px-2.5 py-1.5 rounded-lg transition" data-mode="futures">股期</button>
                         <button class="btn-copy text-xs font-medium bg-sky-900/40 hover:bg-sky-600 text-sky-200 border border-sky-700/50 px-2.5 py-1.5 rounded-lg transition" data-mode="futures_score">股期分數</button>
                         <button class="btn-copy text-xs font-medium bg-green-900/40 hover:bg-green-600 text-green-200 border border-green-700/50 px-2.5 py-1.5 rounded-lg transition" data-mode="eps">EPS</button>
+                        <button class="btn-copy text-xs font-medium bg-orange-900/40 hover:bg-orange-600 text-orange-200 border border-orange-700/50 px-2.5 py-1.5 rounded-lg transition" data-mode="chip">籌碼集中</button>
                     </div>
                 </div>
 
@@ -793,7 +795,8 @@
             "月來越好": "bg-orange-900/40 text-orange-300 border-orange-800", "季不可失": "bg-amber-900/40 text-amber-300 border-amber-800", 
             "守株待兔": "bg-lime-900/40 text-lime-300 border-lime-800", "特別追蹤": "bg-violet-900/40 text-violet-300 border-violet-800", "量價齊揚": "bg-green-900/40 text-green-300 border-green-800", 
             "高成交值": "bg-teal-900/40 text-teal-300 border-teal-800", "法人加持": "bg-indigo-900/40 text-indigo-300 border-indigo-800", 
-            "籌碼集中": "bg-purple-900/40 text-purple-300 border-purple-800", 
+            "5日籌碼集中": "bg-purple-900/40 text-purple-300 border-purple-800",
+            "20日籌碼集中": "bg-fuchsia-900/40 text-fuchsia-300 border-fuchsia-800", 
             "OBV突破": "bg-emerald-900/40 text-emerald-300 border-emerald-800", "MACD突破": "bg-cyan-900/40 text-cyan-300 border-cyan-800", 
             "KD金叉": "bg-blue-900/40 text-blue-300 border-blue-800"
         };
@@ -1342,9 +1345,9 @@
 
                 // 統一所有列表的操作按鈕 (追蹤清單與主日誌一致)
                 const actionHtml = `
-                    <button class="mr-1 hover:scale-110 add-plan-btn text-green-500 bg-gray-800 p-1.5 rounded-lg transition" data-code="${item.code}" title="加入交易規劃"><i class="fa-solid fa-chess-knight"></i></button>
+                    <button class="mr-1 hover:scale-110 add-plan-btn text-green-500 bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-code="${item.code}" title="加入交易規劃"><i class="fa-solid fa-chess-knight"></i></button>
                     <button class="mr-1 hover:scale-110 fav-toggle-btn ${favColor} bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-id="${item.id}" title="${favTitle}">${favIcon}</button>
-                    <button class="text-gray-500 hover:text-red-400 del-btn bg-gray-800 p-1.5 rounded-lg transition" data-id="${item.id}" title="完全刪除紀錄"><i class="fa-solid fa-trash"></i></button>
+                    <button class="text-gray-500 hover:text-red-400 del-btn bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-id="${item.id}" title="完全刪除紀錄"><i class="fa-solid fa-trash"></i></button>
                 `;
 
                 const isChecked = selectedIds[listType].has(item.id) ? 'checked' : '';
@@ -1590,6 +1593,16 @@
                         const g = getEpsInfo(j.code,j).epsGrowth;
                         const gStr = g !== null ? (g * 100).toFixed(2) + '%' : '無';
                         text += `- [期] ${j.code} ${j.name} [${getScore(j.tags, getEpsInfo(j.code, j))}分] (預成長: ${gStr})${shortTags}\n`;
+                    });
+                }
+                else if(mode === 'chip') {
+                    const chipData = data.filter(j => j.tags && (j.tags.includes('5日籌碼集中') || j.tags.includes('20日籌碼集中')));
+                    if (chipData.length === 0) return showToast('目前無 5日/20日 籌碼集中標的', 'error');
+                    
+                    text = `| ${dateStr} 籌碼集中名單${condStr} |\n\n`;
+                    chipData.forEach(j => {
+                        let matchingTags = j.tags.filter(t => t === '5日籌碼集中' || t === '20日籌碼集中').join(' + ');
+                        text += `- ${j.code} ${j.name} [${matchingTags}]\n`;
                     });
                 }
                 executeCopy(text.trim() + copyFootnote);
