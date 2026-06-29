@@ -694,9 +694,9 @@
         nameInput.addEventListener('input', (e) => { const v = e.target.value.trim(); if(state.nameToCode[v]) codeInput.value = state.nameToCode[v]; updatePreview(state.nameToCode[v]); });
 
         // ============================================================================
-        // [防卡死優化] 送出後自動收起手機鍵盤
+        // [極致流暢優化] 送出後秒清空、秒聚焦，背景同步
         // ============================================================================
-        document.getElementById('journal-form').addEventListener('submit', async (e) => {
+        document.getElementById('journal-form').addEventListener('submit', (e) => {
             e.preventDefault();
             const code = codeInput.value.trim(), date = document.getElementById('j-date').value, name = nameInput.value.trim(), notes = document.getElementById('j-notes').value.trim();
             const tagInput = document.querySelector('.tag-input:checked'), tag = tagInput ? tagInput.value : null, docId = `${code}_${date}`;
@@ -717,13 +717,16 @@
             existingIdx !== -1 ? state.journals[existingIdx] = payload : state.journals.push(payload);
 
             saveLocalData(); processAndRenderJournals(); if(document.getElementById('module-favorites').classList.contains('active')) renderFavorites();
-            await putDataToCloud(`journals/${docId}`, payload);
             
+            // 1. 立刻清空 UI，不等雲端，消滅延遲感
             codeInput.value=''; nameInput.value=''; document.getElementById('j-notes').value=''; previewDiv.classList.add('hidden'); 
             
-            // 強制收起手機鍵盤，解決滑不動的問題
-            if (document.activeElement) document.activeElement.blur(); 
+            // 2. 游標立刻跳回「代號」，方便鍵盤不收起直接快速連打
+            setTimeout(() => { codeInput.focus(); }, 10);
             showToast('儲存成功！');
+
+            // 3. 雲端同步放背景執行，不卡死畫面
+            putDataToCloud(`journals/${docId}`, payload).catch(err => console.log('Sync Error', err));
         });
 
         document.getElementById('excel-upload').addEventListener('change', (e) => {
@@ -939,7 +942,6 @@
         cCodeInput.addEventListener('input', (e) => { const v = e.target.value.trim(); if(state.codeToName[v]) cNameInput.value = state.codeToName[v]; });
         cNameInput.addEventListener('input', (e) => { const v = e.target.value.trim(); if(state.nameToCode[v]) cCodeInput.value = state.nameToCode[v]; });
         
-        // 防卡死優化：計算機送出後收起鍵盤
         document.getElementById('calc-form').addEventListener('submit', (e) => {
             e.preventDefault(); const h = parseFloat(document.getElementById('c-high').value), l = parseFloat(document.getElementById('c-low').value), c = parseFloat(document.getElementById('c-close').value);
             if (isNaN(h)||isNaN(l)||isNaN(c)||h<l) return showToast('輸入無效','error');
@@ -947,7 +949,6 @@
             document.getElementById('pv-pp').textContent = pp.toFixed(2); document.getElementById('pv-r1').textContent = ((2*pp)-l).toFixed(2); document.getElementById('pv-r2').textContent = (pp+diff).toFixed(2); document.getElementById('pv-s1').textContent = ((2*pp)-h).toFixed(2); document.getElementById('pv-s2').textContent = (pp-diff).toFixed(2);
             document.getElementById('cdp-cdp').textContent = cdp.toFixed(2); document.getElementById('cdp-ah').textContent = (cdp+diff).toFixed(2); document.getElementById('cdp-nh').textContent = ((2*cdp)-l).toFixed(2); document.getElementById('cdp-nl').textContent = ((2*cdp)-h).toFixed(2); document.getElementById('cdp-al').textContent = (cdp-diff).toFixed(2);
             [0.236, 0.382, 0.5, 0.618, 0.786].forEach(f => document.getElementById(`fb-${f.toString().substring(2)}`).textContent = (h - diff*f).toFixed(2)); showToast('計算完成');
-            if (document.activeElement) document.activeElement.blur(); 
         });
 
         const getCalcText = (type) => {
@@ -962,14 +963,21 @@
         document.querySelectorAll('.btn-copy-calc').forEach(b => b.addEventListener('click', e => { const t = getCalcText(e.currentTarget.dataset.target); t ? executeCopy(t + copyFootnote) : showToast('請先計算','error'); }));
         document.getElementById('btn-copy-calc-all').addEventListener('click', () => { const t = getCalcText('all'); t ? executeCopy(t + copyFootnote) : showToast('請先計算','error'); });
 
-        // 防卡死優化：交易規劃送出後收起鍵盤
         const pEntry = document.getElementById('p-entry'), pStop = document.getElementById('p-stop');
         pEntry.addEventListener('input', e => { const v = parseFloat(e.target.value); if(!isNaN(v)) pStop.value = (v*0.95).toFixed(2); });
-        document.getElementById('plan-form').addEventListener('submit', async(e)=>{
+        
+        document.getElementById('plan-form').addEventListener('submit', (e)=>{
             e.preventDefault(); const id = generateId(), stock = document.getElementById('p-stock').value.trim(), qty = parseInt(document.getElementById('p-qty').value)||1;
             const payload = { id, stock, qty, entry: parseFloat(pEntry.value), stop: parseFloat(pStop.value), target: parseFloat(document.getElementById('p-target').value)||null, note: document.getElementById('p-note').value.trim(), status: '持倉中', pnl: 0, createdAt: Date.now(), updatedAt: Date.now() };
-            state.plans.push(payload); saveLocalData(); renderPlans(); await putDataToCloud(`plans/${id}`, payload); showToast('計畫建立成功'); e.target.reset();
-            if (document.activeElement) document.activeElement.blur(); 
+            state.plans.push(payload); saveLocalData(); renderPlans(); 
+            
+            // 立刻清空並將游標移回標的代號
+            e.target.reset();
+            setTimeout(() => { document.getElementById('p-stock').focus(); }, 10);
+            showToast('計畫建立成功');
+
+            // 雲端同步放背景執行
+            putDataToCloud(`plans/${id}`, payload).catch(err => console.log('Sync Error', err));
         });
 
         window.openCloseModal = (id, def) => { document.getElementById('modal-plan-id').value=id; document.getElementById('modal-exit-price').value=def||''; document.getElementById('close-plan-modal').classList.remove('hidden'); };
