@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-TW" class="dark">
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -59,15 +59,18 @@
 
     <!-- Navigation -->
     <nav class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-50 transition-colors duration-300">
-        <div class="w-full xl:w-[96%] max-w-[1600px] mx-auto px-2 sm:px-6 lg:px-8">
+        <div class="w-full xl:w-[96%] max-w-[1600px] mx-auto px-3 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16 relative">
-                
-                <!-- Logo 與 標題 (修正：取消絕對置中，解決手機版按鈕重疊問題) -->
-                <div class="flex items-center gap-1.5 sm:gap-3 flex-shrink-0 max-w-[60%] sm:max-w-none overflow-hidden">
-                    <div class="bg-blue-600/10 dark:bg-blue-600/20 p-1.5 sm:p-2 rounded-lg flex-shrink-0"><i class="fa-solid fa-chart-line text-blue-600 dark:text-blue-500 text-sm sm:text-xl"></i></div>
-                    <span class="cool-title font-bold text-[16px] sm:text-xl md:text-2xl tracking-wider truncate">萊恩飆股起漲手札</span>
-                    <!-- 雲端狀態：手機版隱藏 (hidden md:flex)，節省空間 -->
-                    <span id="auth-status" class="hidden md:flex ml-1 sm:ml-2 w-7 h-7 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-full shadow-sm items-center justify-center cursor-help flex-shrink-0"><i class="fa-solid fa-spinner fa-spin text-yellow-500 text-xs"></i></span>
+                <!-- 手機版置中標題 -->
+                <div class="absolute inset-0 flex items-center justify-center pointer-events-none md:hidden z-0">
+                    <span class="cool-title text-[17px] font-bold tracking-widest">萊恩飆股起漲手札</span>
+                </div>
+
+                <!-- Logo 與 桌面版標題 -->
+                <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0 relative z-10">
+                    <div class="bg-blue-600/10 dark:bg-blue-600/20 p-2 rounded-lg"><i class="fa-solid fa-chart-line text-blue-600 dark:text-blue-500 text-lg sm:text-xl"></i></div>
+                    <span class="cool-title font-bold text-xl sm:text-2xl tracking-wider hidden md:block">萊恩飆股起漲手札</span>
+                    <span id="auth-status" class="ml-1 sm:ml-2 w-7 h-7 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-full shadow-sm flex items-center justify-center cursor-help"><i class="fa-solid fa-spinner fa-spin text-yellow-500 text-xs"></i></span>
                 </div>
 
                 <!-- Desktop Navigation Buttons -->
@@ -80,12 +83,12 @@
 
                 <!-- System Theme & Backup Tools -->
                 <div class="flex items-center gap-1 sm:gap-2 flex-shrink-0 relative z-10">
-                    <button id="theme-toggle" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-yellow-400 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors shadow-inner" title="切換深淺色模式">
-                        <i class="fa-solid fa-moon dark:hidden text-sm sm:text-base"></i><i class="fa-solid fa-sun hidden dark:block text-sm sm:text-base"></i>
+                    <button id="theme-toggle" class="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-yellow-400 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors shadow-inner" title="切換深淺色模式">
+                        <i class="fa-solid fa-moon dark:hidden"></i><i class="fa-solid fa-sun hidden dark:block"></i>
                     </button>
-                    <button id="btn-sync-modal" class="text-xs sm:text-sm bg-blue-600 hover:bg-blue-500 text-white px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm border border-transparent flex items-center font-medium"><i class="fa-solid fa-cloud-arrow-up sm:mr-1.5"></i><span class="hidden sm:inline">跨裝置同步</span></button>
-                    <button id="btn-import-backup" class="text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center"><i class="fa-solid fa-upload sm:mr-1.5"></i><span class="hidden sm:inline">匯入</span></button>
-                    <button id="btn-export-backup" class="text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center"><i class="fa-solid fa-download sm:mr-1.5"></i><span class="hidden sm:inline">匯出</span></button>
+                    <button id="btn-sync-modal" class="text-xs sm:text-sm bg-blue-600 hover:bg-blue-500 text-white px-2.5 sm:px-3 py-1.5 rounded-lg transition shadow-sm border border-transparent flex items-center font-medium"><i class="fa-solid fa-cloud-arrow-up sm:mr-1.5"></i><span class="hidden sm:inline">跨裝置同步</span></button>
+                    <button id="btn-import-backup" class="text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 px-2.5 sm:px-3 py-1.5 rounded-lg transition shadow-sm flex items-center"><i class="fa-solid fa-upload sm:mr-1.5"></i><span class="hidden sm:inline">匯入</span></button>
+                    <button id="btn-export-backup" class="text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 px-2.5 sm:px-3 py-1.5 rounded-lg transition shadow-sm flex items-center"><i class="fa-solid fa-download sm:mr-1.5"></i><span class="hidden sm:inline">匯出</span></button>
                     <input type="file" id="backup-file" accept=".xlsx" class="hidden">
                 </div>
             </div>
@@ -105,34 +108,35 @@
         <div id="module-journal" class="tab-content active">
             <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-5 mb-6">
                 
+                <!-- 新增條件區塊 (行動優先佈局防擠壓跑版) -->
                 <div class="card-panel p-4 sm:p-6 border-t-4 border-blue-500 flex flex-col gap-4 lg:col-span-3">
                     <div class="flex justify-between items-center border-b border-gray-200 dark:border-gray-700/50 pb-3">
                         <h2 class="font-bold text-blue-600 dark:text-blue-400 flex items-center text-lg sm:text-xl"><div class="bg-blue-500/10 dark:bg-blue-500/20 p-1.5 rounded mr-2"><i class="fa-solid fa-pen-to-square"></i></div> 新增條件</h2>
                     </div>
                     
                     <form id="journal-form" class="flex flex-col gap-4" action="javascript:void(0);">
-                        <!-- 修正：手機版網格分開(grid-cols-2)，防止日期欄位過長超出視窗 -->
-                        <div class="grid grid-cols-2 md:grid-cols-6 gap-3 sm:gap-4">
-                            <div class="col-span-1 md:col-span-1">
+                        <!-- 修正：手機版網格分開，全面防止日期與代號等欄位超出寬度 -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-3 sm:gap-4">
+                            <div class="md:col-span-1">
                                 <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">日期</label>
                                 <input type="date" id="j-date" required class="input-base">
                             </div>
-                            <div class="col-span-1 md:col-span-1">
+                            <div class="md:col-span-1">
                                 <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">代號</label>
                                 <input type="text" id="j-code" list="stock-codes-list" required placeholder="如: 2330" class="input-base" autocomplete="off" enterkeyhint="send">
                             </div>
-                            <div class="col-span-1 md:col-span-1">
+                            <div class="md:col-span-1">
                                 <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">股名</label>
                                 <input type="text" id="j-name" list="stock-names-list" required placeholder="自動帶入" class="input-base" autocomplete="off" enterkeyhint="send">
                             </div>
-                            <div class="col-span-1 sm:col-span-2 md:col-span-3">
+                            <div class="sm:col-span-2 md:col-span-3">
                                 <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">備註紀錄</label>
                                 <input type="text" id="j-notes" placeholder="可自訂筆記..." class="input-base" autocomplete="off" enterkeyhint="send">
                             </div>
-                            <div id="j-preview" class="col-span-2 md:col-span-6 bg-gray-50 dark:bg-gray-900/60 p-3 rounded-lg border border-gray-200 dark:border-gray-600/50 hidden flex-wrap items-center gap-x-4 gap-y-2 shadow-inner mt-1"></div>
+                            <div id="j-preview" class="col-span-1 sm:col-span-2 md:col-span-6 bg-gray-50 dark:bg-gray-900/60 p-3 rounded-lg border border-gray-200 dark:border-gray-600/50 hidden flex-wrap items-center gap-x-4 gap-y-2 shadow-inner mt-1"></div>
                         </div>
 
-                        <!-- 策略標籤 -->
+                        <!-- 策略標籤 (由 JS 動態生成，大幅減輕 HTML 重複性肥大) -->
                         <div class="bg-gray-50 dark:bg-gray-900/40 p-4 rounded-xl border border-gray-200 dark:border-gray-700/50 flex flex-col gap-3 shadow-inner">
                             <label class="block text-xs text-gray-500 dark:text-gray-400 font-medium tracking-wide">策略標籤 <span class="text-gray-400 dark:text-gray-500 font-normal">(無點選亦可新增，點擊選取/取消)</span></label>
                             <div id="form-tags-container" class="space-y-3"></div>
@@ -619,15 +623,13 @@
             const key = localStorage.getItem('ryan_sync_key'), btn = document.getElementById('btn-sync-modal'), st = document.getElementById('auth-status');
             if(key) {
                 btn.innerHTML = `<i class="fa-solid fa-cloud text-green-300 sm:mr-1.5"></i><span class="hidden sm:inline">${key}</span>`;
-                btn.className = "text-xs sm:text-sm bg-green-50 dark:bg-green-900/50 border-green-200 dark:border-green-500/50 text-green-600 dark:text-green-300 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm border flex items-center font-medium";
-                st.className = "hidden md:flex ml-1 sm:ml-2 w-7 h-7 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-full shadow-sm items-center justify-center cursor-help flex-shrink-0";
-                st.innerHTML = `<i class="fa-solid fa-cloud text-green-500 dark:text-green-400 text-xs"></i>`; 
+                btn.className = "text-xs sm:text-sm bg-green-900/50 border-green-500/50 text-green-300 px-2.5 sm:px-3 py-1.5 rounded-lg transition shadow-sm border flex items-center font-medium";
+                st.innerHTML=`<i class="fa-solid fa-cloud text-green-500 dark:text-green-400 text-sm"></i>`; 
                 if(cloudSyncInterval) clearInterval(cloudSyncInterval); cloudSyncInterval = setInterval(loadFromCloud, 5000);
             } else {
                 btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up sm:mr-1.5"></i><span class="hidden sm:inline">跨裝置同步</span>`;
-                btn.className = "text-xs sm:text-sm bg-blue-600 hover:bg-blue-500 text-white px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm border border-transparent flex items-center font-medium";
-                st.className = "hidden md:flex ml-1 sm:ml-2 w-7 h-7 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-full shadow-sm items-center justify-center cursor-help flex-shrink-0";
-                st.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-yellow-500 text-xs"></i>`; 
+                btn.className = "text-xs sm:text-sm bg-blue-600 hover:bg-blue-500 text-white px-2.5 sm:px-3 py-1.5 rounded-lg transition shadow-sm border border-transparent flex items-center font-medium";
+                st.innerHTML=`<i class="fa-solid fa-floppy-disk text-gray-400 text-sm"></i>`; 
                 if(cloudSyncInterval) clearInterval(cloudSyncInterval);
             }
         };
@@ -909,9 +911,8 @@
                 const mode = e.currentTarget.dataset.mode; let data = getFilteredAndSortedData(state.journals).filter(j => !(j.tags && j.tags.includes('特別追蹤')));
                 if(data.length===0) return showToast('清單為空 (已排除特別追蹤)','error');
                 
-                let dStr = state.filters.start === state.filters.end ? state.filters.start : `${state.filters.start.substring(5)}~${state.filters.end.substring(5)}`, tStr = state.filters.tags.length > 0 ? ` [${state.filters.tags.join('+')}]` : '', cond = [];
-                if(state.filters.futuresOnly) cond.push('僅股期'); if(state.filters.excludeNegativeGrowth) cond.push('排除負成長'); if(state.filters.minScore > 0) cond.push(`${state.filters.minScore}分以上`);
-                let cStr = cond.length > 0 ? ` (${cond.join(', ')})` : '', text = `| ${dStr} 篩選名單${tStr}${cStr} |\n\n`;
+                let dStr = state.filters.start === state.filters.end ? state.filters.start : `${state.filters.start.substring(5)}~${state.filters.end.substring(5)}`;
+                let text = `| ${dStr} 多重篩選漏斗 |\n\n`;
 
                 if(mode === 'time') {
                     data.sort((a,b) => { const d = new Date(a.date) - new Date(b.date); return d !== 0 ? d : (a.createdAt||0) - (b.createdAt||0); });
@@ -939,7 +940,7 @@
                 else if(mode === 'chip') {
                     const cData = data.filter(j => j.tags && (j.tags.includes('5日籌碼集中') || j.tags.includes('20日籌碼集中')));
                     if (cData.length === 0) return showToast('目前無 5日/20日 籌碼集中標的', 'error');
-                    text = `| ${dStr} 籌碼集中名單${cStr} |\n\n`; cData.forEach(j => text += `- ${j.code} ${j.name} [${j.tags.filter(t => t === '5日籌碼集中' || t === '20日籌碼集中').join(' + ')}]\n`);
+                    text = `| ${dStr} 多重篩選漏斗 |\n\n`; cData.forEach(j => text += `- ${j.code} ${j.name} [${j.tags.filter(t => t === '5日籌碼集中' || t === '20日籌碼集中').join(' + ')}]\n`);
                 }
                 executeCopy(text.trim() + copyFootnote);
             });
