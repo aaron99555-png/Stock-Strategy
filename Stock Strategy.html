@@ -55,19 +55,16 @@
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen flex flex-col antialiased">
 
-    <!-- Navigation -->
     <nav class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-50 transition-colors duration-300">
         <div class="w-full xl:w-[96%] max-w-[1600px] mx-auto px-2 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16 relative">
                 
-                <!-- 標題靠左並排 -->
                 <div class="flex items-center gap-1.5 sm:gap-3 flex-shrink-0 relative z-10 max-w-[65%] sm:max-w-none overflow-hidden">
                     <div class="bg-blue-600/10 dark:bg-blue-600/20 p-1.5 sm:p-2 rounded-lg flex-shrink-0"><i class="fa-solid fa-chart-line text-blue-600 dark:text-blue-500 text-sm sm:text-xl"></i></div>
                     <span class="cool-title font-bold text-[15px] sm:text-xl md:text-2xl tracking-wider truncate">萊恩飆股起漲手札</span>
                     <span id="auth-status" class="hidden md:flex ml-1 sm:ml-2 w-7 h-7 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-full shadow-sm items-center justify-center cursor-help flex-shrink-0"><i class="fa-solid fa-spinner fa-spin text-yellow-500 text-xs"></i></span>
                 </div>
 
-                <!-- Desktop Navigation Buttons -->
                 <div class="hidden lg:flex flex-1 justify-center space-x-2 relative z-10">
                     <button class="nav-btn px-4 py-2 rounded-lg font-bold text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-900 shadow-inner transition text-sm" data-target="module-journal" data-color="blue"><i class="fa-solid fa-book-journal-whills mr-2"></i>選股日誌</button>
                     <button class="nav-btn px-4 py-2 rounded-lg font-bold text-gray-500 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition text-sm" data-target="module-calculator" data-color="purple"><i class="fa-solid fa-calculator mr-2"></i>支撐壓力</button>
@@ -75,7 +72,6 @@
                     <button class="nav-btn px-4 py-2 rounded-lg font-bold text-gray-500 dark:text-gray-400 hover:text-yellow-600 dark:hover:text-yellow-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition text-sm" data-target="module-favorites" data-color="yellow"><i class="fa-solid fa-star mr-2"></i>追蹤清單</button>
                 </div>
 
-                <!-- System Theme & Backup Tools -->
                 <div class="flex items-center gap-1 sm:gap-2 flex-shrink-0 relative z-10">
                     <button id="theme-toggle" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-yellow-400 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors shadow-inner" title="切換深淺色模式">
                         <i class="fa-solid fa-moon dark:hidden text-sm sm:text-base"></i><i class="fa-solid fa-sun hidden dark:block text-sm sm:text-base"></i>
@@ -87,7 +83,6 @@
                 </div>
             </div>
         </div>
-        <!-- Mobile Navigation Bottom Bar -->
         <div class="lg:hidden border-t border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-800/95 backdrop-blur px-2 py-2 flex gap-2 overflow-x-auto scrollbar-hide">
             <button class="nav-btn-mobile flex-shrink-0 px-4 py-2 text-sm font-medium rounded-lg bg-blue-50 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-500/50 shadow-sm" data-target="module-journal">日誌</button>
             <button class="nav-btn-mobile flex-shrink-0 px-4 py-2 text-sm font-medium rounded-lg text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition" data-target="module-calculator">支撐壓力</button>
@@ -98,7 +93,6 @@
 
     <main class="flex-grow w-full xl:w-[96%] max-w-[1600px] mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-6">
 
-        <!-- Module 1: Stock Journal -->
         <div id="module-journal" class="tab-content active">
             <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-5 mb-6">
                 
@@ -108,7 +102,6 @@
                     </div>
                     
                     <form id="journal-form" class="flex flex-col gap-4" action="javascript:void(0);">
-                        <!-- 修正：手機版網格 12 等分配置 (4:4:4)，完美對稱防溢出 -->
                         <div class="grid grid-cols-12 md:grid-cols-12 gap-1.5 sm:gap-4">
                             <div class="col-span-4 md:col-span-2">
                                 <label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">日期</label>
@@ -126,11 +119,9 @@
                                 <label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">備註紀錄</label>
                                 <input type="text" id="j-notes" placeholder="可自訂筆記..." class="input-base text-xs sm:text-sm" autocomplete="off" enterkeyhint="send">
                             </div>
-                            <!-- 參考資料高亮 -->
                             <div id="j-preview" class="col-span-12 bg-blue-50 dark:bg-sky-900/40 p-3 rounded-lg border border-blue-200 dark:border-sky-700/50 hidden flex-wrap items-center gap-x-4 gap-y-2 shadow-inner mt-1 text-sm"></div>
                         </div>
 
-                        <!-- 策略標籤 -->
                         <div class="bg-gray-50 dark:bg-gray-900/40 p-4 rounded-xl border border-gray-200 dark:border-gray-700/50 flex flex-col gap-3 shadow-inner">
                             <label class="block text-xs text-gray-500 dark:text-gray-400 font-medium tracking-wide">策略標籤 <span class="text-gray-400 dark:text-gray-500 font-normal">(無點選亦可新增，點擊選取/取消)</span></label>
                             <div id="form-tags-container" class="space-y-3"></div>
@@ -142,7 +133,6 @@
                     </form>
                 </div>
 
-                <!-- 個股資料庫設定 -->
                 <div class="card-panel p-5 border-t-4 border-gray-500 flex flex-col justify-between lg:col-span-1">
                     <div>
                         <h2 class="font-bold text-gray-700 dark:text-gray-300 flex items-center mb-3 text-lg sm:text-xl"><div class="bg-gray-100 dark:bg-gray-700 p-1.5 rounded mr-2"><i class="fa-solid fa-database"></i></div> 個股資料庫</h2>
@@ -152,29 +142,27 @@
                 </div>
             </div>
 
-            <!-- 下方：過濾與清單 -->
             <div class="card-panel border-t-4 border-t-blue-500 flex flex-col h-full min-h-[500px]">
                 <div class="p-4 border-b border-gray-200 dark:border-gray-700/50 bg-gray-50/80 dark:bg-gray-800/80 rounded-t-xl flex flex-col 2xl:flex-row justify-between items-start 2xl:items-center gap-4">
                     
-                    <!-- Filter Area -->
                     <div class="flex flex-wrap items-center gap-2 sm:gap-3 w-full 2xl:w-auto">
                         <div class="flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50">
                             <span class="text-xs text-gray-500 dark:text-gray-400 px-2"><i class="fa-solid fa-filter mr-1"></i>區間</span>
-                            <input type="date" id="filter-start" class="bg-transparent text-gray-900 dark:text-white text-base sm:text-sm outline-none px-1">
+                            <input type="date" id="filter-start" class="filter-start bg-transparent text-gray-900 dark:text-white text-base sm:text-sm outline-none px-1">
                             <span class="text-gray-400 mx-1">-</span>
-                            <input type="date" id="filter-end" class="bg-transparent text-gray-900 dark:text-white text-base sm:text-sm outline-none px-1">
+                            <input type="date" id="filter-end" class="filter-end bg-transparent text-gray-900 dark:text-white text-base sm:text-sm outline-none px-1">
                         </div>
                         
                         <label class="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white dark:bg-gray-900/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-700/50 transition hover:bg-gray-50 dark:hover:bg-gray-800">
-                            <input type="checkbox" id="filter-futures" class="rounded border-gray-300 dark:border-gray-600 text-sky-500 focus:ring-sky-500 w-3.5 h-3.5 sm:w-4 sm:h-4">
+                            <input type="checkbox" id="filter-futures" class="filter-futures rounded border-gray-300 dark:border-gray-600 text-sky-500 focus:ring-sky-500 w-3.5 h-3.5 sm:w-4 sm:h-4">
                             <span class="text-xs sm:text-sm text-sky-600 dark:text-sky-400 font-medium whitespace-nowrap">僅含股期</span>
                         </label>
                         <label class="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white dark:bg-gray-900/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-700/50 transition hover:bg-gray-50 dark:hover:bg-gray-800">
-                            <input type="checkbox" id="filter-exclude-negative-growth" class="rounded border-gray-300 dark:border-gray-600 text-green-500 focus:ring-green-500 w-3.5 h-3.5 sm:w-4 sm:h-4">
+                            <input type="checkbox" id="filter-exclude-negative-growth" class="filter-exclude-negative-growth rounded border-gray-300 dark:border-gray-600 text-green-500 focus:ring-green-500 w-3.5 h-3.5 sm:w-4 sm:h-4">
                             <span class="text-xs sm:text-sm text-green-600 dark:text-green-400 font-medium whitespace-nowrap">排除負成長</span>
                         </label>
 
-                        <select id="filter-score" class="bg-white dark:bg-gray-900/50 text-gray-900 dark:text-white text-base sm:text-sm border border-gray-300 dark:border-gray-700/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 focus:ring-2 focus:ring-blue-500 outline-none transition hover:bg-gray-50 dark:hover:bg-gray-800">
+                        <select id="filter-score" class="filter-score bg-white dark:bg-gray-900/50 text-gray-900 dark:text-white text-base sm:text-sm border border-gray-300 dark:border-gray-700/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 focus:ring-2 focus:ring-blue-500 outline-none transition hover:bg-gray-50 dark:hover:bg-gray-800">
                             <option value="0">分數不限</option>
                             <option value="1">1分(含)以上</option>
                             <option value="2">2分(含)以上</option>
@@ -196,7 +184,6 @@
                         </button>
                     </div>
 
-                    <!-- Copy Features Toolbar -->
                     <div class="flex flex-wrap gap-1.5 sm:gap-2 w-full 2xl:w-auto justify-start 2xl:justify-end border-t 2xl:border-t-0 border-gray-200 dark:border-gray-700 pt-3 2xl:pt-0">
                         <span class="text-xs text-gray-400 dark:text-gray-500 mr-1 flex items-center font-medium hidden sm:flex">複製:</span>
                         <button class="btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="selected">複製選擇</button>
@@ -209,13 +196,11 @@
                     </div>
                 </div>
 
-                <!-- Batch Delete Bar -->
                 <div id="batch-bar-journal" class="hidden bg-red-50 dark:bg-red-900/20 border-b border-gray-200 dark:border-gray-700/50 p-2 sm:p-3 justify-between items-center transition-all">
                     <span class="text-xs sm:text-sm text-red-600 dark:text-red-400 font-medium"><i class="fa-solid fa-check-double mr-1.5"></i>已選擇 <span id="batch-count-journal" class="font-bold">0</span> 筆資料</span>
                     <button onclick="confirmBatchDelete('journal')" class="bg-red-600 hover:bg-red-500 text-white text-xs sm:text-sm font-medium px-3 sm:px-4 py-1.5 rounded-lg transition shadow-sm">批次刪除</button>
                 </div>
 
-                <!-- Table Content Grid -->
                 <div class="overflow-x-auto flex-grow relative rounded-b-xl w-full">
                     <table class="min-w-full text-left text-sm whitespace-nowrap table-auto w-full">
                         <thead class="bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400 sticky top-0 z-10 shadow-sm font-medium border-b border-gray-200 dark:border-gray-700">
@@ -241,7 +226,6 @@
             </div>
         </div>
 
-        <!-- Module 2: Support/Resistance Calculator -->
         <div id="module-calculator" class="tab-content">
             <div class="card-panel p-4 sm:p-6 border-t-4 border-purple-500 mb-6">
                 <h2 class="font-bold text-purple-600 dark:text-purple-400 mb-5 border-b border-gray-200 dark:border-gray-700/50 pb-3 text-lg sm:text-xl flex items-center"><div class="bg-purple-500/10 dark:bg-purple-500/20 p-1.5 rounded mr-2"><i class="fa-solid fa-calculator"></i></div> 輸入數據</h2>
@@ -259,7 +243,6 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                <!-- CDP Panel -->
                 <div class="card-panel p-4 sm:p-5 border border-gray-200 dark:border-gray-700/50 shadow-md relative group">
                     <div class="flex justify-between items-center mb-4 border-b border-gray-200 dark:border-gray-700/50 pb-2"><h3 class="font-bold text-blue-600 dark:text-blue-400 text-base sm:text-lg">CDP 短線當沖</h3><button class="btn-copy-calc text-gray-400 hover:text-gray-700 dark:hover:text-white bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-blue-600 w-7 h-7 sm:w-8 sm:h-8 rounded flex items-center justify-center transition" data-target="cdp"><i class="fa-solid fa-copy"></i></button></div>
                     <div class="space-y-2 sm:space-y-2.5 text-sm">
@@ -270,7 +253,6 @@
                         <div class="flex justify-between"><span class="text-gray-500 dark:text-gray-400">追賣(AL)</span><span class="font-bold tw-green" id="cdp-al">-</span></div>
                     </div>
                 </div>
-                <!-- Pivot Panel -->
                 <div class="card-panel p-4 sm:p-5 border border-gray-200 dark:border-gray-700/50 shadow-md relative group">
                     <div class="flex justify-between items-center mb-4 border-b border-gray-200 dark:border-gray-700/50 pb-2"><h3 class="font-bold text-indigo-600 dark:text-indigo-400 text-base sm:text-lg">Pivot 波段樞軸</h3><button class="btn-copy-calc text-gray-400 hover:text-gray-700 dark:hover:text-white bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-indigo-600 w-7 h-7 sm:w-8 sm:h-8 rounded flex items-center justify-center transition" data-target="pivot"><i class="fa-solid fa-copy"></i></button></div>
                     <div class="space-y-2 sm:space-y-2.5 text-sm">
@@ -281,7 +263,6 @@
                         <div class="flex justify-between"><span class="text-gray-500 dark:text-gray-400">支撐二(S2)</span><span class="font-bold tw-green" id="pv-s2">-</span></div>
                     </div>
                 </div>
-                <!-- Fibonacci Panel -->
                 <div class="card-panel p-4 sm:p-5 border border-gray-200 dark:border-gray-700/50 shadow-md relative group md:col-span-2 lg:col-span-1">
                     <div class="flex justify-between items-center mb-4 border-b border-gray-200 dark:border-gray-700/50 pb-2"><h3 class="font-bold text-amber-600 dark:text-amber-400 text-base sm:text-lg">費波那契回撤</h3><button class="btn-copy-calc text-gray-400 hover:text-gray-700 dark:hover:text-white bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-amber-600 w-7 h-7 sm:w-8 sm:h-8 rounded flex items-center justify-center transition" data-target="fibo"><i class="fa-solid fa-copy"></i></button></div>
                     <div class="space-y-2 sm:space-y-2.5 text-sm">
@@ -295,7 +276,6 @@
             </div>
         </div>
 
-        <!-- Module 3: Trading Plan -->
         <div id="module-plan" class="tab-content">
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
                 <div class="card-panel border-l-4 border-blue-500 p-4 sm:p-5 flex items-center"><div class="bg-blue-500/10 dark:bg-blue-500/20 p-3 rounded-full mr-4"><i class="fa-solid fa-chart-pie text-blue-600 dark:text-blue-400 text-xl"></i></div><div><div class="text-sm text-gray-500 dark:text-gray-400 font-medium">總交易筆數</div><div class="text-2xl font-bold text-gray-900 dark:text-white" id="stat-total">0</div></div></div>
@@ -342,34 +322,32 @@
             </div>
         </div>
 
-        <!-- Module 4: Favorites -->
         <div id="module-favorites" class="tab-content">
             <div class="card-panel border-t-4 border-yellow-500 flex flex-col min-h-[500px]">
                 <div class="p-4 border-b border-gray-200 dark:border-gray-700/50 bg-gray-50/80 dark:bg-gray-800/80 rounded-t-xl flex justify-between items-center">
                     <h2 class="font-bold text-yellow-600 dark:text-yellow-400 text-lg sm:text-xl flex items-center"><div class="bg-yellow-500/10 dark:bg-yellow-500/20 p-1.5 rounded mr-2"><i class="fa-solid fa-star"></i></div> 追蹤清單</h2>
-                    <span class="text-xs sm:text-sm text-gray-400 bg-white dark:bg-gray-900/50 px-2 sm:px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700/50">清單與主日誌獨立篩選</span>
+                    <span class="text-xs sm:text-sm text-gray-400 bg-white dark:bg-gray-900/50 px-2 sm:px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700/50">清單與主日誌同步連動</span>
                 </div>
                 
-                <!-- 加入追蹤清單專屬的篩選器 -->
-                <div class="p-4 border-b border-gray-200 dark:border-gray-700/50 bg-gray-50/80 dark:bg-gray-800/80 flex flex-col 2xl:flex-row justify-between items-start 2xl:items-center gap-4 w-full">
-                    <div class="flex flex-wrap items-center gap-2 sm:gap-3 w-full 2xl:w-auto">
+                <div class="p-4 border-b border-gray-200 dark:border-gray-700/50 bg-gray-50/80 dark:bg-gray-800/80 flex flex-wrap items-center gap-2 sm:gap-3 w-full justify-between">
+                    <div class="flex flex-wrap items-center gap-2 sm:gap-3">
                         <div class="flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50">
                             <span class="text-xs text-gray-500 dark:text-gray-400 px-2"><i class="fa-solid fa-filter mr-1"></i>區間</span>
-                            <input type="date" id="filter-start-fav" class="bg-transparent text-gray-900 dark:text-white text-base sm:text-sm outline-none px-1">
+                            <input type="date" id="filter-start-fav" class="filter-start bg-transparent text-gray-900 dark:text-white text-base sm:text-sm outline-none px-1">
                             <span class="text-gray-400 mx-1">-</span>
-                            <input type="date" id="filter-end-fav" class="bg-transparent text-gray-900 dark:text-white text-base sm:text-sm outline-none px-1">
+                            <input type="date" id="filter-end-fav" class="filter-end bg-transparent text-gray-900 dark:text-white text-base sm:text-sm outline-none px-1">
                         </div>
                         
                         <label class="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white dark:bg-gray-900/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-700/50 transition hover:bg-gray-50 dark:hover:bg-gray-800">
-                            <input type="checkbox" id="filter-futures-fav" class="rounded border-gray-300 dark:border-gray-600 text-sky-500 focus:ring-sky-500 w-3.5 h-3.5 sm:w-4 sm:h-4">
+                            <input type="checkbox" id="filter-futures-fav" class="filter-futures rounded border-gray-300 dark:border-gray-600 text-sky-500 focus:ring-sky-500 w-3.5 h-3.5 sm:w-4 sm:h-4">
                             <span class="text-xs sm:text-sm text-sky-600 dark:text-sky-400 font-medium whitespace-nowrap">僅含股期</span>
                         </label>
                         <label class="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white dark:bg-gray-900/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-700/50 transition hover:bg-gray-50 dark:hover:bg-gray-800">
-                            <input type="checkbox" id="filter-exclude-negative-growth-fav" class="rounded border-gray-300 dark:border-gray-600 text-green-500 focus:ring-green-500 w-3.5 h-3.5 sm:w-4 sm:h-4">
+                            <input type="checkbox" id="filter-exclude-negative-growth-fav" class="filter-exclude-negative-growth rounded border-gray-300 dark:border-gray-600 text-green-500 focus:ring-green-500 w-3.5 h-3.5 sm:w-4 sm:h-4">
                             <span class="text-xs sm:text-sm text-green-600 dark:text-green-400 font-medium whitespace-nowrap">排除負成長</span>
                         </label>
 
-                        <select id="filter-score-fav" class="bg-white dark:bg-gray-900/50 text-gray-900 dark:text-white text-base sm:text-sm border border-gray-300 dark:border-gray-700/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 focus:ring-2 focus:ring-blue-500 outline-none transition hover:bg-gray-50 dark:hover:bg-gray-800">
+                        <select id="filter-score-fav" class="filter-score bg-white dark:bg-gray-900/50 text-gray-900 dark:text-white text-base sm:text-sm border border-gray-300 dark:border-gray-700/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 focus:ring-2 focus:ring-blue-500 outline-none transition hover:bg-gray-50 dark:hover:bg-gray-800">
                             <option value="0">分數不限</option>
                             <option value="1">1分(含)以上</option>
                             <option value="2">2分(含)以上</option>
@@ -390,8 +368,7 @@
                             <i class="fa-solid fa-eraser mr-1.5"></i><span class="hidden sm:inline">清除篩選</span><span class="sm:hidden">清除</span>
                         </button>
                     </div>
-                    
-                    <!-- Fav Copy Features Toolbar -->
+
                     <div class="flex flex-wrap gap-1.5 sm:gap-2 w-full 2xl:w-auto justify-start 2xl:justify-end border-t 2xl:border-t-0 border-gray-200 dark:border-gray-700 pt-3 2xl:pt-0">
                         <span class="text-xs text-gray-400 dark:text-gray-500 mr-1 flex items-center font-medium hidden sm:flex">複製:</span>
                         <button class="btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="selected">複製選擇</button>
@@ -403,7 +380,7 @@
                         <button class="btn-copy-base bg-orange-50 dark:bg-orange-900/40 hover:bg-orange-600 border-orange-200 dark:border-orange-700/50 text-orange-700 dark:text-orange-200 btn-copy" data-mode="chip">籌碼集中</button>
                     </div>
                 </div>
-
+                
                 <div id="batch-bar-fav" class="hidden bg-red-50 dark:bg-red-900/20 border-b border-gray-200 dark:border-gray-700/50 p-2 sm:p-3 justify-between items-center transition-all">
                     <span class="text-xs sm:text-sm text-red-600 dark:text-red-400 font-medium"><i class="fa-solid fa-check-double mr-1.5"></i>已選擇 <span id="batch-count-fav" class="font-bold">0</span> 筆資料</span>
                     <button onclick="confirmBatchDelete('fav')" class="bg-red-600 hover:bg-red-500 text-white text-xs sm:text-sm font-medium px-3 sm:px-4 py-1.5 rounded-lg transition shadow-sm">批次刪除</button>
@@ -434,7 +411,6 @@
         </div>
     </main>
 
-    <!-- Modals Overlay Structure -->
     <div id="sync-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center z-[60] hidden">
         <div class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl p-6 border border-gray-200 dark:border-gray-700 w-[340px] max-w-[90%] shadow-2xl mx-4">
             <h3 class="font-bold mb-3 text-xl border-b border-gray-200 dark:border-gray-700 pb-3 flex items-center"><i class="fa-solid fa-cloud-arrow-up text-blue-500 mr-2 text-2xl"></i>跨裝置雲端同步</h3>
@@ -465,7 +441,7 @@
                 <button id="btn-win" class="flex-1 bg-red-600 hover:bg-red-500 text-white py-2 rounded-lg text-sm font-medium transition shadow-md">停利</button>
                 <button id="btn-loss" class="flex-1 bg-green-600 hover:bg-green-500 text-white py-2 rounded-lg text-sm font-medium transition shadow-md">停損</button>
             </div>
-            <button id="btn-cancel-modal" class="w-full mt-3 bg-gray-100 dark:bg-transparent hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 py-2 rounded-lg text-sm transition">取消</button>
+            <button id="btn-cancel-modal" class="w-full mt-3 bg-gray-100 dark:bg-transparent hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 py-2.5 rounded-lg text-sm transition">取消</button>
         </div>
     </div>
 
@@ -550,7 +526,6 @@
                 `).join('');
             });
 
-            // Bind Form Tag Input Clicks
             document.querySelectorAll('.tag-input').forEach(cb => {
                 cb.addEventListener('click', function() {
                     const isChecked = this.checked;
@@ -564,21 +539,16 @@
                 });
             });
 
-            // Bind Filter Panel Clicks (Decoupled Journal and Fav)
-            document.querySelectorAll('#filter-tag-panel .filter-tag-cb').forEach(cb => {
+            document.querySelectorAll('.filter-tag-cb').forEach(cb => {
                 cb.addEventListener('change', (e) => {
                     const val = e.target.value;
-                    if (e.target.checked) { if (!state.filters.tags.includes(val)) state.filters.tags.push(val); } 
-                    else { state.filters.tags = state.filters.tags.filter(t => t !== val); }
-                    renderFilterTags('journal'); processAndRenderJournals(); saveLocalData();
-                });
-            });
-            document.querySelectorAll('#filter-tag-panel-fav .filter-tag-cb').forEach(cb => {
-                cb.addEventListener('change', (e) => {
-                    const val = e.target.value;
-                    if (e.target.checked) { if (!state.favFilters.tags.includes(val)) state.favFilters.tags.push(val); } 
-                    else { state.favFilters.tags = state.favFilters.tags.filter(t => t !== val); }
-                    renderFilterTags('fav'); renderFavorites(); saveLocalData();
+                    const isFav = e.target.closest('#module-favorites') !== null;
+                    const targetFilters = isFav ? state.favFilters : state.filters;
+
+                    if (e.target.checked) { if (!targetFilters.tags.includes(val)) targetFilters.tags.push(val); } 
+                    else { targetFilters.tags = targetFilters.tags.filter(t => t !== val); }
+                    
+                    renderFilterTags(); processAndRenderJournals(); renderFavorites(); saveLocalData();
                 });
             });
         }
@@ -598,18 +568,13 @@
             }
         }
 
-        // ============================================================================
-        // [打勾狀態保存與批次刪除邏輯修復]
-        // ============================================================================
         document.addEventListener('change', (e) => {
-            // 單筆勾選
             if (e.target.classList.contains('row-cb')) {
                 const type = e.target.dataset.type;
                 if (e.target.checked) selectedIds[type].add(e.target.value);
                 else selectedIds[type].delete(e.target.value);
                 updateBatchUI(type);
             }
-            // 全選按鈕
             if (e.target.classList.contains('select-all-cb')) {
                 const type = e.target.dataset.type;
                 const isChecked = e.target.checked;
@@ -622,7 +587,6 @@
             }
         });
 
-        // 呼叫批次刪除確認框
         window.confirmBatchDelete = (type) => {
             if (selectedIds[type].size === 0) return;
             document.getElementById('batch-delete-type').value = type;
@@ -630,7 +594,6 @@
             document.getElementById('batch-delete-modal').classList.remove('hidden');
         };
 
-        // 執行批次刪除
         window.executeBatchDelete = async () => {
             const type = document.getElementById('batch-delete-type').value;
             const idsToDelete = Array.from(selectedIds[type]);
@@ -653,7 +616,6 @@
             document.getElementById('batch-delete-modal').classList.add('hidden');
             showToast(`已成功刪除 ${idsToDelete.length} 筆資料`);
         };
-        // ============================================================================
 
         function loadLocalData() {
             const savedData = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -662,7 +624,6 @@
                 const twStocks = { "2330": "台積電", "2317": "鴻海", "2454": "聯發科", "2382": "廣達", "2603": "長榮" };
                 Object.entries(twStocks).forEach(([c,n]) => { state.codeToName[c] = n; state.nameToCode[n] = c; });
             }
-            if(!state.favFilters) state.favFilters = { start: '', end: '', futuresOnly: false, excludeNegativeGrowth: false, tags: [], minScore: 0 };
         }
         function saveLocalData() { localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state)); }
 
@@ -719,7 +680,6 @@
             };
         };
         
-        // 分數計算：特別追蹤不納入計分，金包銀已納入動能型態(記1分)
         const getScore = (tags, eps) => { 
             let s = 0; 
             if (tags) s = tags.filter(t => t !== '特別追蹤').length; 
@@ -767,7 +727,7 @@
                 if(cloudSyncInterval) clearInterval(cloudSyncInterval); cloudSyncInterval = setInterval(loadFromCloud, 5000);
             } else {
                 btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up sm:mr-1.5"></i><span class="hidden sm:inline">跨裝置同步</span>`;
-                btn.className = "text-xs sm:text-sm bg-blue-600 hover:bg-blue-500 text-white px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm border border-transparent flex items-center font-medium";
+                btn.className = "text-xs sm:text-sm bg-blue-600 hover:bg-blue-50 text-white px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm border border-transparent flex items-center font-medium";
                 st.className = "hidden md:flex ml-1 sm:ml-2 w-7 h-7 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-full shadow-sm items-center justify-center cursor-help flex-shrink-0";
                 st.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-yellow-500 text-xs"></i>`; 
                 if(cloudSyncInterval) clearInterval(cloudSyncInterval);
@@ -867,107 +827,9 @@
             }
         };
 
-        document.getElementById('excel-upload').addEventListener('change', (e) => {
-            const f = e.target.files[0]; if(!f) return; showToast('解析資料庫...');
-            const reader = new FileReader();
-            reader.onload = async (ev) => {
-                try {
-                    const wb = XLSX.read(new Uint8Array(ev.target.result), {type: 'array'}), rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header:1});
-                    let count = 0; const updates = {};
-                    for(let i=1; i<rows.length; i++) {
-                        if(!rows[i] || rows[i].length<2) continue;
-                        const c = String(rows[i][0]).trim(); if(!c) continue; const n = String(rows[i][1]||'').trim();
-                        // 加入處理 Excel 第 7 欄（index 6）的 最高目標價 (targetPrice)
-                        const item = { code: c, name: n, eps2025: parseFloat(rows[i][2])||null, eps2026: parseFloat(rows[i][3])||null, epsGrowth: parseFloat(rows[i][4])||null, futures: String(rows[i][5]||'').trim(), targetPrice: parseFloat(rows[i][6])||null, updatedAt: Date.now() };
-                        state.epsData[c] = item; updates[c] = item;
-                        if (n) { state.codeToName[c] = n; state.nameToCode[n] = c; } count++;
-                    }
-                    saveLocalData(); processAndRenderJournals(); renderFavorites(); renderPlans();
-                    if(isCloudMode() && Object.keys(updates).length > 0) await patchDataToCloud('epsData', updates);
-                    showToast(`更新完成，匯入 ${count} 筆資料`); e.target.value='';
-                } catch(err) { showToast('格式錯誤','error'); }
-            };
-            reader.readAsArrayBuffer(f);
-        });
-
-        document.querySelectorAll('.sortable').forEach(th => {
-            th.addEventListener('click', (e) => {
-                const isFav = e.currentTarget.closest('#module-favorites') !== null, configName = isFav ? 'favSortConfig' : 'sortConfig', key = th.dataset.sort;
-                state[configName].asc = state[configName].key === key ? !state[configName].asc : false; state[configName].key = key;
-                isFav ? renderFavorites() : processAndRenderJournals(); saveLocalData();
-            });
-        });
-
-        document.querySelectorAll('.plan-sortable').forEach(th => {
-            th.addEventListener('click', () => {
-                const key = th.dataset.sort; state.planSortConfig.asc = state.planSortConfig.key === key ? !state.planSortConfig.asc : false; state.planSortConfig.key = key;
-                renderPlans(); saveLocalData();
-            });
-        });
-
-        // 日誌篩選器操作
-        ['start', 'end', 'score'].forEach(key => {
-            const el = document.getElementById(`filter-${key}`);
-            if(el) el.addEventListener('change', (e) => { let val = key==='score'?parseInt(e.target.value)||0:e.target.value; state.filters[key] = val; processAndRenderJournals(); saveLocalData(); });
-        });
-        ['futures', 'exclude-negative-growth'].forEach(key => {
-            const el = document.getElementById(`filter-${key}`);
-            if(el) el.addEventListener('change', (e) => { let stateKey = key==='futures'?'futuresOnly':'excludeNegativeGrowth'; state.filters[stateKey] = e.target.checked; processAndRenderJournals(); saveLocalData(); });
-        });
-
-        // 追蹤清單獨立篩選器操作
-        ['start-fav', 'end-fav', 'score-fav'].forEach(key => {
-            const baseKey = key.replace('-fav', ''); const el = document.getElementById(`filter-${key}`);
-            if(el) el.addEventListener('change', (e) => { let val = baseKey==='score'?parseInt(e.target.value)||0:e.target.value; state.favFilters[baseKey] = val; renderFavorites(); saveLocalData(); });
-        });
-        ['futures-fav', 'exclude-negative-growth-fav'].forEach(key => {
-            const stateKey = key==='futures-fav'?'futuresOnly':'excludeNegativeGrowth'; const el = document.getElementById(`filter-${key}`);
-            if(el) el.addEventListener('change', (e) => { state.favFilters[stateKey] = e.target.checked; renderFavorites(); saveLocalData(); });
-        });
-
-        // 清除按鈕分離
-        document.getElementById('btn-clear-filters').addEventListener('click', () => {
-            const today = getToday(); state.filters = { start: today, end: today, futuresOnly: false, excludeNegativeGrowth: false, minScore: 0, tags: [] }; state.sortConfig = { key: 'createdAt', asc: false };
-            document.getElementById('filter-start').value = today; document.getElementById('filter-end').value = today; document.getElementById('filter-futures').checked = false; document.getElementById('filter-exclude-negative-growth').checked = false; document.getElementById('filter-score').value = "0";
-            document.querySelectorAll('#filter-tag-panel .filter-tag-cb').forEach(cb => cb.checked = false); renderFilterTags('journal'); processAndRenderJournals(); saveLocalData(); showToast('日誌篩選已清除');
-        });
-        document.getElementById('btn-clear-filters-fav').addEventListener('click', () => {
-            state.favFilters = { start: '', end: '', futuresOnly: false, excludeNegativeGrowth: false, minScore: 0, tags: [] }; state.favSortConfig = { key: 'createdAt', asc: false };
-            document.getElementById('filter-start-fav').value = ''; document.getElementById('filter-end-fav').value = ''; document.getElementById('filter-futures-fav').checked = false; document.getElementById('filter-exclude-negative-growth-fav').checked = false; document.getElementById('filter-score-fav').value = "0";
-            document.querySelectorAll('#filter-tag-panel-fav .filter-tag-cb').forEach(cb => cb.checked = false); renderFilterTags('fav'); renderFavorites(); saveLocalData(); showToast('追蹤篩選已清除');
-        });
-
-        ['', '-fav'].forEach(suffix => {
-            const btn = document.getElementById('filter-tag-btn' + suffix);
-            const panel = document.getElementById('filter-tag-panel' + suffix);
-            if(btn && panel) {
-                btn.addEventListener('click', (e) => { e.stopPropagation(); panel.classList.toggle('hidden'); });
-                document.addEventListener('click', (e) => { if(!panel.contains(e.target) && e.target !== btn) panel.classList.add('hidden'); });
-            }
-        });
-
-        window.removeFilterTag = (tag, type) => {
-            if(type === 'fav') {
-                state.favFilters.tags = state.favFilters.tags.filter(t => t !== tag);
-                const cb = document.querySelector(`#filter-tag-panel-fav .filter-tag-cb[value="${tag}"]`); if (cb) cb.checked = false;
-                renderFilterTags('fav'); renderFavorites();
-            } else {
-                state.filters.tags = state.filters.tags.filter(t => t !== tag);
-                const cb = document.querySelector(`#filter-tag-panel .filter-tag-cb[value="${tag}"]`); if (cb) cb.checked = false;
-                renderFilterTags('journal'); processAndRenderJournals();
-            }
-            saveLocalData();
-        };
-
-        function renderFilterTags(type) {
-            const tags = type === 'fav' ? state.favFilters.tags : state.filters.tags;
-            const containerId = type === 'fav' ? 'filter-tags-display-fav' : 'filter-tags-display';
-            document.getElementById(containerId).innerHTML = tags.map(t => `<span class="bg-blue-600/10 dark:bg-blue-900/60 text-blue-600 dark:text-blue-200 text-xs px-2 py-1 rounded-lg flex items-center cursor-pointer hover:bg-red-600 hover:text-white dark:hover:bg-red-800/80 transition" onclick="removeFilterTag('${t}', '${type}')">${t} <i class="fa-solid fa-xmark ml-1.5 opacity-70"></i></span>`).join('');
-        }
-
-        const getFilteredAndSortedData = (dataList, filters, sortConfig) => {
-            const { start, end, futuresOnly, excludeNegativeGrowth, tags, minScore } = filters;
-            const { key, asc } = sortConfig;
+        const getFilteredAndSortedData = (dataList, currentFilters, currentSortConfig) => {
+            const { start, end, futuresOnly, excludeNegativeGrowth, tags, minScore } = currentFilters;
+            const { key, asc } = currentSortConfig;
             let filtered = dataList.filter(j => {
                 if(start && j.date < start) return false; if(end && j.date > end) return false;
                 const ei = getEpsInfo(j.code, j);
@@ -1032,7 +894,6 @@
             tbody.innerHTML = rowsHtml;
             updateBatchUI(listType);
 
-            // Bind Table Tag Removals
             tbody.querySelectorAll('.tag-remove-btn').forEach(b => b.addEventListener('click', async (e)=>{
                 e.stopPropagation(); const id = e.currentTarget.dataset.id, tag = e.currentTarget.dataset.tag, j = state.journals.find(x => x.id === id);
                 if(j && j.tags) { j.tags = j.tags.filter(t => t !== tag); j.updatedAt = Date.now(); saveLocalData(); processAndRenderJournals(); if(document.getElementById('module-favorites').classList.contains('active')) renderFavorites(); await putDataToCloud(`journals/${id}`, j); showToast(`已移除標籤: ${tag}`); }
@@ -1074,6 +935,8 @@
                 let data = getFilteredAndSortedData(state.journals, currentFilters, isFav ? state.favSortConfig : state.sortConfig);
                 if(isFav) data = data.filter(j => j.isFavorite);
 
+                let dStr = currentFilters.start === currentFilters.end ? (currentFilters.start ? currentFilters.start.replace(/-/g, '/') : '全區間') : `${currentFilters.start.substring(5).replace(/-/g, '/')}~${currentFilters.end.substring(5).replace(/-/g, '/')}`;
+
                 // 複製選擇邏輯：只複製打勾的標的，並且「只輸出篩選器中所選取的策略」
                 if (mode === 'selected') {
                     let checkedIds = selectedIds[listType];
@@ -1082,10 +945,7 @@
                     data = data.filter(j => checkedIds.has(j.id));
                     data.sort((a,b) => { const d = new Date(a.date) - new Date(b.date); return d !== 0 ? d : (a.createdAt||0) - (b.createdAt||0); });
                     
-                    // 核心修改：目標策略改為動態抓取「篩選策略(可複選)」中打勾的值
                     let targetStrategies = currentFilters.tags;
-                    
-                    // 提示防呆機制：如果沒有選擇任何篩選策略
                     if (targetStrategies.length === 0) {
                         return showToast('請先在上方「篩選策略」勾選您要複製的策略', 'error');
                     }
@@ -1102,10 +962,9 @@
                         }
                     });
 
-                    let dStr = currentFilters.start === currentFilters.end ? (currentFilters.start ? currentFilters.start.replace(/-/g, '/') : '全區間') : `${currentFilters.start.substring(5).replace(/-/g, '/')}~${currentFilters.end.substring(5).replace(/-/g, '/')}`;
-                    let text = `| ${dStr} 嚴選策略標的 |\n\n`;
+                    // 修正：抬頭完全同步為對稱的篩選漏斗格式
+                    let text = `| ${dStr} 多重篩選漏斗 |\n\n`;
 
-                    // 依照使用者勾選的策略順序輸出
                     targetStrategies.forEach(s => {
                         if(sm[s] && sm[s].length > 0) {
                             text += `🎯 [${s === '特別追蹤' ? '特別關注' : s}] (共 ${sm[s].length} 檔)\n`;
@@ -1128,21 +987,16 @@
                 data = data.filter(j => !(j.tags && j.tags.includes('特別追蹤')));
                 if(data.length===0) return showToast('清單為空 (已排除特別關注)','error');
                 
-                let dStr = currentFilters.start === currentFilters.end ? (currentFilters.start ? currentFilters.start.replace(/-/g, '/') : '全區間') : `${currentFilters.start.substring(5).replace(/-/g, '/')}~${currentFilters.end.substring(5).replace(/-/g, '/')}`;
                 let text = `| ${dStr} 多重篩選漏斗 |\n\n`;
 
-                if(mode === 'time') {
-                    data.sort((a,b) => { const d = new Date(a.date) - new Date(b.date); return d !== 0 ? d : (a.createdAt||0) - (b.createdAt||0); });
-                    data.forEach(j => { let tags = (currentFilters.tags.length > 0 ? (j.tags||[]).filter(t => currentFilters.tags.includes(t)) : (j.tags||[]).filter(t => t !== '特別追蹤')); text += `- ${j.code} ${j.name} (${getScore(j.tags, getEpsInfo(j.code, j))}分)${tags.length>0?` [${tags.map(t=>t[0]).join('')}]`:''}\n`; });
-                } 
-                else if(mode === 'strategy') {
+                if(mode === 'strategy') {
                     const sm = {}; data.forEach(j => { if(j.tags) j.tags.forEach(t => { if(currentFilters.tags.length>0 ? currentFilters.tags.includes(t) : t !== '特別追蹤') { if(!sm[t]) sm[t]=[]; sm[t].push(j); }}); });
                     const order = ['金包銀', '多頭營收創高', '破繭而出', '月來越好', '季不可失', '守株待兔', '量價齊揚', 'OBV突破'];
                     Object.keys(sm).sort((a, b) => { const iA = order.indexOf(a), iB = order.indexOf(b); if (iA !== -1 && iB !== -1) return iA - iB; if (iA !== -1) return -1; if (iB !== -1) return 1; return a.localeCompare(b); }).forEach(s => { text += `🎯 [${s}] (共 ${sm[s].length} 檔)\n`; sm[s].forEach(a => text += `- ${a.code} ${a.name}\n`); text += '\n'; });
                 }
                 else if(mode === 'score') {
                     data.sort((a,b)=>getScore(b.tags, getEpsInfo(b.code, b))-getScore(a.tags, getEpsInfo(a.code, a))).forEach(j => {
-                        let tags = currentFilters.tags.length > 0 ? (j.tags||[]).filter(t => currentFilters.tags.includes(t)) : (j.tags||[]).filter(t => t !== '特別追蹤');
+                        let tags = currentFilters.tags.length > 0 ? (currentFilters.tags||[]).filter(t => currentFilters.tags.includes(t)) : (currentFilters.tags||[]).filter(t => t !== '特別追蹤');
                         const g = getEpsInfo(j.code,j).epsGrowth; text += `- ${j.code} ${j.name} [${getScore(j.tags, getEpsInfo(j.code, j))}分] (預成長: ${g!==null?(g*100).toFixed(2)+'%':'無'})${tags.length>0?` ${tags.map(t=>t[0]).join('')}`:''}\n`;
                     });
                 }
@@ -1150,7 +1004,7 @@
                 else if(mode === 'futures') data.filter(j => getEpsInfo(j.code,j).futures).forEach(j => text += `- [期] ${j.code} ${j.name}\n`);
                 else if(mode === 'futures_score') {
                     data.filter(j => getEpsInfo(j.code,j).futures).sort((a,b)=>getScore(b.tags, getEpsInfo(b.code, b))-getScore(a.tags, getEpsInfo(a.code, a))).forEach(j => {
-                        let tags = currentFilters.tags.length > 0 ? (j.tags||[]).filter(t => currentFilters.tags.includes(t)) : (j.tags||[]).filter(t => t !== '特別追蹤');
+                        let tags = currentFilters.tags.length > 0 ? (currentFilters.tags||[]).filter(t => currentFilters.tags.includes(t)) : (currentFilters.tags||[]).filter(t => t !== '特別追蹤');
                         const g = getEpsInfo(j.code,j).epsGrowth; text += `- [期] ${j.code} ${j.name} [${getScore(j.tags, getEpsInfo(j.code, j))}分] (預成長: ${g!==null?(g*100).toFixed(2)+'%':'無'})${tags.length>0?` ${tags.map(t=>t[0]).join('')}`:''}\n`;
                     });
                 }
@@ -1178,11 +1032,11 @@
         const getCalcText = (type) => {
             if(document.getElementById('cdp-cdp').textContent==='-') return null;
             const c = document.getElementById('c-code').value.trim(), n = document.getElementById('c-name').value.trim(), s = (c||n) ? `${c} ${n}`.trim() : '';
-            const tC = `[CDP 短線當沖]\n追買(AH): ${document.getElementById('cdp-ah').textContent}\n賣出(NH): ${document.getElementById('cdp-nh').textContent}\n均價(CDP): ${document.getElementById('cdp-cdp').textContent}\n買進(NL):  ${document.getElementById('cdp-nl').textContent}\n追賣(AL):  ${document.getElementById('cdp-al').textContent}`;
-            const tP = `[Pivot 波段樞軸]\n壓力二(R2): ${document.getElementById('pv-r2').textContent}\n壓力一(R1): ${document.getElementById('pv-r1').textContent}\n樞軸點(PP): ${document.getElementById('pv-pp').textContent}\n支撐一(S1): ${document.getElementById('pv-s1').textContent}\n支撐二(S2): ${document.getElementById('pv-s2').textContent}`;
-            const tF = `[費波那契回撤]\n0.236: ${document.getElementById('fb-236').textContent}\n0.382: ${document.getElementById('fb-382').textContent}\n0.500: ${document.getElementById('fb-500').textContent}\n0.618: ${document.getElementById('fb-618').textContent}\n0.786: ${document.getElementById('fb-786').textContent}`;
-            if(type==='cdp') return (s ? `【${s}】\n` : '') + tC; if(type==='pivot') return (s ? `【${s}】\n` : '') + tP; if(type==='fibo') return (s ? `【${s}】\n` : '') + tF;
-            if(type==='all') return `【支撐壓力計算結果】${s ? ' ' + s : ''}\n高:${document.getElementById('c-high').value} 低:${document.getElementById('c-low').value} 收:${document.getElementById('c-close').value}\n\n${tC}\n\n${tP}\n\n${tF}`;
+            const textC = `[CDP 短線當沖]\n追買(AH): ${document.getElementById('cdp-ah').textContent}\n賣出(NH): ${document.getElementById('cdp-nh').textContent}\n均價(CDP): ${document.getElementById('cdp-cdp').textContent}\n買進(NL):  ${document.getElementById('cdp-nl').textContent}\n追賣(AL):  ${document.getElementById('cdp-al').textContent}`;
+            const textP = `[Pivot 波段樞軸]\n壓力二(R2): ${document.getElementById('pv-r2').textContent}\n壓力一(R1): ${document.getElementById('pv-r1').textContent}\n樞軸點(PP): ${document.getElementById('pv-pp').textContent}\n支撐一(S1): ${document.getElementById('pv-s1').textContent}\n支撐二(S2): ${document.getElementById('pv-s2').textContent}`;
+            const textF = `[費波那契回撤]\n0.236: ${document.getElementById('fb-236').textContent}\n0.382: ${document.getElementById('fb-382').textContent}\n0.500: ${document.getElementById('fb-500').textContent}\n0.618: ${document.getElementById('fb-618').textContent}\n0.786: ${document.getElementById('fb-786').textContent}`;
+            if(type==='cdp') return (s ? `【${s}】\n` : '') + textC; if(type==='pivot') return (s ? `【${s}】\n` : '') + textP; if(type==='fibo') return (s ? `【${s}】\n` : '') + textF;
+            if(type==='all') return `【支撐壓力計算結果】${s ? ' ' + s : ''}\n高:${document.getElementById('c-high').value} 低:${document.getElementById('c-low').value} 收:${document.getElementById('c-close').value}\n\n${textC}\n\n${textP}\n\n${textF}`;
         };
         document.querySelectorAll('.btn-copy-calc').forEach(b => b.addEventListener('click', e => { const t = getCalcText(e.currentTarget.dataset.target); t ? executeCopy(t + copyFootnote) : showToast('請先計算','error'); }));
         document.getElementById('btn-copy-calc-all').addEventListener('click', () => { const t = getCalcText('all'); t ? executeCopy(t + copyFootnote) : showToast('請先計算','error'); });
@@ -1248,22 +1102,21 @@
             
             const today = getToday();
             state.filters = { start: today, end: today, futuresOnly: false, excludeNegativeGrowth: false, tags: [], minScore: 0 };
-            
-            // 追蹤清單預設為空白 (無時間限制)
-            if(!state.favFilters) state.favFilters = { start: '', end: '', futuresOnly: false, excludeNegativeGrowth: false, tags: [], minScore: 0 };
-            
+            state.favFilters = { start: '', end: '', futuresOnly: false, excludeNegativeGrowth: false, tags: [], minScore: 0 };
             state.sortConfig = { key: 'createdAt', asc: false }; state.favSortConfig = { key: 'createdAt', asc: false }; state.planSortConfig = { key: 'createdAt', asc: false };
             saveLocalData();
 
-            // 雙面板數值初始化 (解耦獨立)
-            document.getElementById('filter-start').value = today; document.getElementById('filter-end').value = today;
-            document.getElementById('filter-start-fav').value = state.favFilters.start || ''; document.getElementById('filter-end-fav').value = state.favFilters.end || '';
-            document.getElementById('j-date').value = today;
+            // 分別初始化兩邊面板的預設時間值
+            document.getElementById('filter-start').value = today; 
+            document.getElementById('filter-end').value = today;
+            document.getElementById('filter-start-fav').value = ''; 
+            document.getElementById('filter-end-fav').value = '';
             
+            document.getElementById('j-date').value = today;
             document.querySelectorAll('.filter-futures, .filter-exclude-negative-growth').forEach(el => el.checked = false);
             document.querySelectorAll('.filter-score').forEach(el => el.value = "0");
             document.querySelectorAll('.filter-tag-cb').forEach(cb => cb.checked = false); 
-            renderFilterTags('journal'); renderFilterTags('fav');
+            renderFilterTags();
 
             processAndRenderJournals(); renderFavorites(); renderPlans();
             updateSyncStatusUI();
