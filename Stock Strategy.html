@@ -502,13 +502,13 @@
         // ============================================================================
         const TAG_CATEGORIES = [
             { title: "🌟 特別關注", tags: [
-                { name: "特別追蹤", color: "#8b5cf6", style: "bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 border-violet-300 dark:border-violet-800" },
-                { name: "金包銀", color: "#eab308", style: "bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300 border-yellow-300 dark:border-yellow-800" }
+                { name: "特別追蹤", color: "#8b5cf6", style: "bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 border-violet-300 dark:border-violet-800" }
             ]},
             { title: "📊 基本面佳", tags: [
                 { name: "多頭營收創高", color: "#ec4899", style: "bg-pink-100 dark:bg-pink-900/40 text-pink-700 dark:text-pink-300 border-pink-300 dark:border-pink-800" }
             ]},
             { title: "🔥 動能與型態", tags: [
+                { name: "金包銀", color: "#eab308", style: "bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300 border-yellow-300 dark:border-yellow-800" },
                 { name: "披荊斬棘", color: "#ef4444", style: "bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 border-red-300 dark:border-red-800" },
                 { name: "破繭而出", color: "#f43f5e", style: "bg-rose-100 dark:bg-rose-900/40 text-rose-700 dark:text-rose-300 border-rose-300 dark:border-rose-800" },
                 { name: "月來越好", color: "#f97316", style: "bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300 border-orange-300 dark:border-orange-800" },
@@ -662,10 +662,10 @@
             };
         };
         
-        // 分數計算：特別關注系列標籤不納入計分
+        // 分數計算：特別追蹤不納入計分，金包銀已納入動能型態(記1分)
         const getScore = (tags, eps) => { 
             let s = 0; 
-            if (tags) s = tags.filter(t => t !== '特別追蹤' && t !== '金包銀').length; 
+            if (tags) s = tags.filter(t => t !== '特別追蹤').length; 
             if (eps && eps.epsGrowth > 0 && eps.eps2026 > 0) s += 1; 
             return s; 
         };
@@ -1017,36 +1017,64 @@
                 let data = getFilteredAndSortedData(state.journals, currentFilters, isFav ? state.favSortConfig : state.sortConfig);
                 if(isFav) data = data.filter(j => j.isFavorite);
 
-                // 複製選擇邏輯：只複製打勾的標的，並且允許輸出「特別關注」的策略標籤
+                // 複製選擇邏輯：只複製打勾的標的，並且允許輸出指定的嚴選策略標籤
                 if (mode === 'selected') {
                     let checkedIds = selectedIds[listType];
                     if(checkedIds.size === 0) return showToast('請先在清單中勾選要複製的標的', 'error');
                     data = data.filter(j => checkedIds.has(j.id));
                     data.sort((a,b) => { const d = new Date(a.date) - new Date(b.date); return d !== 0 ? d : (a.createdAt||0) - (b.createdAt||0); });
-                    let text = `| 🎯 已選標的清單 |\n\n`;
+                    
+                    const targetStrategies = ['特別追蹤', '金包銀', '破繭而出', '月來越好', '季不可失', '守株待兔'];
+                    const sm = {};
                     data.forEach(j => {
-                        let tags = j.tags || [];
-                        text += `- ${j.code} ${j.name} (${getScore(j.tags, getEpsInfo(j.code, j))}分)${tags.length>0?` [${tags.map(t=>t[0]).join('')}]`:''}\n`;
+                        if(j.tags) {
+                            j.tags.forEach(t => {
+                                if(targetStrategies.includes(t)) {
+                                    if(!sm[t]) sm[t] = [];
+                                    sm[t].push(j);
+                                }
+                            });
+                        }
                     });
+
+                    let text = `| 🎯 嚴選策略標的 |\n\n`;
+                    targetStrategies.forEach(s => {
+                        if(sm[s] && sm[s].length > 0) {
+                            text += `🎯 [${s === '特別追蹤' ? '特別關注' : s}] (共 ${sm[s].length} 檔)\n`;
+                            sm[s].forEach(a => {
+                                text += `- ${a.code} ${a.name}\n`;
+                            });
+                            text += '\n';
+                        }
+                    });
+                    
+                    if (Object.keys(sm).length === 0) {
+                        text += '選取的標的無符合的指定策略。\n';
+                    }
+
                     executeCopy(text.trim() + copyFootnote);
                     return;
                 }
 
-                // 其他模式不複製特別關注
-                data = data.filter(j => !(j.tags && (j.tags.includes('特別追蹤') || j.tags.includes('金包銀'))));
+                // 其他模式不複製特別關注 (特別追蹤)
+                data = data.filter(j => !(j.tags && j.tags.includes('特別追蹤')));
                 if(data.length===0) return showToast('清單為空 (已排除特別關注)','error');
                 
                 let dStr = currentFilters.start === currentFilters.end ? (currentFilters.start ? currentFilters.start.replace(/-/g, '/') : '全區間') : `${currentFilters.start.substring(5).replace(/-/g, '/')}~${currentFilters.end.substring(5).replace(/-/g, '/')}`;
                 let text = `| ${dStr} 多重篩選漏斗 |\n\n`;
 
-                if(mode === 'strategy') {
-                    const sm = {}; data.forEach(j => { if(j.tags) j.tags.forEach(t => { if(currentFilters.tags.length>0 ? currentFilters.tags.includes(t) : (!['特別追蹤', '金包銀'].includes(t))) { if(!sm[t]) sm[t]=[]; sm[t].push(j); }}); });
-                    const order = ['多頭營收創高', '破繭而出', '月來越好', '季不可失', '守株待兔', '量價齊揚', 'OBV突破'];
+                if(mode === 'time') {
+                    data.sort((a,b) => { const d = new Date(a.date) - new Date(b.date); return d !== 0 ? d : (a.createdAt||0) - (b.createdAt||0); });
+                    data.forEach(j => { let tags = (currentFilters.tags.length > 0 ? (j.tags||[]).filter(t => currentFilters.tags.includes(t)) : (j.tags||[]).filter(t => t !== '特別追蹤')); text += `- ${j.code} ${j.name} (${getScore(j.tags, getEpsInfo(j.code, j))}分)${tags.length>0?` [${tags.map(t=>t[0]).join('')}]`:''}\n`; });
+                } 
+                else if(mode === 'strategy') {
+                    const sm = {}; data.forEach(j => { if(j.tags) j.tags.forEach(t => { if(currentFilters.tags.length>0 ? currentFilters.tags.includes(t) : t !== '特別追蹤') { if(!sm[t]) sm[t]=[]; sm[t].push(j); }}); });
+                    const order = ['金包銀', '多頭營收創高', '破繭而出', '月來越好', '季不可失', '守株待兔', '量價齊揚', 'OBV突破'];
                     Object.keys(sm).sort((a, b) => { const iA = order.indexOf(a), iB = order.indexOf(b); if (iA !== -1 && iB !== -1) return iA - iB; if (iA !== -1) return -1; if (iB !== -1) return 1; return a.localeCompare(b); }).forEach(s => { text += `🎯 [${s}] (共 ${sm[s].length} 檔)\n`; sm[s].forEach(a => text += `- ${a.code} ${a.name}\n`); text += '\n'; });
                 }
                 else if(mode === 'score') {
                     data.sort((a,b)=>getScore(b.tags, getEpsInfo(b.code, b))-getScore(a.tags, getEpsInfo(a.code, a))).forEach(j => {
-                        let tags = currentFilters.tags.length > 0 ? (j.tags||[]).filter(t => currentFilters.tags.includes(t)) : (j.tags||[]).filter(t => !['特別追蹤', '金包銀'].includes(t));
+                        let tags = currentFilters.tags.length > 0 ? (j.tags||[]).filter(t => currentFilters.tags.includes(t)) : (j.tags||[]).filter(t => t !== '特別追蹤');
                         const g = getEpsInfo(j.code,j).epsGrowth; text += `- ${j.code} ${j.name} [${getScore(j.tags, getEpsInfo(j.code, j))}分] (預成長: ${g!==null?(g*100).toFixed(2)+'%':'無'})${tags.length>0?` ${tags.map(t=>t[0]).join('')}`:''}\n`;
                     });
                 }
@@ -1054,7 +1082,7 @@
                 else if(mode === 'futures') data.filter(j => getEpsInfo(j.code,j).futures).forEach(j => text += `- [期] ${j.code} ${j.name}\n`);
                 else if(mode === 'futures_score') {
                     data.filter(j => getEpsInfo(j.code,j).futures).sort((a,b)=>getScore(b.tags, getEpsInfo(b.code, b))-getScore(a.tags, getEpsInfo(a.code, a))).forEach(j => {
-                        let tags = currentFilters.tags.length > 0 ? (j.tags||[]).filter(t => currentFilters.tags.includes(t)) : (j.tags||[]).filter(t => !['特別追蹤', '金包銀'].includes(t));
+                        let tags = currentFilters.tags.length > 0 ? (j.tags||[]).filter(t => currentFilters.tags.includes(t)) : (j.tags||[]).filter(t => t !== '特別追蹤');
                         const g = getEpsInfo(j.code,j).epsGrowth; text += `- [期] ${j.code} ${j.name} [${getScore(j.tags, getEpsInfo(j.code, j))}分] (預成長: ${g!==null?(g*100).toFixed(2)+'%':'無'})${tags.length>0?` ${tags.map(t=>t[0]).join('')}`:''}\n`;
                     });
                 }
