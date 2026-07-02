@@ -199,7 +199,7 @@
                     <!-- Copy Features Toolbar -->
                     <div class="flex flex-wrap gap-1.5 sm:gap-2 w-full 2xl:w-auto justify-start 2xl:justify-end border-t 2xl:border-t-0 border-gray-200 dark:border-gray-700 pt-3 2xl:pt-0">
                         <span class="text-xs text-gray-400 dark:text-gray-500 mr-1 flex items-center font-medium hidden sm:flex">複製:</span>
-                        <button class="btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="time">時間</button>
+                        <button class="btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="selected">複製選擇</button>
                         <button class="btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="strategy">策略</button>
                         <button class="btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="score">分數</button>
                         <button class="btn-copy-base bg-sky-50 dark:bg-sky-900/40 hover:bg-sky-600 border-sky-200 dark:border-sky-700/50 text-sky-700 dark:text-sky-200 btn-copy" data-mode="futures">股期</button>
@@ -347,47 +347,61 @@
             <div class="card-panel border-t-4 border-yellow-500 flex flex-col min-h-[500px]">
                 <div class="p-4 border-b border-gray-200 dark:border-gray-700/50 bg-gray-50/80 dark:bg-gray-800/80 rounded-t-xl flex justify-between items-center">
                     <h2 class="font-bold text-yellow-600 dark:text-yellow-400 text-lg sm:text-xl flex items-center"><div class="bg-yellow-500/10 dark:bg-yellow-500/20 p-1.5 rounded mr-2"><i class="fa-solid fa-star"></i></div> 追蹤清單</h2>
-                    <span class="text-xs sm:text-sm text-gray-400 bg-white dark:bg-gray-900/50 px-2 sm:px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700/50">清單與主日誌同步連動</span>
+                    <span class="text-xs sm:text-sm text-gray-400 bg-white dark:bg-gray-900/50 px-2 sm:px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700/50">清單與主日誌獨立篩選</span>
                 </div>
                 
                 <!-- 加入追蹤清單專屬的篩選器 -->
-                <div class="p-4 border-b border-gray-200 dark:border-gray-700/50 bg-gray-50/80 dark:bg-gray-800/80 flex flex-wrap items-center gap-2 sm:gap-3 w-full">
-                    <div class="flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50">
-                        <span class="text-xs text-gray-500 dark:text-gray-400 px-2"><i class="fa-solid fa-filter mr-1"></i>區間</span>
-                        <input type="date" id="filter-start-fav" class="filter-start bg-transparent text-gray-900 dark:text-white text-base sm:text-sm outline-none px-1">
-                        <span class="text-gray-400 mx-1">-</span>
-                        <input type="date" id="filter-end-fav" class="filter-end bg-transparent text-gray-900 dark:text-white text-base sm:text-sm outline-none px-1">
-                    </div>
-                    
-                    <label class="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white dark:bg-gray-900/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-700/50 transition hover:bg-gray-50 dark:hover:bg-gray-800">
-                        <input type="checkbox" id="filter-futures-fav" class="filter-futures rounded border-gray-300 dark:border-gray-600 text-sky-500 focus:ring-sky-500 w-3.5 h-3.5 sm:w-4 sm:h-4">
-                        <span class="text-xs sm:text-sm text-sky-600 dark:text-sky-400 font-medium whitespace-nowrap">僅含股期</span>
-                    </label>
-                    <label class="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white dark:bg-gray-900/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-700/50 transition hover:bg-gray-50 dark:hover:bg-gray-800">
-                        <input type="checkbox" id="filter-exclude-negative-growth-fav" class="filter-exclude-negative-growth rounded border-gray-300 dark:border-gray-600 text-green-500 focus:ring-green-500 w-3.5 h-3.5 sm:w-4 sm:h-4">
-                        <span class="text-xs sm:text-sm text-green-600 dark:text-green-400 font-medium whitespace-nowrap">排除負成長</span>
-                    </label>
-
-                    <select id="filter-score-fav" class="filter-score bg-white dark:bg-gray-900/50 text-gray-900 dark:text-white text-base sm:text-sm border border-gray-300 dark:border-gray-700/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 focus:ring-2 focus:ring-blue-500 outline-none transition hover:bg-gray-50 dark:hover:bg-gray-800">
-                        <option value="0">分數不限</option>
-                        <option value="1">1分(含)以上</option>
-                        <option value="2">2分(含)以上</option>
-                        <option value="3">3分(含)以上</option>
-                        <option value="4">4分(含)以上</option>
-                    </select>
-                    
-                    <div class="flex items-center gap-2 w-full md:w-auto relative">
-                        <button type="button" id="filter-tag-btn-fav" class="bg-white dark:bg-gray-900/50 text-gray-900 dark:text-white text-xs sm:text-sm border border-gray-300 dark:border-gray-700/50 rounded-lg px-3 py-1.5 sm:py-2 focus:ring-2 focus:ring-blue-500 outline-none transition hover:bg-gray-50 dark:hover:bg-gray-800 w-full sm:w-auto flex items-center justify-between gap-2 shadow-sm">
-                            <span>+ 篩選策略(可複選)</span><i class="fa-solid fa-chevron-down text-[10px] opacity-70"></i>
-                        </button>
-                        <div id="filter-tag-panel-fav" class="absolute left-0 top-full mt-1.5 w-[280px] bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl shadow-2xl hidden z-50 p-3 max-h-[60vh] overflow-y-auto">
-                            <div id="filter-tags-container-fav"></div>
+                <div class="p-4 border-b border-gray-200 dark:border-gray-700/50 bg-gray-50/80 dark:bg-gray-800/80 flex flex-col 2xl:flex-row justify-between items-start 2xl:items-center gap-4 w-full">
+                    <div class="flex flex-wrap items-center gap-2 sm:gap-3 w-full 2xl:w-auto">
+                        <div class="flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50">
+                            <span class="text-xs text-gray-500 dark:text-gray-400 px-2"><i class="fa-solid fa-filter mr-1"></i>區間</span>
+                            <input type="date" id="filter-start-fav" class="bg-transparent text-gray-900 dark:text-white text-base sm:text-sm outline-none px-1">
+                            <span class="text-gray-400 mx-1">-</span>
+                            <input type="date" id="filter-end-fav" class="bg-transparent text-gray-900 dark:text-white text-base sm:text-sm outline-none px-1">
                         </div>
+                        
+                        <label class="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white dark:bg-gray-900/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-700/50 transition hover:bg-gray-50 dark:hover:bg-gray-800">
+                            <input type="checkbox" id="filter-futures-fav" class="rounded border-gray-300 dark:border-gray-600 text-sky-500 focus:ring-sky-500 w-3.5 h-3.5 sm:w-4 sm:h-4">
+                            <span class="text-xs sm:text-sm text-sky-600 dark:text-sky-400 font-medium whitespace-nowrap">僅含股期</span>
+                        </label>
+                        <label class="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white dark:bg-gray-900/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-700/50 transition hover:bg-gray-50 dark:hover:bg-gray-800">
+                            <input type="checkbox" id="filter-exclude-negative-growth-fav" class="rounded border-gray-300 dark:border-gray-600 text-green-500 focus:ring-green-500 w-3.5 h-3.5 sm:w-4 sm:h-4">
+                            <span class="text-xs sm:text-sm text-green-600 dark:text-green-400 font-medium whitespace-nowrap">排除負成長</span>
+                        </label>
+
+                        <select id="filter-score-fav" class="bg-white dark:bg-gray-900/50 text-gray-900 dark:text-white text-base sm:text-sm border border-gray-300 dark:border-gray-700/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 focus:ring-2 focus:ring-blue-500 outline-none transition hover:bg-gray-50 dark:hover:bg-gray-800">
+                            <option value="0">分數不限</option>
+                            <option value="1">1分(含)以上</option>
+                            <option value="2">2分(含)以上</option>
+                            <option value="3">3分(含)以上</option>
+                            <option value="4">4分(含)以上</option>
+                        </select>
+                        
+                        <div class="flex items-center gap-2 w-full md:w-auto relative">
+                            <button type="button" id="filter-tag-btn-fav" class="bg-white dark:bg-gray-900/50 text-gray-900 dark:text-white text-xs sm:text-sm border border-gray-300 dark:border-gray-700/50 rounded-lg px-3 py-1.5 sm:py-2 focus:ring-2 focus:ring-blue-500 outline-none transition hover:bg-gray-50 dark:hover:bg-gray-800 w-full sm:w-auto flex items-center justify-between gap-2 shadow-sm">
+                                <span>+ 篩選策略(可複選)</span><i class="fa-solid fa-chevron-down text-[10px] opacity-70"></i>
+                            </button>
+                            <div id="filter-tag-panel-fav" class="absolute left-0 top-full mt-1.5 w-[280px] bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl shadow-2xl hidden z-50 p-3 max-h-[60vh] overflow-y-auto">
+                                <div id="filter-tags-container-fav"></div>
+                            </div>
+                        </div>
+                        <div id="filter-tags-display-fav" class="flex flex-wrap gap-1.5 w-full md:w-auto"></div>
+                        <button type="button" id="btn-clear-filters-fav" class="text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-red-600 text-gray-700 dark:text-gray-300 hover:text-white border border-gray-300 dark:border-gray-600 hover:border-red-500 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center ml-auto 2xl:ml-0 whitespace-nowrap">
+                            <i class="fa-solid fa-eraser mr-1.5"></i><span class="hidden sm:inline">清除篩選</span><span class="sm:hidden">清除</span>
+                        </button>
                     </div>
-                    <div id="filter-tags-display-fav" class="flex flex-wrap gap-1.5 w-full md:w-auto"></div>
-                    <button type="button" id="btn-clear-filters-fav" class="text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-red-600 text-gray-700 dark:text-gray-300 hover:text-white border border-gray-300 dark:border-gray-600 hover:border-red-500 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center ml-auto 2xl:ml-0 whitespace-nowrap">
-                        <i class="fa-solid fa-eraser mr-1.5"></i><span class="hidden sm:inline">清除篩選</span><span class="sm:hidden">清除</span>
-                    </button>
+                    
+                    <!-- Fav Copy Features Toolbar -->
+                    <div class="flex flex-wrap gap-1.5 sm:gap-2 w-full 2xl:w-auto justify-start 2xl:justify-end border-t 2xl:border-t-0 border-gray-200 dark:border-gray-700 pt-3 2xl:pt-0">
+                        <span class="text-xs text-gray-400 dark:text-gray-500 mr-1 flex items-center font-medium hidden sm:flex">複製:</span>
+                        <button class="btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="selected">複製選擇</button>
+                        <button class="btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="strategy">策略</button>
+                        <button class="btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="score">分數</button>
+                        <button class="btn-copy-base bg-sky-50 dark:bg-sky-900/40 hover:bg-sky-600 border-sky-200 dark:border-sky-700/50 text-sky-700 dark:text-sky-200 btn-copy" data-mode="futures">股期</button>
+                        <button class="btn-copy-base bg-sky-50 dark:bg-sky-900/40 hover:bg-sky-600 border-sky-200 dark:border-sky-700/50 text-sky-700 dark:text-sky-200 btn-copy" data-mode="futures_score">股期分數</button>
+                        <button class="btn-copy-base bg-green-50 dark:bg-green-900/40 hover:bg-green-600 border-green-200 dark:border-green-700/50 text-green-700 dark:text-green-200 btn-copy" data-mode="eps">EPS</button>
+                        <button class="btn-copy-base bg-orange-50 dark:bg-orange-900/40 hover:bg-orange-600 border-orange-200 dark:border-orange-700/50 text-orange-700 dark:text-orange-200 btn-copy" data-mode="chip">籌碼集中</button>
+                    </div>
                 </div>
 
                 <div id="batch-bar-fav" class="hidden bg-red-50 dark:bg-red-900/20 border-b border-gray-200 dark:border-gray-700/50 p-2 sm:p-3 justify-between items-center transition-all">
@@ -478,6 +492,7 @@
         let state = {
             journals: [], plans: [], epsData: {}, codeToName: {}, nameToCode: {},
             filters: { start: '', end: '', futuresOnly: false, excludeNegativeGrowth: false, tags: [], minScore: 0 },
+            favFilters: { start: '', end: '', futuresOnly: false, excludeNegativeGrowth: false, tags: [], minScore: 0 },
             sortConfig: { key: 'createdAt', asc: false }, favSortConfig: { key: 'createdAt', asc: false }, planSortConfig: { key: 'createdAt', asc: false }
         };
         const selectedIds = { journal: new Set(), fav: new Set(), plan: new Set() };
@@ -549,17 +564,21 @@
                 });
             });
 
-            // Bind Dual Filter Panel Clicks (Sync behavior)
-            document.querySelectorAll('.filter-tag-cb').forEach(cb => {
+            // Bind Filter Panel Clicks (Decoupled Journal and Fav)
+            document.querySelectorAll('#filter-tag-panel .filter-tag-cb').forEach(cb => {
                 cb.addEventListener('change', (e) => {
                     const val = e.target.value;
                     if (e.target.checked) { if (!state.filters.tags.includes(val)) state.filters.tags.push(val); } 
                     else { state.filters.tags = state.filters.tags.filter(t => t !== val); }
-                    
-                    // Sync visually on both panels
-                    document.querySelectorAll(`.filter-tag-cb[value="${val}"]`).forEach(c => c.checked = e.target.checked);
-                    
-                    renderFilterTags(); processAndRenderJournals(); renderFavorites(); saveLocalData();
+                    renderFilterTags('journal'); processAndRenderJournals(); saveLocalData();
+                });
+            });
+            document.querySelectorAll('#filter-tag-panel-fav .filter-tag-cb').forEach(cb => {
+                cb.addEventListener('change', (e) => {
+                    const val = e.target.value;
+                    if (e.target.checked) { if (!state.favFilters.tags.includes(val)) state.favFilters.tags.push(val); } 
+                    else { state.favFilters.tags = state.favFilters.tags.filter(t => t !== val); }
+                    renderFilterTags('fav'); renderFavorites(); saveLocalData();
                 });
             });
         }
@@ -586,6 +605,7 @@
                 const twStocks = { "2330": "台積電", "2317": "鴻海", "2454": "聯發科", "2382": "廣達", "2603": "長榮" };
                 Object.entries(twStocks).forEach(([c,n]) => { state.codeToName[c] = n; state.nameToCode[n] = c; });
             }
+            if(!state.favFilters) state.favFilters = { start: '', end: '', futuresOnly: false, excludeNegativeGrowth: false, tags: [], minScore: 0 };
         }
         function saveLocalData() { localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state)); }
 
@@ -800,6 +820,7 @@
                     for(let i=1; i<rows.length; i++) {
                         if(!rows[i] || rows[i].length<2) continue;
                         const c = String(rows[i][0]).trim(); if(!c) continue; const n = String(rows[i][1]||'').trim();
+                        // 加入處理 Excel 第 7 欄（index 6）的 最高目標價 (targetPrice)
                         const item = { code: c, name: n, eps2025: parseFloat(rows[i][2])||null, eps2026: parseFloat(rows[i][3])||null, epsGrowth: parseFloat(rows[i][4])||null, futures: String(rows[i][5]||'').trim(), targetPrice: parseFloat(rows[i][6])||null, updatedAt: Date.now() };
                         state.epsData[c] = item; updates[c] = item;
                         if (n) { state.codeToName[c] = n; state.nameToCode[n] = c; } count++;
@@ -827,50 +848,36 @@
             });
         });
 
-        // 雙向綁定篩選器操作
-        const filterFields = [
-            { key: 'start', cls: 'filter-start', type: 'value' },
-            { key: 'end', cls: 'filter-end', type: 'value' },
-            { key: 'futuresOnly', cls: 'filter-futures', type: 'checked' },
-            { key: 'excludeNegativeGrowth', cls: 'filter-exclude-negative-growth', type: 'checked' },
-            { key: 'minScore', cls: 'filter-score', type: 'value', isInt: true }
-        ];
-
-        filterFields.forEach(f => {
-            document.querySelectorAll(`.${f.cls}`).forEach(el => {
-                el.addEventListener('change', (e) => {
-                    let val = f.type === 'checked' ? e.target.checked : e.target.value;
-                    if (f.isInt) val = parseInt(val) || 0;
-                    state.filters[f.key] = val;
-                    
-                    // 同步另一個面板的數值
-                    document.querySelectorAll(`.${f.cls}`).forEach(otherEl => {
-                        if(otherEl !== e.target) {
-                            if(f.type === 'checked') otherEl.checked = val;
-                            else otherEl.value = val;
-                        }
-                    });
-                    
-                    processAndRenderJournals(); renderFavorites(); saveLocalData();
-                });
-            });
+        // 日誌篩選器操作
+        ['start', 'end', 'score'].forEach(key => {
+            const el = document.getElementById(`filter-${key}`);
+            if(el) el.addEventListener('change', (e) => { let val = key==='score'?parseInt(e.target.value)||0:e.target.value; state.filters[key] = val; processAndRenderJournals(); saveLocalData(); });
+        });
+        ['futures', 'exclude-negative-growth'].forEach(key => {
+            const el = document.getElementById(`filter-${key}`);
+            if(el) el.addEventListener('change', (e) => { let stateKey = key==='futures'?'futuresOnly':'excludeNegativeGrowth'; state.filters[stateKey] = e.target.checked; processAndRenderJournals(); saveLocalData(); });
         });
 
-        ['btn-clear-filters', 'btn-clear-filters-fav'].forEach(btnId => {
-            const btn = document.getElementById(btnId);
-            if(!btn) return;
-            btn.addEventListener('click', () => {
-                const today = getToday();
-                state.filters = { start: today, end: today, futuresOnly: false, excludeNegativeGrowth: false, minScore: 0, tags: [] };
-                state.sortConfig = { key: 'createdAt', asc: false }; state.favSortConfig = { key: 'createdAt', asc: false };
-                
-                document.querySelectorAll('.filter-start, .filter-end').forEach(el => el.value = today);
-                document.querySelectorAll('.filter-futures, .filter-exclude-negative-growth').forEach(el => el.checked = false);
-                document.querySelectorAll('.filter-score').forEach(el => el.value = "0");
-                document.querySelectorAll('.filter-tag-cb').forEach(cb => cb.checked = false);
-                
-                renderFilterTags(); processAndRenderJournals(); renderFavorites(); saveLocalData(); showToast('已清除篩選條件與排序');
-            });
+        // 追蹤清單獨立篩選器操作
+        ['start-fav', 'end-fav', 'score-fav'].forEach(key => {
+            const baseKey = key.replace('-fav', ''); const el = document.getElementById(`filter-${key}`);
+            if(el) el.addEventListener('change', (e) => { let val = baseKey==='score'?parseInt(e.target.value)||0:e.target.value; state.favFilters[baseKey] = val; renderFavorites(); saveLocalData(); });
+        });
+        ['futures-fav', 'exclude-negative-growth-fav'].forEach(key => {
+            const stateKey = key==='futures-fav'?'futuresOnly':'excludeNegativeGrowth'; const el = document.getElementById(`filter-${key}`);
+            if(el) el.addEventListener('change', (e) => { state.favFilters[stateKey] = e.target.checked; renderFavorites(); saveLocalData(); });
+        });
+
+        // 清除按鈕分離
+        document.getElementById('btn-clear-filters').addEventListener('click', () => {
+            const today = getToday(); state.filters = { start: today, end: today, futuresOnly: false, excludeNegativeGrowth: false, minScore: 0, tags: [] }; state.sortConfig = { key: 'createdAt', asc: false };
+            document.getElementById('filter-start').value = today; document.getElementById('filter-end').value = today; document.getElementById('filter-futures').checked = false; document.getElementById('filter-exclude-negative-growth').checked = false; document.getElementById('filter-score').value = "0";
+            document.querySelectorAll('#filter-tag-panel .filter-tag-cb').forEach(cb => cb.checked = false); renderFilterTags('journal'); processAndRenderJournals(); saveLocalData(); showToast('日誌篩選已清除');
+        });
+        document.getElementById('btn-clear-filters-fav').addEventListener('click', () => {
+            state.favFilters = { start: '', end: '', futuresOnly: false, excludeNegativeGrowth: false, minScore: 0, tags: [] }; state.favSortConfig = { key: 'createdAt', asc: false };
+            document.getElementById('filter-start-fav').value = ''; document.getElementById('filter-end-fav').value = ''; document.getElementById('filter-futures-fav').checked = false; document.getElementById('filter-exclude-negative-growth-fav').checked = false; document.getElementById('filter-score-fav').value = "0";
+            document.querySelectorAll('#filter-tag-panel-fav .filter-tag-cb').forEach(cb => cb.checked = false); renderFilterTags('fav'); renderFavorites(); saveLocalData(); showToast('追蹤篩選已清除');
         });
 
         ['', '-fav'].forEach(suffix => {
@@ -882,22 +889,28 @@
             }
         });
 
-        window.removeFilterTag = (tag) => {
-            state.filters.tags = state.filters.tags.filter(t => t !== tag);
-            document.querySelectorAll(`.filter-tag-cb[value="${tag}"]`).forEach(cb => cb.checked = false);
-            renderFilterTags(); processAndRenderJournals(); renderFavorites(); saveLocalData();
+        window.removeFilterTag = (tag, type) => {
+            if(type === 'fav') {
+                state.favFilters.tags = state.favFilters.tags.filter(t => t !== tag);
+                const cb = document.querySelector(`#filter-tag-panel-fav .filter-tag-cb[value="${tag}"]`); if (cb) cb.checked = false;
+                renderFilterTags('fav'); renderFavorites();
+            } else {
+                state.filters.tags = state.filters.tags.filter(t => t !== tag);
+                const cb = document.querySelector(`#filter-tag-panel .filter-tag-cb[value="${tag}"]`); if (cb) cb.checked = false;
+                renderFilterTags('journal'); processAndRenderJournals();
+            }
+            saveLocalData();
         };
 
-        function renderFilterTags() {
-            const html = state.filters.tags.map(t => `<span class="bg-blue-600/10 dark:bg-blue-900/60 text-blue-600 dark:text-blue-200 text-xs px-2 py-1 rounded-lg flex items-center cursor-pointer hover:bg-red-600 hover:text-white dark:hover:bg-red-800/80 transition" onclick="removeFilterTag('${t}')">${t} <i class="fa-solid fa-xmark ml-1.5 opacity-70"></i></span>`).join('');
-            const d1 = document.getElementById('filter-tags-display');
-            const d2 = document.getElementById('filter-tags-display-fav');
-            if(d1) d1.innerHTML = html;
-            if(d2) d2.innerHTML = html;
+        function renderFilterTags(type) {
+            const tags = type === 'fav' ? state.favFilters.tags : state.filters.tags;
+            const containerId = type === 'fav' ? 'filter-tags-display-fav' : 'filter-tags-display';
+            document.getElementById(containerId).innerHTML = tags.map(t => `<span class="bg-blue-600/10 dark:bg-blue-900/60 text-blue-600 dark:text-blue-200 text-xs px-2 py-1 rounded-lg flex items-center cursor-pointer hover:bg-red-600 hover:text-white dark:hover:bg-red-800/80 transition" onclick="removeFilterTag('${t}', '${type}')">${t} <i class="fa-solid fa-xmark ml-1.5 opacity-70"></i></span>`).join('');
         }
 
-        const getFilteredAndSortedData = (dataList) => {
-            const { start, end, futuresOnly, excludeNegativeGrowth, tags, minScore } = state.filters, { key, asc } = state.sortConfig;
+        const getFilteredAndSortedData = (dataList, filters, sortConfig) => {
+            const { start, end, futuresOnly, excludeNegativeGrowth, tags, minScore } = filters;
+            const { key, asc } = sortConfig;
             let filtered = dataList.filter(j => {
                 if(start && j.date < start) return false; if(end && j.date > end) return false;
                 const ei = getEpsInfo(j.code, j);
@@ -982,19 +995,10 @@
 
         window.deleteRow = async (id) => { state.journals = state.journals.filter(j => j.id !== id); saveLocalData(); processAndRenderJournals(); if(document.getElementById('module-favorites').classList.contains('active')) renderFavorites(); await deleteDataFromCloud(`journals/${id}`); showToast('紀錄已刪除'); };
 
-        function processAndRenderJournals() { renderTableRows(getFilteredAndSortedData(state.journals), 'journal-table-body', 'journal-empty'); }
+        function processAndRenderJournals() { renderTableRows(getFilteredAndSortedData(state.journals, state.filters, state.sortConfig), 'journal-table-body', 'journal-empty'); }
         function renderFavorites() { 
-            // 讓追蹤清單也完整套用全域篩選邏輯
-            let filteredData = getFilteredAndSortedData(state.journals);
+            let filteredData = getFilteredAndSortedData(state.journals, state.favFilters, state.favSortConfig);
             let favs = filteredData.filter(j => j.isFavorite); 
-            
-            const { key, asc } = state.favSortConfig || { key: 'createdAt', asc: false };
-            favs.sort((a, b) => {
-                let vA, vB; const eA = getEpsInfo(a.code, a), eB = getEpsInfo(b.code, b);
-                switch(key) { case 'date': vA=a.date; vB=b.date; break; case 'code': vA=a.code; vB=b.code; break; case 'name': vA=a.name; vB=b.name; break; case 'eps2025': vA=eA.eps2025??-9999; vB=eB.eps2025??-9999; break; case 'eps2026': vA=eA.eps2026??-9999; vB=eB.eps2026??-9999; break; case 'epsGrowth': vA=eA.epsGrowth??-9999; vB=eB.epsGrowth??-9999; break; case 'score': vA=getScore(a.tags, eA); vB=getScore(b.tags, eB); break; case 'targetPrice': vA=eA.targetPrice??-9999; vB=eB.targetPrice??-9999; break; default: vA=a.createdAt||0; vB=b.createdAt||0; break; }
-                if(vA === vB) return (a.createdAt||0) - (b.createdAt||0);
-                return asc ? (vA > vB ? 1 : -1) : (vA > vB ? -1 : 1);
-            });
             renderTableRows(favs, 'fav-table-body', 'fav-empty', true); 
         }
 
@@ -1004,26 +1008,45 @@
 
         document.querySelectorAll('.btn-copy').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                const mode = e.currentTarget.dataset.mode; 
-                // 複製時不將「特別關注」群組納入考量
-                let data = getFilteredAndSortedData(state.journals).filter(j => !(j.tags && (j.tags.includes('特別追蹤') || j.tags.includes('金包銀'))));
+                const mode = e.currentTarget.dataset.mode;
+                const activeTab = document.querySelector('.tab-content.active').id;
+                const isFav = activeTab === 'module-favorites';
+                const currentFilters = isFav ? state.favFilters : state.filters;
+                const listType = isFav ? 'fav' : 'journal';
+
+                let data = getFilteredAndSortedData(state.journals, currentFilters, isFav ? state.favSortConfig : state.sortConfig);
+                if(isFav) data = data.filter(j => j.isFavorite);
+
+                // 複製選擇邏輯：只複製打勾的標的，並且允許輸出「特別關注」的策略標籤
+                if (mode === 'selected') {
+                    let checkedIds = selectedIds[listType];
+                    if(checkedIds.size === 0) return showToast('請先在清單中勾選要複製的標的', 'error');
+                    data = data.filter(j => checkedIds.has(j.id));
+                    data.sort((a,b) => { const d = new Date(a.date) - new Date(b.date); return d !== 0 ? d : (a.createdAt||0) - (b.createdAt||0); });
+                    let text = `| 🎯 已選標的清單 |\n\n`;
+                    data.forEach(j => {
+                        let tags = j.tags || [];
+                        text += `- ${j.code} ${j.name} (${getScore(j.tags, getEpsInfo(j.code, j))}分)${tags.length>0?` [${tags.map(t=>t[0]).join('')}]`:''}\n`;
+                    });
+                    executeCopy(text.trim() + copyFootnote);
+                    return;
+                }
+
+                // 其他模式不複製特別關注
+                data = data.filter(j => !(j.tags && (j.tags.includes('特別追蹤') || j.tags.includes('金包銀'))));
                 if(data.length===0) return showToast('清單為空 (已排除特別關注)','error');
                 
-                let dStr = state.filters.start === state.filters.end ? state.filters.start.replace(/-/g, '/') : `${state.filters.start.substring(5).replace(/-/g, '/')}~${state.filters.end.substring(5).replace(/-/g, '/')}`;
+                let dStr = currentFilters.start === currentFilters.end ? (currentFilters.start ? currentFilters.start.replace(/-/g, '/') : '全區間') : `${currentFilters.start.substring(5).replace(/-/g, '/')}~${currentFilters.end.substring(5).replace(/-/g, '/')}`;
                 let text = `| ${dStr} 多重篩選漏斗 |\n\n`;
 
-                if(mode === 'time') {
-                    data.sort((a,b) => { const d = new Date(a.date) - new Date(b.date); return d !== 0 ? d : (a.createdAt||0) - (b.createdAt||0); });
-                    data.forEach(j => { let tags = (state.filters.tags.length > 0 ? (j.tags||[]).filter(t => state.filters.tags.includes(t)) : (j.tags||[]).filter(t => !['特別追蹤', '金包銀'].includes(t))); text += `- ${j.code} ${j.name} (${getScore(j.tags, getEpsInfo(j.code, j))})${tags.length>0?` [${tags.map(t=>t[0]).join('')}]`:''}\n`; });
-                } 
-                else if(mode === 'strategy') {
-                    const sm = {}; data.forEach(j => { if(j.tags) j.tags.forEach(t => { if(state.filters.tags.length>0 ? state.filters.tags.includes(t) : (!['特別追蹤', '金包銀'].includes(t))) { if(!sm[t]) sm[t]=[]; sm[t].push(j); }}); });
+                if(mode === 'strategy') {
+                    const sm = {}; data.forEach(j => { if(j.tags) j.tags.forEach(t => { if(currentFilters.tags.length>0 ? currentFilters.tags.includes(t) : (!['特別追蹤', '金包銀'].includes(t))) { if(!sm[t]) sm[t]=[]; sm[t].push(j); }}); });
                     const order = ['多頭營收創高', '破繭而出', '月來越好', '季不可失', '守株待兔', '量價齊揚', 'OBV突破'];
                     Object.keys(sm).sort((a, b) => { const iA = order.indexOf(a), iB = order.indexOf(b); if (iA !== -1 && iB !== -1) return iA - iB; if (iA !== -1) return -1; if (iB !== -1) return 1; return a.localeCompare(b); }).forEach(s => { text += `🎯 [${s}] (共 ${sm[s].length} 檔)\n`; sm[s].forEach(a => text += `- ${a.code} ${a.name}\n`); text += '\n'; });
                 }
                 else if(mode === 'score') {
                     data.sort((a,b)=>getScore(b.tags, getEpsInfo(b.code, b))-getScore(a.tags, getEpsInfo(a.code, a))).forEach(j => {
-                        let tags = state.filters.tags.length > 0 ? (j.tags||[]).filter(t => state.filters.tags.includes(t)) : (j.tags||[]).filter(t => !['特別追蹤', '金包銀'].includes(t));
+                        let tags = currentFilters.tags.length > 0 ? (j.tags||[]).filter(t => currentFilters.tags.includes(t)) : (j.tags||[]).filter(t => !['特別追蹤', '金包銀'].includes(t));
                         const g = getEpsInfo(j.code,j).epsGrowth; text += `- ${j.code} ${j.name} [${getScore(j.tags, getEpsInfo(j.code, j))}分] (預成長: ${g!==null?(g*100).toFixed(2)+'%':'無'})${tags.length>0?` ${tags.map(t=>t[0]).join('')}`:''}\n`;
                     });
                 }
@@ -1031,7 +1054,7 @@
                 else if(mode === 'futures') data.filter(j => getEpsInfo(j.code,j).futures).forEach(j => text += `- [期] ${j.code} ${j.name}\n`);
                 else if(mode === 'futures_score') {
                     data.filter(j => getEpsInfo(j.code,j).futures).sort((a,b)=>getScore(b.tags, getEpsInfo(b.code, b))-getScore(a.tags, getEpsInfo(a.code, a))).forEach(j => {
-                        let tags = state.filters.tags.length > 0 ? (j.tags||[]).filter(t => state.filters.tags.includes(t)) : (j.tags||[]).filter(t => !['特別追蹤', '金包銀'].includes(t));
+                        let tags = currentFilters.tags.length > 0 ? (j.tags||[]).filter(t => currentFilters.tags.includes(t)) : (j.tags||[]).filter(t => !['特別追蹤', '金包銀'].includes(t));
                         const g = getEpsInfo(j.code,j).epsGrowth; text += `- [期] ${j.code} ${j.name} [${getScore(j.tags, getEpsInfo(j.code, j))}分] (預成長: ${g!==null?(g*100).toFixed(2)+'%':'無'})${tags.length>0?` ${tags.map(t=>t[0]).join('')}`:''}\n`;
                     });
                 }
@@ -1123,22 +1146,28 @@
 
         // 初始化
         document.addEventListener('DOMContentLoaded', async () => {
-            initThemeSwitcher();
+            initThemeSwitcher(); 
             renderDynamicTags(); 
             loadLocalData();
             
             const today = getToday();
             state.filters = { start: today, end: today, futuresOnly: false, excludeNegativeGrowth: false, tags: [], minScore: 0 };
+            
+            // 追蹤清單預設為空白 (無時間限制)
+            if(!state.favFilters) state.favFilters = { start: '', end: '', futuresOnly: false, excludeNegativeGrowth: false, tags: [], minScore: 0 };
+            
             state.sortConfig = { key: 'createdAt', asc: false }; state.favSortConfig = { key: 'createdAt', asc: false }; state.planSortConfig = { key: 'createdAt', asc: false };
             saveLocalData();
 
-            // 雙面板數值初始化
-            document.querySelectorAll('.filter-start, .filter-end').forEach(el => el.value = today);
+            // 雙面板數值初始化 (解耦獨立)
+            document.getElementById('filter-start').value = today; document.getElementById('filter-end').value = today;
+            document.getElementById('filter-start-fav').value = state.favFilters.start || ''; document.getElementById('filter-end-fav').value = state.favFilters.end || '';
             document.getElementById('j-date').value = today;
+            
             document.querySelectorAll('.filter-futures, .filter-exclude-negative-growth').forEach(el => el.checked = false);
             document.querySelectorAll('.filter-score').forEach(el => el.value = "0");
             document.querySelectorAll('.filter-tag-cb').forEach(cb => cb.checked = false); 
-            renderFilterTags();
+            renderFilterTags('journal'); renderFilterTags('fav');
 
             processAndRenderJournals(); renderFavorites(); renderPlans();
             updateSyncStatusUI();
