@@ -598,6 +598,63 @@
             }
         }
 
+        // ============================================================================
+        // [打勾狀態保存與批次刪除邏輯修復]
+        // ============================================================================
+        document.addEventListener('change', (e) => {
+            // 單筆勾選
+            if (e.target.classList.contains('row-cb')) {
+                const type = e.target.dataset.type;
+                if (e.target.checked) selectedIds[type].add(e.target.value);
+                else selectedIds[type].delete(e.target.value);
+                updateBatchUI(type);
+            }
+            // 全選按鈕
+            if (e.target.classList.contains('select-all-cb')) {
+                const type = e.target.dataset.type;
+                const isChecked = e.target.checked;
+                document.querySelectorAll(`.row-cb[data-type="${type}"]`).forEach(cb => {
+                    cb.checked = isChecked;
+                    if (isChecked) selectedIds[type].add(cb.value);
+                    else selectedIds[type].delete(cb.value);
+                });
+                updateBatchUI(type);
+            }
+        });
+
+        // 呼叫批次刪除確認框
+        window.confirmBatchDelete = (type) => {
+            if (selectedIds[type].size === 0) return;
+            document.getElementById('batch-delete-type').value = type;
+            document.getElementById('batch-delete-msg').textContent = `確定要刪除這 ${selectedIds[type].size} 筆資料嗎？此操作無法復原。`;
+            document.getElementById('batch-delete-modal').classList.remove('hidden');
+        };
+
+        // 執行批次刪除
+        window.executeBatchDelete = async () => {
+            const type = document.getElementById('batch-delete-type').value;
+            const idsToDelete = Array.from(selectedIds[type]);
+            
+            if (type === 'journal' || type === 'fav') {
+                state.journals = state.journals.filter(j => !idsToDelete.includes(j.id));
+                idsToDelete.forEach(id => deleteDataFromCloud(`journals/${id}`).catch(()=>{}));
+                selectedIds.journal.clear();
+                selectedIds.fav.clear();
+                processAndRenderJournals();
+                renderFavorites();
+            } else if (type === 'plan') {
+                state.plans = state.plans.filter(p => !idsToDelete.includes(p.id));
+                idsToDelete.forEach(id => deleteDataFromCloud(`plans/${id}`).catch(()=>{}));
+                selectedIds.plan.clear();
+                renderPlans();
+            }
+            
+            saveLocalData();
+            document.getElementById('batch-delete-modal').classList.add('hidden');
+            showToast(`已成功刪除 ${idsToDelete.length} 筆資料`);
+        };
+        // ============================================================================
+
         function loadLocalData() {
             const savedData = localStorage.getItem(LOCAL_STORAGE_KEY);
             if (savedData) { try { state = { ...state, ...JSON.parse(savedData) }; } catch (e) { } } 
