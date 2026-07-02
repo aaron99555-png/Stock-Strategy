@@ -617,6 +617,89 @@
             showToast(`已成功刪除 ${idsToDelete.length} 筆資料`);
         };
 
+        // 雙向綁定篩選器操作與選單
+        const filterFields = [
+            { key: 'start', cls: 'filter-start', type: 'value' },
+            { key: 'end', cls: 'filter-end', type: 'value' },
+            { key: 'futuresOnly', cls: 'filter-futures', type: 'checked' },
+            { key: 'excludeNegativeGrowth', cls: 'filter-exclude-negative-growth', type: 'checked' },
+            { key: 'minScore', cls: 'filter-score', type: 'value', isInt: true }
+        ];
+
+        filterFields.forEach(f => {
+            document.querySelectorAll(`.${f.cls}`).forEach(el => {
+                el.addEventListener('change', (e) => {
+                    let val = f.type === 'checked' ? e.target.checked : e.target.value;
+                    if (f.isInt) val = parseInt(val) || 0;
+                    
+                    const isFav = e.target.closest('#module-favorites') !== null;
+                    const targetFilters = isFav ? state.favFilters : state.filters;
+                    targetFilters[f.key] = val;
+                    
+                    isFav ? renderFavorites() : processAndRenderJournals();
+                    saveLocalData();
+                });
+            });
+        });
+
+        ['btn-clear-filters', 'btn-clear-filters-fav'].forEach(btnId => {
+            const btn = document.getElementById(btnId);
+            if(!btn) return;
+            btn.addEventListener('click', (e) => {
+                const isFav = btnId.includes('fav');
+                const today = getToday();
+                if(isFav) {
+                    state.favFilters = { start: '', end: '', futuresOnly: false, excludeNegativeGrowth: false, minScore: 0, tags: [] };
+                    document.getElementById('filter-start-fav').value = '';
+                    document.getElementById('filter-end-fav').value = '';
+                    document.getElementById('filter-futures-fav').checked = false;
+                    document.getElementById('filter-exclude-negative-growth-fav').checked = false;
+                    document.getElementById('filter-score-fav').value = "0";
+                    document.querySelectorAll('#filter-tags-container-fav .filter-tag-cb').forEach(cb => cb.checked = false);
+                    renderFavorites();
+                } else {
+                    state.filters = { start: today, end: today, futuresOnly: false, excludeNegativeGrowth: false, minScore: 0, tags: [] };
+                    document.getElementById('filter-start').value = today;
+                    document.getElementById('filter-end').value = today;
+                    document.getElementById('filter-futures').checked = false;
+                    document.getElementById('filter-exclude-negative-growth').checked = false;
+                    document.getElementById('filter-score').value = "0";
+                    document.querySelectorAll('#filter-tags-container .filter-tag-cb').forEach(cb => cb.checked = false);
+                    processAndRenderJournals();
+                }
+                renderFilterTags(); saveLocalData(); showToast('已清除篩選條件');
+            });
+        });
+
+        ['', '-fav'].forEach(suffix => {
+            const btn = document.getElementById('filter-tag-btn' + suffix);
+            const panel = document.getElementById('filter-tag-panel' + suffix);
+            if(btn && panel) {
+                btn.addEventListener('click', (e) => { e.stopPropagation(); panel.classList.toggle('hidden'); });
+                document.addEventListener('click', (e) => { if(!panel.contains(e.target) && e.target !== btn) panel.classList.add('hidden'); });
+            }
+        });
+
+        window.removeFilterTag = (tag, isFav) => {
+            if(isFav) {
+                state.favFilters.tags = state.favFilters.tags.filter(t => t !== tag);
+                document.querySelectorAll(`#filter-tags-container-fav .filter-tag-cb[value="${tag}"]`).forEach(cb => cb.checked = false);
+                renderFavorites();
+            } else {
+                state.filters.tags = state.filters.tags.filter(t => t !== tag);
+                document.querySelectorAll(`#filter-tags-container .filter-tag-cb[value="${tag}"]`).forEach(cb => cb.checked = false);
+                processAndRenderJournals();
+            }
+            renderFilterTags(); saveLocalData();
+        };
+
+        function renderFilterTags() {
+            const d1 = document.getElementById('filter-tags-display');
+            const d2 = document.getElementById('filter-tags-display-fav');
+            if(d1) d1.innerHTML = state.filters.tags.map(t => `<span class="bg-blue-600/10 dark:bg-blue-900/60 text-blue-600 dark:text-blue-200 text-xs px-2 py-1 rounded-lg flex items-center cursor-pointer hover:bg-red-600 hover:text-white dark:hover:bg-red-800/80 transition" onclick="removeFilterTag('${t}', false)">${t} <i class="fa-solid fa-xmark ml-1.5 opacity-70"></i></span>`).join('');
+            if(d2) d2.innerHTML = state.favFilters.tags.map(t => `<span class="bg-blue-600/10 dark:bg-blue-900/60 text-blue-600 dark:text-blue-200 text-xs px-2 py-1 rounded-lg flex items-center cursor-pointer hover:bg-red-600 hover:text-white dark:hover:bg-red-800/80 transition" onclick="removeFilterTag('${t}', true)">${t} <i class="fa-solid fa-xmark ml-1.5 opacity-70"></i></span>`).join('');
+        }
+
         function loadLocalData() {
             const savedData = localStorage.getItem(LOCAL_STORAGE_KEY);
             if (savedData) { try { state = { ...state, ...JSON.parse(savedData) }; } catch (e) { } } 
@@ -747,7 +830,7 @@
 
         const syncModal = document.getElementById('sync-modal'), syncInput = document.getElementById('sync-key-input');
         document.getElementById('btn-sync-modal').addEventListener('click', () => { syncInput.value = localStorage.getItem('ryan_sync_key') || ''; syncModal.classList.remove('hidden'); });
-        document.getElementById('btn-cancel-sync').addEventListener('click', () => syncModal.classList.add('hidden'));
+        document.getElementById('btn-cancel-sync').addEventListener('click', () => syncModal.classList.add('hidden'); });
         document.getElementById('btn-save-sync').addEventListener('click', async () => {
             const key = syncInput.value.trim();
             if(key) { localStorage.setItem('ryan_sync_key', key); showToast('已綁定同步碼，正在載入雲端資料...'); await loadFromCloud(); } 
@@ -962,7 +1045,6 @@
                         }
                     });
 
-                    // 修正：抬頭完全同步為對稱的篩選漏斗格式
                     let text = `| ${dStr} 多重篩選漏斗 |\n\n`;
 
                     targetStrategies.forEach(s => {
