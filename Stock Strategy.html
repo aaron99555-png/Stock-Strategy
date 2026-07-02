@@ -1074,14 +1074,22 @@
                 let data = getFilteredAndSortedData(state.journals, currentFilters, isFav ? state.favSortConfig : state.sortConfig);
                 if(isFav) data = data.filter(j => j.isFavorite);
 
-                // 複製選擇邏輯：只複製打勾的標的，並且允許輸出指定的嚴選策略標籤
+                // 複製選擇邏輯：只複製打勾的標的，並且「只輸出篩選器中所選取的策略」
                 if (mode === 'selected') {
                     let checkedIds = selectedIds[listType];
                     if(checkedIds.size === 0) return showToast('請先在清單中勾選要複製的標的', 'error');
+                    
                     data = data.filter(j => checkedIds.has(j.id));
                     data.sort((a,b) => { const d = new Date(a.date) - new Date(b.date); return d !== 0 ? d : (a.createdAt||0) - (b.createdAt||0); });
                     
-                    const targetStrategies = ['特別追蹤', '金包銀', '破繭而出', '月來越好', '季不可失', '守株待兔'];
+                    // 核心修改：目標策略改為動態抓取「篩選策略(可複選)」中打勾的值
+                    let targetStrategies = currentFilters.tags;
+                    
+                    // 提示防呆機制：如果沒有選擇任何篩選策略
+                    if (targetStrategies.length === 0) {
+                        return showToast('請先在上方「篩選策略」勾選您要複製的策略', 'error');
+                    }
+
                     const sm = {};
                     data.forEach(j => {
                         if(j.tags) {
@@ -1094,7 +1102,10 @@
                         }
                     });
 
-                    let text = `| 🎯 嚴選策略標的 |\n\n`;
+                    let dStr = currentFilters.start === currentFilters.end ? (currentFilters.start ? currentFilters.start.replace(/-/g, '/') : '全區間') : `${currentFilters.start.substring(5).replace(/-/g, '/')}~${currentFilters.end.substring(5).replace(/-/g, '/')}`;
+                    let text = `| ${dStr} 嚴選策略標的 |\n\n`;
+
+                    // 依照使用者勾選的策略順序輸出
                     targetStrategies.forEach(s => {
                         if(sm[s] && sm[s].length > 0) {
                             text += `🎯 [${s === '特別追蹤' ? '特別關注' : s}] (共 ${sm[s].length} 檔)\n`;
