@@ -78,12 +78,12 @@
                     </button>
                     <button id="btn-sync-modal" class="text-xs sm:text-sm bg-blue-600 hover:bg-blue-500 text-white px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm border border-transparent flex items-center font-medium"><i class="fa-solid fa-cloud-arrow-up sm:mr-1.5"></i><span class="hidden sm:inline">跨裝置同步</span></button>
                     
-                    <button id="btn-db-upload" class="text-xs sm:text-sm bg-purple-50 dark:bg-purple-900/40 hover:bg-purple-100 dark:hover:bg-purple-800/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-700/50 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center font-medium" title="匯入個股資料庫 Excel">
+                    <button id="btn-db-upload" onclick="document.getElementById('excel-upload').click()" class="text-xs sm:text-sm bg-purple-50 dark:bg-purple-900/40 hover:bg-purple-100 dark:hover:bg-purple-800/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-700/50 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center font-medium" title="匯入個股資料庫 Excel">
                         <i class="fa-solid fa-database sm:mr-1.5"></i><span class="hidden sm:inline">資料庫</span>
                     </button>
                     <input type="file" id="excel-upload" accept=".xlsx, .xls" class="hidden">
 
-                    <button id="btn-import-backup" class="text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center"><i class="fa-solid fa-upload sm:mr-1.5"></i><span class="hidden sm:inline">匯入</span></button>
+                    <button id="btn-import-backup" onclick="document.getElementById('backup-file').click()" class="text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center"><i class="fa-solid fa-upload sm:mr-1.5"></i><span class="hidden sm:inline">匯入</span></button>
                     <button id="btn-export-backup" class="text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center"><i class="fa-solid fa-download sm:mr-1.5"></i><span class="hidden sm:inline">匯出</span></button>
                     <input type="file" id="backup-file" accept=".xlsx" class="hidden">
                 </div>
@@ -172,18 +172,19 @@
                             <option value="4">4分(含)以上</option>
                         </select>
                         
-                        <div class="flex items-center gap-2 w-full md:w-auto relative">
-                            <button type="button" id="filter-tag-btn" class="bg-white dark:bg-gray-900/50 text-gray-900 dark:text-white text-xs sm:text-sm border border-gray-300 dark:border-gray-700/50 rounded-lg px-3 py-1.5 sm:py-2 focus:ring-2 focus:ring-blue-500 outline-none transition hover:bg-gray-50 dark:hover:bg-gray-800 w-full sm:w-auto flex items-center justify-between gap-2 shadow-sm">
+                        <!-- 策略選單與清除篩選同一行 -->
+                        <div class="flex items-center gap-2 relative">
+                            <button type="button" id="filter-tag-btn" class="bg-white dark:bg-gray-900/50 text-gray-900 dark:text-white text-xs sm:text-sm border border-gray-300 dark:border-gray-700/50 rounded-lg px-3 py-1.5 sm:py-2 focus:ring-2 focus:ring-blue-500 outline-none transition hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center justify-between gap-2 shadow-sm whitespace-nowrap">
                                 <span>+ 篩選策略(可複選)</span><i class="fa-solid fa-chevron-down text-[10px] opacity-70"></i>
+                            </button>
+                            <button type="button" id="btn-clear-filters" class="text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-red-600 text-gray-700 dark:text-gray-300 hover:text-white border border-gray-300 dark:border-gray-600 hover:border-red-500 px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center whitespace-nowrap">
+                                <i class="fa-solid fa-eraser sm:mr-1.5"></i><span class="hidden sm:inline">清除篩選</span><span class="sm:hidden">清除</span>
                             </button>
                             <div id="filter-tag-panel" class="absolute left-0 top-full mt-1.5 w-[280px] bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl shadow-2xl hidden z-50 p-3 max-h-[60vh] overflow-y-auto">
                                 <div id="filter-tags-container"></div>
                             </div>
                         </div>
-                        <div id="filter-tags-display" class="flex flex-wrap gap-1.5 w-full md:w-auto"></div>
-                        <button type="button" id="btn-clear-filters" class="text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-red-600 text-gray-700 dark:text-gray-300 hover:text-white border border-gray-300 dark:border-gray-600 hover:border-red-500 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center ml-auto 2xl:ml-0 whitespace-nowrap">
-                            <i class="fa-solid fa-eraser mr-1.5"></i><span class="hidden sm:inline">清除篩選</span><span class="sm:hidden">清除</span>
-                        </button>
+                        <div id="filter-tags-display" class="flex flex-wrap gap-1.5 w-full md:w-auto mt-2 2xl:mt-0"></div>
                     </div>
 
                     <div class="flex flex-wrap gap-1.5 sm:gap-2 w-full 2xl:w-auto justify-start 2xl:justify-end border-t 2xl:border-t-0 border-gray-200 dark:border-gray-700 pt-3 2xl:pt-0">
@@ -208,13 +209,13 @@
                         <thead class="bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400 sticky top-0 z-30 shadow-sm font-medium border-b border-gray-200 dark:border-gray-700">
                             <tr>
                                 <th class="py-3 px-2 w-[40px] min-w-[40px] max-w-[40px] text-center sticky left-0 top-0 bg-gray-50 dark:bg-gray-900 z-40"><input type="checkbox" class="select-all-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" data-type="journal"></th>
-                                <th class="py-3 px-2 sm:px-3 w-[70px] min-w-[70px] max-w-[70px] text-center sticky left-[40px] top-0 bg-gray-50 dark:bg-gray-900 z-40 sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition" data-sort="date">日期 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
-                                <th class="py-3 px-3 sm:px-4 w-[110px] min-w-[110px] max-w-[110px] sticky left-[110px] top-0 bg-gray-50 dark:bg-gray-900 z-40 border-r border-gray-200 dark:border-gray-700 sortable" data-sort="code">代號/股名 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
-                                <th class="py-3 px-2 sm:px-3 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition" data-sort="eps2025">25 EPS <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
-                                <th class="py-3 px-2 sm:px-3 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition" data-sort="eps2026">預26 EPS <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
-                                <th class="py-3 px-3 sm:px-4 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition" data-sort="epsGrowth">成長率 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
-                                <th class="py-3 px-3 sm:px-4 text-center sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition" data-sort="score">分數 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
-                                <th class="py-3 px-3 sm:px-4 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition" data-sort="targetPrice">最高目標價 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+                                <th class="py-3 px-2 sm:px-3 w-[70px] min-w-[70px] max-w-[70px] text-center sticky left-[40px] top-0 bg-gray-50 dark:bg-gray-900 z-40 sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-sort="date">日期 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+                                <th class="py-3 px-3 sm:px-4 w-[110px] min-w-[110px] max-w-[110px] sticky left-[110px] top-0 bg-gray-50 dark:bg-gray-900 z-40 border-r border-gray-200 dark:border-gray-700 sortable cursor-pointer" data-sort="code">代號/股名 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+                                <th class="py-3 px-2 sm:px-3 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-sort="eps2025">25 EPS <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+                                <th class="py-3 px-2 sm:px-3 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-sort="eps2026">預26 EPS <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+                                <th class="py-3 px-3 sm:px-4 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-sort="epsGrowth">成長率 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+                                <th class="py-3 px-3 sm:px-4 text-center sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-sort="score">分數 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+                                <th class="py-3 px-3 sm:px-4 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-sort="targetPrice">最高目標價 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
                                 <th class="py-3 px-3">策略標籤</th>
                                 <th class="py-3 px-3 w-full">備註</th>
                                 <th class="py-3 px-3 text-center">操作</th>
@@ -308,12 +309,12 @@
                         <thead class="bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700 font-medium">
                             <tr>
                                 <th class="py-3 px-2 sm:px-3 w-8 text-center"><input type="checkbox" class="select-all-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" data-type="plan"></th>
-                                <th class="py-3 px-3 sm:px-4 plan-sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition" data-sort="stock">標的 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
-                                <th class="py-3 px-3 sm:px-4 plan-sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition" data-sort="qty">部位 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
-                                <th class="py-3 px-3 sm:px-4 plan-sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition" data-sort="entry">進場價 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
-                                <th class="py-3 px-3 sm:px-4 tw-red plan-sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition" data-sort="target">停利目標 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
-                                <th class="py-3 px-3 sm:px-4 tw-green plan-sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition" data-sort="stop">停損防守 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
-                                <th class="py-3 px-3 sm:px-4 plan-sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition" data-sort="status">狀態 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+                                <th class="py-3 px-3 sm:px-4 plan-sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-sort="stock">標的 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+                                <th class="py-3 px-3 sm:px-4 plan-sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-sort="qty">部位 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+                                <th class="py-3 px-3 sm:px-4 plan-sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-sort="entry">進場價 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+                                <th class="py-3 px-3 sm:px-4 tw-red plan-sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-sort="target">停利目標 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+                                <th class="py-3 px-3 sm:px-4 tw-green plan-sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-sort="stop">停損防守 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+                                <th class="py-3 px-3 sm:px-4 plan-sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-sort="status">狀態 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
                                 <th class="py-3 px-3 sm:px-4 text-center">操作/結算</th>
                             </tr>
                         </thead>
@@ -356,18 +357,18 @@
                             <option value="4">4分(含)以上</option>
                         </select>
                         
-                        <div class="flex items-center gap-2 w-full md:w-auto relative">
-                            <button type="button" id="filter-tag-btn-fav" class="bg-white dark:bg-gray-900/50 text-gray-900 dark:text-white text-xs sm:text-sm border border-gray-300 dark:border-gray-700/50 rounded-lg px-3 py-1.5 sm:py-2 focus:ring-2 focus:ring-blue-500 outline-none transition hover:bg-gray-50 dark:hover:bg-gray-800 w-full sm:w-auto flex items-center justify-between gap-2 shadow-sm">
+                        <div class="flex items-center gap-2 relative">
+                            <button type="button" id="filter-tag-btn-fav" class="bg-white dark:bg-gray-900/50 text-gray-900 dark:text-white text-xs sm:text-sm border border-gray-300 dark:border-gray-700/50 rounded-lg px-3 py-1.5 sm:py-2 focus:ring-2 focus:ring-blue-500 outline-none transition hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center justify-between gap-2 shadow-sm whitespace-nowrap">
                                 <span>+ 篩選策略(可複選)</span><i class="fa-solid fa-chevron-down text-[10px] opacity-70"></i>
+                            </button>
+                            <button type="button" id="btn-clear-filters-fav" class="text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-red-600 text-gray-700 dark:text-gray-300 hover:text-white border border-gray-300 dark:border-gray-600 hover:border-red-500 px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center whitespace-nowrap">
+                                <i class="fa-solid fa-eraser sm:mr-1.5"></i><span class="hidden sm:inline">清除篩選</span><span class="sm:hidden">清除</span>
                             </button>
                             <div id="filter-tag-panel-fav" class="absolute left-0 top-full mt-1.5 w-[280px] bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl shadow-2xl hidden z-50 p-3 max-h-[60vh] overflow-y-auto">
                                 <div id="filter-tags-container-fav"></div>
                             </div>
                         </div>
-                        <div id="filter-tags-display-fav" class="flex flex-wrap gap-1.5 w-full md:w-auto"></div>
-                        <button type="button" id="btn-clear-filters-fav" class="text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-red-600 text-gray-700 dark:text-gray-300 hover:text-white border border-gray-300 dark:border-gray-600 hover:border-red-500 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center ml-auto 2xl:ml-0 whitespace-nowrap">
-                            <i class="fa-solid fa-eraser mr-1.5"></i><span class="hidden sm:inline">清除篩選</span><span class="sm:hidden">清除</span>
-                        </button>
+                        <div id="filter-tags-display-fav" class="flex flex-wrap gap-1.5 w-full md:w-auto mt-2 2xl:mt-0"></div>
                     </div>
 
                     <div class="flex flex-wrap gap-1.5 sm:gap-2 w-full 2xl:w-auto justify-start 2xl:justify-end border-t 2xl:border-t-0 border-gray-200 dark:border-gray-700 pt-3 2xl:pt-0">
@@ -392,13 +393,13 @@
                         <thead class="bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400 sticky top-0 z-30 shadow-sm font-medium border-b border-gray-200 dark:border-gray-700">
                             <tr>
                                 <th class="py-3 px-2 w-[40px] min-w-[40px] max-w-[40px] text-center sticky left-0 top-0 bg-gray-50 dark:bg-gray-900 z-40"><input type="checkbox" class="select-all-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" data-type="fav"></th>
-                                <th class="py-3 px-2 sm:px-3 w-[70px] min-w-[70px] max-w-[70px] text-center sticky left-[40px] top-0 bg-gray-50 dark:bg-gray-900 z-40 sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition" data-sort="date">日期 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
-                                <th class="py-3 px-3 sm:px-4 w-[110px] min-w-[110px] max-w-[110px] sticky left-[110px] top-0 bg-gray-50 dark:bg-gray-900 z-40 border-r border-gray-200 dark:border-gray-700 sortable" data-sort="code">代號/股名 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
-                                <th class="py-3 px-2 sm:px-3 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition" data-sort="eps2025">25 EPS <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
-                                <th class="py-3 px-2 sm:px-3 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition" data-sort="eps2026">預26 EPS <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
-                                <th class="py-3 px-3 sm:px-4 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition" data-sort="epsGrowth">成長率 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
-                                <th class="py-3 px-3 sm:px-4 text-center sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition" data-sort="score">分數 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
-                                <th class="py-3 px-3 sm:px-4 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition" data-sort="targetPrice">最高目標價 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+                                <th class="py-3 px-2 sm:px-3 w-[70px] min-w-[70px] max-w-[70px] text-center sticky left-[40px] top-0 bg-gray-50 dark:bg-gray-900 z-40 sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-sort="date">日期 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+                                <th class="py-3 px-3 sm:px-4 w-[110px] min-w-[110px] max-w-[110px] sticky left-[110px] top-0 bg-gray-50 dark:bg-gray-900 z-40 border-r border-gray-200 dark:border-gray-700 sortable cursor-pointer" data-sort="code">代號/股名 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+                                <th class="py-3 px-2 sm:px-3 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-sort="eps2025">25 EPS <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+                                <th class="py-3 px-2 sm:px-3 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-sort="eps2026">預26 EPS <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+                                <th class="py-3 px-3 sm:px-4 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-sort="epsGrowth">成長率 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+                                <th class="py-3 px-3 sm:px-4 text-center sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-sort="score">分數 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+                                <th class="py-3 px-3 sm:px-4 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-sort="targetPrice">最高目標價 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
                                 <th class="py-3 px-3">策略標籤</th>
                                 <th class="py-3 px-3 text-center">操作</th>
                             </tr>
@@ -551,13 +552,17 @@
             document.querySelectorAll('.filter-tag-cb').forEach(cb => {
                 cb.addEventListener('change', (e) => {
                     const val = e.target.value;
-                    const isFav = e.target.closest('#module-favorites') !== null;
-                    const targetFilters = isFav ? state.favFilters : state.filters;
+                    const isChecked = e.target.checked;
 
-                    if (e.target.checked) { if (!targetFilters.tags.includes(val)) targetFilters.tags.push(val); } 
-                    else { targetFilters.tags = targetFilters.tags.filter(t => t !== val); }
+                    if (isChecked) { 
+                        if (!state.filters.tags.includes(val)) state.filters.tags.push(val); 
+                        if (!state.favFilters.tags.includes(val)) state.favFilters.tags.push(val); 
+                    } else { 
+                        state.filters.tags = state.filters.tags.filter(t => t !== val); 
+                        state.favFilters.tags = state.favFilters.tags.filter(t => t !== val); 
+                    }
                     
-                    document.querySelectorAll(`.filter-tag-cb[value="${val}"]`).forEach(c => c.checked = e.target.checked);
+                    document.querySelectorAll(`.filter-tag-cb[value="${val}"]`).forEach(c => c.checked = isChecked);
                     renderFilterTags(); processAndRenderJournals(); renderFavorites(); saveLocalData();
                 });
             });
@@ -987,10 +992,8 @@
                 else if (favLevel === 2) { favColor = 'text-orange-500'; favIcon = '<i class="fa-solid fa-star"></i><span class="ml-1 text-[10px] font-bold">2</span>'; favTitle = '二次追蹤'; } 
                 else if (favLevel === 3) { favColor = 'text-red-500'; favIcon = '<i class="fa-solid fa-star"></i><span class="ml-1 text-[10px] font-bold">3</span>'; favTitle = '三次追蹤'; }
 
-                // 日期轉為簡易 MM/DD 格式
                 const formattedDate = item.date ? item.date.substring(5).replace('-', '/') : '';
 
-                // 更新：背景色改為不透明以支援凍結欄位，日期與代號/股名合併凍結
                 rowsHtml += `
                     <tr class="transition border-b border-gray-200 dark:border-gray-700/50 text-gray-900 dark:text-white text-sm ${ei.futures ? "bg-sky-50 dark:bg-sky-900 hover:bg-sky-100 dark:hover:bg-sky-800" : "bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800"}">
                         <td class="py-3 px-2 w-[40px] min-w-[40px] max-w-[40px] text-center sticky left-0 bg-inherit z-20"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${item.id}" data-type="${listType}" ${selectedIds[listType].has(item.id) ? 'checked' : ''}></td>
@@ -1034,7 +1037,12 @@
             }));
         };
 
-        window.deleteRow = async (id) => { state.journals = state.journals.filter(j => j.id !== id); saveLocalData(); processAndRenderJournals(); if(document.getElementById('module-favorites').classList.contains('active')) renderFavorites(); await deleteDataFromCloud(`journals/${id}`); showToast('紀錄已刪除'); };
+        window.deleteRow = async (id) => { 
+            if(!confirm('確定要刪除這筆紀錄嗎？此操作無法復原。')) return;
+            state.journals = state.journals.filter(j => j.id !== id); 
+            saveLocalData(); processAndRenderJournals(); if(document.getElementById('module-favorites').classList.contains('active')) renderFavorites(); 
+            await deleteDataFromCloud(`journals/${id}`); showToast('紀錄已刪除'); 
+        };
 
         function processAndRenderJournals() { renderTableRows(getFilteredAndSortedData(state.journals, state.filters, state.sortConfig), 'journal-table-body', 'journal-empty'); }
         function renderFavorites() { 
@@ -1089,8 +1097,9 @@
                     targetStrategies.forEach(s => {
                         if(sm[s] && sm[s].length > 0) {
                             text += `🎯 [${s === '特別追蹤' ? '特別關注' : s}] (共 ${sm[s].length} 檔)\n`;
-                            // 修正：拔除橫線
-                            sm[s].forEach(a => { text += `${a.code} ${a.name}\n`; });
+                            sm[s].forEach(a => {
+                                text += `${a.code} ${a.name}\n`;
+                            });
                             text += '\n';
                         }
                     });
@@ -1101,7 +1110,6 @@
                     return;
                 }
 
-                // 其他模式不複製特別關注 (特別追蹤)
                 data = data.filter(j => !(j.tags && j.tags.includes('特別追蹤')));
                 if(data.length===0) return showToast('清單為空 (已排除特別關注)','error');
                 
@@ -1167,10 +1175,18 @@
             setTimeout(() => { document.getElementById('p-stock').focus(); }, 15);
         });
         window.openCloseModal = (id, def) => { document.getElementById('modal-plan-id').value=id; document.getElementById('modal-exit-price').value=def||''; document.getElementById('close-plan-modal').classList.remove('hidden'); };
-        window.deletePlan = async (id) => { state.plans = state.plans.filter(p => p.id !== id); saveLocalData(); renderPlans(); await deleteDataFromCloud(`plans/${id}`); showToast('規劃已刪除'); };
+        
+        window.deletePlan = async (id) => { 
+            if(!confirm('確定要刪除這筆規劃嗎？此操作無法復原。')) return;
+            state.plans = state.plans.filter(p => p.id !== id); 
+            saveLocalData(); renderPlans(); 
+            await deleteDataFromCloud(`plans/${id}`); showToast('規劃已刪除'); 
+        };
+        
         document.getElementById('btn-cancel-modal').addEventListener('click', ()=>document.getElementById('close-plan-modal').classList.add('hidden'));
         
         const closeTrade = async (status) => {
+            if(!confirm(`確定要以「${status}」結算此筆交易嗎？`)) return;
             const id = document.getElementById('modal-plan-id').value, ex = parseFloat(document.getElementById('modal-exit-price').value);
             if(isNaN(ex)) return showToast('無效金額','error');
             const p = state.plans.find(x=>x.id===id); if(!p) return;
@@ -1232,8 +1248,161 @@
             document.querySelectorAll('.filter-tag-cb').forEach(cb => cb.checked = false); 
             renderFilterTags();
 
+            // [資料庫/匯出/匯入 功能實作]
+            const excelUpload = document.getElementById('excel-upload');
+            if(excelUpload) {
+                excelUpload.addEventListener('change', (e) => {
+                    const f = e.target.files[0]; if(!f) return; showToast('解析資料庫...');
+                    const reader = new FileReader();
+                    reader.onload = async (ev) => {
+                        try {
+                            const wb = XLSX.read(new Uint8Array(ev.target.result), {type: 'array'});
+                            const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header:1});
+                            let count = 0; const updates = {};
+                            for(let i=1; i<rows.length; i++) {
+                                if(!rows[i] || rows[i].length<2) continue;
+                                const c = String(rows[i][0]).trim(); if(!c) continue; const n = String(rows[i][1]||'').trim();
+                                const item = { code: c, name: n, eps2025: parseFloat(rows[i][2])||null, eps2026: parseFloat(rows[i][3])||null, epsGrowth: parseFloat(rows[i][4])||null, futures: String(rows[i][5]||'').trim(), targetPrice: parseFloat(rows[i][6])||null, updatedAt: Date.now() };
+                                state.epsData[c] = item; updates[c] = item;
+                                if (n) { state.codeToName[c] = n; state.nameToCode[n] = c; } count++;
+                            }
+                            saveLocalData(); processAndRenderJournals(); renderFavorites(); renderPlans();
+                            if(isCloudMode() && Object.keys(updates).length > 0) await patchDataToCloud('epsData', updates);
+                            showToast(`更新完成，匯入 ${count} 筆資料`); e.target.value='';
+                        } catch(err) { showToast('格式錯誤','error'); }
+                    };
+                    reader.readAsArrayBuffer(f);
+                });
+            }
+
+            const btnExport = document.getElementById('btn-export-backup');
+            if(btnExport) {
+                btnExport.addEventListener('click', () => {
+                    try {
+                        const wb = XLSX.utils.book_new();
+                        
+                        const jData = state.journals.map(j => ({
+                            ID: j.id, 日期: j.date, 代號: j.code, 股名: j.name, 
+                            標籤: (j.tags||[]).join(','), 備註: j.notes||'', 
+                            追蹤星級: j.isFavorite === true ? 1 : (parseInt(j.isFavorite)||0),
+                            建立時間: j.createdAt||Date.now()
+                        }));
+                        const wsJournals = XLSX.utils.json_to_sheet(jData.length ? jData : [{訊息: "暫無資料"}]);
+                        XLSX.utils.book_append_sheet(wb, wsJournals, "選股日誌");
+
+                        const pData = state.plans.map(p => ({
+                            ID: p.id, 標的: p.stock, 張數: p.qty, 進場價: p.entry, 
+                            停損價: p.stop, 停利目標: p.target||'', 狀態: p.status, 
+                            實際出場: p.exitPrice||'', 損益: p.pnl||0, 備註: p.note||'',
+                            建立時間: p.createdAt||Date.now()
+                        }));
+                        const wsPlans = XLSX.utils.json_to_sheet(pData.length ? pData : [{訊息: "暫無資料"}]);
+                        XLSX.utils.book_append_sheet(wb, wsPlans, "交易規劃");
+
+                        const dateStr = getToday().replace(/-/g, '');
+                        XLSX.writeFile(wb, `萊恩手札備份_${dateStr}.xlsx`);
+                        showToast('匯出 Excel 備份成功');
+                    } catch(e) {
+                        showToast('匯出失敗', 'error');
+                    }
+                });
+            }
+
+            const backupFile = document.getElementById('backup-file');
+            if(backupFile) {
+                backupFile.addEventListener('change', (e) => {
+                    const f = e.target.files[0]; if(!f) return; showToast('讀取備份檔...');
+                    const reader = new FileReader();
+                    reader.onload = async (ev) => {
+                        try {
+                            const wb = XLSX.read(new Uint8Array(ev.target.result), {type: 'array'});
+                            let jCount = 0; let pCount = 0;
+
+                            if(wb.Sheets["選股日誌"]) {
+                                const jRows = XLSX.utils.sheet_to_json(wb.Sheets["選股日誌"]);
+                                jRows.forEach(row => {
+                                    if(!row.ID || row.訊息) return;
+                                    const exIdx = state.journals.findIndex(x => x.id === row.ID);
+                                    const jItem = {
+                                        id: String(row.ID), date: row.日期, code: String(row.代號), name: row.股名,
+                                        tags: row.標籤 ? String(row.標籤).split(',').filter(t=>t) : [],
+                                        notes: row.備註||'', isFavorite: parseInt(row.追蹤星級)||0,
+                                        createdAt: parseInt(row.建立時間)||Date.now(), updatedAt: Date.now()
+                                    };
+                                    if(exIdx > -1) state.journals[exIdx] = jItem; else state.journals.push(jItem);
+                                    if(isCloudMode()) putDataToCloud(`journals/${jItem.id}`, jItem).catch(()=>{});
+                                    jCount++;
+                                });
+                            }
+                            
+                            if(wb.Sheets["交易規劃"]) {
+                                const pRows = XLSX.utils.sheet_to_json(wb.Sheets["交易規劃"]);
+                                pRows.forEach(row => {
+                                    if(!row.ID || row.訊息) return;
+                                    const exIdx = state.plans.findIndex(x => x.id === row.ID);
+                                    const pItem = {
+                                        id: String(row.ID), stock: String(row.標的), qty: parseInt(row.張數)||1,
+                                        entry: parseFloat(row.進場價)||0, stop: parseFloat(row.停損價)||0, target: parseFloat(row.停利目標)||null,
+                                        status: row.狀態||'持倉中', exitPrice: parseFloat(row.實際出場)||null, pnl: parseFloat(row.損益)||0,
+                                        note: row.備註||'', createdAt: parseInt(row.建立時間)||Date.now(), updatedAt: Date.now()
+                                    };
+                                    if(exIdx > -1) state.plans[exIdx] = pItem; else state.plans.push(pItem);
+                                    if(isCloudMode()) putDataToCloud(`plans/${pItem.id}`, pItem).catch(()=>{});
+                                    pCount++;
+                                });
+                            }
+
+                            saveLocalData(); processAndRenderJournals(); renderFavorites(); renderPlans();
+                            showToast(`備份匯入完成 (日誌:${jCount}, 規劃:${pCount})`); e.target.value='';
+                        } catch(err) { showToast('匯入失敗，格式錯誤', 'error'); }
+                    };
+                    reader.readAsArrayBuffer(f);
+                });
+            }
+
             processAndRenderJournals(); renderFavorites(); renderPlans();
             updateSyncStatusUI();
+            
+            // 加入排序點擊監聽綁定
+            document.querySelectorAll('.sortable').forEach(th => {
+                th.addEventListener('click', (e) => {
+                    const isFav = e.currentTarget.closest('#module-favorites') !== null;
+                    const config = isFav ? state.favSortConfig : state.sortConfig;
+                    const key = th.dataset.sort;
+                    
+                    if (config.key === key) {
+                        config.asc = !config.asc;
+                    } else {
+                        config.key = key;
+                        config.asc = false;
+                    }
+                    
+                    // 重置所有圖標，更新選取欄位的圖標
+                    document.querySelectorAll('.sortable i').forEach(icon => { icon.className = 'fa-solid fa-sort ml-1 text-xs opacity-50'; });
+                    th.querySelector('i').className = `fa-solid fa-sort-${config.asc ? 'up' : 'down'} ml-1 text-xs text-blue-500`;
+
+                    isFav ? renderFavorites() : processAndRenderJournals();
+                    saveLocalData();
+                });
+            });
+
+            document.querySelectorAll('.plan-sortable').forEach(th => {
+                th.addEventListener('click', (e) => {
+                    const key = th.dataset.sort;
+                    if (state.planSortConfig.key === key) {
+                        state.planSortConfig.asc = !state.planSortConfig.asc;
+                    } else {
+                        state.planSortConfig.key = key;
+                        state.planSortConfig.asc = false;
+                    }
+                    
+                    document.querySelectorAll('.plan-sortable i').forEach(icon => { icon.className = 'fa-solid fa-sort ml-1 text-xs opacity-50'; });
+                    th.querySelector('i').className = `fa-solid fa-sort-${state.planSortConfig.asc ? 'up' : 'down'} ml-1 text-xs text-blue-500`;
+
+                    renderPlans();
+                    saveLocalData();
+                });
+            });
             
             bindContinuousInputFix('journal-form', 'j-code');
             bindContinuousInputFix('calc-form', 'c-code');
