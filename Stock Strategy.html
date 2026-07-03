@@ -107,12 +107,11 @@
                     <div class="flex justify-between items-center border-b border-gray-200 dark:border-gray-700/50 pb-3">
                         <h2 class="font-bold text-blue-600 dark:text-blue-400 flex items-center text-lg sm:text-xl relative">
                             <div class="bg-blue-500/10 dark:bg-blue-500/20 p-1.5 rounded mr-2"><i class="fa-solid fa-pen-to-square"></i></div> 新增條件
-                            <span id="auto-save-indicator" class="ml-4 text-xs font-medium transition-opacity duration-300 opacity-0 flex items-center bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 px-2 py-1 rounded-md"><i class="fa-solid fa-circle-notch fa-spin mr-1.5"></i>自動儲存中...</span>
                         </h2>
                     </div>
                     
                     <form id="journal-form" class="flex flex-col gap-4" action="javascript:void(0);">
-                        <div class="grid grid-cols-12 md:grid-cols-12 gap-1.5 sm:gap-4">
+                        <div class="grid grid-cols-12 md:grid-cols-12 gap-1.5 sm:gap-4 items-end">
                             <div class="col-span-4 md:col-span-2">
                                 <label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">日期</label>
                                 <input type="date" id="j-date" required class="input-base !px-1 sm:!px-3 text-xs sm:text-sm text-center sm:text-left">
@@ -125,9 +124,12 @@
                                 <label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">股名</label>
                                 <input type="text" id="j-name" list="stock-names-list" required placeholder="自動帶入" class="input-base !px-1 sm:!px-3 text-xs sm:text-sm text-center sm:text-left" autocomplete="off" enterkeyhint="next">
                             </div>
-                            <div class="col-span-12 md:col-span-6">
-                                <label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">備註紀錄 (自動儲存)</label>
-                                <input type="text" id="j-notes" placeholder="輸入內容將自動同步，按 Enter 可清空準備下一筆..." class="input-base text-xs sm:text-sm" autocomplete="off" enterkeyhint="send">
+                            <div class="col-span-9 md:col-span-5">
+                                <label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">備註紀錄</label>
+                                <input type="text" id="j-notes" placeholder="輸入內容後按 Enter 或點擊加入..." class="input-base text-xs sm:text-sm" autocomplete="off" enterkeyhint="send">
+                            </div>
+                            <div class="col-span-3 md:col-span-1">
+                                <button type="submit" id="btn-journal-submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white text-base sm:text-sm font-bold py-2.5 sm:py-2 rounded-lg transition shadow-md">加入</button>
                             </div>
                             <div id="j-preview" class="col-span-12 bg-blue-50 dark:bg-sky-900/40 p-3 rounded-lg border border-blue-200 dark:border-sky-700/50 hidden flex-wrap items-center gap-x-4 gap-y-2 shadow-inner mt-1 text-sm"></div>
                         </div>
@@ -283,7 +285,7 @@
         <div id="module-revenue" class="tab-content">
             <div class="card-panel border-t-4 border-pink-500 overflow-hidden flex flex-col h-full min-h-[500px]">
                 <div class="p-4 sm:p-5 bg-gray-50/50 dark:bg-gray-800/80 border-b border-gray-200 dark:border-gray-700/50 flex flex-col gap-4">
-                    <h2 class="font-bold text-pink-600 dark:text-pink-400 text-lg sm:text-xl flex items-center"><div class="bg-pink-500/10 dark:bg-pink-500/20 p-1.5 rounded mr-2"><i class="fa-solid fa-money-bill-trend-up"></i></div> 新增多頭營收創高</h2>
+                    <h2 class="font-bold text-pink-600 dark:text-pink-400 text-lg sm:text-xl flex items-center"><div class="bg-pink-500/10 dark:bg-pink-500/20 p-1.5 rounded mr-2"><i class="fa-solid fa-money-bill-trend-up"></i></div> 營收創高</h2>
                     <form id="revenue-form" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 sm:gap-4 items-end" action="javascript:void(0);">
                         <div class="col-span-1"><label class="block text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">創高月份</label><input type="month" id="r-month" required class="input-base" enterkeyhint="next"></div>
                         <div class="col-span-1"><label class="block text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">代號</label><input type="text" id="r-code" list="stock-codes-list" required class="input-base" autocomplete="off" enterkeyhint="next"></div>
@@ -633,7 +635,6 @@
                         this.nextElementSibling.style.borderColor = this.nextElementSibling.dataset.color;
                         this.nextElementSibling.style.color = '#fff';
                     }
-                    triggerAutoSave(); 
                 });
             });
 
@@ -656,9 +657,6 @@
             });
         }
 
-        let autoSaveTimeout = null;
-        const autoSaveIndicator = document.getElementById('auto-save-indicator');
-
         function saveJournalEntry(clearAfter = false) {
             const code = codeInput.value.trim(), date = document.getElementById('j-date').value, name = nameInput.value.trim(), notes = document.getElementById('j-notes').value.trim();
             if(!code || !name || !date) return;
@@ -677,7 +675,18 @@
             
             let createdAt = existingIdx !== -1 ? (state.journals[existingIdx].createdAt || Date.now()) : Date.now();
             
-            const payload = { id: docId, date, code, name, tags, notes, isFavorite, createdAt, updatedAt: Date.now() };
+            // 完美合併備註邏輯：保留舊備註，有新備註就用「；」隔開串接
+            let mergedNotes = notes;
+            if (existingIdx !== -1) {
+                const oldNotes = state.journals[existingIdx].notes || '';
+                if (notes && oldNotes && oldNotes !== notes && !oldNotes.includes(notes)) {
+                    mergedNotes = oldNotes + '；' + notes;
+                } else if (!notes) {
+                    mergedNotes = oldNotes;
+                }
+            }
+            
+            const payload = { id: docId, date, code, name, tags, notes: mergedNotes, isFavorite, createdAt, updatedAt: Date.now() };
             existingIdx !== -1 ? state.journals[existingIdx] = payload : state.journals.push(payload);
 
             saveLocalData(); 
@@ -690,29 +699,13 @@
                 codeInput.value = ''; nameInput.value = ''; document.getElementById('j-notes').value = ''; 
                 previewDiv.classList.add('hidden'); 
                 setTimeout(() => codeInput.focus(), 15);
-                showToast('已登錄並清空欄位準備下一筆');
+                showToast('已成功加入清單');
             }
         }
 
-        function triggerAutoSave() {
-            clearTimeout(autoSaveTimeout);
-            autoSaveIndicator.classList.remove('opacity-0');
-            autoSaveIndicator.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-1.5 text-blue-500"></i>自動儲存中...';
-            
-            autoSaveTimeout = setTimeout(() => {
-                const code = codeInput.value.trim(), name = nameInput.value.trim(), date = document.getElementById('j-date').value;
-                if(code && name && date) {
-                    saveJournalEntry(false);
-                    autoSaveIndicator.innerHTML = '<i class="fa-solid fa-check text-green-500 mr-1.5"></i>已儲存';
-                    setTimeout(() => autoSaveIndicator.classList.add('opacity-0'), 2000);
-                } else {
-                    autoSaveIndicator.classList.add('opacity-0');
-                }
-            }, 1000);
-        }
-
-        ['j-date', 'j-code', 'j-name', 'j-notes'].forEach(id => {
-            document.getElementById(id).addEventListener('input', triggerAutoSave);
+        document.getElementById('journal-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            saveJournalEntry(true);
         });
 
         function updateBatchUI(type) {
@@ -1178,8 +1171,19 @@
             const docId = `${code}_${month}`; // Prevent duplicate per month per stock
             const existingIdx = state.revenueRecords.findIndex(r => r.id === docId);
 
+            // 營收創高模組同步加入「完美合併備註」邏輯
+            let mergedNotes = notes;
+            if (existingIdx !== -1) {
+                const oldNotes = state.revenueRecords[existingIdx].notes || '';
+                if (notes && oldNotes && oldNotes !== notes && !oldNotes.includes(notes)) {
+                    mergedNotes = oldNotes + '；' + notes;
+                } else if (!notes) {
+                    mergedNotes = oldNotes;
+                }
+            }
+
             const payload = {
-                id: docId, month, code, name, notes,
+                id: docId, month, code, name, notes: mergedNotes,
                 createdAt: existingIdx !== -1 ? state.revenueRecords[existingIdx].createdAt : Date.now(),
                 updatedAt: Date.now()
             };
