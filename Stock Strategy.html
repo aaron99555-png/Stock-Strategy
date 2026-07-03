@@ -172,10 +172,9 @@
                             <option value="4">4分(含)以上</option>
                         </select>
                         
-                        <!-- 策略選單與清除篩選同一行 -->
                         <div class="flex items-center gap-2 relative">
                             <button type="button" id="filter-tag-btn" class="bg-white dark:bg-gray-900/50 text-gray-900 dark:text-white text-xs sm:text-sm border border-gray-300 dark:border-gray-700/50 rounded-lg px-3 py-1.5 sm:py-2 focus:ring-2 focus:ring-blue-500 outline-none transition hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center justify-between gap-2 shadow-sm whitespace-nowrap">
-                                <span>+ 篩選策略(可複選)</span><i class="fa-solid fa-chevron-down text-[10px] opacity-70"></i>
+                                <span>+ 標籤挑選</span><i class="fa-solid fa-chevron-down text-[10px] opacity-70"></i>
                             </button>
                             <button type="button" id="btn-clear-filters" class="text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-red-600 text-gray-700 dark:text-gray-300 hover:text-white border border-gray-300 dark:border-gray-600 hover:border-red-500 px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center whitespace-nowrap">
                                 <i class="fa-solid fa-eraser sm:mr-1.5"></i><span class="hidden sm:inline">清除篩選</span><span class="sm:hidden">清除</span>
@@ -189,7 +188,7 @@
 
                     <div class="flex flex-wrap gap-1.5 sm:gap-2 w-full 2xl:w-auto justify-start 2xl:justify-end border-t 2xl:border-t-0 border-gray-200 dark:border-gray-700 pt-3 2xl:pt-0">
                         <span class="text-xs text-gray-400 dark:text-gray-500 mr-1 flex items-center font-medium hidden sm:flex">複製:</span>
-                        <button class="btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="selected">複製選擇</button>
+                        <button class="btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="selected">獨選</button>
                         <button class="btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="strategy">策略</button>
                         <button class="btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="score">分數</button>
                         <button class="btn-copy-base bg-sky-50 dark:bg-sky-900/40 hover:bg-sky-600 border-sky-200 dark:border-sky-700/50 text-sky-700 dark:text-sky-200 btn-copy" data-mode="futures">股期</button>
@@ -210,7 +209,7 @@
                             <tr>
                                 <th class="py-3 px-2 w-[40px] min-w-[40px] max-w-[40px] text-center sticky left-0 top-0 bg-gray-50 dark:bg-gray-900 z-40"><input type="checkbox" class="select-all-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" data-type="journal"></th>
                                 <th class="py-3 px-2 sm:px-3 w-[70px] min-w-[70px] max-w-[70px] text-center sticky left-[40px] top-0 bg-gray-50 dark:bg-gray-900 z-40 sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-sort="date">日期 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
-                                <th class="py-3 px-3 sm:px-4 w-[110px] min-w-[110px] max-w-[110px] sticky left-[110px] top-0 bg-gray-50 dark:bg-gray-900 z-40 border-r border-gray-200 dark:border-gray-700 sortable cursor-pointer" data-sort="code">代號/股名 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+                                <th class="py-3 px-3 sm:px-4 w-[95px] min-w-[95px] max-w-[95px] sticky left-[110px] top-0 bg-gray-50 dark:bg-gray-900 z-40 border-r border-gray-200 dark:border-gray-700 sortable cursor-pointer" data-sort="code">代號/股名 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
                                 <th class="py-3 px-2 sm:px-3 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-sort="eps2025">25 EPS <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
                                 <th class="py-3 px-2 sm:px-3 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-sort="eps2026">預26 EPS <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
                                 <th class="py-3 px-3 sm:px-4 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-sort="epsGrowth">成長率 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
@@ -359,7 +358,7 @@
                         
                         <div class="flex items-center gap-2 relative">
                             <button type="button" id="filter-tag-btn-fav" class="bg-white dark:bg-gray-900/50 text-gray-900 dark:text-white text-xs sm:text-sm border border-gray-300 dark:border-gray-700/50 rounded-lg px-3 py-1.5 sm:py-2 focus:ring-2 focus:ring-blue-500 outline-none transition hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center justify-between gap-2 shadow-sm whitespace-nowrap">
-                                <span>+ 篩選策略(可複選)</span><i class="fa-solid fa-chevron-down text-[10px] opacity-70"></i>
+                                <span>+ 標籤挑選</span><i class="fa-solid fa-chevron-down text-[10px] opacity-70"></i>
                             </button>
                             <button type="button" id="btn-clear-filters-fav" class="text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-red-600 text-gray-700 dark:text-gray-300 hover:text-white border border-gray-300 dark:border-gray-600 hover:border-red-500 px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center whitespace-nowrap">
                                 <i class="fa-solid fa-eraser sm:mr-1.5"></i><span class="hidden sm:inline">清除篩選</span><span class="sm:hidden">清除</span>
@@ -373,7 +372,7 @@
 
                     <div class="flex flex-wrap gap-1.5 sm:gap-2 w-full 2xl:w-auto justify-start 2xl:justify-end border-t 2xl:border-t-0 border-gray-200 dark:border-gray-700 pt-3 2xl:pt-0">
                         <span class="text-xs text-gray-400 dark:text-gray-500 mr-1 flex items-center font-medium hidden sm:flex">複製:</span>
-                        <button class="btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="selected">複製選擇</button>
+                        <button class="btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="selected">獨選</button>
                         <button class="btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="strategy">策略</button>
                         <button class="btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="score">分數</button>
                         <button class="btn-copy-base bg-sky-50 dark:bg-sky-900/40 hover:bg-sky-600 border-sky-200 dark:border-sky-700/50 text-sky-700 dark:text-sky-200 btn-copy" data-mode="futures">股期</button>
@@ -394,7 +393,7 @@
                             <tr>
                                 <th class="py-3 px-2 w-[40px] min-w-[40px] max-w-[40px] text-center sticky left-0 top-0 bg-gray-50 dark:bg-gray-900 z-40"><input type="checkbox" class="select-all-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" data-type="fav"></th>
                                 <th class="py-3 px-2 sm:px-3 w-[70px] min-w-[70px] max-w-[70px] text-center sticky left-[40px] top-0 bg-gray-50 dark:bg-gray-900 z-40 sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-sort="date">日期 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
-                                <th class="py-3 px-3 sm:px-4 w-[110px] min-w-[110px] max-w-[110px] sticky left-[110px] top-0 bg-gray-50 dark:bg-gray-900 z-40 border-r border-gray-200 dark:border-gray-700 sortable cursor-pointer" data-sort="code">代號/股名 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+                                <th class="py-3 px-3 sm:px-4 w-[95px] min-w-[95px] max-w-[95px] sticky left-[110px] top-0 bg-gray-50 dark:bg-gray-900 z-40 border-r border-gray-200 dark:border-gray-700 sortable cursor-pointer" data-sort="code">代號/股名 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
                                 <th class="py-3 px-2 sm:px-3 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-sort="eps2025">25 EPS <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
                                 <th class="py-3 px-2 sm:px-3 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-sort="eps2026">預26 EPS <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
                                 <th class="py-3 px-3 sm:px-4 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-sort="epsGrowth">成長率 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
@@ -545,7 +544,7 @@
                         this.nextElementSibling.style.borderColor = this.nextElementSibling.dataset.color;
                         this.nextElementSibling.style.color = '#fff';
                     }
-                    triggerAutoSave(); // 點擊標籤時自動儲存
+                    triggerAutoSave(); 
                 });
             });
 
@@ -604,7 +603,7 @@
             if(clearAfter) {
                 codeInput.value = ''; nameInput.value = ''; document.getElementById('j-notes').value = ''; 
                 previewDiv.classList.add('hidden'); 
-                document.querySelectorAll('.tag-input').forEach(o => { o.checked = false; o.nextElementSibling.style.cssText = ''; });
+                // 【核心修改】不要清空策略標籤的勾選狀態，方便連續輸入
                 setTimeout(() => codeInput.focus(), 15);
                 showToast('已登錄並清空欄位準備下一筆');
             }
@@ -959,7 +958,10 @@
                 const ei = getEpsInfo(j.code, j);
                 if(futuresOnly && !ei.futures) return false; if(excludeNegativeGrowth && ei.epsGrowth !== null && ei.epsGrowth < 0) return false;
                 if(minScore > 0 && getScore(j.tags, ei) < minScore) return false;
-                if(tags.length > 0 && !tags.every(t => j.tags && j.tags.includes(t))) return false;
+                
+                // 【核心修改】標籤過濾改為「聯集(OR)」模式：只要擁有其中一個打勾標籤就會呈現
+                if(tags.length > 0 && !tags.some(t => j.tags && j.tags.includes(t))) return false;
+                
                 return true;
             });
             filtered.sort((a, b) => {
@@ -994,13 +996,14 @@
 
                 const formattedDate = item.date ? item.date.substring(5).replace('-', '/') : '';
 
+                // 【核心修改】合併凍結：將格子寬度降為 95px，縮小股號，放大股名
                 rowsHtml += `
                     <tr class="transition border-b border-gray-200 dark:border-gray-700/50 text-gray-900 dark:text-white text-sm ${ei.futures ? "bg-sky-50 dark:bg-sky-900 hover:bg-sky-100 dark:hover:bg-sky-800" : "bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800"}">
                         <td class="py-3 px-2 w-[40px] min-w-[40px] max-w-[40px] text-center sticky left-0 bg-inherit z-20"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${item.id}" data-type="${listType}" ${selectedIds[listType].has(item.id) ? 'checked' : ''}></td>
                         <td class="py-3 px-2 sm:px-3 w-[70px] min-w-[70px] max-w-[70px] text-center sticky left-[40px] bg-inherit z-20 font-medium whitespace-nowrap text-gray-600 dark:text-gray-400">${formattedDate}</td>
-                        <td class="py-2 px-3 sm:px-4 w-[110px] min-w-[110px] max-w-[110px] sticky left-[110px] bg-inherit z-20 border-r border-gray-200 dark:border-gray-700/50">
-                            <div class="font-medium text-[13px] sm:text-sm leading-tight">${ei.futures ? '<span class="bg-sky-600 text-white text-[10px] px-1 py-0.5 rounded mr-1 align-top shadow-sm">期</span>' : ''}${item.code}</div>
-                            <div class="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate max-w-[80px] sm:max-w-[90px]">${item.name}</div>
+                        <td class="py-2 px-2 sm:px-3 w-[95px] min-w-[95px] max-w-[95px] sticky left-[110px] bg-inherit z-20 border-r border-gray-200 dark:border-gray-700/50 overflow-hidden">
+                            <div class="text-[10px] sm:text-[11px] text-gray-500 dark:text-gray-400 mb-0.5 leading-none flex items-center">${ei.futures ? '<span class="bg-sky-600 text-white text-[9px] px-1 rounded mr-1">期</span>' : ''}${item.code}</div>
+                            <div class="font-bold text-[14px] sm:text-[15px] leading-tight truncate tracking-wide text-gray-800 dark:text-gray-200">${item.name}</div>
                         </td>
                         <td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2025)}</td>
                         <td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2026)}</td>
@@ -1068,6 +1071,7 @@
 
                 let dStr = currentFilters.start === currentFilters.end ? (currentFilters.start ? currentFilters.start.replace(/-/g, '/') : '全區間') : `${currentFilters.start.substring(5).replace(/-/g, '/')}~${currentFilters.end.substring(5).replace(/-/g, '/')}`;
 
+                // 【核心修改】獨選匯出邏輯：無須上方篩選，自動依照全部策略分類匯出打勾項目
                 if (mode === 'selected') {
                     let checkedIds = selectedIds[listType];
                     if(checkedIds.size === 0) return showToast('請先在清單中勾選要複製的標的', 'error');
@@ -1075,26 +1079,30 @@
                     data = data.filter(j => checkedIds.has(j.id));
                     data.sort((a,b) => { const d = new Date(a.date) - new Date(b.date); return d !== 0 ? d : (a.createdAt||0) - (b.createdAt||0); });
                     
-                    let targetStrategies = currentFilters.tags;
-                    if (targetStrategies.length === 0) {
-                        return showToast('請先在上方「篩選策略」勾選您要複製的策略', 'error');
-                    }
-
                     const sm = {};
+                    const allStrats = TAG_CATEGORIES.flatMap(c => c.tags.map(t => t.name));
+                    
                     data.forEach(j => {
+                        let hasStrat = false;
                         if(j.tags) {
                             j.tags.forEach(t => {
-                                if(targetStrategies.includes(t)) {
+                                if(allStrats.includes(t)) {
                                     if(!sm[t]) sm[t] = [];
                                     sm[t].push(j);
+                                    hasStrat = true;
                                 }
                             });
+                        }
+                        if(!hasStrat) {
+                            if(!sm['未分類']) sm['未分類'] = [];
+                            sm['未分類'].push(j);
                         }
                     });
 
                     let text = `| ${dStr} 多重篩選漏斗 |\n\n`;
 
-                    targetStrategies.forEach(s => {
+                    const finalStrats = [...allStrats, '未分類'];
+                    finalStrats.forEach(s => {
                         if(sm[s] && sm[s].length > 0) {
                             text += `🎯 [${s === '特別追蹤' ? '特別關注' : s}] (共 ${sm[s].length} 檔)\n`;
                             sm[s].forEach(a => {
@@ -1104,7 +1112,7 @@
                         }
                     });
                     
-                    if (Object.keys(sm).length === 0) text += '選取的標的無符合的指定策略。\n';
+                    if (Object.keys(sm).length === 0) text += '選取的標的無資料。\n';
 
                     executeCopy(text.trim() + copyFootnote);
                     return;
@@ -1122,16 +1130,16 @@
                 }
                 else if(mode === 'score') {
                     data.sort((a,b)=>getScore(b.tags, getEpsInfo(b.code, b))-getScore(a.tags, getEpsInfo(a.code, a))).forEach(j => {
-                        let tags = currentFilters.tags.length > 0 ? (currentFilters.tags||[]).filter(t => currentFilters.tags.includes(t)) : (currentFilters.tags||[]).filter(t => t !== '特別追蹤');
-                        const g = getEpsInfo(j.code,j).epsGrowth; text += `${j.code} ${j.name} [${getScore(j.tags, getEpsInfo(j.code, j))}分] (預成長: ${g!==null?(g*100).toFixed(2)+'%':'無'})${tags.length>0?` ${tags.map(t=>t[0]).join('')}`:''}\n`;
+                        let tags = currentFilters.tags.length > 0 ? (j.tags||[]).filter(t => currentFilters.tags.includes(t)) : (j.tags||[]).filter(t => t !== '特別追蹤');
+                        text += `${j.code} ${j.name} [${getScore(j.tags, getEpsInfo(j.code, j))}分]${tags.length>0?` ${tags.map(t=>t[0]).join('')}`:''}\n`;
                     });
                 }
                 else if(mode === 'eps') data.sort((a,b)=>(getEpsInfo(b.code,b).epsGrowth||-999) - (getEpsInfo(a.code,a).epsGrowth||-999)).forEach(j => { const g = getEpsInfo(j.code,j).epsGrowth; text += `${j.code} ${j.name} (EPS成長: ${g!==null?(g*100).toFixed(2)+'%':'無'})\n`; });
                 else if(mode === 'futures') data.filter(j => getEpsInfo(j.code,j).futures).forEach(j => text += `[期] ${j.code} ${j.name}\n`);
                 else if(mode === 'futures_score') {
                     data.filter(j => getEpsInfo(j.code,j).futures).sort((a,b)=>getScore(b.tags, getEpsInfo(b.code, b))-getScore(a.tags, getEpsInfo(a.code, a))).forEach(j => {
-                        let tags = currentFilters.tags.length > 0 ? (currentFilters.tags||[]).filter(t => currentFilters.tags.includes(t)) : (currentFilters.tags||[]).filter(t => t !== '特別追蹤');
-                        const g = getEpsInfo(j.code,j).epsGrowth; text += `[期] ${j.code} ${j.name} [${getScore(j.tags, getEpsInfo(j.code, j))}分] (預成長: ${g!==null?(g*100).toFixed(2)+'%':'無'})${tags.length>0?` ${tags.map(t=>t[0]).join('')}`:''}\n`;
+                        let tags = currentFilters.tags.length > 0 ? (j.tags||[]).filter(t => currentFilters.tags.includes(t)) : (j.tags||[]).filter(t => t !== '特別追蹤');
+                        text += `[期] ${j.code} ${j.name} [${getScore(j.tags, getEpsInfo(j.code, j))}分]${tags.length>0?` ${tags.map(t=>t[0]).join('')}`:''}\n`;
                     });
                 }
                 else if(mode === 'chip') {
