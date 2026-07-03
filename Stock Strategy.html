@@ -208,8 +208,8 @@
                         <thead class="bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400 sticky top-0 z-30 shadow-sm font-medium border-b border-gray-200 dark:border-gray-700">
                             <tr>
                                 <th class="py-3 px-2 w-[40px] min-w-[40px] max-w-[40px] text-center sticky left-0 top-0 bg-gray-50 dark:bg-gray-900 z-40"><input type="checkbox" class="select-all-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" data-type="journal"></th>
-                                <th class="py-3 px-3 sm:px-4 w-[110px] min-w-[110px] max-w-[110px] sticky left-[40px] top-0 bg-gray-50 dark:bg-gray-900 z-40 border-r border-gray-200 dark:border-gray-700 sortable" data-sort="code">代號/股名 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
-                                <th class="py-3 px-3 sm:px-4 sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition" data-sort="date">日期 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+                                <th class="py-3 px-2 sm:px-3 w-[70px] min-w-[70px] max-w-[70px] text-center sticky left-[40px] top-0 bg-gray-50 dark:bg-gray-900 z-40 sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition" data-sort="date">日期 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+                                <th class="py-3 px-3 sm:px-4 w-[110px] min-w-[110px] max-w-[110px] sticky left-[110px] top-0 bg-gray-50 dark:bg-gray-900 z-40 border-r border-gray-200 dark:border-gray-700 sortable" data-sort="code">代號/股名 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
                                 <th class="py-3 px-2 sm:px-3 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition" data-sort="eps2025">25 EPS <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
                                 <th class="py-3 px-2 sm:px-3 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition" data-sort="eps2026">預26 EPS <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
                                 <th class="py-3 px-3 sm:px-4 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition" data-sort="epsGrowth">成長率 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
@@ -392,8 +392,8 @@
                         <thead class="bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400 sticky top-0 z-30 shadow-sm font-medium border-b border-gray-200 dark:border-gray-700">
                             <tr>
                                 <th class="py-3 px-2 w-[40px] min-w-[40px] max-w-[40px] text-center sticky left-0 top-0 bg-gray-50 dark:bg-gray-900 z-40"><input type="checkbox" class="select-all-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" data-type="fav"></th>
-                                <th class="py-3 px-3 sm:px-4 w-[110px] min-w-[110px] max-w-[110px] sticky left-[40px] top-0 bg-gray-50 dark:bg-gray-900 z-40 border-r border-gray-200 dark:border-gray-700 sortable" data-sort="code">代號/股名 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
-                                <th class="py-3 px-3 sm:px-4 sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition" data-sort="date">日期 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+                                <th class="py-3 px-2 sm:px-3 w-[70px] min-w-[70px] max-w-[70px] text-center sticky left-[40px] top-0 bg-gray-50 dark:bg-gray-900 z-40 sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition" data-sort="date">日期 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+                                <th class="py-3 px-3 sm:px-4 w-[110px] min-w-[110px] max-w-[110px] sticky left-[110px] top-0 bg-gray-50 dark:bg-gray-900 z-40 border-r border-gray-200 dark:border-gray-700 sortable" data-sort="code">代號/股名 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
                                 <th class="py-3 px-2 sm:px-3 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition" data-sort="eps2025">25 EPS <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
                                 <th class="py-3 px-2 sm:px-3 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition" data-sort="eps2026">預26 EPS <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
                                 <th class="py-3 px-3 sm:px-4 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition" data-sort="epsGrowth">成長率 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
@@ -987,17 +987,18 @@
                 else if (favLevel === 2) { favColor = 'text-orange-500'; favIcon = '<i class="fa-solid fa-star"></i><span class="ml-1 text-[10px] font-bold">2</span>'; favTitle = '二次追蹤'; } 
                 else if (favLevel === 3) { favColor = 'text-red-500'; favIcon = '<i class="fa-solid fa-star"></i><span class="ml-1 text-[10px] font-bold">3</span>'; favTitle = '三次追蹤'; }
 
-                const formattedDate = item.date ? item.date.replace(/-/g, '/') : '';
+                // 日期轉為簡易 MM/DD 格式
+                const formattedDate = item.date ? item.date.substring(5).replace('-', '/') : '';
 
-                // 更新：背景色改為不透明以支援凍結欄位，代號/股名合併並改為左側凍結
+                // 更新：背景色改為不透明以支援凍結欄位，日期與代號/股名合併凍結
                 rowsHtml += `
                     <tr class="transition border-b border-gray-200 dark:border-gray-700/50 text-gray-900 dark:text-white text-sm ${ei.futures ? "bg-sky-50 dark:bg-sky-900 hover:bg-sky-100 dark:hover:bg-sky-800" : "bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800"}">
                         <td class="py-3 px-2 w-[40px] min-w-[40px] max-w-[40px] text-center sticky left-0 bg-inherit z-20"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${item.id}" data-type="${listType}" ${selectedIds[listType].has(item.id) ? 'checked' : ''}></td>
-                        <td class="py-2 px-3 sm:px-4 w-[110px] min-w-[110px] sticky left-[40px] bg-inherit z-20 border-r border-gray-200 dark:border-gray-700/50">
+                        <td class="py-3 px-2 sm:px-3 w-[70px] min-w-[70px] max-w-[70px] text-center sticky left-[40px] bg-inherit z-20 font-medium whitespace-nowrap text-gray-600 dark:text-gray-400">${formattedDate}</td>
+                        <td class="py-2 px-3 sm:px-4 w-[110px] min-w-[110px] max-w-[110px] sticky left-[110px] bg-inherit z-20 border-r border-gray-200 dark:border-gray-700/50">
                             <div class="font-medium text-[13px] sm:text-sm leading-tight">${ei.futures ? '<span class="bg-sky-600 text-white text-[10px] px-1 py-0.5 rounded mr-1 align-top shadow-sm">期</span>' : ''}${item.code}</div>
                             <div class="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate max-w-[80px] sm:max-w-[90px]">${item.name}</div>
                         </td>
-                        <td class="py-3 px-3 sm:px-4 whitespace-nowrap">${formattedDate}</td>
                         <td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2025)}</td>
                         <td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2026)}</td>
                         <td class="py-3 px-3 sm:px-4 text-right">${formatNumColor(ei.epsGrowth, true)}</td>
