@@ -18,8 +18,22 @@
         @layer components {
             .card-panel { @apply bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 transition-colors duration-300; }
             .input-base { @apply w-full bg-gray-50 dark:bg-gray-700/80 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-base focus:outline-none focus:ring-2 focus:ring-blue-500 transition shadow-inner; }
-            .btn-nav { @apply px-4 py-2 rounded-lg font-bold transition-colors text-sm flex items-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700/50; }
             .btn-copy-base { @apply text-xs font-medium px-2.5 py-1.5 rounded-lg transition border shadow-sm; }
+            
+            /* 優化後：上方模組導覽列超顯目按鈕設計 */
+            .nav-btn { @apply px-3 sm:px-4 py-2 rounded-lg font-bold transition-all duration-200 text-xs sm:text-sm flex items-center text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800/60 hover:bg-gray-200 dark:hover:bg-gray-700 border-b-2 border-transparent; }
+            .nav-btn.active-blue { @apply text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/60 border-blue-500 shadow-sm; }
+            .nav-btn.active-purple { @apply text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-900/60 border-purple-500 shadow-sm; }
+            .nav-btn.active-pink { @apply text-pink-700 dark:text-pink-300 bg-pink-100 dark:bg-pink-900/60 border-pink-500 shadow-sm; }
+            .nav-btn.active-green { @apply text-green-700 dark:text-green-300 bg-green-100 dark:bg-green-900/60 border-green-500 shadow-sm; }
+            .nav-btn.active-yellow { @apply text-yellow-700 dark:text-yellow-300 bg-yellow-100 dark:bg-yellow-900/60 border-yellow-500 shadow-sm; }
+
+            .nav-btn-mobile { @apply flex-shrink-0 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 border border-transparent; }
+            .nav-btn-mobile.active-blue { @apply bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-700 shadow-sm; }
+            .nav-btn-mobile.active-purple { @apply bg-purple-100 dark:bg-purple-900/60 text-purple-700 dark:text-purple-300 border-purple-300 dark:border-purple-700 shadow-sm; }
+            .nav-btn-mobile.active-pink { @apply bg-pink-100 dark:bg-pink-900/60 text-pink-700 dark:text-pink-300 border-pink-300 dark:border-pink-700 shadow-sm; }
+            .nav-btn-mobile.active-green { @apply bg-green-100 dark:bg-green-900/60 text-green-700 dark:text-green-300 border-green-300 dark:border-green-700 shadow-sm; }
+            .nav-btn-mobile.active-yellow { @apply bg-yellow-100 dark:bg-yellow-900/60 text-yellow-700 dark:text-yellow-300 border-yellow-300 dark:border-yellow-700 shadow-sm; }
         }
     </style>
     <style>
@@ -66,11 +80,11 @@
                 </div>
 
                 <div class="hidden lg:flex flex-1 justify-center space-x-1 sm:space-x-2 relative z-10">
-                    <button class="nav-btn px-3 sm:px-4 py-2 rounded-lg font-bold text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-900 shadow-inner transition text-xs sm:text-sm" data-target="module-journal" data-color="blue"><i class="fa-solid fa-book-journal-whills mr-1.5 sm:mr-2"></i>選股日誌</button>
-                    <button class="nav-btn px-3 sm:px-4 py-2 rounded-lg font-bold text-gray-500 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition text-xs sm:text-sm" data-target="module-calculator" data-color="purple"><i class="fa-solid fa-calculator mr-1.5 sm:mr-2"></i>支撐壓力</button>
-                    <button class="nav-btn px-3 sm:px-4 py-2 rounded-lg font-bold text-gray-500 dark:text-gray-400 hover:text-pink-600 dark:hover:text-pink-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition text-xs sm:text-sm" data-target="module-revenue" data-color="pink"><i class="fa-solid fa-money-bill-trend-up mr-1.5 sm:mr-2"></i>營收創高</button>
-                    <button class="nav-btn px-3 sm:px-4 py-2 rounded-lg font-bold text-gray-500 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition text-xs sm:text-sm" data-target="module-plan" data-color="green"><i class="fa-solid fa-chess-knight mr-1.5 sm:mr-2"></i>交易規劃</button>
-                    <button class="nav-btn px-3 sm:px-4 py-2 rounded-lg font-bold text-gray-500 dark:text-gray-400 hover:text-yellow-600 dark:hover:text-yellow-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition text-xs sm:text-sm" data-target="module-favorites" data-color="yellow"><i class="fa-solid fa-star mr-1.5 sm:mr-2"></i>追蹤清單</button>
+                    <button class="nav-btn active-blue" data-target="module-journal" data-color="blue"><i class="fa-solid fa-book-journal-whills mr-1.5 sm:mr-2"></i>選股日誌</button>
+                    <button class="nav-btn" data-target="module-calculator" data-color="purple"><i class="fa-solid fa-calculator mr-1.5 sm:mr-2"></i>支撐壓力</button>
+                    <button class="nav-btn" data-target="module-revenue" data-color="pink"><i class="fa-solid fa-money-bill-trend-up mr-1.5 sm:mr-2"></i>營收創高</button>
+                    <button class="nav-btn" data-target="module-plan" data-color="green"><i class="fa-solid fa-chess-knight mr-1.5 sm:mr-2"></i>交易規劃</button>
+                    <button class="nav-btn" data-target="module-favorites" data-color="yellow"><i class="fa-solid fa-star mr-1.5 sm:mr-2"></i>追蹤清單</button>
                 </div>
 
                 <div class="flex items-center gap-1 sm:gap-2 flex-shrink-0 relative z-10">
@@ -91,11 +105,11 @@
             </div>
         </div>
         <div class="lg:hidden border-t border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-800/95 backdrop-blur px-2 py-2 flex gap-2 overflow-x-auto scrollbar-hide">
-            <button class="nav-btn-mobile flex-shrink-0 px-4 py-2 text-sm font-medium rounded-lg bg-blue-50 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-500/50 shadow-sm" data-target="module-journal">日誌</button>
-            <button class="nav-btn-mobile flex-shrink-0 px-4 py-2 text-sm font-medium rounded-lg text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition" data-target="module-calculator">支撐壓力</button>
-            <button class="nav-btn-mobile flex-shrink-0 px-4 py-2 text-sm font-medium rounded-lg text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition" data-target="module-revenue">營收</button>
-            <button class="nav-btn-mobile flex-shrink-0 px-4 py-2 text-sm font-medium rounded-lg text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition" data-target="module-plan">規劃</button>
-            <button class="nav-btn-mobile flex-shrink-0 px-4 py-2 text-sm font-medium rounded-lg text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition" data-target="module-favorites">追蹤</button>
+            <button class="nav-btn-mobile active-blue" data-target="module-journal" data-color="blue">日誌</button>
+            <button class="nav-btn-mobile" data-target="module-calculator" data-color="purple">支撐壓力</button>
+            <button class="nav-btn-mobile" data-target="module-revenue" data-color="pink">營收</button>
+            <button class="nav-btn-mobile" data-target="module-plan" data-color="green">規劃</button>
+            <button class="nav-btn-mobile" data-target="module-favorites" data-color="yellow">追蹤</button>
         </div>
     </nav>
 
@@ -657,9 +671,25 @@
             });
         }
 
+        // ==========================================
+        // 核心寫入與合併邏輯
+        // ==========================================
         function saveJournalEntry(clearAfter = false) {
-            const code = codeInput.value.trim(), date = document.getElementById('j-date').value, name = nameInput.value.trim(), notes = document.getElementById('j-notes').value.trim();
-            if(!code || !name || !date) return;
+            // 直接抓取 DOM 元素，避免 ReferenceError
+            const codeInput = document.getElementById('j-code');
+            const dateInput = document.getElementById('j-date');
+            const nameInput = document.getElementById('j-name');
+            const notesInput = document.getElementById('j-notes');
+
+            const code = codeInput.value.trim();
+            const date = dateInput.value;
+            const name = nameInput.value.trim();
+            const notes = notesInput.value.trim();
+
+            if(!code || !name || !date) {
+                showToast('請完整填寫日期、代號與股名', 'error');
+                return;
+            }
             
             const tagInput = document.querySelector('.tag-input:checked');
             const tag = tagInput ? tagInput.value : null;
@@ -682,7 +712,7 @@
                 if (notes && oldNotes && oldNotes !== notes && !oldNotes.includes(notes)) {
                     mergedNotes = oldNotes + '；' + notes;
                 } else if (!notes) {
-                    mergedNotes = oldNotes;
+                    mergedNotes = oldNotes; // 如果沒有輸入新備註，則保留舊的
                 }
             }
             
@@ -696,17 +726,17 @@
             putDataToCloud(`journals/${docId}`, payload).catch(() => {});
 
             if(clearAfter) {
-                codeInput.value = ''; nameInput.value = ''; document.getElementById('j-notes').value = ''; 
-                previewDiv.classList.add('hidden'); 
+                // 清空輸入框（但不清空策略標籤與日期）
+                codeInput.value = ''; 
+                nameInput.value = ''; 
+                notesInput.value = ''; 
+                const previewDiv = document.getElementById('j-preview');
+                if(previewDiv) previewDiv.classList.add('hidden'); 
+                
                 setTimeout(() => codeInput.focus(), 15);
                 showToast('已成功加入清單');
             }
         }
-
-        document.getElementById('journal-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            saveJournalEntry(true);
-        });
 
         function updateBatchUI(type) {
             const bar = document.getElementById(`batch-bar-${type}`), countSpan = document.getElementById(`batch-count-${type}`);
@@ -788,7 +818,7 @@
         filterFields.forEach(f => {
             document.querySelectorAll(`.${f.cls}`).forEach(el => {
                 el.addEventListener('change', (e) => {
-                    let val = f.target.type === 'checkbox' ? e.target.checked : e.target.value;
+                    let val = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
                     if (f.isInt) val = parseInt(val) || 0;
                     
                     state.filters[f.key] = val;
@@ -1012,14 +1042,19 @@
         document.querySelectorAll('.nav-btn, .nav-btn-mobile').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const tid = e.currentTarget.dataset.target, color = e.currentTarget.dataset.color || 'blue';
+                
+                // Desktop
                 document.querySelectorAll('.nav-btn').forEach(b => {
-                    b.className = `nav-btn px-3 sm:px-4 py-2 rounded-lg font-bold transition border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-${b.dataset.color}-500 hover:bg-gray-100 dark:hover:bg-gray-700/50 text-xs sm:text-sm`;
-                    if(b.dataset.target === tid) b.className = `nav-btn px-3 sm:px-4 py-2 rounded-lg font-bold transition border-b-2 text-${color}-600 dark:text-${color}-400 bg-gray-100 dark:bg-gray-900 border-${color}-500 shadow-inner text-xs sm:text-sm`;
+                    b.className = `nav-btn`;
+                    if(b.dataset.target === tid) b.classList.add(`active-${color}`);
                 });
+                
+                // Mobile
                 document.querySelectorAll('.nav-btn-mobile').forEach(b => {
-                    b.className = `nav-btn-mobile flex-shrink-0 px-4 py-2 text-sm font-medium rounded-lg text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition`;
-                    if(b.dataset.target === tid) b.className = `nav-btn-mobile flex-shrink-0 px-4 py-2 text-sm font-medium rounded-lg bg-${color}-50 dark:bg-${color}-900/50 text-${color}-600 dark:text-${color}-400 border border-${color}-200 dark:border-${color}-500/50 shadow-sm`;
+                    b.className = `nav-btn-mobile`;
+                    if(b.dataset.target === tid) b.classList.add(`active-${color}`);
                 });
+                
                 document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === tid));
                 if(tid === 'module-favorites') renderFavorites();
                 if(tid === 'module-journal') processAndRenderJournals();
@@ -1027,14 +1062,34 @@
             });
         });
 
-        const codeInput = document.getElementById('j-code'), nameInput = document.getElementById('j-name'), previewDiv = document.getElementById('j-preview');
+        // ===============================================
+        // DOM 操作輔助
+        // ===============================================
         const updatePreview = (code) => {
-            if(!code || !state.epsData[code]) return previewDiv.classList.add('hidden');
-            const data = state.epsData[code]; previewDiv.classList.remove('hidden');
-            previewDiv.innerHTML = `<span class="text-blue-600 dark:text-blue-400 font-bold flex items-center"><i class="fa-solid fa-link mr-1.5"></i>參考資料</span><div class="flex flex-wrap items-center gap-3 text-xs sm:text-sm ml-2 text-gray-700 dark:text-gray-300"><span><span class="text-gray-400 text-[10px] sm:text-xs mr-1">25 EPS:</span>${formatNumColor(data.eps2025)}</span><span><span class="text-gray-400 text-[10px] sm:text-xs mr-1">預26 EPS:</span>${formatNumColor(data.eps2026)}</span><span><span class="text-gray-400 text-[10px] sm:text-xs mr-1">成長率:</span>${data.epsGrowth != null ? formatNumColor(data.epsGrowth, true) : '-'}</span><span><span class="text-gray-400 text-[10px] sm:text-xs mr-1">目標價:</span>${data.targetPrice ? `<span class="text-yellow-600 dark:text-yellow-400 font-bold">${data.targetPrice}</span>` : '-'}</span>${data.futures === '●' ? '<span class="bg-sky-600 text-white text-[10px] px-1.5 py-0.5 rounded ml-1">期</span>' : ''}</div>`;
+            const previewDiv = document.getElementById('j-preview');
+            if(!code || !state.epsData[code]) {
+                if(previewDiv) previewDiv.classList.add('hidden');
+                return;
+            }
+            const data = state.epsData[code]; 
+            if(previewDiv) {
+                previewDiv.classList.remove('hidden');
+                previewDiv.innerHTML = `<span class="text-blue-600 dark:text-blue-400 font-bold flex items-center"><i class="fa-solid fa-link mr-1.5"></i>參考資料</span><div class="flex flex-wrap items-center gap-3 text-xs sm:text-sm ml-2 text-gray-700 dark:text-gray-300"><span><span class="text-gray-400 text-[10px] sm:text-xs mr-1">25 EPS:</span>${formatNumColor(data.eps2025)}</span><span><span class="text-gray-400 text-[10px] sm:text-xs mr-1">預26 EPS:</span>${formatNumColor(data.eps2026)}</span><span><span class="text-gray-400 text-[10px] sm:text-xs mr-1">成長率:</span>${data.epsGrowth != null ? formatNumColor(data.epsGrowth, true) : '-'}</span><span><span class="text-gray-400 text-[10px] sm:text-xs mr-1">目標價:</span>${data.targetPrice ? `<span class="text-yellow-600 dark:text-yellow-400 font-bold">${data.targetPrice}</span>` : '-'}</span>${data.futures === '●' ? '<span class="bg-sky-600 text-white text-[10px] px-1.5 py-0.5 rounded ml-1">期</span>' : ''}</div>`;
+            }
         };
-        codeInput.addEventListener('input', (e) => { const v = e.target.value.trim(); if(state.codeToName[v]) nameInput.value = state.codeToName[v]; updatePreview(v); });
-        nameInput.addEventListener('input', (e) => { const v = e.target.value.trim(); if(state.nameToCode[v]) codeInput.value = state.nameToCode[v]; updatePreview(state.nameToCode[v]); });
+
+        document.getElementById('j-code')?.addEventListener('input', (e) => { 
+            const v = e.target.value.trim(); 
+            const nameInput = document.getElementById('j-name');
+            if(state.codeToName[v] && nameInput) nameInput.value = state.codeToName[v]; 
+            updatePreview(v); 
+        });
+        document.getElementById('j-name')?.addEventListener('input', (e) => { 
+            const v = e.target.value.trim(); 
+            const codeInput = document.getElementById('j-code');
+            if(state.nameToCode[v] && codeInput) codeInput.value = state.nameToCode[v]; 
+            updatePreview(state.nameToCode[v]); 
+        });
 
         window.editNotes = async (id) => {
             const j = state.journals.find(x => x.id === id);
@@ -1156,10 +1211,10 @@
         }
 
         const rCodeInput = document.getElementById('r-code'), rNameInput = document.getElementById('r-name');
-        rCodeInput.addEventListener('input', (e) => { const v = e.target.value.trim(); if(state.codeToName[v]) rNameInput.value = state.codeToName[v]; });
-        rNameInput.addEventListener('input', (e) => { const v = e.target.value.trim(); if(state.nameToCode[v]) rCodeInput.value = state.nameToCode[v]; });
+        rCodeInput?.addEventListener('input', (e) => { const v = e.target.value.trim(); if(state.codeToName[v]) rNameInput.value = state.codeToName[v]; });
+        rNameInput?.addEventListener('input', (e) => { const v = e.target.value.trim(); if(state.nameToCode[v]) rCodeInput.value = state.nameToCode[v]; });
 
-        document.getElementById('revenue-form').addEventListener('submit', async (e) => {
+        document.getElementById('revenue-form')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const month = document.getElementById('r-month').value;
             const code = document.getElementById('r-code').value.trim();
@@ -1171,7 +1226,6 @@
             const docId = `${code}_${month}`; // Prevent duplicate per month per stock
             const existingIdx = state.revenueRecords.findIndex(r => r.id === docId);
 
-            // 營收創高模組同步加入「完美合併備註」邏輯
             let mergedNotes = notes;
             if (existingIdx !== -1) {
                 const oldNotes = state.revenueRecords[existingIdx].notes || '';
@@ -1200,7 +1254,7 @@
             showToast('營收創高紀錄已建立');
 
             e.target.reset();
-            document.getElementById('r-month').value = month; // Keep the month selected
+            document.getElementById('r-month').value = month; 
             setTimeout(() => document.getElementById('r-code').focus(), 15);
         });
 
@@ -1232,6 +1286,7 @@
         function renderRevenueRecords() {
             const tb = document.getElementById('revenue-table-body');
             const empty = document.getElementById('revenue-empty');
+            if(!tb || !empty) return;
             
             let filteredRecords = state.revenueRecords;
             if (state.revenueFilters && state.revenueFilters.month) {
@@ -1282,8 +1337,8 @@
         }
 
         const copyFootnote = `\n\n-------------------\n⚠️ 停損是紀律，停利是藝術。\n⚠️ 位階決定勝率，部位決定存活。\n⚠️ 趨勢-族群-題材-位階-動能-風控`;
-        const executeCopy = (text) => { if(navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(() => { showToast('複製成功'); showPreview(text); }).catch(()=> fallbackCopy(text)); else fallbackCopy(text); };
-        const fallbackCopy = (text) => { const t = document.createElement("textarea"); t.value = text; t.style.position="fixed"; document.body.appendChild(t); t.focus(); t.select(); try { document.execCommand('copy'); showToast('複製成功'); showPreview(text); } catch(e) { showToast('複製失敗','error'); } document.body.removeChild(t); };
+        const executeCopy = (text) => { if(navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(() => { showToast('複製成功'); }).catch(()=> fallbackCopy(text)); else fallbackCopy(text); };
+        const fallbackCopy = (text) => { const t = document.createElement("textarea"); t.value = text; t.style.position="fixed"; document.body.appendChild(t); t.focus(); t.select(); try { document.execCommand('copy'); showToast('複製成功'); } catch(e) { showToast('複製失敗','error'); } document.body.removeChild(t); };
 
         document.querySelectorAll('.btn-copy').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -1347,10 +1402,10 @@
             });
         });
 
-        const cCodeInput = document.getElementById('c-code'), cNameInput = document.getElementById('c-name');
-        cCodeInput.addEventListener('input', (e) => { const v = e.target.value.trim(); if(state.codeToName[v]) cNameInput.value = state.codeToName[v]; });
-        cNameInput.addEventListener('input', (e) => { const v = e.target.value.trim(); if(state.nameToCode[v]) cCodeInput.value = state.nameToCode[v]; });
-        document.getElementById('calc-form').addEventListener('submit', (e) => {
+        document.getElementById('c-code')?.addEventListener('input', (e) => { const v = e.target.value.trim(); const n = document.getElementById('c-name'); if(state.codeToName[v] && n) n.value = state.codeToName[v]; });
+        document.getElementById('c-name')?.addEventListener('input', (e) => { const v = e.target.value.trim(); const c = document.getElementById('c-code'); if(state.nameToCode[v] && c) c.value = state.nameToCode[v]; });
+        
+        document.getElementById('calc-form')?.addEventListener('submit', (e) => {
             e.preventDefault(); const h = parseFloat(document.getElementById('c-high').value), l = parseFloat(document.getElementById('c-low').value), c = parseFloat(document.getElementById('c-close').value);
             if (isNaN(h)||isNaN(l)||isNaN(c)||h<l) return showToast('輸入無效','error');
             const pp = (h+l+c)/3, cdp = (h+l+2*c)/4, diff = h-l;
@@ -1360,6 +1415,7 @@
             [0.191, 0.382, 0.500, 0.618, 0.809].forEach(f => document.getElementById(`gr-${f.toFixed(3).substring(2)}`).textContent = (h - diff*f).toFixed(2)); 
             showToast('計算完成');
         });
+        
         const getCalcText = (type) => {
             if(document.getElementById('cdp-cdp').textContent==='-') return null;
             const c = document.getElementById('c-code').value.trim(), n = document.getElementById('c-name').value.trim(), s = (c||n) ? `${c} ${n}`.trim() : '';
@@ -1372,17 +1428,20 @@
             if(type==='gr') return (s ? `【${s}】\n` : '') + textF;
             if(type==='all') return `【支撐壓力計算結果】${s ? ' ' + s : ''}\n高:${document.getElementById('c-high').value} 低:${document.getElementById('c-low').value} 收:${document.getElementById('c-close').value}\n\n${textC}\n\n${textP}\n\n${textF}`;
         };
+        
         document.querySelectorAll('.btn-copy-calc').forEach(b => b.addEventListener('click', e => { const t = getCalcText(e.currentTarget.dataset.target); t ? executeCopy(t + copyFootnote) : showToast('請先計算','error'); }));
-        document.getElementById('btn-copy-calc-all').addEventListener('click', () => { const t = getCalcText('all'); t ? executeCopy(t + copyFootnote) : showToast('請先計算','error'); });
+        document.getElementById('btn-copy-calc-all')?.addEventListener('click', () => { const t = getCalcText('all'); t ? executeCopy(t + copyFootnote) : showToast('請先計算','error'); });
 
         const pEntry = document.getElementById('p-entry'), pStop = document.getElementById('p-stop');
-        pEntry.addEventListener('input', e => { const v = parseFloat(e.target.value); if(!isNaN(v)) pStop.value = (v*0.95).toFixed(2); });
-        document.getElementById('plan-form').addEventListener('submit', async(e)=>{
+        pEntry?.addEventListener('input', e => { const v = parseFloat(e.target.value); if(!isNaN(v) && pStop) pStop.value = (v*0.95).toFixed(2); });
+        
+        document.getElementById('plan-form')?.addEventListener('submit', async(e)=>{
             e.preventDefault(); const id = generateId(), stock = document.getElementById('p-stock').value.trim(), qty = parseInt(document.getElementById('p-qty').value)||1;
             const payload = { id, stock, qty, entry: parseFloat(pEntry.value), stop: parseFloat(pStop.value), target: parseFloat(document.getElementById('p-target').value)||null, note: document.getElementById('p-note').value.trim(), status: '持倉中', pnl: 0, createdAt: Date.now(), updatedAt: Date.now() };
             state.plans.push(payload); saveLocalData(); renderPlans(); await putDataToCloud(`plans/${id}`, payload); showToast('計畫建立成功'); e.target.reset();
             setTimeout(() => { document.getElementById('p-stock').focus(); }, 15);
         });
+        
         window.openCloseModal = (id, def) => { document.getElementById('modal-plan-id').value=id; document.getElementById('modal-exit-price').value=def||''; document.getElementById('close-plan-modal').classList.remove('hidden'); };
         
         window.deletePlan = async (id) => { 
@@ -1392,7 +1451,7 @@
             await deleteDataFromCloud(`plans/${id}`); showToast('規劃已刪除'); 
         };
         
-        document.getElementById('btn-cancel-modal').addEventListener('click', ()=>document.getElementById('close-plan-modal').classList.add('hidden'));
+        document.getElementById('btn-cancel-modal')?.addEventListener('click', ()=>document.getElementById('close-plan-modal').classList.add('hidden'));
         
         const closeTrade = async (status) => {
             if(!confirm(`確定要以「${status}」結算此筆交易嗎？`)) return;
@@ -1402,10 +1461,14 @@
             const pnl = Math.round((ex - p.entry)*p.qty*1000); p.status = status; p.exitPrice = ex; p.pnl = pnl; p.updatedAt = Date.now();
             saveLocalData(); renderPlans(); await putDataToCloud(`plans/${id}`, p); document.getElementById('close-plan-modal').classList.add('hidden'); showToast(`結算損益: $${pnl}`);
         };
-        document.getElementById('btn-win').addEventListener('click', ()=>closeTrade('已停利')); document.getElementById('btn-loss').addEventListener('click', ()=>closeTrade('已停損'));
+        
+        document.getElementById('btn-win')?.addEventListener('click', ()=>closeTrade('已停利')); 
+        document.getElementById('btn-loss')?.addEventListener('click', ()=>closeTrade('已停損'));
 
         function renderPlans() {
-            const tb = document.getElementById('plan-table-body'); tb.innerHTML=''; let cc=0, wc=0, tp=0, rowsHtml = '';
+            const tb = document.getElementById('plan-table-body'); 
+            if(!tb) return;
+            tb.innerHTML=''; let cc=0, wc=0, tp=0, rowsHtml = '';
             const sortedPlans = [...state.plans].sort((a, b) => {
                 let vA, vB;
                 switch(state.planSortConfig.key) {
@@ -1591,12 +1654,12 @@
                 });
             }
 
-            // [營收創高面板專用] 綁定監聽器
             document.getElementById('filter-revenue-month')?.addEventListener('change', (e) => {
                 state.revenueFilters.month = e.target.value;
                 renderRevenueRecords();
                 saveLocalData();
             });
+            
             document.getElementById('btn-clear-revenue-filters')?.addEventListener('click', () => {
                 document.getElementById('filter-revenue-month').value = '';
                 state.revenueFilters.month = '';
@@ -1604,6 +1667,7 @@
                 saveLocalData();
                 showToast('已清除篩選月份');
             });
+            
             document.getElementById('btn-copy-revenue')?.addEventListener('click', () => {
                 let data = state.revenueRecords;
                 if (state.revenueFilters && state.revenueFilters.month) {
@@ -1622,6 +1686,14 @@
                 });
 
                 executeCopy(text.trim() + copyFootnote);
+            });
+
+            // ===============================================
+            // 綁定各個表單的 Submit 監聽事件
+            // ===============================================
+            document.getElementById('journal-form')?.addEventListener('submit', (e) => {
+                e.preventDefault();
+                saveJournalEntry(true);
             });
 
             processAndRenderJournals(); renderFavorites(); renderPlans(); renderRevenueRecords();
