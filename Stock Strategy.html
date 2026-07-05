@@ -1679,7 +1679,7 @@
                 data.forEach(r => uniqueStocks.set(r.code, r.name));
 
                 const monthStr = state.revenueFilters && state.revenueFilters.month ? state.revenueFilters.month.replace('-', '/') : '全區間';
-                let text = `| ${monthStr} 多重篩選漏斗 |\n\n🎯 [多頭營收創高] (共 ${uniqueStocks.size} 檔)\n`;
+                let text = `| ${monthStr} 多重篩選漏斗 |\n\n🎯 [營收創高] (共 ${uniqueStocks.size} 檔)\n`;
                 
                 uniqueStocks.forEach((name, code) => {
                     text += `${code} ${name}\n`;
