@@ -206,8 +206,9 @@
 
                     <div class="flex flex-wrap gap-1.5 sm:gap-2 w-full 2xl:w-auto justify-start 2xl:justify-end border-t 2xl:border-t-0 border-gray-200 dark:border-gray-700 pt-3 2xl:pt-0">
                         <span class="text-xs text-gray-400 dark:text-gray-500 mr-1 flex items-center font-medium hidden sm:flex">複製:</span>
-                        <button class="btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="selected">獨選</button>
-                        <button class="btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="strategy">策略</button>
+                        <button class="btn-copy-base bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 btn-copy" data-mode="selected"><i class="fa-solid fa-check-square mr-1 text-blue-500"></i>獨選</button>
+                        <button class="btn-copy-base bg-amber-500 hover:bg-amber-400 border-amber-600 text-white shadow-md btn-copy" data-mode="gold_silver"><i class="fa-solid fa-coins mr-1"></i>金包銀</button>
+                        <button class="btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="strategy">五大策略</button>
                         <button class="btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="score">分數</button>
                         <button class="btn-copy-base bg-sky-50 dark:bg-sky-900/40 hover:bg-sky-600 border-sky-200 dark:border-sky-700/50 text-sky-700 dark:text-sky-200 btn-copy" data-mode="futures">股期</button>
                         <button class="btn-copy-base bg-sky-50 dark:bg-sky-900/40 hover:bg-sky-600 border-sky-200 dark:border-sky-700/50 text-sky-700 dark:text-sky-200 btn-copy" data-mode="futures_score">股期分數</button>
@@ -445,8 +446,9 @@
 
                     <div class="flex flex-wrap gap-1.5 sm:gap-2 w-full 2xl:w-auto justify-start 2xl:justify-end border-t 2xl:border-t-0 border-gray-200 dark:border-gray-700 pt-3 2xl:pt-0">
                         <span class="text-xs text-gray-400 dark:text-gray-500 mr-1 flex items-center font-medium hidden sm:flex">複製:</span>
-                        <button class="btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="selected">獨選</button>
-                        <button class="btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="strategy">策略</button>
+                        <button class="btn-copy-base bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 btn-copy" data-mode="selected"><i class="fa-solid fa-check-square mr-1 text-blue-500"></i>獨選</button>
+                        <button class="btn-copy-base bg-amber-500 hover:bg-amber-400 border-amber-600 text-white shadow-md btn-copy" data-mode="gold_silver"><i class="fa-solid fa-coins mr-1"></i>金包銀</button>
+                        <button class="btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="strategy">五大策略</button>
                         <button class="btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="score">分數</button>
                         <button class="btn-copy-base bg-sky-50 dark:bg-sky-900/40 hover:bg-sky-600 border-sky-200 dark:border-sky-700/50 text-sky-700 dark:text-sky-200 btn-copy" data-mode="futures">股期</button>
                         <button class="btn-copy-base bg-sky-50 dark:bg-sky-900/40 hover:bg-sky-600 border-sky-200 dark:border-sky-700/50 text-sky-700 dark:text-sky-200 btn-copy" data-mode="futures_score">股期分數</button>
@@ -1374,10 +1376,37 @@
                 
                 let text = `| ${dStr} 多重篩選漏斗 |\n\n`;
 
-                if(mode === 'strategy') {
-                    const sm = {}; data.forEach(j => { if(j.tags) j.tags.forEach(t => { if(currentFilters.tags.length>0 ? currentFilters.tags.includes(t) : t !== '特別追蹤') { if(!sm[t]) sm[t]=[]; sm[t].push(j); }}); });
-                    const order = ['金包銀', '大腸包小腸', '多頭營收創高', '破繭而出', '月來越好', '季不可失', '守株待兔', '量價齊揚', 'OBV突破'];
-                    Object.keys(sm).sort((a, b) => { const iA = order.indexOf(a), iB = order.indexOf(b); if (iA !== -1 && iB !== -1) return iA - iB; if (iA !== -1) return -1; if (iB !== -1) return 1; return a.localeCompare(b); }).forEach(s => { text += `🎯 [${s}] (共 ${sm[s].length} 檔)\n`; sm[s].forEach(a => text += `${a.code} ${a.name}\n`); text += '\n'; });
+                if(mode === 'gold_silver') {
+                    const targetStrategy = '金包銀';
+                    const sm = [];
+                    data.forEach(j => {
+                        if (j.tags && j.tags.includes(targetStrategy)) sm.push(j);
+                    });
+                    if(sm.length > 0) {
+                        text += `🎯 [${targetStrategy}] (共 ${sm.length} 檔)\n`;
+                        sm.forEach(a => text += `${a.code} ${a.name}\n`);
+                        text += '\n';
+                    } else {
+                        return showToast('無金包銀標的', 'error');
+                    }
+                }
+                else if(mode === 'strategy') {
+                    const targetStrategies = ['破繭而出', '月來越好', '季不可失', '守株待兔', '量價齊揚'];
+                    const sm = {}; 
+                    data.forEach(j => { 
+                        if(j.tags) j.tags.forEach(t => { 
+                            if(targetStrategies.includes(t)) { 
+                                if(!sm[t]) sm[t]=[]; sm[t].push(j); 
+                            }
+                        }); 
+                    });
+                    targetStrategies.forEach(s => { 
+                        if(sm[s] && sm[s].length > 0) {
+                            text += `🎯 [${s}] (共 ${sm[s].length} 檔)\n`; 
+                            sm[s].forEach(a => text += `${a.code} ${a.name}\n`); 
+                            text += '\n'; 
+                        }
+                    });
                 }
                 else if(mode === 'score') {
                     data.sort((a,b)=>getScore(b.tags, getEpsInfo(b.code, b))-getScore(a.tags, getEpsInfo(a.code, a))).forEach(j => {
