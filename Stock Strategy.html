@@ -1443,16 +1443,21 @@
         });
 
         window.editReportContent = async (id) => {
-            const r = state.reports.find(x => x.id === id);
-            if(!r) return;
-            const newContent = prompt("請修改報告重點：", r.content || "");
-            if(newContent !== null && newContent.trim() !== "") {
-                r.content = newContent.trim();
-                r.updatedAt = Date.now();
-                saveLocalData();
-                renderReports();
-                await putDataToCloud(`reports/${id}`, r);
-                showToast("報告修改成功");
+            try {
+                const r = state.reports.find(x => x.id === id);
+                if(!r) return;
+                const newContent = prompt("請修改報告重點：", r.content || "");
+                if(newContent !== null && newContent.trim() !== "") {
+                    r.content = newContent.trim();
+                    r.updatedAt = Date.now();
+                    saveLocalData();
+                    renderReports();
+                    await putDataToCloud(`reports/${id}`, r);
+                    showToast("報告修改成功");
+                }
+            } catch (err) {
+                console.error("修改過程發生錯誤:", err);
+                showToast("修改失敗，請檢查資料", "error");
             }
         };
 
@@ -1472,7 +1477,7 @@
             const empty = document.getElementById('report-empty');
             if(!tb || !empty) return;
             
-            let filteredReports = state.reports;
+            let filteredReports = state.reports || [];
             if (state.reportFilters) {
                 if (state.reportFilters.start) filteredReports = filteredReports.filter(r => r.date >= state.reportFilters.start);
                 if (state.reportFilters.end) filteredReports = filteredReports.filter(r => r.date <= state.reportFilters.end);
@@ -1485,13 +1490,15 @@
 
             const sortedReports = [...filteredReports].sort((a, b) => {
                 let vA, vB;
-                switch(state.reportSortConfig.key) {
+                const sortKey = state.reportSortConfig ? state.reportSortConfig.key : 'date';
+                switch(sortKey) {
                     case 'date': vA=a.date; vB=b.date; break;
                     case 'code': vA=a.code; vB=b.code; break;
                     default: vA=a.createdAt||0; vB=b.createdAt||0; break;
                 }
                 if(vA === vB) return (b.createdAt||0) - (a.createdAt||0); // Tie breaker
-                return state.reportSortConfig.asc ? (vA > vB ? 1 : -1) : (vA > vB ? -1 : 1);
+                const isAsc = state.reportSortConfig ? state.reportSortConfig.asc : false;
+                return isAsc ? (vA > vB ? 1 : -1) : (vA > vB ? -1 : 1);
             });
 
             let rowsHtml = '';
@@ -1499,13 +1506,13 @@
                 const formattedDate = r.date ? r.date.substring(5).replace('-', '/') : '';
                 rowsHtml += `
                     <tr class="border-b border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-sm">
-                        <td class="py-3 px-2 sm:px-3 text-center sticky left-0 bg-inherit z-20"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${r.id}" data-type="report" ${selectedIds['report'].has(r.id) ? 'checked' : ''}></td>
+                        <td class="py-3 px-2 sm:px-3 text-center sticky left-0 bg-inherit z-20"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${r.id}" data-type="report" ${selectedIds['report'] && selectedIds['report'].has(r.id) ? 'checked' : ''}></td>
                         <td class="py-3 px-3 sm:px-4 font-medium text-gray-600 dark:text-gray-400">${formattedDate}</td>
                         <td class="py-3 px-3 sm:px-4"><span class="font-bold mr-2 text-gray-800 dark:text-gray-200">${r.code}</span><span class="text-gray-600 dark:text-gray-400">${r.name}</span></td>
                         <td class="py-3 px-3 sm:px-4 text-gray-700 dark:text-gray-300 w-full whitespace-normal leading-relaxed">${r.content||''}</td>
                         <td class="py-3 px-3 sm:px-4 text-center whitespace-nowrap">
-                            <button class="mr-1 text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" onclick="editReportContent('${r.id}')" title="修改"><i class="fa-solid fa-pen"></i></button>
-                            <button class="text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" onclick="deleteReportRow('${r.id}')" title="刪除"><i class="fa-solid fa-trash"></i></button>
+                            <button class="mr-1 text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" onclick="window.editReportContent('${r.id}')" title="修改"><i class="fa-solid fa-pen"></i></button>
+                            <button class="text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" onclick="window.deleteReportRow('${r.id}')" title="刪除"><i class="fa-solid fa-trash"></i></button>
                         </td>
                     </tr>`;
             });
@@ -1621,22 +1628,24 @@
         
         window.openCloseModal = (id, def) => { document.getElementById('modal-plan-id').value=id; document.getElementById('modal-exit-price').value=def||''; document.getElementById('close-plan-modal').classList.remove('hidden'); };
         
-        window.deletePlan = async (id) => { 
-            if(!confirm('確定要刪除這筆規劃嗎？此操作無法復原。')) return;
-            state.plans = state.plans.filter(p => p.id !== id); 
-            saveLocalData(); renderPlans(); 
-            await deleteDataFromCloud(`plans/${id}`); showToast('規劃已刪除'); 
+        window.deletePlan = (id) => { 
+            window.openConfirmModal('確定要刪除這筆規劃嗎？此操作無法復原。', async () => {
+                state.plans = state.plans.filter(p => p.id !== id); 
+                saveLocalData(); renderPlans(); 
+                await deleteDataFromCloud(`plans/${id}`); showToast('規劃已刪除'); 
+            });
         };
         
         document.getElementById('btn-cancel-modal')?.addEventListener('click', ()=>document.getElementById('close-plan-modal').classList.add('hidden'));
         
-        const closeTrade = async (status) => {
-            if(!confirm(`確定要以「${status}」結算此筆交易嗎？`)) return;
-            const id = document.getElementById('modal-plan-id').value, ex = parseFloat(document.getElementById('modal-exit-price').value);
-            if(isNaN(ex)) return showToast('無效金額','error');
-            const p = state.plans.find(x=>x.id===id); if(!p) return;
-            const pnl = Math.round((ex - p.entry)*p.qty*1000); p.status = status; p.exitPrice = ex; p.pnl = pnl; p.updatedAt = Date.now();
-            saveLocalData(); renderPlans(); await putDataToCloud(`plans/${id}`, p); document.getElementById('close-plan-modal').classList.add('hidden'); showToast(`結算損益: $${pnl}`);
+        const closeTrade = (status) => {
+            window.openConfirmModal(`確定要以「${status}」結算此筆交易嗎？`, async () => {
+                const id = document.getElementById('modal-plan-id').value, ex = parseFloat(document.getElementById('modal-exit-price').value);
+                if(isNaN(ex)) return showToast('無效金額','error');
+                const p = state.plans.find(x=>x.id===id); if(!p) return;
+                const pnl = Math.round((ex - p.entry)*p.qty*1000); p.status = status; p.exitPrice = ex; p.pnl = pnl; p.updatedAt = Date.now();
+                saveLocalData(); renderPlans(); await putDataToCloud(`plans/${id}`, p); document.getElementById('close-plan-modal').classList.add('hidden'); showToast(`結算損益: $${pnl}`);
+            });
         };
         
         document.getElementById('btn-win')?.addEventListener('click', ()=>closeTrade('已停利')); 
