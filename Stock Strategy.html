@@ -340,9 +340,10 @@
                                 <th class="py-3 px-2 sm:px-3 w-8 text-center sticky top-0 bg-gray-50 dark:bg-gray-900 z-40"><input type="checkbox" class="select-all-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" data-type="revenue"></th>
                                 <th class="py-3 px-3 sm:px-4 revenue-sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer sticky top-0 bg-gray-50 dark:bg-gray-900 z-40" data-sort="month">創高月份 <i class="fa-solid fa-sort-down ml-1 text-xs text-blue-500"></i></th>
                                 <th class="py-3 px-3 sm:px-4 revenue-sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer sticky top-0 bg-gray-50 dark:bg-gray-900 z-40" data-sort="code">代號/股名 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
-                                <th class="py-3 px-2 sm:px-3 text-right sticky top-0 bg-gray-50 dark:bg-gray-900 z-40">25 EPS</th>
-                                <th class="py-3 px-2 sm:px-3 text-right sticky top-0 bg-gray-50 dark:bg-gray-900 z-40">預26 EPS</th>
-                                <th class="py-3 px-3 sm:px-4 text-right sticky top-0 bg-gray-50 dark:bg-gray-900 z-40">成長率</th>
+                                <th class="py-3 px-2 sm:px-3 text-right revenue-sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer sticky top-0 bg-gray-50 dark:bg-gray-900 z-40" data-sort="eps2025">25 EPS <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+                                <th class="py-3 px-2 sm:px-3 text-right revenue-sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer sticky top-0 bg-gray-50 dark:bg-gray-900 z-40" data-sort="eps2026">預26 EPS <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+                                <th class="py-3 px-3 sm:px-4 text-right revenue-sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer sticky top-0 bg-gray-50 dark:bg-gray-900 z-40" data-sort="epsGrowth">成長率 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+                                <th class="py-3 px-3 sm:px-4 text-right revenue-sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer sticky top-0 bg-gray-50 dark:bg-gray-900 z-40" data-sort="targetPrice">最高目標價 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
                                 <th class="py-3 px-3 sm:px-4 w-full sticky top-0 bg-gray-50 dark:bg-gray-900 z-40">備註</th>
                                 <th class="py-3 px-3 sm:px-4 text-center sticky top-0 bg-gray-50 dark:bg-gray-900 z-40">操作</th>
                             </tr>
@@ -1373,9 +1374,16 @@
 
             const sortedRecords = [...filteredRecords].sort((a, b) => {
                 let vA, vB;
+                const eA = getEpsInfo(a.code, {});
+                const eB = getEpsInfo(b.code, {});
+                
                 switch(state.revenueSortConfig.key) {
                     case 'month': vA=a.month; vB=b.month; break;
                     case 'code': vA=a.code; vB=b.code; break;
+                    case 'eps2025': vA=eA.eps2025??-9999; vB=eB.eps2025??-9999; break;
+                    case 'eps2026': vA=eA.eps2026??-9999; vB=eB.eps2026??-9999; break;
+                    case 'epsGrowth': vA=eA.epsGrowth??-9999; vB=eB.epsGrowth??-9999; break;
+                    case 'targetPrice': vA=eA.targetPrice??-9999; vB=eB.targetPrice??-9999; break;
                     default: vA=a.createdAt||0; vB=b.createdAt||0; break;
                 }
                 if(vA === vB) return (b.createdAt||0) - (a.createdAt||0); // Tie breaker
@@ -1398,6 +1406,7 @@
                         <td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2025)}</td>
                         <td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2026)}</td>
                         <td class="py-3 px-3 sm:px-4 text-right">${formatNumColor(ei.epsGrowth, true)}</td>
+                        <td class="py-3 px-3 sm:px-4 text-right">${formatTargetPrice(ei.targetPrice)}</td>
                         <td class="py-3 px-3 sm:px-4 text-gray-600 dark:text-gray-300 w-full">${r.notes||''}</td>
                         <td class="py-3 px-3 sm:px-4 text-center whitespace-nowrap">
                             <button class="mr-1 text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" onclick="editRevenueNotes('${r.id}')" title="修改備註"><i class="fa-solid fa-comment-dots"></i></button>
@@ -1407,117 +1416,6 @@
             });
             tb.innerHTML = rowsHtml;
             updateBatchUI('revenue');
-        }
-
-        // --- 法人報告模組邏輯 ---
-        const repCodeInput = document.getElementById('rep-code'), repNameInput = document.getElementById('rep-name');
-        repCodeInput?.addEventListener('input', (e) => { const v = e.target.value.trim(); if(state.codeToName[v]) repNameInput.value = state.codeToName[v]; });
-        repNameInput?.addEventListener('input', (e) => { const v = e.target.value.trim(); if(state.nameToCode[v]) repCodeInput.value = state.nameToCode[v]; });
-
-        document.getElementById('report-form')?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const date = document.getElementById('rep-date').value;
-            const code = document.getElementById('rep-code').value.trim();
-            const name = document.getElementById('rep-name').value.trim();
-            const content = document.getElementById('rep-content').value.trim();
-
-            if(!code || !name || !content || !date) return;
-
-            const docId = `${code}_${Date.now()}`;
-            const payload = {
-                id: docId, date, code, name, content,
-                createdAt: Date.now(), updatedAt: Date.now()
-            };
-
-            state.reports.push(payload);
-            saveLocalData();
-            renderReports();
-            processAndRenderJournals();
-            if(document.getElementById('module-favorites').classList.contains('active')) renderFavorites();
-
-            await putDataToCloud(`reports/${docId}`, payload);
-            showToast('法人報告已加入');
-
-            e.target.reset();
-            setTimeout(() => document.getElementById('rep-code').focus(), 15);
-        });
-
-        window.editReportContent = async (id) => {
-            try {
-                const r = state.reports.find(x => x.id === id);
-                if(!r) return;
-                const newContent = prompt("請修改報告重點：", r.content || "");
-                if(newContent !== null && newContent.trim() !== "") {
-                    r.content = newContent.trim();
-                    r.updatedAt = Date.now();
-                    saveLocalData();
-                    renderReports();
-                    await putDataToCloud(`reports/${id}`, r);
-                    showToast("報告修改成功");
-                }
-            } catch (err) {
-                console.error("修改過程發生錯誤:", err);
-                showToast("修改失敗，請檢查資料", "error");
-            }
-        };
-
-        window.deleteReportRow = async (id) => {
-            if(!confirm('確定要刪除這筆法人報告嗎？')) return;
-            state.reports = state.reports.filter(r => r.id !== id);
-            saveLocalData();
-            renderReports();
-            processAndRenderJournals();
-            if(document.getElementById('module-favorites').classList.contains('active')) renderFavorites();
-            await deleteDataFromCloud(`reports/${id}`);
-            showToast('報告已刪除');
-        };
-
-        function renderReports() {
-            const tb = document.getElementById('report-table-body');
-            const empty = document.getElementById('report-empty');
-            if(!tb || !empty) return;
-            
-            let filteredReports = state.reports || [];
-            if (state.reportFilters) {
-                if (state.reportFilters.start) filteredReports = filteredReports.filter(r => r.date >= state.reportFilters.start);
-                if (state.reportFilters.end) filteredReports = filteredReports.filter(r => r.date <= state.reportFilters.end);
-            }
-
-            if (filteredReports.length === 0) {
-                tb.innerHTML = ''; empty.classList.remove('hidden'); updateBatchUI('report'); return;
-            }
-            empty.classList.add('hidden');
-
-            const sortedReports = [...filteredReports].sort((a, b) => {
-                let vA, vB;
-                const sortKey = state.reportSortConfig ? state.reportSortConfig.key : 'date';
-                switch(sortKey) {
-                    case 'date': vA=a.date; vB=b.date; break;
-                    case 'code': vA=a.code; vB=b.code; break;
-                    default: vA=a.createdAt||0; vB=b.createdAt||0; break;
-                }
-                if(vA === vB) return (b.createdAt||0) - (a.createdAt||0); // Tie breaker
-                const isAsc = state.reportSortConfig ? state.reportSortConfig.asc : false;
-                return isAsc ? (vA > vB ? 1 : -1) : (vA > vB ? -1 : 1);
-            });
-
-            let rowsHtml = '';
-            sortedReports.forEach(r => {
-                const formattedDate = r.date ? r.date.substring(5).replace('-', '/') : '';
-                rowsHtml += `
-                    <tr class="border-b border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-sm">
-                        <td class="py-3 px-2 sm:px-3 text-center sticky left-0 bg-inherit z-20"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${r.id}" data-type="report" ${selectedIds['report'] && selectedIds['report'].has(r.id) ? 'checked' : ''}></td>
-                        <td class="py-3 px-3 sm:px-4 font-medium text-gray-600 dark:text-gray-400">${formattedDate}</td>
-                        <td class="py-3 px-3 sm:px-4"><span class="font-bold mr-2 text-gray-800 dark:text-gray-200">${r.code}</span><span class="text-gray-600 dark:text-gray-400">${r.name}</span></td>
-                        <td class="py-3 px-3 sm:px-4 text-gray-700 dark:text-gray-300 w-full whitespace-normal leading-relaxed">${r.content||''}</td>
-                        <td class="py-3 px-3 sm:px-4 text-center whitespace-nowrap">
-                            <button class="mr-1 text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" onclick="window.editReportContent('${r.id}')" title="修改"><i class="fa-solid fa-pen"></i></button>
-                            <button class="text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" onclick="window.deleteReportRow('${r.id}')" title="刪除"><i class="fa-solid fa-trash"></i></button>
-                        </td>
-                    </tr>`;
-            });
-            tb.innerHTML = rowsHtml;
-            updateBatchUI('report');
         }
 
         const copyFootnote = `\n\n-------------------\n⚠️ 停損是紀律，停利是藝術。\n⚠️ 位階決定勝率，部位決定存活。\n⚠️ 趨勢-族群-題材-位階-動能-風控`;
@@ -1985,20 +1883,9 @@
                     else { state.revenueSortConfig.key = key; state.revenueSortConfig.asc = false; }
                     
                     document.querySelectorAll('.revenue-sortable i').forEach(icon => { icon.className = 'fa-solid fa-sort ml-1 text-xs opacity-50'; });
-                    th.querySelector('i').className = `fa-solid fa-sort-${state.revenueSortConfig.asc ? 'up' : 'down'} ml-1 text-xs text-blue-500`;
+                    const icon = th.querySelector('i');
+                    if (icon) icon.className = `fa-solid fa-sort-${state.revenueSortConfig.asc ? 'up' : 'down'} ml-1 text-xs text-blue-500`;
                     renderRevenueRecords(); saveLocalData();
-                });
-            });
-            
-            document.querySelectorAll('.report-sortable').forEach(th => {
-                th.addEventListener('click', (e) => {
-                    const key = th.dataset.sort;
-                    if (state.reportSortConfig.key === key) state.reportSortConfig.asc = !state.reportSortConfig.asc;
-                    else { state.reportSortConfig.key = key; state.reportSortConfig.asc = false; }
-                    
-                    document.querySelectorAll('.report-sortable i').forEach(icon => { icon.className = 'fa-solid fa-sort ml-1 text-xs opacity-50'; });
-                    th.querySelector('i').className = `fa-solid fa-sort-${state.reportSortConfig.asc ? 'up' : 'down'} ml-1 text-xs text-blue-500`;
-                    renderReports(); saveLocalData();
                 });
             });
             
