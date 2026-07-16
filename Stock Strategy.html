@@ -1515,6 +1515,7 @@
             showToast('法人報告已加入');
 
             e.target.reset();
+            document.getElementById('rep-date').value = date; // 保留剛才選取的日期
             setTimeout(() => document.getElementById('rep-code').focus(), 15);
         });
 
