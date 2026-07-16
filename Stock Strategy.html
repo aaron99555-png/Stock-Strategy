@@ -20,7 +20,6 @@
             .input-base { @apply w-full bg-gray-50 dark:bg-gray-700/80 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-base focus:outline-none focus:ring-2 focus:ring-blue-500 transition shadow-inner; }
             .btn-copy-base { @apply text-xs font-medium px-2.5 py-1.5 rounded-lg transition border shadow-sm; }
             
-            /* 優化後：上方模組導覽列超顯目按鈕設計 */
             .nav-btn { @apply px-3 sm:px-4 py-2 rounded-lg font-bold transition-all duration-200 text-xs sm:text-sm flex items-center text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800/60 hover:bg-gray-200 dark:hover:bg-gray-700 border-b-2 border-transparent; }
             .nav-btn.active-blue { @apply text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/60 border-blue-500 shadow-sm; }
             .nav-btn.active-purple { @apply text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-900/60 border-purple-500 shadow-sm; }
@@ -50,8 +49,8 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         
         .tw-red { color: #ef4444; } .tw-green { color: #22c55e; }
-        .sortable, .plan-sortable, .revenue-sortable { cursor: pointer; user-select: none; transition: color 0.2s; }
-        .sortable:hover, .plan-sortable:hover, .revenue-sortable:hover { @apply text-blue-500 dark:text-white; }
+        .sortable, .plan-sortable, .revenue-sortable, .report-sortable { cursor: pointer; user-select: none; transition: color 0.2s; }
+        .sortable:hover, .plan-sortable:hover, .revenue-sortable:hover, .report-sortable:hover { @apply text-blue-500 dark:text-white; }
         th, td { vertical-align: middle; }
 
         .cool-title {
@@ -343,6 +342,7 @@
                                 <th class="py-3 px-2 sm:px-3 text-right sticky top-0 bg-gray-50 dark:bg-gray-900 z-40">25 EPS</th>
                                 <th class="py-3 px-2 sm:px-3 text-right sticky top-0 bg-gray-50 dark:bg-gray-900 z-40">預26 EPS</th>
                                 <th class="py-3 px-3 sm:px-4 text-right sticky top-0 bg-gray-50 dark:bg-gray-900 z-40">成長率</th>
+                                <th class="py-3 px-3 sm:px-4 text-right sticky top-0 bg-gray-50 dark:bg-gray-900 z-40">最高目標價</th>
                                 <th class="py-3 px-3 sm:px-4 w-full sticky top-0 bg-gray-50 dark:bg-gray-900 z-40">備註</th>
                                 <th class="py-3 px-3 sm:px-4 text-center sticky top-0 bg-gray-50 dark:bg-gray-900 z-40">操作</th>
                             </tr>
@@ -546,7 +546,12 @@
         <div class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl p-6 border border-gray-200 dark:border-gray-700 w-[340px] max-w-[90%] shadow-2xl mx-4">
             <h3 class="font-bold mb-3 text-xl border-b border-gray-200 dark:border-gray-700 pb-3 flex items-center"><i class="fa-solid fa-cloud-arrow-up text-blue-500 mr-2 text-2xl"></i>跨裝置雲端同步</h3>
             <p class="text-sm text-gray-600 dark:text-gray-300 mb-5 leading-relaxed bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg border border-blue-200 dark:border-blue-800/30">請輸入專屬「同步碼」。在不同裝置輸入相同代碼即可同步所有選股與規劃數據。</p>
-            <div class="mb-5"><input type="text" id="sync-key-input" placeholder="請輸入自訂同步碼" class="input-base font-medium tracking-wider"></div>
+            <div class="mb-5 relative">
+                <input type="password" id="sync-key-input" placeholder="請輸入自訂同步碼" class="input-base font-medium tracking-wider pr-10">
+                <button type="button" id="toggle-sync-visibility" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition">
+                    <i class="fa-solid fa-eye"></i>
+                </button>
+            </div>
             <div class="flex gap-3"><button id="btn-save-sync" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-2.5 rounded-lg text-sm font-bold transition shadow-md">建立連線 / 載入</button></div>
             <button id="btn-cancel-sync" class="w-full mt-3 bg-gray-100 dark:bg-transparent hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 py-2.5 rounded-lg text-sm transition">關閉</button>
         </div>
@@ -586,6 +591,30 @@
         </div>
     </div>
 
+    <div id="confirm-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center z-[100] hidden">
+        <div class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl p-6 border border-gray-200 dark:border-gray-700 w-[340px] max-w-[90%] shadow-2xl mx-4">
+            <h3 class="font-bold mb-3 text-xl flex items-center text-blue-600 dark:text-blue-400"><i class="fa-solid fa-circle-question mr-2"></i>確認操作</h3>
+            <p id="confirm-modal-msg" class="text-sm text-gray-600 dark:text-gray-300 mb-5 leading-relaxed"></p>
+            <div class="flex gap-3">
+                <button id="btn-confirm-yes" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-2.5 rounded-lg text-sm font-bold transition shadow-md">確定</button>
+            </div>
+            <button id="btn-confirm-no" class="w-full mt-3 bg-gray-100 dark:bg-transparent hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 py-2.5 rounded-lg text-sm transition">取消</button>
+        </div>
+    </div>
+
+    <div id="prompt-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center z-[100] hidden">
+        <div class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl p-6 border border-gray-200 dark:border-gray-700 w-[400px] max-w-[90%] shadow-2xl mx-4">
+            <h3 id="prompt-modal-title" class="font-bold mb-3 text-xl flex items-center text-blue-600 dark:text-blue-400"><i class="fa-solid fa-pen-to-square mr-2"></i>編輯內容</h3>
+            <div class="mb-5">
+                <input type="text" id="prompt-modal-input" class="input-base">
+            </div>
+            <div class="flex gap-3">
+                <button id="btn-prompt-save" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-2.5 rounded-lg text-sm font-bold transition shadow-md">儲存</button>
+            </div>
+            <button id="btn-prompt-cancel" class="w-full mt-3 bg-gray-100 dark:bg-transparent hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 py-2.5 rounded-lg text-sm transition">取消</button>
+        </div>
+    </div>
+
     <div id="toast-container" class="fixed bottom-5 right-5 z-[200] flex flex-col gap-3 pointer-events-none"></div>
     <datalist id="stock-codes-list"></datalist><datalist id="stock-names-list"></datalist>
 
@@ -605,6 +634,46 @@
             sortConfig: { key: 'createdAt', asc: false }, favSortConfig: { key: 'createdAt', asc: false }, planSortConfig: { key: 'createdAt', asc: false }, revenueSortConfig: { key: 'month', asc: false }, reportSortConfig: { key: 'date', asc: false }
         };
         const selectedIds = { journal: new Set(), fav: new Set(), plan: new Set(), revenue: new Set(), report: new Set() };
+
+        let confirmCallback = null;
+        window.openConfirmModal = (msg, callback) => {
+            document.getElementById('confirm-modal-msg').textContent = msg;
+            confirmCallback = callback;
+            document.getElementById('confirm-modal').classList.remove('hidden');
+        };
+        document.getElementById('btn-confirm-yes').addEventListener('click', () => {
+            document.getElementById('confirm-modal').classList.add('hidden');
+            if (confirmCallback) confirmCallback();
+        });
+        document.getElementById('btn-confirm-no').addEventListener('click', () => {
+            document.getElementById('confirm-modal').classList.add('hidden');
+            confirmCallback = null;
+        });
+
+        let promptCallback = null;
+        window.openPromptModal = (title, defaultValue, callback) => {
+            document.getElementById('prompt-modal-title').innerHTML = `<i class="fa-solid fa-pen-to-square mr-2"></i>${title}`;
+            const input = document.getElementById('prompt-modal-input');
+            input.value = defaultValue;
+            promptCallback = callback;
+            document.getElementById('prompt-modal').classList.remove('hidden');
+            setTimeout(() => input.focus(), 100);
+        };
+        document.getElementById('btn-prompt-save').addEventListener('click', () => {
+            const val = document.getElementById('prompt-modal-input').value;
+            document.getElementById('prompt-modal').classList.add('hidden');
+            if (promptCallback) promptCallback(val);
+        });
+        document.getElementById('btn-prompt-cancel').addEventListener('click', () => {
+            document.getElementById('prompt-modal').classList.add('hidden');
+            promptCallback = null;
+        });
+        document.getElementById('prompt-modal-input').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('btn-prompt-save').click();
+            }
+        });
 
         const TAG_CATEGORIES = [
             { title: "🌟 特別關注", tags: [
@@ -729,11 +798,7 @@
             });
         }
 
-        // ==========================================
-        // 核心寫入與合併邏輯
-        // ==========================================
         function saveJournalEntry(clearAfter = false) {
-            // 直接抓取 DOM 元素，避免 ReferenceError
             const codeInput = document.getElementById('j-code');
             const dateInput = document.getElementById('j-date');
             const nameInput = document.getElementById('j-name');
@@ -763,14 +828,13 @@
             
             let createdAt = existingIdx !== -1 ? (state.journals[existingIdx].createdAt || Date.now()) : Date.now();
             
-            // 完美合併備註邏輯：保留舊備註，有新備註就用「；」隔開串接
             let mergedNotes = notes;
             if (existingIdx !== -1) {
                 const oldNotes = state.journals[existingIdx].notes || '';
                 if (notes && oldNotes && oldNotes !== notes && !oldNotes.includes(notes)) {
                     mergedNotes = oldNotes + '；' + notes;
                 } else if (!notes) {
-                    mergedNotes = oldNotes; // 如果沒有輸入新備註，則保留舊的
+                    mergedNotes = oldNotes;
                 }
             }
             
@@ -784,7 +848,6 @@
             putDataToCloud(`journals/${docId}`, payload).catch(() => {});
 
             if(clearAfter) {
-                // 清空輸入框（但不清空策略標籤與日期）
                 codeInput.value = ''; 
                 nameInput.value = ''; 
                 notesInput.value = ''; 
@@ -1100,7 +1163,21 @@
         }
 
         const syncModal = document.getElementById('sync-modal'), syncInput = document.getElementById('sync-key-input');
-        document.getElementById('btn-sync-modal').addEventListener('click', () => { syncInput.value = localStorage.getItem('ryan_sync_key') || ''; syncModal.classList.remove('hidden'); });
+        
+        document.getElementById('toggle-sync-visibility')?.addEventListener('click', function() {
+            const icon = this.querySelector('i');
+            if (syncInput.type === 'password') {
+                syncInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                syncInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+
+        document.getElementById('btn-sync-modal').addEventListener('click', () => { syncInput.value = localStorage.getItem('ryan_sync_key') || ''; syncInput.type = 'password'; document.getElementById('toggle-sync-visibility').querySelector('i').className = 'fa-solid fa-eye'; syncModal.classList.remove('hidden'); });
         document.getElementById('btn-cancel-sync').addEventListener('click', () => syncModal.classList.add('hidden'));
         document.getElementById('btn-save-sync').addEventListener('click', async () => {
             const key = syncInput.value.trim();
@@ -1113,13 +1190,11 @@
             btn.addEventListener('click', (e) => {
                 const tid = e.currentTarget.dataset.target, color = e.currentTarget.dataset.color || 'blue';
                 
-                // Desktop
                 document.querySelectorAll('.nav-btn').forEach(b => {
                     b.className = `nav-btn`;
                     if(b.dataset.target === tid) b.classList.add(`active-${color}`);
                 });
                 
-                // Mobile
                 document.querySelectorAll('.nav-btn-mobile').forEach(b => {
                     b.className = `nav-btn-mobile`;
                     if(b.dataset.target === tid) b.classList.add(`active-${color}`);
@@ -1133,9 +1208,6 @@
             });
         });
 
-        // ===============================================
-        // DOM 操作輔助
-        // ===============================================
         const updatePreview = (code) => {
             const previewDiv = document.getElementById('j-preview');
             if(!code || !state.epsData[code]) {
@@ -1165,16 +1237,17 @@
         window.editNotes = async (id) => {
             const j = state.journals.find(x => x.id === id);
             if(!j) return;
-            const newNotes = prompt("請修改備註說明：", j.notes || "");
-            if(newNotes !== null) {
-                j.notes = newNotes.trim();
-                j.updatedAt = Date.now();
-                saveLocalData();
-                processAndRenderJournals();
-                if(document.getElementById('module-favorites').classList.contains('active')) renderFavorites();
-                showToast("備註修改成功");
-                await putDataToCloud(`journals/${id}`, j);
-            }
+            window.openPromptModal("修改備註說明", j.notes || "", async (newNotes) => {
+                if(newNotes !== null) {
+                    j.notes = newNotes.trim();
+                    j.updatedAt = Date.now();
+                    saveLocalData();
+                    processAndRenderJournals();
+                    if(document.getElementById('module-favorites').classList.contains('active')) renderFavorites();
+                    showToast("備註修改成功");
+                    await putDataToCloud(`journals/${id}`, j);
+                }
+            });
         };
 
         const getFilteredAndSortedData = (dataList, currentFilters, currentSortConfig) => {
@@ -1270,10 +1343,11 @@
         };
 
         window.deleteRow = async (id) => { 
-            if(!confirm('確定要刪除這筆紀錄嗎？此操作無法復原。')) return;
-            state.journals = state.journals.filter(j => j.id !== id); 
-            saveLocalData(); processAndRenderJournals(); if(document.getElementById('module-favorites').classList.contains('active')) renderFavorites(); 
-            await deleteDataFromCloud(`journals/${id}`); showToast('紀錄已刪除'); 
+            window.openConfirmModal('確定要刪除這筆紀錄嗎？此操作無法復原。', async () => {
+                state.journals = state.journals.filter(j => j.id !== id); 
+                saveLocalData(); processAndRenderJournals(); if(document.getElementById('module-favorites').classList.contains('active')) renderFavorites(); 
+                await deleteDataFromCloud(`journals/${id}`); showToast('紀錄已刪除'); 
+            });
         };
 
         function processAndRenderJournals() { renderTableRows(getFilteredAndSortedData(state.journals, state.filters, state.sortConfig), 'journal-table-body', 'journal-empty'); }
@@ -1296,7 +1370,7 @@
 
             if(!month || !code || !name) return;
 
-            const docId = `${code}_${month}`; // Prevent duplicate per month per stock
+            const docId = `${code}_${month}`; 
             const existingIdx = state.revenueRecords.findIndex(r => r.id === docId);
 
             let mergedNotes = notes;
@@ -1334,26 +1408,28 @@
         window.editRevenueNotes = async (id) => {
             const r = state.revenueRecords.find(x => x.id === id);
             if(!r) return;
-            const newNotes = prompt("請修改備註說明：", r.notes || "");
-            if(newNotes !== null) {
-                r.notes = newNotes.trim();
-                r.updatedAt = Date.now();
-                saveLocalData();
-                renderRevenueRecords();
-                await putDataToCloud(`revenueRecords/${id}`, r);
-                showToast("備註修改成功");
-            }
+            window.openPromptModal("修改備註說明", r.notes || "", async (newNotes) => {
+                if(newNotes !== null) {
+                    r.notes = newNotes.trim();
+                    r.updatedAt = Date.now();
+                    saveLocalData();
+                    renderRevenueRecords();
+                    await putDataToCloud(`revenueRecords/${id}`, r);
+                    showToast("備註修改成功");
+                }
+            });
         };
 
         window.deleteRevenueRow = async (id) => {
-            if(!confirm('確定要刪除這筆創高紀錄嗎？')) return;
-            state.revenueRecords = state.revenueRecords.filter(r => r.id !== id);
-            saveLocalData();
-            renderRevenueRecords();
-            processAndRenderJournals();
-            if(document.getElementById('module-favorites').classList.contains('active')) renderFavorites();
-            await deleteDataFromCloud(`revenueRecords/${id}`);
-            showToast('紀錄已刪除');
+            window.openConfirmModal('確定要刪除這筆創高紀錄嗎？', async () => {
+                state.revenueRecords = state.revenueRecords.filter(r => r.id !== id);
+                saveLocalData();
+                renderRevenueRecords();
+                processAndRenderJournals();
+                if(document.getElementById('module-favorites').classList.contains('active')) renderFavorites();
+                await deleteDataFromCloud(`revenueRecords/${id}`);
+                showToast('紀錄已刪除');
+            });
         };
 
         function renderRevenueRecords() {
@@ -1378,7 +1454,7 @@
                     case 'code': vA=a.code; vB=b.code; break;
                     default: vA=a.createdAt||0; vB=b.createdAt||0; break;
                 }
-                if(vA === vB) return (b.createdAt||0) - (a.createdAt||0); // Tie breaker
+                if(vA === vB) return (b.createdAt||0) - (a.createdAt||0); 
                 return state.revenueSortConfig.asc ? (vA > vB ? 1 : -1) : (vA > vB ? -1 : 1);
             });
 
@@ -1398,6 +1474,7 @@
                         <td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2025)}</td>
                         <td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2026)}</td>
                         <td class="py-3 px-3 sm:px-4 text-right">${formatNumColor(ei.epsGrowth, true)}</td>
+                        <td class="py-3 px-3 sm:px-4 text-right">${formatTargetPrice(ei.targetPrice)}</td>
                         <td class="py-3 px-3 sm:px-4 text-gray-600 dark:text-gray-300 w-full">${r.notes||''}</td>
                         <td class="py-3 px-3 sm:px-4 text-center whitespace-nowrap">
                             <button class="mr-1 text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" onclick="editRevenueNotes('${r.id}')" title="修改備註"><i class="fa-solid fa-comment-dots"></i></button>
@@ -1409,7 +1486,6 @@
             updateBatchUI('revenue');
         }
 
-        // --- 法人報告模組邏輯 ---
         const repCodeInput = document.getElementById('rep-code'), repNameInput = document.getElementById('rep-name');
         repCodeInput?.addEventListener('input', (e) => { const v = e.target.value.trim(); if(state.codeToName[v]) repNameInput.value = state.codeToName[v]; });
         repNameInput?.addEventListener('input', (e) => { const v = e.target.value.trim(); if(state.nameToCode[v]) repCodeInput.value = state.nameToCode[v]; });
@@ -1446,15 +1522,16 @@
             try {
                 const r = state.reports.find(x => x.id === id);
                 if(!r) return;
-                const newContent = prompt("請修改報告重點：", r.content || "");
-                if(newContent !== null && newContent.trim() !== "") {
-                    r.content = newContent.trim();
-                    r.updatedAt = Date.now();
-                    saveLocalData();
-                    renderReports();
-                    await putDataToCloud(`reports/${id}`, r);
-                    showToast("報告修改成功");
-                }
+                window.openPromptModal("修改報告重點", r.content || "", async (newContent) => {
+                    if(newContent !== null && newContent.trim() !== "") {
+                        r.content = newContent.trim();
+                        r.updatedAt = Date.now();
+                        saveLocalData();
+                        renderReports();
+                        await putDataToCloud(`reports/${id}`, r);
+                        showToast("報告修改成功");
+                    }
+                });
             } catch (err) {
                 console.error("修改過程發生錯誤:", err);
                 showToast("修改失敗，請檢查資料", "error");
@@ -1462,14 +1539,15 @@
         };
 
         window.deleteReportRow = async (id) => {
-            if(!confirm('確定要刪除這筆法人報告嗎？')) return;
-            state.reports = state.reports.filter(r => r.id !== id);
-            saveLocalData();
-            renderReports();
-            processAndRenderJournals();
-            if(document.getElementById('module-favorites').classList.contains('active')) renderFavorites();
-            await deleteDataFromCloud(`reports/${id}`);
-            showToast('報告已刪除');
+            window.openConfirmModal('確定要刪除這筆法人報告嗎？', async () => {
+                state.reports = state.reports.filter(r => r.id !== id);
+                saveLocalData();
+                renderReports();
+                processAndRenderJournals();
+                if(document.getElementById('module-favorites').classList.contains('active')) renderFavorites();
+                await deleteDataFromCloud(`reports/${id}`);
+                showToast('報告已刪除');
+            });
         };
 
         function renderReports() {
@@ -1496,7 +1574,7 @@
                     case 'code': vA=a.code; vB=b.code; break;
                     default: vA=a.createdAt||0; vB=b.createdAt||0; break;
                 }
-                if(vA === vB) return (b.createdAt||0) - (a.createdAt||0); // Tie breaker
+                if(vA === vB) return (b.createdAt||0) - (a.createdAt||0); 
                 const isAsc = state.reportSortConfig ? state.reportSortConfig.asc : false;
                 return isAsc ? (vA > vB ? 1 : -1) : (vA > vB ? -1 : 1);
             });
@@ -1941,15 +2019,12 @@
                 executeCopy(text.trim() + copyFootnote);
             });
 
-            // ===============================================
-            // 綁定各個表單的 Submit 監聽事件
-            // ===============================================
             document.getElementById('journal-form')?.addEventListener('submit', (e) => {
                 e.preventDefault();
                 saveJournalEntry(true);
             });
 
-            processAndRenderJournals(); renderFavorites(); renderPlans(); renderRevenueRecords();
+            processAndRenderJournals(); renderFavorites(); renderPlans(); renderRevenueRecords(); renderReports();
             updateSyncStatusUI();
             
             document.querySelectorAll('.sortable').forEach(th => {
@@ -1988,6 +2063,19 @@
                     const icon = th.querySelector('i');
                     if (icon) icon.className = `fa-solid fa-sort-${state.revenueSortConfig.asc ? 'up' : 'down'} ml-1 text-xs text-blue-500`;
                     renderRevenueRecords(); saveLocalData();
+                });
+            });
+
+            document.querySelectorAll('.report-sortable').forEach(th => {
+                th.addEventListener('click', (e) => {
+                    const key = th.dataset.sort;
+                    if (state.reportSortConfig.key === key) state.reportSortConfig.asc = !state.reportSortConfig.asc;
+                    else { state.reportSortConfig.key = key; state.reportSortConfig.asc = false; }
+                    
+                    document.querySelectorAll('.report-sortable i').forEach(icon => { icon.className = 'fa-solid fa-sort ml-1 text-xs opacity-50'; });
+                    const icon = th.querySelector('i');
+                    if (icon) icon.className = `fa-solid fa-sort-${state.reportSortConfig.asc ? 'up' : 'down'} ml-1 text-xs text-blue-500`;
+                    renderReports(); saveLocalData();
                 });
             });
             
