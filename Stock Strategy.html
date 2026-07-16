@@ -396,7 +396,7 @@
                                 <th class="py-3 px-2 sm:px-3 w-8 text-center sticky top-0 bg-gray-50 dark:bg-gray-900 z-40"><input type="checkbox" class="select-all-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" data-type="report"></th>
                                 <th class="py-3 px-3 sm:px-4 report-sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer sticky top-0 bg-gray-50 dark:bg-gray-900 z-40 w-[120px]" data-sort="date">日期 <i class="fa-solid fa-sort-down ml-1 text-xs text-blue-500"></i></th>
                                 <th class="py-3 px-3 sm:px-4 report-sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer sticky top-0 bg-gray-50 dark:bg-gray-900 z-40 w-[120px]" data-sort="code">代號/股名 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
-                                <th class="py-3 px-3 sm:px-4 w-full sticky top-0 bg-gray-50 dark:bg-gray-900 z-40">報告摘要</th>
+                                <th class="py-3 px-3 sm:px-4 w-full min-w-[280px] sm:min-w-[400px] sticky top-0 bg-gray-50 dark:bg-gray-900 z-40">報告摘要</th>
                                 <th class="py-3 px-3 sm:px-4 text-center sticky top-0 bg-gray-50 dark:bg-gray-900 z-40">操作</th>
                             </tr>
                         </thead>
@@ -1551,6 +1551,13 @@
             });
         };
 
+        window.copySingleReport = (id) => {
+            const r = state.reports.find(x => x.id === id);
+            if(!r) return;
+            const text = `${r.code} / ${r.name}\n${r.content || ''}`;
+            executeCopy(text);
+        };
+
         function renderReports() {
             const tb = document.getElementById('report-table-body');
             const empty = document.getElementById('report-empty');
@@ -1588,8 +1595,9 @@
                         <td class="py-3 px-2 sm:px-3 text-center sticky left-0 bg-inherit z-20"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${r.id}" data-type="report" ${selectedIds['report'] && selectedIds['report'].has(r.id) ? 'checked' : ''}></td>
                         <td class="py-3 px-3 sm:px-4 font-medium text-gray-600 dark:text-gray-400">${formattedDate}</td>
                         <td class="py-3 px-3 sm:px-4"><span class="font-bold mr-2 text-gray-800 dark:text-gray-200">${r.code}</span><span class="text-gray-600 dark:text-gray-400">${r.name}</span></td>
-                        <td class="py-3 px-3 sm:px-4 text-gray-700 dark:text-gray-300 w-full whitespace-normal leading-relaxed">${r.content||''}</td>
+                        <td class="py-3 px-3 sm:px-4 text-gray-700 dark:text-gray-300 w-full min-w-[280px] sm:min-w-[400px] whitespace-normal leading-relaxed">${r.content||''}</td>
                         <td class="py-3 px-3 sm:px-4 text-center whitespace-nowrap">
+                            <button class="mr-1 text-teal-600 dark:text-teal-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" onclick="window.copySingleReport('${r.id}')" title="複製報告"><i class="fa-solid fa-copy"></i></button>
                             <button class="mr-1 text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" onclick="window.editReportContent('${r.id}')" title="修改"><i class="fa-solid fa-pen"></i></button>
                             <button class="text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" onclick="window.deleteReportRow('${r.id}')" title="刪除"><i class="fa-solid fa-trash"></i></button>
                         </td>
