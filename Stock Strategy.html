@@ -21,9 +21,11 @@
             /* 優化：鎖定高度，徹底解決 iOS Safari 日期框與文字框大小不一的問題 */
             .input-base { 
                 @apply w-full h-[42px] bg-gray-50 dark:bg-gray-700/80 border border-gray-300 dark:border-gray-600 rounded-lg px-2 sm:px-3 text-gray-900 dark:text-white text-[13px] sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 transition shadow-inner; 
-                -webkit-appearance: none;
-                appearance: none;
+                -webkit-appearance: none !important;
+                -moz-appearance: none !important;
+                appearance: none !important;
                 box-sizing: border-box;
+                margin: 0;
             }
             
             .btn-copy-base { @apply text-xs font-medium px-2.5 py-1.5 rounded-lg transition border shadow-sm; }
@@ -85,20 +87,21 @@
          */
         input[type="date"], input[type="month"] { position: relative; }
         input[type="date"]::-webkit-datetime-edit, input[type="month"]::-webkit-datetime-edit {
+            opacity: 0 !important;
             color: transparent !important; background: transparent !important;
         }
         input[type="date"]::after, input[type="month"]::after {
             content: attr(data-date);
             position: absolute; left: 0; top: 0; right: 0; bottom: 0;
-            display: flex; align-items: center;
+            display: flex; align-items: center; justify-content: center;
             color: currentColor; /* 完美繼承 Tailwind 的 text 色系 */
-            padding: inherit; font-family: inherit;
             pointer-events: none; /* 確保點擊可以穿透開啟日曆 */
         }
-        .text-center[type="date"]::after, .text-center[type="month"]::after { justify-content: center; }
-        .text-left[type="date"]::after, .text-left[type="month"]::after { justify-content: flex-start; }
         @media (min-width: 640px) {
-            .sm\:text-left[type="date"]::after, .sm\:text-left[type="month"]::after { justify-content: flex-start; }
+            input.sm\:text-left[type="date"]::after, input.sm\:text-left[type="month"]::after {
+                justify-content: flex-start;
+                padding-left: 0.75rem; /* 對齊 px-3 */
+            }
         }
         input[type="date"]::-webkit-calendar-picker-indicator, input[type="month"]::-webkit-calendar-picker-indicator {
             position: absolute; top: 0; right: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;
@@ -243,7 +246,15 @@
                             <button type="button" id="filter-tag-btn" class="bg-white dark:bg-gray-900/50 text-gray-900 dark:text-white text-xs sm:text-sm border border-gray-300 dark:border-gray-700/50 rounded-lg px-3 py-1.5 sm:py-2 focus:ring-2 focus:ring-blue-500 outline-none transition hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center justify-between gap-2 shadow-sm whitespace-nowrap">
                                 <span>+ 標籤挑選</span><i class="fa-solid fa-chevron-down text-[10px] opacity-70"></i>
                             </button>
-                            <div id="filter-tag-panel" class="absolute left-0 top-full mt-1.5 w-[280px] bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl shadow-2xl hidden z-50 p-3 max-h-[60vh] overflow-y-auto">
+                            <div id="filter-tag-panel" class="absolute left-0 top-full mt-1.5 w-[280px] sm:w-[320px] bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl shadow-2xl hidden z-50 p-3 max-h-[60vh] overflow-y-auto">
+                                <!-- 加入邏輯切換選項 -->
+                                <div class="mb-3 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                                    <span class="text-xs font-bold text-gray-700 dark:text-gray-300">篩選邏輯</span>
+                                    <div class="flex items-center bg-gray-100 dark:bg-gray-900 p-1 rounded-lg">
+                                        <button type="button" id="btn-logic-or" class="logic-btn px-2 py-1 text-[10px] sm:text-xs rounded font-medium transition-colors bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm" data-logic="OR">符合任一 (OR)</button>
+                                        <button type="button" id="btn-logic-and" class="logic-btn px-2 py-1 text-[10px] sm:text-xs rounded font-medium transition-colors text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" data-logic="AND">完全符合 (AND)</button>
+                                    </div>
+                                </div>
                                 <div id="filter-tags-container"></div>
                             </div>
                         </div>
@@ -352,9 +363,9 @@
                 <div class="p-4 sm:p-5 bg-gray-50/50 dark:bg-gray-800/80 border-b border-gray-200 dark:border-gray-700/50 flex flex-col gap-4">
                     <h2 class="font-bold text-pink-600 dark:text-pink-400 text-lg sm:text-xl flex items-center"><div class="bg-pink-500/10 dark:bg-pink-500/20 p-1.5 rounded mr-2"><i class="fa-solid fa-money-bill-trend-up"></i></div> 營收創高</h2>
                     <form id="revenue-form" class="grid grid-cols-12 md:grid-cols-7 gap-1.5 sm:gap-4 items-end" action="javascript:void(0);">
-                        <div class="col-span-4 md:col-span-1"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">創高月份</label><input type="month" id="r-month" required class="input-base !px-0.5 sm:!px-3 text-center sm:text-left" enterkeyhint="next"></div>
-                        <div class="col-span-4 md:col-span-1"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">代號</label><input type="text" id="r-code" list="stock-codes-list" required class="input-base !px-1 sm:!px-3 text-center sm:text-left" autocomplete="off" enterkeyhint="next"></div>
-                        <div class="col-span-4 md:col-span-1"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">股名</label><input type="text" id="r-name" list="stock-names-list" required class="input-base !px-1 sm:!px-3 text-center sm:text-left" autocomplete="off" enterkeyhint="next"></div>
+                        <div class="col-span-4 md:col-span-1"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">創高月份</label><input type="month" id="r-month" required class="input-base !px-0.5 sm:!px-3 text-[13px] sm:text-sm text-center sm:text-left" enterkeyhint="next"></div>
+                        <div class="col-span-4 md:col-span-1"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">代號</label><input type="text" id="r-code" list="stock-codes-list" required class="input-base !px-1 sm:!px-3 text-[13px] sm:text-sm text-center sm:text-left" autocomplete="off" enterkeyhint="next"></div>
+                        <div class="col-span-4 md:col-span-1"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">股名</label><input type="text" id="r-name" list="stock-names-list" required class="input-base !px-1 sm:!px-3 text-[13px] sm:text-sm text-center sm:text-left" autocomplete="off" enterkeyhint="next"></div>
                         <div class="col-span-9 md:col-span-3"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">備註說明</label><input type="text" id="r-notes" placeholder="可選填..." class="input-base text-xs sm:text-sm" autocomplete="off" enterkeyhint="send"></div>
                         <div class="col-span-3 md:col-span-1"><button type="submit" id="btn-revenue-submit" class="w-full h-[42px] bg-pink-600 hover:bg-pink-500 text-white text-base sm:text-sm font-bold rounded-lg transition shadow-md">加入</button></div>
                     </form>
@@ -364,7 +375,7 @@
                     <div class="flex flex-wrap items-center gap-2 sm:gap-3 w-full lg:w-auto">
                         <div class="flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 max-w-[150px] sm:max-w-none">
                             <span class="text-xs text-gray-500 dark:text-gray-400 px-1 sm:px-2 hidden sm:inline"><i class="fa-solid fa-filter mr-1"></i>月份</span>
-                            <input type="month" id="filter-revenue-month" class="bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-1 w-[90px] sm:w-auto">
+                            <input type="month" id="filter-revenue-month" class="bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-1 w-[90px] sm:w-auto text-center">
                         </div>
                         
                         <div class="flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50">
@@ -413,9 +424,9 @@
                 <div class="p-4 sm:p-5 bg-gray-50/50 dark:bg-gray-800/80 border-b border-gray-200 dark:border-gray-700/50 flex flex-col gap-4">
                     <h2 class="font-bold text-indigo-600 dark:text-indigo-400 text-lg sm:text-xl flex items-center"><div class="bg-indigo-500/10 dark:bg-indigo-500/20 p-1.5 rounded mr-2"><i class="fa-solid fa-file-invoice"></i></div> 法人報告</h2>
                     <form id="report-form" class="grid grid-cols-12 md:grid-cols-9 gap-1.5 sm:gap-4 items-end" action="javascript:void(0);">
-                        <div class="col-span-4 md:col-span-1"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">報告日期</label><input type="date" id="rep-date" required class="input-base !px-0.5 sm:!px-3 text-center sm:text-left"></div>
-                        <div class="col-span-4 md:col-span-1"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">代號</label><input type="text" id="rep-code" list="stock-codes-list" required class="input-base !px-1 sm:!px-3 text-center sm:text-left" autocomplete="off" enterkeyhint="next"></div>
-                        <div class="col-span-4 md:col-span-1"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">股名</label><input type="text" id="rep-name" list="stock-names-list" required class="input-base !px-1 sm:!px-3 text-center sm:text-left" autocomplete="off" enterkeyhint="next"></div>
+                        <div class="col-span-4 md:col-span-1"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">報告日期</label><input type="date" id="rep-date" required class="input-base !px-0.5 sm:!px-3 text-[13px] sm:text-sm text-center sm:text-left"></div>
+                        <div class="col-span-4 md:col-span-1"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">代號</label><input type="text" id="rep-code" list="stock-codes-list" required class="input-base !px-1 sm:!px-3 text-[13px] sm:text-sm text-center sm:text-left" autocomplete="off" enterkeyhint="next"></div>
+                        <div class="col-span-4 md:col-span-1"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">股名</label><input type="text" id="rep-name" list="stock-names-list" required class="input-base !px-1 sm:!px-3 text-[13px] sm:text-sm text-center sm:text-left" autocomplete="off" enterkeyhint="next"></div>
                         <div class="col-span-9 md:col-span-5"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">報告內容重點</label><input type="text" id="rep-content" required placeholder="貼上或輸入報告摘要..." class="input-base text-xs sm:text-sm" autocomplete="off" enterkeyhint="send"></div>
                         <div class="col-span-3 md:col-span-1"><button type="submit" id="btn-report-submit" class="w-full h-[42px] bg-indigo-600 hover:bg-indigo-500 text-white text-base sm:text-sm font-bold rounded-lg transition shadow-md">加入</button></div>
                     </form>
@@ -425,9 +436,9 @@
                     <div class="flex flex-wrap items-center gap-2 sm:gap-3 w-full lg:w-auto">
                         <div class="flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 max-w-[180px] sm:max-w-none">
                             <span class="text-xs text-gray-500 dark:text-gray-400 px-1 sm:px-2 hidden sm:inline"><i class="fa-solid fa-filter mr-1"></i>區間</span>
-                            <input type="date" id="filter-rep-start" class="bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-0.5 sm:px-1 w-[75px] sm:w-auto">
+                            <input type="date" id="filter-rep-start" class="bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-0.5 sm:px-1 w-[75px] sm:w-auto text-center">
                             <span class="text-gray-400 mx-0.5 sm:mx-1">-</span>
-                            <input type="date" id="filter-rep-end" class="bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-0.5 sm:px-1 w-[75px] sm:w-auto">
+                            <input type="date" id="filter-rep-end" class="bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-0.5 sm:px-1 w-[75px] sm:w-auto text-center">
                         </div>
                         
                         <div class="flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50">
@@ -479,12 +490,12 @@
                     <h2 class="font-bold text-green-600 dark:text-green-400 mb-4 text-lg sm:text-xl flex items-center"><div class="bg-green-500/10 dark:bg-green-500/20 p-1.5 rounded mr-2"><i class="fa-solid fa-chess-knight"></i></div> 新增交易規劃</h2>
                     
                     <form id="plan-form" class="grid grid-cols-12 md:grid-cols-8 gap-2 sm:gap-4 items-end" action="javascript:void(0);">
-                        <div class="col-span-4 md:col-span-1"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">代號</label><input type="text" id="p-stock" list="stock-codes-list" required class="input-base !px-1 sm:!px-3 text-center sm:text-left" autocomplete="off" enterkeyhint="next"></div>
-                        <div class="col-span-4 md:col-span-1"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">股名</label><input type="text" id="p-name" list="stock-names-list" required class="input-base !px-1 sm:!px-3 text-center sm:text-left" autocomplete="off" enterkeyhint="next"></div>
-                        <div class="col-span-4 md:col-span-1"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">張數</label><input type="number" id="p-qty" min="1" value="1" required class="input-base !px-1 sm:!px-3 text-center sm:text-left" enterkeyhint="next"></div>
-                        <div class="col-span-4 md:col-span-1"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">進場價</label><input type="number" step="0.01" id="p-entry" required class="input-base !px-1 sm:!px-3 text-center sm:text-left" enterkeyhint="next"></div>
-                        <div class="col-span-4 md:col-span-1"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">停損(95折)</label><input type="number" step="0.01" id="p-stop" required class="input-base text-green-600 dark:text-green-400 font-bold !px-1 sm:!px-3 text-center sm:text-left" enterkeyhint="next"></div>
-                        <div class="col-span-4 md:col-span-1"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">停利價</label><input type="number" step="0.01" id="p-target" class="input-base tw-red font-bold !px-1 sm:!px-3 text-center sm:text-left" enterkeyhint="next"></div>
+                        <div class="col-span-4 md:col-span-1"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">代號</label><input type="text" id="p-stock" list="stock-codes-list" required class="input-base !px-1 sm:!px-3 text-[13px] sm:text-sm text-center sm:text-left" autocomplete="off" enterkeyhint="next"></div>
+                        <div class="col-span-4 md:col-span-1"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">股名</label><input type="text" id="p-name" list="stock-names-list" required class="input-base !px-1 sm:!px-3 text-[13px] sm:text-sm text-center sm:text-left" autocomplete="off" enterkeyhint="next"></div>
+                        <div class="col-span-4 md:col-span-1"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">張數</label><input type="number" id="p-qty" min="1" value="1" required class="input-base !px-1 sm:!px-3 text-[13px] sm:text-sm text-center sm:text-left" enterkeyhint="next"></div>
+                        <div class="col-span-4 md:col-span-1"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">進場價</label><input type="number" step="0.01" id="p-entry" required class="input-base !px-1 sm:!px-3 text-[13px] sm:text-sm text-center sm:text-left" enterkeyhint="next"></div>
+                        <div class="col-span-4 md:col-span-1"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">停損(95折)</label><input type="number" step="0.01" id="p-stop" required class="input-base text-green-600 dark:text-green-400 font-bold !px-1 sm:!px-3 text-[13px] sm:text-sm text-center sm:text-left" enterkeyhint="next"></div>
+                        <div class="col-span-4 md:col-span-1"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">停利價</label><input type="number" step="0.01" id="p-target" class="input-base tw-red font-bold !px-1 sm:!px-3 text-[13px] sm:text-sm text-center sm:text-left" enterkeyhint="next"></div>
                         <div class="col-span-8 md:col-span-1 lg:col-span-1"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">權證/備註</label><input type="text" id="p-note" placeholder="可選填..." class="input-base text-xs sm:text-sm" autocomplete="off" enterkeyhint="send"></div>
                         <div class="col-span-4 md:col-span-1 lg:col-span-1"><button type="submit" id="btn-plan-submit" class="w-full h-[42px] bg-green-600 hover:bg-green-500 text-white text-base sm:text-sm font-bold rounded-lg transition shadow-md">加入</button></div>
                     </form>
@@ -526,9 +537,9 @@
                     <div class="flex flex-wrap items-center gap-2 sm:gap-3 w-full lg:w-auto">
                         <div class="flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 max-w-[180px] sm:max-w-none">
                             <span class="text-xs text-gray-500 dark:text-gray-400 px-1 sm:px-2 hidden sm:inline"><i class="fa-solid fa-filter mr-1"></i>區間</span>
-                            <input type="date" id="filter-start-fav" class="filter-start bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-0.5 sm:px-1 w-[75px] sm:w-auto">
+                            <input type="date" id="filter-start-fav" class="filter-start bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-0.5 sm:px-1 w-[75px] sm:w-auto text-center">
                             <span class="text-gray-400 mx-0.5 sm:mx-1">-</span>
-                            <input type="date" id="filter-end-fav" class="filter-end bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-0.5 sm:px-1 w-[75px] sm:w-auto">
+                            <input type="date" id="filter-end-fav" class="filter-end bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-0.5 sm:px-1 w-[75px] sm:w-auto text-center">
                         </div>
                         
                         <div class="flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50">
@@ -557,7 +568,14 @@
                             <button type="button" id="filter-tag-btn-fav" class="bg-white dark:bg-gray-900/50 text-gray-900 dark:text-white text-xs sm:text-sm border border-gray-300 dark:border-gray-700/50 rounded-lg px-3 py-1.5 sm:py-2 focus:ring-2 focus:ring-blue-500 outline-none transition hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center justify-between gap-2 shadow-sm whitespace-nowrap">
                                 <span>+ 標籤挑選</span><i class="fa-solid fa-chevron-down text-[10px] opacity-70"></i>
                             </button>
-                            <div id="filter-tag-panel-fav" class="absolute left-0 top-full mt-1.5 w-[280px] bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl shadow-2xl hidden z-50 p-3 max-h-[60vh] overflow-y-auto">
+                            <div id="filter-tag-panel-fav" class="absolute left-0 top-full mt-1.5 w-[280px] sm:w-[320px] bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl shadow-2xl hidden z-50 p-3 max-h-[60vh] overflow-y-auto">
+                                <div class="mb-3 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                                    <span class="text-xs font-bold text-gray-700 dark:text-gray-300">篩選邏輯</span>
+                                    <div class="flex items-center bg-gray-100 dark:bg-gray-900 p-1 rounded-lg">
+                                        <button type="button" id="btn-logic-or-fav" class="logic-btn-fav px-2 py-1 text-[10px] sm:text-xs rounded font-medium transition-colors bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm" data-logic="OR">符合任一 (OR)</button>
+                                        <button type="button" id="btn-logic-and-fav" class="logic-btn-fav px-2 py-1 text-[10px] sm:text-xs rounded font-medium transition-colors text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" data-logic="AND">完全符合 (AND)</button>
+                                    </div>
+                                </div>
                                 <div id="filter-tags-container-fav"></div>
                             </div>
                         </div>
@@ -688,7 +706,6 @@
     <datalist id="stock-codes-list"></datalist><datalist id="stock-names-list"></datalist>
 
     <script>
-        // 優化 2: 日期無痕覆蓋 (捕捉 JS 設值的瞬間，同步更新 data-date 給 CSS 使用)
         const originalDateSetter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set;
         Object.defineProperty(HTMLInputElement.prototype, 'value', {
             set: function(val) {
@@ -700,7 +717,6 @@
             get: Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').get
         });
 
-        // 捕捉使用者手動選擇日期的瞬間，同步更新 data-date
         document.addEventListener('input', (e) => {
             if (e.target.type === 'date' || e.target.type === 'month') {
                 e.target.setAttribute('data-date', e.target.value.replace(/-/g, '/'));
@@ -713,7 +729,6 @@
         const isCloudMode = () => !!localStorage.getItem('ryan_sync_key');
         let cloudSyncInterval = null;
 
-        // 優化 3: 防禦 XSS 與破版的 HTML 跳脫函數
         const escapeHTML = (str) => {
             if (!str) return '';
             return String(str).replace(/[&<>'"]/g, tag => ({
@@ -721,7 +736,6 @@
             }[tag] || tag));
         };
 
-        // 優化 1: Debounce 搜尋防抖函數 (大幅提升搜尋效能)
         const debounce = (func, wait) => {
             let timeout;
             return function executedFunction(...args) {
@@ -733,8 +747,8 @@
 
         let state = {
             journals: [], plans: [], revenueRecords: [], reports: [], epsData: {}, codeToName: {}, nameToCode: {},
-            filters: { start: '', end: '', code: '', futuresOnly: false, excludeNegativeGrowth: false, tags: [], minScore: 0 },
-            favFilters: { start: '', end: '', code: '', futuresOnly: false, excludeNegativeGrowth: false, tags: [], minScore: 0 },
+            filters: { start: '', end: '', code: '', futuresOnly: false, excludeNegativeGrowth: false, tags: [], minScore: 0, tagLogic: 'OR' }, // 新增 tagLogic
+            favFilters: { start: '', end: '', code: '', futuresOnly: false, excludeNegativeGrowth: false, tags: [], minScore: 0, tagLogic: 'OR' }, // 新增 tagLogic
             revenueFilters: { month: '', code: '' },
             reportFilters: { start: '', end: '', code: '' },
             sortConfig: { key: 'createdAt', asc: false }, favSortConfig: { key: 'createdAt', asc: false }, planSortConfig: { key: 'createdAt', asc: false }, revenueSortConfig: { key: 'month', asc: false }, reportSortConfig: { key: 'date', asc: false }
@@ -863,6 +877,45 @@
                 journalChevron.style.transform = journalWrapper.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
             });
         }
+
+        // 綁定邏輯切換按鈕事件
+        document.querySelectorAll('.logic-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const logic = e.target.dataset.logic;
+                state.filters.tagLogic = logic;
+                
+                // 更新按鈕樣式
+                document.querySelectorAll('.logic-btn').forEach(b => {
+                    b.classList.remove('bg-white', 'dark:bg-gray-700', 'text-blue-600', 'dark:text-blue-400', 'shadow-sm');
+                    b.classList.add('text-gray-500', 'dark:text-gray-400', 'hover:text-gray-700', 'dark:hover:text-gray-200');
+                });
+                
+                e.target.classList.remove('text-gray-500', 'dark:text-gray-400', 'hover:text-gray-700', 'dark:hover:text-gray-200');
+                e.target.classList.add('bg-white', 'dark:bg-gray-700', 'text-blue-600', 'dark:text-blue-400', 'shadow-sm');
+                
+                processAndRenderJournals();
+                saveLocalData();
+            });
+        });
+        
+        document.querySelectorAll('.logic-btn-fav').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const logic = e.target.dataset.logic;
+                state.favFilters.tagLogic = logic;
+                
+                // 更新按鈕樣式
+                document.querySelectorAll('.logic-btn-fav').forEach(b => {
+                    b.classList.remove('bg-white', 'dark:bg-gray-700', 'text-blue-600', 'dark:text-blue-400', 'shadow-sm');
+                    b.classList.add('text-gray-500', 'dark:text-gray-400', 'hover:text-gray-700', 'dark:hover:text-gray-200');
+                });
+                
+                e.target.classList.remove('text-gray-500', 'dark:text-gray-400', 'hover:text-gray-700', 'dark:hover:text-gray-200');
+                e.target.classList.add('bg-white', 'dark:bg-gray-700', 'text-blue-600', 'dark:text-blue-400', 'shadow-sm');
+                
+                renderFavorites();
+                saveLocalData();
+            });
+        });
 
         function renderDynamicTags() {
             const formContainer = document.getElementById('form-tags-container');
@@ -1107,8 +1160,8 @@
             btn.addEventListener('click', (e) => {
                 const today = getToday();
                 
-                state.filters = { start: today, end: today, code: '', futuresOnly: false, excludeNegativeGrowth: false, minScore: 0, tags: [] };
-                state.favFilters = { start: '', end: '', code: '', futuresOnly: false, excludeNegativeGrowth: false, minScore: 0, tags: [] };
+                state.filters = { start: today, end: today, code: '', futuresOnly: false, excludeNegativeGrowth: false, minScore: 0, tags: [], tagLogic: 'OR' };
+                state.favFilters = { start: '', end: '', code: '', futuresOnly: false, excludeNegativeGrowth: false, minScore: 0, tags: [], tagLogic: 'OR' };
                 
                 document.querySelectorAll('.filter-start').forEach(el => el.value = el.id === 'filter-start-fav' ? '' : today);
                 document.querySelectorAll('.filter-end').forEach(el => el.value = el.id === 'filter-end-fav' ? '' : today);
@@ -1117,6 +1170,17 @@
                 document.querySelectorAll('.filter-score').forEach(el => el.value = "0");
                 document.querySelectorAll('.filter-tag-cb').forEach(cb => cb.checked = false);
                 
+                // 重置邏輯按鈕樣式
+                document.querySelectorAll('.logic-btn, .logic-btn-fav').forEach(b => {
+                    if (b.dataset.logic === 'OR') {
+                        b.classList.remove('text-gray-500', 'dark:text-gray-400', 'hover:text-gray-700', 'dark:hover:text-gray-200');
+                        b.classList.add('bg-white', 'dark:bg-gray-700', 'text-blue-600', 'dark:text-blue-400', 'shadow-sm');
+                    } else {
+                        b.classList.remove('bg-white', 'dark:bg-gray-700', 'text-blue-600', 'dark:text-blue-400', 'shadow-sm');
+                        b.classList.add('text-gray-500', 'dark:text-gray-400', 'hover:text-gray-700', 'dark:hover:text-gray-200');
+                    }
+                });
+
                 renderFilterTags(); processAndRenderJournals(); renderFavorites(); saveLocalData(); showToast('已清除篩選條件');
             });
         });
@@ -1155,17 +1219,41 @@
             if(!state.revenueRecords) state.revenueRecords = [];
             if(!state.reports) state.reports = [];
             
-            if(!state.filters) state.filters = { start: '', end: '', code: '', futuresOnly: false, excludeNegativeGrowth: false, tags: [], minScore: 0 };
-            if(!state.favFilters) state.favFilters = { start: '', end: '', code: '', futuresOnly: false, excludeNegativeGrowth: false, tags: [], minScore: 0 };
+            if(!state.filters) state.filters = { start: '', end: '', code: '', futuresOnly: false, excludeNegativeGrowth: false, tags: [], minScore: 0, tagLogic: 'OR' };
+            if(!state.favFilters) state.favFilters = { start: '', end: '', code: '', futuresOnly: false, excludeNegativeGrowth: false, tags: [], minScore: 0, tagLogic: 'OR' };
             if(!state.revenueFilters) state.revenueFilters = { month: '', code: '' };
             if(!state.reportFilters) state.reportFilters = { start: '', end: '', code: '' };
             
+            if(state.filters.tagLogic === undefined) state.filters.tagLogic = 'OR';
+            if(state.favFilters.tagLogic === undefined) state.favFilters.tagLogic = 'OR';
+
             if(state.filters.code === undefined) state.filters.code = '';
             if(state.favFilters.code === undefined) state.favFilters.code = '';
             if(state.revenueFilters.code === undefined) state.revenueFilters.code = '';
             if(state.reportFilters.code === undefined) state.reportFilters.code = '';
 
             if(!state.reportSortConfig) state.reportSortConfig = { key: 'date', asc: false };
+            
+            // 根據讀取的資料更新按鈕外觀
+            document.querySelectorAll('.logic-btn').forEach(b => {
+                if (b.dataset.logic === state.filters.tagLogic) {
+                    b.classList.remove('text-gray-500', 'dark:text-gray-400', 'hover:text-gray-700', 'dark:hover:text-gray-200');
+                    b.classList.add('bg-white', 'dark:bg-gray-700', 'text-blue-600', 'dark:text-blue-400', 'shadow-sm');
+                } else {
+                    b.classList.remove('bg-white', 'dark:bg-gray-700', 'text-blue-600', 'dark:text-blue-400', 'shadow-sm');
+                    b.classList.add('text-gray-500', 'dark:text-gray-400', 'hover:text-gray-700', 'dark:hover:text-gray-200');
+                }
+            });
+            
+            document.querySelectorAll('.logic-btn-fav').forEach(b => {
+                if (b.dataset.logic === state.favFilters.tagLogic) {
+                    b.classList.remove('text-gray-500', 'dark:text-gray-400', 'hover:text-gray-700', 'dark:hover:text-gray-200');
+                    b.classList.add('bg-white', 'dark:bg-gray-700', 'text-blue-600', 'dark:text-blue-400', 'shadow-sm');
+                } else {
+                    b.classList.remove('bg-white', 'dark:bg-gray-700', 'text-blue-600', 'dark:text-blue-400', 'shadow-sm');
+                    b.classList.add('text-gray-500', 'dark:text-gray-400', 'hover:text-gray-700', 'dark:hover:text-gray-200');
+                }
+            });
         }
         function saveLocalData() { localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state)); }
 
@@ -1398,7 +1486,7 @@
         };
 
         const getFilteredAndSortedData = (dataList, currentFilters, currentSortConfig) => {
-            const { start, end, code, futuresOnly, excludeNegativeGrowth, tags, minScore } = currentFilters;
+            const { start, end, code, futuresOnly, excludeNegativeGrowth, tags, minScore, tagLogic } = currentFilters;
             const { key, asc } = currentSortConfig;
             let filtered = dataList.filter(j => {
                 if(start && j.date < start) return false; if(end && j.date > end) return false;
@@ -1413,7 +1501,16 @@
                 if(futuresOnly && !ei.futures) return false; if(excludeNegativeGrowth && ei.epsGrowth !== null && ei.epsGrowth < 0) return false;
                 if(minScore > 0 && getScore(j.tags, ei) < minScore) return false;
                 
-                if(tags.length > 0 && !tags.some(t => j.tags && j.tags.includes(t))) return false;
+                // 標籤篩選邏輯判斷 (OR 或 AND)
+                if(tags.length > 0) {
+                    if (tagLogic === 'AND') {
+                        // 必須包含「所有」勾選的標籤
+                        if (!tags.every(t => j.tags && j.tags.includes(t))) return false;
+                    } else {
+                        // 只要包含「任一」勾選的標籤
+                        if (!tags.some(t => j.tags && j.tags.includes(t))) return false;
+                    }
+                }
                 
                 return true;
             });
@@ -1728,6 +1825,7 @@
             executeCopy(text);
         };
 
+        // 獨立出的 Debounce
         document.getElementById('filter-revenue-code')?.addEventListener('input', debounce((e) => {
             state.revenueFilters.code = e.target.value.trim();
             renderRevenueRecords(); saveLocalData();
@@ -1971,8 +2069,8 @@
             const today = getToday();
             const lastWeekToday = `${pastWeekDate.getFullYear()}-${String(pastWeekDate.getMonth() + 1).padStart(2, '0')}-${String(pastWeekDate.getDate()).padStart(2, '0')}`;
 
-            state.filters = { start: today, end: today, code: '', futuresOnly: false, excludeNegativeGrowth: false, tags: [], minScore: 0 };
-            state.favFilters = { start: '', end: '', code: '', futuresOnly: false, excludeNegativeGrowth: false, tags: [], minScore: 0 };
+            state.filters = { start: today, end: today, code: '', futuresOnly: false, excludeNegativeGrowth: false, tags: [], minScore: 0, tagLogic: 'OR' };
+            state.favFilters = { start: '', end: '', code: '', futuresOnly: false, excludeNegativeGrowth: false, tags: [], minScore: 0, tagLogic: 'OR' };
             state.reportFilters = { start: lastWeekToday, end: today, code: '' }; 
 
             state.sortConfig = { key: 'createdAt', asc: false }; state.favSortConfig = { key: 'createdAt', asc: false }; state.planSortConfig = { key: 'createdAt', asc: false }; state.revenueSortConfig = { key: 'month', asc: false };
@@ -2149,6 +2247,12 @@
                     reader.readAsArrayBuffer(f);
                 });
             }
+
+            document.getElementById('filter-revenue-month')?.addEventListener('change', (e) => {
+                state.revenueFilters.month = e.target.value;
+                renderRevenueRecords();
+                saveLocalData();
+            });
             
             document.getElementById('btn-clear-revenue-filters')?.addEventListener('click', () => {
                 document.getElementById('filter-revenue-month').value = '';
@@ -2228,13 +2332,9 @@
                 executeCopy(text.trim() + copyFootnote);
             });
 
-            // 初始化設定資料日期
-            document.querySelectorAll('input[type="date"], input[type="month"]').forEach(el => {
-                if(el.value) {
-                    el.setAttribute('data-date', el.type === 'month' ? el.value.replace('-', '/') : el.value.replace(/-/g, '/'));
-                }
-            });
-
+            // ===============================================
+            // 綁定各個表單的 Submit 監聽事件
+            // ===============================================
             document.getElementById('journal-form')?.addEventListener('submit', (e) => {
                 e.preventDefault();
                 saveJournalEntry(true);
