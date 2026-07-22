@@ -18,7 +18,6 @@
         @layer components {
             .card-panel { @apply bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 transition-colors duration-300; }
             
-            /* 優化：鎖定高度，徹底解決 iOS Safari 日期框與文字框大小不一的問題 */
             .input-base { 
                 @apply w-full h-[42px] bg-gray-50 dark:bg-gray-700/80 border border-gray-300 dark:border-gray-600 rounded-lg px-2 sm:px-3 text-gray-900 dark:text-white text-[13px] sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 transition shadow-inner; 
                 -webkit-appearance: none !important;
@@ -53,7 +52,6 @@
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .dark ::-webkit-scrollbar-thumb { background: #4b5563; }
         
-        /* 隱藏特定區塊的捲動條 (為了手機版滑動選單美觀) */
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
 
@@ -81,11 +79,11 @@
             -webkit-background-clip: text; 
         }
 
-        /* 
-         * 強制去除手機原生中文年月日顯示 (無痕過濾技術)
-         * 將 iOS Webkit 原生日期文字變透明，並用 ::after 填上乾淨的 XXXX/XX/XX 格式
-         */
-        input[type="date"], input[type="month"] { position: relative; }
+        input[type="date"], input[type="month"] { 
+            position: relative; 
+            color: transparent !important; 
+            text-shadow: none !important; 
+        }
         input[type="date"]::-webkit-datetime-edit, input[type="month"]::-webkit-datetime-edit {
             opacity: 0 !important;
             color: transparent !important; background: transparent !important;
@@ -94,13 +92,16 @@
             content: attr(data-date);
             position: absolute; left: 0; top: 0; right: 0; bottom: 0;
             display: flex; align-items: center; justify-content: center;
-            color: currentColor; /* 完美繼承 Tailwind 的 text 色系 */
-            pointer-events: none; /* 確保點擊可以穿透開啟日曆 */
+            color: #1f2937;
+            pointer-events: none;
+        }
+        .dark input[type="date"]::after, .dark input[type="month"]::after {
+            color: #f9fafb;
         }
         @media (min-width: 640px) {
             input.sm\:text-left[type="date"]::after, input.sm\:text-left[type="month"]::after {
                 justify-content: flex-start;
-                padding-left: 0.75rem; /* 對齊 px-3 */
+                padding-left: 0.75rem;
             }
         }
         input[type="date"]::-webkit-calendar-picker-indicator, input[type="month"]::-webkit-calendar-picker-indicator {
@@ -247,7 +248,6 @@
                                 <span>+ 標籤挑選</span><i class="fa-solid fa-chevron-down text-[10px] opacity-70"></i>
                             </button>
                             <div id="filter-tag-panel" class="absolute left-0 top-full mt-1.5 w-[280px] sm:w-[320px] bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl shadow-2xl hidden z-50 p-3 max-h-[60vh] overflow-y-auto">
-                                <!-- 加入邏輯切換選項 -->
                                 <div class="mb-3 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                                     <span class="text-xs font-bold text-gray-700 dark:text-gray-300">篩選邏輯</span>
                                     <div class="flex items-center bg-gray-100 dark:bg-gray-900 p-1 rounded-lg">
@@ -747,8 +747,8 @@
 
         let state = {
             journals: [], plans: [], revenueRecords: [], reports: [], epsData: {}, codeToName: {}, nameToCode: {},
-            filters: { start: '', end: '', code: '', futuresOnly: false, excludeNegativeGrowth: false, tags: [], minScore: 0, tagLogic: 'OR' }, // 新增 tagLogic
-            favFilters: { start: '', end: '', code: '', futuresOnly: false, excludeNegativeGrowth: false, tags: [], minScore: 0, tagLogic: 'OR' }, // 新增 tagLogic
+            filters: { start: '', end: '', code: '', futuresOnly: false, excludeNegativeGrowth: false, tags: [], minScore: 0, tagLogic: 'OR' },
+            favFilters: { start: '', end: '', code: '', futuresOnly: false, excludeNegativeGrowth: false, tags: [], minScore: 0, tagLogic: 'OR' },
             revenueFilters: { month: '', code: '' },
             reportFilters: { start: '', end: '', code: '' },
             sortConfig: { key: 'createdAt', asc: false }, favSortConfig: { key: 'createdAt', asc: false }, planSortConfig: { key: 'createdAt', asc: false }, revenueSortConfig: { key: 'month', asc: false }, reportSortConfig: { key: 'date', asc: false }
@@ -836,7 +836,7 @@
             "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800",
             "bg-teal-100 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 border-teal-200 dark:border-teal-800",
             "bg-cyan-100 dark:bg-cyan-900/40 text-cyan-700 dark:text-cyan-300 border-cyan-200 dark:border-cyan-800",
-            "bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800",
+            "bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-900/60",
             "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800",
             "bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 border-violet-200 dark:border-violet-800",
             "bg-fuchsia-100 dark:bg-fuchsia-900/40 text-fuchsia-700 dark:text-fuchsia-300 border-fuchsia-200 dark:border-fuchsia-800",
@@ -844,18 +844,10 @@
         ];
         
         const MONTH_TEXT_COLORS = [
-            "text-red-600 dark:text-red-400",
-            "text-orange-600 dark:text-orange-400",
-            "text-amber-600 dark:text-amber-400",
-            "text-lime-600 dark:text-lime-400",
-            "text-emerald-600 dark:text-emerald-400",
-            "text-teal-600 dark:text-teal-400",
-            "text-cyan-600 dark:text-cyan-400",
-            "text-blue-600 dark:text-blue-400",
-            "text-indigo-600 dark:text-indigo-400",
-            "text-violet-600 dark:text-violet-400",
-            "text-fuchsia-600 dark:text-fuchsia-400",
-            "text-rose-600 dark:text-rose-400"
+            "text-red-600 dark:text-red-400", "text-orange-600 dark:text-orange-400", "text-amber-600 dark:text-amber-400",
+            "text-lime-600 dark:text-lime-400", "text-emerald-600 dark:text-emerald-400", "text-teal-600 dark:text-teal-400",
+            "text-cyan-600 dark:text-cyan-400", "text-blue-600 dark:text-blue-400", "text-indigo-600 dark:text-indigo-400",
+            "text-violet-600 dark:text-violet-400", "text-fuchsia-600 dark:text-fuchsia-400", "text-rose-600 dark:text-rose-400"
         ];
 
         const toggleTagsBtn = document.getElementById('toggle-tags-btn');
@@ -878,42 +870,32 @@
             });
         }
 
-        // 綁定邏輯切換按鈕事件
+        // 綁定邏輯切換按鈕事件 (OR / AND)
         document.querySelectorAll('.logic-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const logic = e.target.dataset.logic;
                 state.filters.tagLogic = logic;
-                
-                // 更新按鈕樣式
                 document.querySelectorAll('.logic-btn').forEach(b => {
                     b.classList.remove('bg-white', 'dark:bg-gray-700', 'text-blue-600', 'dark:text-blue-400', 'shadow-sm');
                     b.classList.add('text-gray-500', 'dark:text-gray-400', 'hover:text-gray-700', 'dark:hover:text-gray-200');
                 });
-                
                 e.target.classList.remove('text-gray-500', 'dark:text-gray-400', 'hover:text-gray-700', 'dark:hover:text-gray-200');
                 e.target.classList.add('bg-white', 'dark:bg-gray-700', 'text-blue-600', 'dark:text-blue-400', 'shadow-sm');
-                
-                processAndRenderJournals();
-                saveLocalData();
+                processAndRenderJournals(); saveLocalData();
             });
         });
-        
+
         document.querySelectorAll('.logic-btn-fav').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const logic = e.target.dataset.logic;
                 state.favFilters.tagLogic = logic;
-                
-                // 更新按鈕樣式
                 document.querySelectorAll('.logic-btn-fav').forEach(b => {
                     b.classList.remove('bg-white', 'dark:bg-gray-700', 'text-blue-600', 'dark:text-blue-400', 'shadow-sm');
                     b.classList.add('text-gray-500', 'dark:text-gray-400', 'hover:text-gray-700', 'dark:hover:text-gray-200');
                 });
-                
                 e.target.classList.remove('text-gray-500', 'dark:text-gray-400', 'hover:text-gray-700', 'dark:hover:text-gray-200');
                 e.target.classList.add('bg-white', 'dark:bg-gray-700', 'text-blue-600', 'dark:text-blue-400', 'shadow-sm');
-                
-                renderFavorites();
-                saveLocalData();
+                renderFavorites(); saveLocalData();
             });
         });
 
@@ -967,9 +949,6 @@
             });
         }
 
-        // ==========================================
-        // 核心寫入與合併邏輯
-        // ==========================================
         function saveJournalEntry(clearAfter = false) {
             const codeInput = document.getElementById('j-code');
             const dateInput = document.getElementById('j-date');
@@ -1170,7 +1149,6 @@
                 document.querySelectorAll('.filter-score').forEach(el => el.value = "0");
                 document.querySelectorAll('.filter-tag-cb').forEach(cb => cb.checked = false);
                 
-                // 重置邏輯按鈕樣式
                 document.querySelectorAll('.logic-btn, .logic-btn-fav').forEach(b => {
                     if (b.dataset.logic === 'OR') {
                         b.classList.remove('text-gray-500', 'dark:text-gray-400', 'hover:text-gray-700', 'dark:hover:text-gray-200');
@@ -1233,8 +1211,7 @@
             if(state.reportFilters.code === undefined) state.reportFilters.code = '';
 
             if(!state.reportSortConfig) state.reportSortConfig = { key: 'date', asc: false };
-            
-            // 根據讀取的資料更新按鈕外觀
+
             document.querySelectorAll('.logic-btn').forEach(b => {
                 if (b.dataset.logic === state.filters.tagLogic) {
                     b.classList.remove('text-gray-500', 'dark:text-gray-400', 'hover:text-gray-700', 'dark:hover:text-gray-200');
@@ -1372,7 +1349,8 @@
         const updateSyncStatusUI = () => {
             const key = localStorage.getItem('ryan_sync_key'), btn = document.getElementById('btn-sync-modal'), st = document.getElementById('auth-status');
             if(key) {
-                btn.innerHTML = `<i class="fa-solid fa-cloud text-green-300 sm:mr-1.5"></i><span class="hidden sm:inline">${escapeHTML(key)}</span>`;
+                // 優化：隱藏明文數字同步碼，改為顯示「雲端已同步」
+                btn.innerHTML = `<i class="fa-solid fa-cloud text-green-300 sm:mr-1.5"></i><span class="hidden sm:inline">雲端已同步</span>`;
                 btn.className = "text-xs sm:text-sm bg-green-50 dark:bg-green-900/50 border-green-200 dark:border-green-500/50 text-green-600 dark:text-green-300 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm border flex items-center font-medium";
                 st.className = "hidden md:flex ml-1 sm:ml-2 w-7 h-7 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-full shadow-sm items-center justify-center cursor-help flex-shrink-0";
                 st.innerHTML = `<i class="fa-solid fa-cloud text-green-500 dark:text-green-400 text-xs"></i>`; 
@@ -1501,13 +1479,10 @@
                 if(futuresOnly && !ei.futures) return false; if(excludeNegativeGrowth && ei.epsGrowth !== null && ei.epsGrowth < 0) return false;
                 if(minScore > 0 && getScore(j.tags, ei) < minScore) return false;
                 
-                // 標籤篩選邏輯判斷 (OR 或 AND)
                 if(tags.length > 0) {
                     if (tagLogic === 'AND') {
-                        // 必須包含「所有」勾選的標籤
                         if (!tags.every(t => j.tags && j.tags.includes(t))) return false;
                     } else {
-                        // 只要包含「任一」勾選的標籤
                         if (!tags.some(t => j.tags && j.tags.includes(t))) return false;
                     }
                 }
@@ -1825,7 +1800,6 @@
             executeCopy(text);
         };
 
-        // 獨立出的 Debounce
         document.getElementById('filter-revenue-code')?.addEventListener('input', debounce((e) => {
             state.revenueFilters.code = e.target.value.trim();
             renderRevenueRecords(); saveLocalData();
@@ -2332,9 +2306,6 @@
                 executeCopy(text.trim() + copyFootnote);
             });
 
-            // ===============================================
-            // 綁定各個表單的 Submit 監聽事件
-            // ===============================================
             document.getElementById('journal-form')?.addEventListener('submit', (e) => {
                 e.preventDefault();
                 saveJournalEntry(true);
