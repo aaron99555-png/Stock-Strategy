@@ -18,14 +18,12 @@
         @layer components {
             .card-panel { @apply bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 transition-colors duration-300; }
             
-            /* 修正1：鎖定高度，徹底解決 iOS Safari 日期框與文字框大小不一的問題 */
+            /* 優化：鎖定高度，徹底解決 iOS Safari 日期框與文字框大小不一的問題 */
             .input-base { 
                 @apply w-full h-[42px] bg-gray-50 dark:bg-gray-700/80 border border-gray-300 dark:border-gray-600 rounded-lg px-2 sm:px-3 text-gray-900 dark:text-white text-[13px] sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 transition shadow-inner; 
-                -webkit-appearance: none !important;
-                -moz-appearance: none !important;
-                appearance: none !important;
-                box-sizing: border-box !important;
-                margin: 0 !important;
+                -webkit-appearance: none;
+                appearance: none;
+                box-sizing: border-box;
             }
             
             .btn-copy-base { @apply text-xs font-medium px-2.5 py-1.5 rounded-lg transition border shadow-sm; }
@@ -82,27 +80,25 @@
         }
 
         /* 
-         * 修正2：強制去除手機原生中文年月日顯示 (無痕過濾技術)
+         * 強制去除手機原生中文年月日顯示 (無痕過濾技術)
          * 將 iOS Webkit 原生日期文字變透明，並用 ::after 填上乾淨的 XXXX/XX/XX 格式
          */
         input[type="date"], input[type="month"] { position: relative; }
         input[type="date"]::-webkit-datetime-edit, input[type="month"]::-webkit-datetime-edit {
-            opacity: 0 !important;
             color: transparent !important; background: transparent !important;
         }
         input[type="date"]::after, input[type="month"]::after {
             content: attr(data-date);
             position: absolute; left: 0; top: 0; right: 0; bottom: 0;
-            display: flex; align-items: center; justify-content: center;
+            display: flex; align-items: center;
             color: currentColor; /* 完美繼承 Tailwind 的 text 色系 */
+            padding: inherit; font-family: inherit;
             pointer-events: none; /* 確保點擊可以穿透開啟日曆 */
-            font-family: inherit;
         }
+        .text-center[type="date"]::after, .text-center[type="month"]::after { justify-content: center; }
+        .text-left[type="date"]::after, .text-left[type="month"]::after { justify-content: flex-start; }
         @media (min-width: 640px) {
-            input.sm\:text-left[type="date"]::after, input.sm\:text-left[type="month"]::after {
-                justify-content: flex-start;
-                padding-left: 0.75rem; /* 對齊 px-3 */
-            }
+            .sm\:text-left[type="date"]::after, .sm\:text-left[type="month"]::after { justify-content: flex-start; }
         }
         input[type="date"]::-webkit-calendar-picker-indicator, input[type="month"]::-webkit-calendar-picker-indicator {
             position: absolute; top: 0; right: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;
