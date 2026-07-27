@@ -1047,8 +1047,8 @@
       DOM.trendChartNoData.classList.add('hidden');
 
       const locConfig = {
-        '危險品庫房': { actualColor: '#5C2483', limitColor: '#EF4444' }, // 實際:紫色, 上限:紅色
-        '原膠室(C4+P1)': { actualColor: '#3B82F6', limitColor: '#F97316' } // 實際:藍色, 上限:橘色
+        '危險品庫房': { actualColor: '#5C2483', limitColor: '#A855F7' }, // 實際:深紫, 上限:明亮紫
+        '原膠室(C4+P1)': { actualColor: '#1D4ED8', limitColor: '#60A5FA' } // 實際:深藍, 上限:明亮藍
       };
 
       const datasets = [];
@@ -1094,7 +1094,7 @@
           const isPass = lastVal <= limitValue;
           const statusText = isPass ? '✅ 符合規定' : '❌ 超出上限';
           const statusColor = isPass ? 'text-green-600' : 'text-red-600';
-          const limitLineColorClass = locGroup === '危險品庫房' ? 'border-red-500 text-red-600' : 'border-orange-500 text-orange-600';
+          const limitLineColorClass = locGroup === '危險品庫房' ? 'border-purple-400 text-purple-600' : 'border-blue-400 text-blue-600';
 
           conclusionHtml += `
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-3 bg-white border border-slate-200 rounded-lg shadow-sm gap-2">
