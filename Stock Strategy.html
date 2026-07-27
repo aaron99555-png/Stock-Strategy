@@ -147,13 +147,14 @@
             <input type="date" id="filterEnd" class="w-full border border-slate-300 rounded p-1.5 text-xs md:text-sm focus:ring-benq-main outline-none"/>
           </div>
           
+          <!-- 區域複選篩選 -->
           <div class="relative">
             <label class="block text-[10px] md:text-xs text-slate-500 mb-1 flex items-center gap-1"><i data-lucide="map-pin" class="w-3 h-3"></i>儲存區域</label>
-            <button type="button" id="btnToggleLocFilter" class="w-full border border-slate-300 rounded p-1.5 text-xs md:text-sm bg-white focus:ring-benq-main outline-none flex justify-between items-center text-left">
+            <button type="button" id="btnToggleLocFilter" class="w-full border border-slate-300 rounded p-1.5 text-xs md:text-sm bg-white focus:ring-benq-main outline-none flex justify-between items-center text-left min-w-[100px]">
               <span id="locFilterBtnText" class="truncate text-slate-600">全區域</span>
               <i data-lucide="chevron-down" class="w-3 h-3 ml-1 text-slate-400 pointer-events-none shrink-0"></i>
             </button>
-            <div id="locFilterDropdownPanel" class="hidden absolute z-50 w-full min-w-[120px] mt-1 bg-white border border-slate-200 rounded-md shadow-lg flex flex-col overflow-hidden">
+            <div id="locFilterDropdownPanel" class="hidden absolute z-50 w-full min-w-[140px] mt-1 bg-white border border-slate-200 rounded-md shadow-lg flex flex-col overflow-hidden">
               <div id="locCheckboxes" class="max-h-48 overflow-y-auto p-2 flex flex-col gap-1 text-xs md:text-sm"></div>
             </div>
           </div>
@@ -214,9 +215,17 @@
             <h3 class="text-base md:text-lg font-bold text-benq-dark flex items-center gap-2">
               <i data-lucide="file-text" class="w-4 h-4 md:w-5 md:h-5"></i> 管制表彙整
             </h3>
-            <div class="flex items-center gap-2 w-full sm:w-auto">
-              <label class="text-xs md:text-sm text-benq-dark font-medium shrink-0">盤點日：</label>
-              <select id="reportDateSelect" class="w-full sm:w-auto border border-purple-300 rounded p-1.5 text-xs md:text-sm bg-white focus:ring-benq-main outline-none min-w-[120px]"></select>
+            <div class="flex items-center gap-4 w-full sm:w-auto flex-wrap sm:flex-nowrap">
+              <!-- 顯示隱藏合規結果的開關 -->
+              <label class="flex items-center gap-1.5 cursor-pointer text-xs md:text-sm text-slate-700 font-medium hover:text-benq-main transition-colors">
+                <input type="checkbox" id="toggleCompliance" class="w-4 h-4 text-benq-main rounded border-slate-300 focus:ring-benq-main" checked>
+                顯示檢核與超標結果
+              </label>
+              <div class="w-px h-4 bg-purple-200 hidden sm:block"></div>
+              <div class="flex items-center gap-2 w-full sm:w-auto">
+                <label class="text-xs md:text-sm text-benq-dark font-medium shrink-0">盤點日：</label>
+                <select id="reportDateSelect" class="w-full sm:w-auto border border-purple-300 rounded p-1.5 text-xs md:text-sm bg-white focus:ring-benq-main outline-none min-w-[120px]"></select>
+              </div>
             </div>
           </div>
           <div id="summaryContainer" class="flex flex-col gap-6"></div>
@@ -260,13 +269,12 @@
         </div>
 
         <!-- Sheet 3：趨勢圖表 -->
-        <div id="viewChart" class="animate-in fade-in duration-300 hidden flex-col min-h-[400px]">
+        <div id="viewChart" class="animate-in fade-in duration-300 hidden flex-col">
           
-          <!-- 第一組圖表：單一化學品 -->
+          <!-- 第一圖表：單一化學品趨勢 -->
           <h3 class="shrink-0 text-base md:text-lg font-semibold text-benq-dark mb-3 md:mb-4 flex items-center gap-2">
             <i data-lucide="activity" class="w-4 h-4 text-benq-main"></i> 儲存量變化趨勢圖 (依化學品)
           </h3>
-          
           <div class="mb-4 shrink-0 relative" id="chartChemDropdownContainer">
             <label class="block text-xs md:text-sm font-bold mb-2 text-slate-700">選擇化學品 (請點擊展開並勾選)：</label>
             <button type="button" id="btnToggleChartChem" class="w-full flex justify-between items-center border border-slate-300 p-2.5 rounded-lg bg-white text-sm focus:ring-2 focus:ring-benq-main outline-none shadow-sm transition-colors hover:bg-slate-50">
@@ -281,59 +289,83 @@
               <div id="multiChemCheckboxes" class="max-h-64 overflow-y-auto p-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 content-start text-sm"></div>
             </div>
           </div>
-
-          <div class="flex-1 w-full relative min-h-[300px] md:min-h-[400px] mb-8 border-b border-slate-200 pb-8">
+          <div class="w-full relative min-h-[350px] md:min-h-[400px]">
             <div id="chartNoData" class="absolute inset-0 flex items-center justify-center bg-white/80 z-10 text-slate-500 text-sm hidden">尚無符合條件的資料或未選取化學品</div>
             <canvas id="myChart"></canvas>
           </div>
 
-          <!-- 第二組圖表：區域總倍數趨勢分析 -->
-          <div class="shrink-0 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-purple-50 p-3 rounded-lg border border-purple-100 shadow-sm mb-4">
-            <h3 class="text-base md:text-lg font-bold text-benq-dark flex items-center gap-2">
-              <i data-lucide="bar-chart-2" class="w-4 h-4 md:w-5 md:h-5"></i> 區域總倍數趨勢分析
-            </h3>
-            
-            <div class="relative w-full sm:w-auto min-w-[220px]" id="trendLocDropdownContainer">
-              <label class="text-xs md:text-sm text-benq-dark font-medium shrink-0 absolute -top-2 left-2 bg-purple-50 px-1 z-10">選擇區域</label>
-              <button type="button" id="btnToggleTrendLoc" class="w-full border border-purple-300 rounded p-2 text-xs md:text-sm bg-white focus:ring-benq-main outline-none flex justify-between items-center text-left">
-                <span id="trendLocBtnText" class="truncate text-slate-600 font-medium">危險品庫房, 原膠室(C4+P1)</span>
-                <i data-lucide="chevron-down" class="w-4 h-4 ml-1 text-purple-400 pointer-events-none shrink-0"></i>
-              </button>
-              <div id="trendLocDropdownPanel" class="hidden absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-md shadow-lg flex flex-col overflow-hidden">
-                <div class="p-1.5 border-b border-slate-100 flex gap-1 bg-slate-50 shrink-0">
-                  <button type="button" id="btnSelectAllTrendLocs" class="text-xs bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 px-2 py-1 rounded transition-colors font-medium shadow-sm flex-1">全選</button>
-                  <button type="button" id="btnClearAllTrendLocs" class="text-xs bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 px-2 py-1 rounded transition-colors font-medium shadow-sm flex-1">清除</button>
-                </div>
-                <div id="trendLocCheckboxes" class="max-h-48 overflow-y-auto p-1.5 flex flex-col gap-1 text-xs md:text-sm">
-                  <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-100 p-1.5 rounded transition-colors">
-                    <input type="checkbox" value="危險品庫房" class="trend-loc-checkbox w-4 h-4 text-benq-main rounded border-slate-300 focus:ring-benq-main" checked>
-                    <span class="truncate text-slate-700">危險品庫房</span>
-                  </label>
-                  <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-100 p-1.5 rounded transition-colors">
-                    <input type="checkbox" value="原膠室(C4+P1)" class="trend-loc-checkbox w-4 h-4 text-benq-main rounded border-slate-300 focus:ring-benq-main" checked>
-                    <span class="truncate text-slate-700">原膠室(C4+P1)</span>
-                  </label>
-                </div>
+          <!-- 分隔線 -->
+          <hr class="my-6 md:my-8 border-slate-200">
+
+          <!-- 第二圖表：區域總倍數趨勢分析 -->
+          <h3 class="shrink-0 text-base md:text-lg font-semibold text-benq-dark mb-3 md:mb-4 flex items-center gap-2">
+            <i data-lucide="bar-chart-2" class="w-4 h-4 text-benq-main"></i> 區域總倍數趨勢分析
+          </h3>
+          <div class="mb-4 shrink-0 relative" id="trendLocDropdownContainer">
+            <label class="block text-xs md:text-sm font-bold mb-2 text-slate-700">選擇分析區域 (可複選)：</label>
+            <button type="button" id="btnToggleTrendLoc" class="w-full md:w-1/2 flex justify-between items-center border border-slate-300 p-2.5 rounded-lg bg-white text-sm focus:ring-2 focus:ring-benq-main outline-none shadow-sm transition-colors hover:bg-slate-50">
+              <span id="trendLocBtnText" class="truncate text-slate-500">已選擇 1 項區域</span>
+              <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 pointer-events-none"></i>
+            </button>
+            <div id="trendLocDropdownPanel" class="hidden absolute z-50 w-full md:w-1/2 mt-1 bg-white border border-slate-200 rounded-lg shadow-xl flex flex-col overflow-hidden">
+              <div class="p-2 border-b border-slate-100 flex gap-2 bg-slate-50 shrink-0">
+                <button type="button" id="btnSelectAllTrendLoc" class="text-xs bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 px-4 py-1.5 rounded transition-colors font-medium shadow-sm flex-1">全選</button>
+                <button type="button" id="btnClearAllTrendLoc" class="text-xs bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 px-4 py-1.5 rounded transition-colors font-medium shadow-sm flex-1">清除</button>
+              </div>
+              <div class="p-3 flex flex-col gap-3 text-sm">
+                <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-100 p-1.5 rounded transition-colors">
+                  <input type="checkbox" value="危險品庫房" class="trend-loc-checkbox w-4 h-4 text-benq-main rounded border-slate-300" checked>
+                  <span class="text-slate-700">危險品庫房</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-100 p-1.5 rounded transition-colors">
+                  <input type="checkbox" value="原膠室(C4+P1)" class="trend-loc-checkbox w-4 h-4 text-benq-main rounded border-slate-300">
+                  <span class="text-slate-700">原膠室(C4+P1)</span>
+                </label>
               </div>
             </div>
           </div>
+          
+          <div id="trendConclusions" class="flex flex-col gap-2 mb-4 shrink-0"></div>
 
-          <!-- 結論區 -->
-          <div id="trendConclusion" class="mb-4 flex flex-col gap-2"></div>
-
-          <div class="flex-1 w-full relative min-h-[300px] md:min-h-[400px]">
-            <div id="trendChartNoData" class="absolute inset-0 flex items-center justify-center bg-white/80 z-10 text-slate-500 text-sm hidden">該日期區間無對應區域資料</div>
+          <div class="w-full relative min-h-[350px] md:min-h-[400px]">
+            <div id="trendChartNoData" class="absolute inset-0 flex items-center justify-center bg-white/80 z-10 text-slate-500 text-sm hidden">請設定日期區間，或勾選欲分析的區域。</div>
             <canvas id="trendChart"></canvas>
           </div>
 
         </div>
-
       </div>
     </main>
   </div>
 
   <script>
+    // --- 註冊 Chart.js 自訂外掛 (用於繪製全寬度的虛線) ---
+    const horizontalThresholdPlugin = {
+      id: 'horizontalThresholdPlugin',
+      // 將 beforeDraw 改為 afterDatasetsDraw，確保虛線畫在柱狀圖的上方
+      afterDatasetsDraw(chart) {
+        const { ctx, chartArea, scales } = chart;
+        if(!chartArea) return;
+        chart.data.datasets.forEach(ds => {
+          if (ds.customThreshold !== undefined) {
+            const yPos = scales.y.getPixelForValue(ds.customThreshold);
+            if (yPos > chartArea.bottom || yPos < chartArea.top) return;
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(chartArea.left, yPos);
+            ctx.lineTo(chartArea.right, yPos);
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = ds.borderColor;
+            ctx.setLineDash([5, 5]);
+            ctx.stroke();
+            ctx.restore();
+          }
+        });
+      }
+    };
+    Chart.register(horizontalThresholdPlugin);
+
     // --- 初始設定與資料 ---
+    // 最新化學品資料庫 (與 Excel 檔案完全同步，並包含 KR-519 等)
     const baseChemicals = [
       { name: 'SAIVINOL PL-7930', category: '添加劑', petroleumClass: '第一石油類', flashPoint: '-10', controlAmt: 200 },
       { name: 'SAIVINOL PL-7701', category: '添加劑', petroleumClass: '第一石油類', flashPoint: '-10', controlAmt: 200 },
@@ -441,10 +473,11 @@
       pendingSaveAction: null,
       chartInstance: null,
       trendChartInstance: null,
-      selectedRecordIds: new Set()
+      selectedRecordIds: new Set(),
+      showCompliance: true
     };
 
-    // --- 本機記憶存取 ---
+    // --- STREAMING_CHUNK:Local storage and DOM setup... ---
     function loadData() {
       const stored = localStorage.getItem('bml_inventory_data');
       if (stored) {
@@ -453,19 +486,14 @@
           state.inventoryData.forEach((item, index) => {
             if (!item.createdAt) item.createdAt = Date.now() - index * 1000;
           });
-        } catch (e) {
-          state.inventoryData = [];
-        }
-      } else {
-        state.inventoryData = [];
-      }
+        } catch (e) { state.inventoryData = []; }
+      } else { state.inventoryData = []; }
     }
 
     function saveDataToStorage() {
       localStorage.setItem('bml_inventory_data', JSON.stringify(state.inventoryData));
     }
 
-    // --- DOM 元素選擇 ---
     const DOM = {
       updateTime: document.getElementById('updateTime'),
       inputDate: document.getElementById('inputDate'),
@@ -493,16 +521,9 @@
       btnShareLine: document.getElementById('btnShareLine'),
       fileUpload: document.getElementById('fileUpload'),
       reportDateSelect: document.getElementById('reportDateSelect'),
-      tabs: {
-        summary: document.getElementById('tabSummary'),
-        list: document.getElementById('tabList'),
-        chart: document.getElementById('tabChart')
-      },
-      views: {
-        summary: document.getElementById('viewSummary'),
-        list: document.getElementById('viewList'),
-        chart: document.getElementById('viewChart')
-      },
+      toggleCompliance: document.getElementById('toggleCompliance'),
+      tabs: { summary: document.getElementById('tabSummary'), list: document.getElementById('tabList'), chart: document.getElementById('tabChart') },
+      views: { summary: document.getElementById('viewSummary'), list: document.getElementById('viewList'), chart: document.getElementById('viewChart') },
       summaryContainer: document.getElementById('summaryContainer'),
       listBody: document.getElementById('listBody'),
       listCount: document.getElementById('listCount'),
@@ -517,18 +538,14 @@
       chartChemDropdownPanel: document.getElementById('chartChemDropdownPanel'),
       chartChemDropdownContainer: document.getElementById('chartChemDropdownContainer'),
       chartChemBtnText: document.getElementById('chartChemBtnText'),
-      
-      // Trend Chart DOMs
+      trendLocDropdownContainer: document.getElementById('trendLocDropdownContainer'),
       btnToggleTrendLoc: document.getElementById('btnToggleTrendLoc'),
       trendLocDropdownPanel: document.getElementById('trendLocDropdownPanel'),
-      trendLocDropdownContainer: document.getElementById('trendLocDropdownContainer'),
+      btnSelectAllTrendLoc: document.getElementById('btnSelectAllTrendLoc'),
+      btnClearAllTrendLoc: document.getElementById('btnClearAllTrendLoc'),
       trendLocBtnText: document.getElementById('trendLocBtnText'),
-      btnSelectAllTrendLocs: document.getElementById('btnSelectAllTrendLocs'),
-      btnClearAllTrendLocs: document.getElementById('btnClearAllTrendLocs'),
-      trendConclusion: document.getElementById('trendConclusion'),
       trendChartNoData: document.getElementById('trendChartNoData'),
-      trendChartCanvas: document.getElementById('trendChart'),
-
+      trendConclusions: document.getElementById('trendConclusions'),
       warningModal: document.getElementById('warningModal'),
       modalMsg: document.getElementById('modalMsg'),
       modalApplyAmt: document.getElementById('modalApplyAmt'),
@@ -540,7 +557,7 @@
       btnForceSave: document.getElementById('btnForceSave')
     };
 
-    // --- 篩選執行 ---
+    // --- STREAMING_CHUNK:Filtering and Initialization... ---
     window.applyFilters = function() {
       state.filters.startDate = DOM.filterStart.value;
       state.filters.endDate = DOM.filterEnd.value;
@@ -561,7 +578,6 @@
       processData();
     };
 
-    // --- 初始化 ---
     function init() {
       lucide.createIcons();
       loadData(); 
@@ -587,6 +603,9 @@
       `).join('');
 
       document.querySelectorAll('.chem-checkbox').forEach(cb => {
+        cb.addEventListener('change', renderChart);
+      });
+      document.querySelectorAll('.trend-loc-checkbox').forEach(cb => {
         cb.addEventListener('change', renderChart);
       });
     }
@@ -658,10 +677,7 @@
       updateTabsUI();
       if (state.activeTab === 'summary') renderSummary();
       if (state.activeTab === 'list') renderList();
-      if (state.activeTab === 'chart') {
-        renderChart();
-        renderTrendChart();
-      }
+      if (state.activeTab === 'chart') renderChart();
       lucide.createIcons();
     }
 
@@ -679,7 +695,7 @@
       });
     }
 
-    // --- 管制表彙整 ---
+    // --- STREAMING_CHUNK:Rendering dynamic summary... ---
     function renderSummary() {
       const baseDataForSummary = state.inventoryData.map(record => {
         const c = state.chemicals.find(x => x.id === record.chemId) || {};
@@ -699,7 +715,6 @@
       });
 
       let html = '';
-
       let renderGroups = [];
       const locs = state.filters.locations || [];
 
@@ -710,7 +725,6 @@
         if (locs.includes('危險品庫房')) {
           renderGroups.push({ title: '危險品庫房', dataFilter: d => d.location === '危險品庫房', ruleKey: '危險品庫房' });
         }
-        
         const hasC4 = locs.includes('原膠室(C4)');
         const hasP1 = locs.includes('原膠室(P1)');
 
@@ -723,9 +737,10 @@
         }
       }
 
+      const showComp = state.showCompliance;
+
       renderGroups.forEach(group => {
         const locData = baseDataForSummary.filter(group.dataFilter);
-
         const rules = applicationRules[group.ruleKey] || [];
         const groupedRules = {};
         
@@ -780,20 +795,21 @@
                   <span class="text-slate-500 font-medium">總倍數:</span>
                   <span class="font-bold text-benq-main text-sm md:text-base">${locTotalActualMultiple > 0 ? locTotalActualMultiple.toFixed(2) : '0.00'}</span>
                 </div>
+                ${showComp ? `
                 <div class="w-px h-6 bg-slate-300 hidden sm:block"></div>
                 <div class="font-bold px-2 py-1 rounded w-full sm:w-auto text-center ${isLocPass ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
                   ${isLocPass ? '✅ 總量符合' : '❌ 總量超標'}
-                </div>
+                </div>` : ''}
               </div>
             </div>
             <div class="overflow-x-auto">
-              <table class="w-full text-xs md:text-sm text-left border-collapse break-words min-w-[800px]">
+              <table class="w-full text-xs md:text-sm text-left border-collapse break-words ${showComp ? 'min-w-[800px]' : 'min-w-[600px]'}">
                 <thead class="text-[10px] md:text-xs text-slate-700 bg-slate-100 border-b-2 border-slate-300 text-center">
                   <tr>
                     <th rowspan="2" class="px-2 md:px-3 py-2 md:py-3 border border-slate-200 align-middle bg-slate-200/50 w-20 md:w-24">危物種類</th>
                     <th colspan="5" class="px-2 md:px-3 py-1.5 md:py-2 border border-slate-200 bg-purple-100/60 text-benq-dark tracking-wide">${group.ruleKey} 合法申請量</th>
-                    <th colspan="3" class="px-2 md:px-3 py-1.5 md:py-2 border border-slate-200 bg-amber-100/60">實際儲存量及符合度</th>
-                    <th rowspan="2" class="px-2 md:px-3 py-2 md:py-3 border border-slate-200 align-middle bg-emerald-100/60 w-24 md:w-32">種類符合度</th>
+                    <th colspan="${showComp ? 3 : 1}" class="px-2 md:px-3 py-1.5 md:py-2 border border-slate-200 bg-amber-100/60">實際儲存量${showComp ? '及符合度' : ''}</th>
+                    ${showComp ? `<th rowspan="2" class="px-2 md:px-3 py-2 md:py-3 border border-slate-200 align-middle bg-emerald-100/60 w-24 md:w-32">種類符合度</th>` : ''}
                   </tr>
                   <tr>
                     <th class="px-2 md:px-3 py-1.5 md:py-2 border border-slate-200 bg-purple-50 w-24 md:w-28">標示版分類</th>
@@ -802,8 +818,10 @@
                     <th class="px-2 md:px-3 py-1.5 md:py-2 border border-slate-200 bg-purple-50 w-16 md:w-20">倍數</th>
                     <th class="px-2 md:px-3 py-1.5 md:py-2 border border-slate-200 bg-purple-50 w-16 md:w-20">倍加總</th>
                     <th class="px-2 md:px-3 py-1.5 md:py-2 border border-slate-200 bg-amber-50 w-20 md:w-24">實際量</th>
+                    ${showComp ? `
                     <th class="px-2 md:px-3 py-1.5 md:py-2 border border-slate-200 bg-amber-50 w-20 md:w-24">超標量</th>
                     <th class="px-2 md:px-3 py-1.5 md:py-2 border border-slate-200 bg-amber-50 w-20 md:w-24">符合度</th>
+                    ` : ''}
                   </tr>
                 </thead>
                 <tbody>
@@ -832,9 +850,7 @@
             
             html += `<tr class="${trClass}">`;
             
-            if (rIdx === 0) {
-              html += `<td rowspan="${classRowSpan}" class="px-2 md:px-3 py-2 md:py-3 border border-slate-200 font-bold text-center align-middle bg-slate-50/50">${pClass}</td>`;
-            }
+            if (rIdx === 0) html += `<td rowspan="${classRowSpan}" class="px-2 md:px-3 py-2 md:py-3 border border-slate-200 font-bold text-center align-middle bg-slate-50/50">${pClass}</td>`;
             
             html += `<td class="px-2 md:px-3 py-2 md:py-3 border border-slate-200 font-medium text-slate-800 text-center">${rule.label || rule.category} ${rule.isLeftover ? '<span class="text-red-500 text-[10px] md:text-xs block">(無申請)</span>' : ''}</td>`;
             html += `<td class="px-2 md:px-3 py-2 md:py-3 border border-slate-200 text-right text-slate-600">${rule.applyAmt.toFixed(2)}</td>`;
@@ -844,10 +860,13 @@
             if (rIdx === 0) html += `<td rowspan="${classRowSpan}" class="px-2 md:px-3 py-2 md:py-3 border border-slate-200 text-center align-middle bg-purple-50/40 font-bold text-benq-main text-sm md:text-base">${classApplyMultSum.toFixed(2)}</td>`;
 
             html += `<td class="px-2 md:px-3 py-2 md:py-3 border border-slate-200 text-right text-benq-main font-bold">${actualStorage > 0 ? actualStorage.toFixed(2) : '-'}</td>`;
-            html += `<td class="px-2 md:px-3 py-2 md:py-3 border border-slate-200 text-right font-medium ${excessAmt > 0 ? 'text-red-600' : 'text-slate-400'}">${excessAmt > 0 ? excessAmt.toFixed(2) : '-'}</td>`;
-            html += `<td class="px-2 md:px-3 py-2 md:py-3 border border-slate-200 text-center"><span class="px-2 py-1 rounded text-[10px] md:text-xs font-bold whitespace-nowrap ${isPass ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">${isPass ? '符合' : '不符'}</span></td>`;
+            
+            if (showComp) {
+              html += `<td class="px-2 md:px-3 py-2 md:py-3 border border-slate-200 text-right font-medium ${excessAmt > 0 ? 'text-red-600' : 'text-slate-400'}">${excessAmt > 0 ? excessAmt.toFixed(2) : '-'}</td>`;
+              html += `<td class="px-2 md:px-3 py-2 md:py-3 border border-slate-200 text-center"><span class="px-2 py-1 rounded text-[10px] md:text-xs font-bold whitespace-nowrap ${isPass ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">${isPass ? '符合' : '不符'}</span></td>`;
+            }
 
-            if (rIdx === 0) {
+            if (rIdx === 0 && showComp) {
               html += `
                 <td rowspan="${classRowSpan}" class="px-2 md:px-3 py-2 md:py-3 border border-slate-200 text-center align-middle bg-slate-50">
                   <div class="flex flex-col items-center justify-center gap-1.5">
@@ -870,46 +889,30 @@
       DOM.summaryContainer.innerHTML = html || '<div class="text-center text-slate-400 py-8">查無資料</div>';
     }
 
+    // --- STREAMING_CHUNK:Rendering lists and charts... ---
     window.handleSort = function(key) {
-      if (state.sortConfig.key === key) {
-        state.sortConfig.direction *= -1;
-      } else {
-        state.sortConfig.key = key;
-        state.sortConfig.direction = 1;
-      }
-      
-      document.querySelectorAll('.sort-icon').forEach(el => {
-        el.classList.remove('sort-asc', 'sort-desc');
-      });
+      if (state.sortConfig.key === key) state.sortConfig.direction *= -1;
+      else { state.sortConfig.key = key; state.sortConfig.direction = 1; }
+      document.querySelectorAll('.sort-icon').forEach(el => el.classList.remove('sort-asc', 'sort-desc'));
       const th = document.getElementById(`sort-${key}`);
-      if (th) {
-        th.classList.add(state.sortConfig.direction === 1 ? 'sort-asc' : 'sort-desc');
-      }
-
-      renderList();
-      lucide.createIcons();
+      if (th) th.classList.add(state.sortConfig.direction === 1 ? 'sort-asc' : 'sort-desc');
+      renderList(); lucide.createIcons();
     };
 
     function renderList() {
       DOM.listCount.innerText = `共 ${state.filteredData.length} 筆明細`;
-
       let displayData = [...state.filteredData];
-      
       if (state.sortConfig.key) {
         displayData.sort((a, b) => {
-          let valA = a[state.sortConfig.key];
-          let valB = b[state.sortConfig.key];
+          let valA = a[state.sortConfig.key]; let valB = b[state.sortConfig.key];
           if (typeof valA === 'string') return valA.localeCompare(valB) * state.sortConfig.direction;
           return (valA > valB ? 1 : -1) * state.sortConfig.direction;
         });
-      } else {
-        displayData.sort((a, b) => b.createdAt - a.createdAt);
-      }
+      } else displayData.sort((a, b) => b.createdAt - a.createdAt);
 
       if (displayData.length === 0) {
         DOM.listBody.innerHTML = `<tr><td colspan="10" class="px-4 py-8 text-center text-slate-400">尚無符合條件的清單資料</td></tr>`;
-        updateBatchDeleteUI();
-        return;
+        updateBatchDeleteUI(); return;
       }
       
       DOM.listBody.innerHTML = displayData.map(row => {
@@ -940,41 +943,32 @@
 
       document.querySelectorAll('.row-checkbox').forEach(cb => {
         cb.addEventListener('change', (e) => {
-          if (e.target.checked) {
-            state.selectedRecordIds.add(e.target.value);
-            e.target.closest('tr').classList.add('bg-purple-50/30');
-          } else {
-            state.selectedRecordIds.delete(e.target.value);
-            e.target.closest('tr').classList.remove('bg-purple-50/30');
-          }
+          if (e.target.checked) { state.selectedRecordIds.add(e.target.value); e.target.closest('tr').classList.add('bg-purple-50/30'); }
+          else { state.selectedRecordIds.delete(e.target.value); e.target.closest('tr').classList.remove('bg-purple-50/30'); }
           updateBatchDeleteUI();
         });
       });
-
       updateBatchDeleteUI();
     }
 
     function updateBatchDeleteUI() {
       if (!DOM.btnBatchDelete || !DOM.batchDeleteText || !DOM.selectAllList) return;
-
       const visibleIds = state.filteredData.map(r => r.id);
       const isAllVisibleSelected = visibleIds.length > 0 && visibleIds.every(id => state.selectedRecordIds.has(id));
-      
-      DOM.selectAllList.checked = isAllVisibleSelected;
-      DOM.selectAllList.disabled = visibleIds.length === 0;
-
+      DOM.selectAllList.checked = isAllVisibleSelected; DOM.selectAllList.disabled = visibleIds.length === 0;
       if (state.selectedRecordIds.size > 0) {
-        DOM.btnBatchDelete.classList.remove('hidden');
-        DOM.btnBatchDelete.classList.add('flex');
+        DOM.btnBatchDelete.classList.remove('hidden'); DOM.btnBatchDelete.classList.add('flex');
         DOM.batchDeleteText.innerText = `刪除選定項目 (${state.selectedRecordIds.size}筆)`;
-      } else {
-        DOM.btnBatchDelete.classList.add('hidden');
-        DOM.btnBatchDelete.classList.remove('flex');
-      }
+      } else { DOM.btnBatchDelete.classList.add('hidden'); DOM.btnBatchDelete.classList.remove('flex'); }
     }
 
     function renderChart() {
       if (!window.Chart) return;
+      renderChemChart();
+      renderTrendChart();
+    }
+
+    function renderChemChart() {
       const canvas = document.getElementById('myChart');
       if (state.filteredData.length === 0) {
         DOM.chartNoData.classList.remove('hidden');
@@ -983,15 +977,9 @@
       }
 
       const selectedChems = Array.from(document.querySelectorAll('.chem-checkbox:checked')).map(cb => cb.value);
-      
       if (DOM.chartChemBtnText) {
-        if (selectedChems.length === 0) {
-          DOM.chartChemBtnText.innerText = '請展開勾選欲顯示的項目...';
-          DOM.chartChemBtnText.className = 'truncate text-slate-500';
-        } else {
-          DOM.chartChemBtnText.innerText = `已選擇 ${selectedChems.length} 項化學品`;
-          DOM.chartChemBtnText.className = 'truncate text-benq-main font-bold';
-        }
+        if (selectedChems.length === 0) { DOM.chartChemBtnText.innerText = '請展開勾選欲顯示的項目...'; DOM.chartChemBtnText.className = 'truncate text-slate-500'; }
+        else { DOM.chartChemBtnText.innerText = `已選擇 ${selectedChems.length} 項化學品`; DOM.chartChemBtnText.className = 'truncate text-benq-main font-bold'; }
       }
 
       if(selectedChems.length === 0) {
@@ -1002,7 +990,6 @@
       }
       
       DOM.chartNoData.classList.add('hidden');
-
       const dates = [...new Set(state.filteredData.map(d => d.date))].sort((a, b) => new Date(a) - new Date(b));
 
       const datasets = selectedChems.map((chemName, index) => {
@@ -1010,14 +997,10 @@
           const record = state.filteredData.find(d => d.date === date && d.chemName === chemName);
           return record ? record.storageAmt : null;
         });
-        
         const hue = (index * 360) / selectedChems.length;
-        const color = `hsl(${hue}, 70%, 50%)`;
-        const bgColor = `hsla(${hue}, 70%, 50%, 0.1)`;
-
         return {
           label: chemName, data: dataPoints,
-          borderColor: color, backgroundColor: bgColor,
+          borderColor: `hsl(${hue}, 70%, 50%)`, backgroundColor: `hsla(${hue}, 70%, 50%, 0.1)`,
           tension: 0.3, spanGaps: true, pointRadius: 4, borderWidth: 2, fill: true
         };
       });
@@ -1028,182 +1011,135 @@
         options: {
           responsive: true, maintainAspectRatio: false,
           plugins: { legend: { position: 'top' }, tooltip: { callbacks: { label: c => `${c.dataset.label}: ${c.parsed.y} kg/L` } } },
-          scales: { y: { beginAtZero: true, title: { display: true, text: '儲存量 (L)' } }, x: { title: { display: false } } }
+          scales: { y: { beginAtZero: true, grace: '20%', title: { display: true, text: '儲存量 (L)' } }, x: { title: { display: false } } }
         }
       });
     }
 
     function renderTrendChart() {
-      if (!window.Chart || !DOM.trendChartCanvas) return;
-      
-      const selectedTrendLocs = Array.from(document.querySelectorAll('.trend-loc-checkbox:checked')).map(cb => cb.value);
-
-      if (DOM.trendLocBtnText) {
-        if (selectedTrendLocs.length === 0) {
-          DOM.trendLocBtnText.innerText = '請展開勾選區域...';
-          DOM.trendLocBtnText.className = 'truncate text-slate-500';
-        } else if (selectedTrendLocs.length === 2) {
-          DOM.trendLocBtnText.innerText = '全區域';
-          DOM.trendLocBtnText.className = 'truncate text-benq-main font-bold';
-        } else {
-          DOM.trendLocBtnText.innerText = selectedTrendLocs.join(', ');
-          DOM.trendLocBtnText.className = 'truncate text-benq-main font-bold';
-        }
-      }
-
-      if (selectedTrendLocs.length === 0) {
-        DOM.trendChartNoData.classList.remove('hidden');
-        DOM.trendChartNoData.innerText = '請選擇要顯示的區域';
-        DOM.trendConclusion.innerHTML = '';
-        if (state.trendChartInstance) { state.trendChartInstance.destroy(); state.trendChartInstance = null; }
-        return;
-      }
-
-      let baseData = state.inventoryData.map(record => {
+      const canvas = document.getElementById('trendChart');
+      // Trend chart ignores normal chemical/class filters, relies only on date & trend loc dropdown
+      const baseRawData = state.inventoryData.map(record => {
         const c = state.chemicals.find(x => x.id === record.chemId) || {};
-        return {
-          date: record.date,
-          locGroup: (c.location && c.location.includes('原膠室')) ? '原膠室(C4+P1)' : c.location,
-          multiple: c.controlAmt ? (record.storageAmt / c.controlAmt) : 0
-        };
+        return { ...record, location: c.location || '未知場所', controlAmt: c.controlAmt || 1 };
+      }).filter(d => {
+        let pass = true;
+        if (state.filters.startDate) pass = pass && new Date(d.date) >= new Date(state.filters.startDate);
+        if (state.filters.endDate) pass = pass && new Date(d.date) <= new Date(state.filters.endDate);
+        return pass;
       });
 
-      if (state.filters.startDate) baseData = baseData.filter(d => new Date(d.date) >= new Date(state.filters.startDate));
-      if (state.filters.endDate) baseData = baseData.filter(d => new Date(d.date) <= new Date(state.filters.endDate));
+      const dates = [...new Set(baseRawData.map(d => d.date))].sort((a, b) => new Date(a) - new Date(b));
+      
+      const selectedLocs = Array.from(document.querySelectorAll('.trend-loc-checkbox:checked')).map(cb => cb.value);
+      if (DOM.trendLocBtnText) {
+        if (selectedLocs.length === 0) { DOM.trendLocBtnText.innerText = '請勾選欲分析的區域...'; DOM.trendLocBtnText.className = 'truncate text-slate-500'; }
+        else { DOM.trendLocBtnText.innerText = `已選擇 ${selectedLocs.length} 項區域`; DOM.trendLocBtnText.className = 'truncate text-benq-main font-bold'; }
+      }
 
-      const allDates = [...new Set(baseData.map(d => d.date))].sort((a, b) => new Date(a) - new Date(b));
-
-      if (allDates.length === 0) {
+      if (dates.length === 0 || selectedLocs.length === 0) {
         DOM.trendChartNoData.classList.remove('hidden');
-        DOM.trendChartNoData.innerText = '該日期區間無對應區域資料';
-        DOM.trendConclusion.innerHTML = '';
+        DOM.trendConclusions.innerHTML = '';
         if (state.trendChartInstance) { state.trendChartInstance.destroy(); state.trendChartInstance = null; }
         return;
       }
-      
       DOM.trendChartNoData.classList.add('hidden');
+
+      const locConfig = {
+        '危險品庫房': { actualColor: '#5C2483', limitColor: '#EF4444' }, // 實際:紫色, 上限:紅色
+        '原膠室(C4+P1)': { actualColor: '#3B82F6', limitColor: '#F97316' } // 實際:藍色, 上限:橘色
+      };
 
       const datasets = [];
       let conclusionHtml = '';
 
-      const colors = {
-        '危險品庫房': { bar: 'rgba(92, 36, 131, 0.7)', limit: 'rgba(239, 68, 68, 0.9)' }, 
-        '原膠室(C4+P1)': { bar: 'rgba(14, 165, 233, 0.7)', limit: 'rgba(245, 158, 11, 0.9)' }
-      };
-
-      selectedTrendLocs.forEach((loc, index) => {
-        const rules = applicationRules[loc] || [];
-        const totalLimit = rules.reduce((sum, r) => sum + r.applyMultiple, 0);
-
-        const locData = baseData.filter(d => d.locGroup === loc);
-        const actualMultiples = allDates.map(date => {
-          const dayData = locData.filter(d => d.date === date);
-          const sum = dayData.reduce((acc, curr) => acc + curr.multiple, 0);
-          return parseFloat(sum.toFixed(2));
+      selectedLocs.forEach(locGroup => {
+        const rules = applicationRules[locGroup] || [];
+        const limitValue = rules.reduce((acc, cur) => acc + cur.applyMultiple, 0);
+        
+        const dataPoints = dates.map(date => {
+          const dayItems = baseRawData.filter(d => d.date === date && (locGroup === '原膠室(C4+P1)' ? d.location.includes('原膠室') : d.location === locGroup));
+          return dayItems.reduce((sum, item) => sum + (item.storageAmt / item.controlAmt), 0);
         });
 
-        const limitData = allDates.map(() => parseFloat(totalLimit.toFixed(2)));
-        const barColor = colors[loc]?.bar || `hsla(${index * 137}, 70%, 50%, 0.8)`;
-        const limitColor = colors[loc]?.limit || `hsla(${index * 137 + 50}, 80%, 50%, 1)`;
+        const colorCfg = locConfig[locGroup];
 
+        // 實際倍數柱狀圖
         datasets.push({
           type: 'bar',
-          label: `${loc} 實際倍數`,
-          data: actualMultiples,
-          backgroundColor: barColor,
-          borderColor: barColor.replace('0.7', '1'),
-          borderWidth: 1,
-          borderRadius: 4,
-          order: 2
+          label: `${locGroup} 實際倍數`,
+          data: dataPoints,
+          backgroundColor: colorCfg.actualColor,
+          borderRadius: 4
         });
 
+        // 合法上限全寬虛線 (利用自訂外掛)
         datasets.push({
           type: 'line',
-          label: `${loc} 合法上限`,
-          data: limitData,
-          borderColor: limitColor,
-          backgroundColor: limitColor,
-          borderWidth: 3,
-          borderDash: [8, 6],
-          pointRadius: 0,
-          fill: false,
-          showLine: false,
-          order: 1,
-          customLimitLine: { value: totalLimit, color: limitColor, width: 3 }
+          label: `${locGroup} 合法上限`,
+          data: [], // 不繪製實體點，由外掛畫全寬水平線
+          borderColor: colorCfg.limitColor,
+          borderDash: [5, 5],
+          customThreshold: limitValue,
+          pointRadius: 0
         });
 
-        const latestActual = actualMultiples[actualMultiples.length - 1] || 0;
-        const isPass = latestActual <= totalLimit;
+        // 結論文字處理 (抓取區間最後一天的數據)
+        if (dataPoints.length > 0) {
+          const lastVal = dataPoints[dataPoints.length - 1];
+          const isPass = lastVal <= limitValue;
+          const statusText = isPass ? '✅ 符合規定' : '❌ 超出上限';
+          const statusColor = isPass ? 'text-green-600' : 'text-red-600';
+          const limitLineColorClass = locGroup === '危險品庫房' ? 'border-red-500 text-red-600' : 'border-orange-500 text-orange-600';
 
-        conclusionHtml += `
-          <div class="flex items-center gap-2 bg-white px-3 py-2 rounded-md border border-slate-200 shadow-sm flex-wrap">
-            <span class="font-bold text-sm" style="color:${barColor.replace('0.7', '1')};">${loc}</span>
-            <span class="px-2 py-0.5 rounded text-xs font-bold ${isPass ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
-              ${isPass ? '✅ 符合規定' : '❌ 超出上限'}
-            </span>
-            <span class="ml-1 text-slate-600 text-xs">實際 <b>${latestActual.toFixed(2)}</b> / 上限 <b style="color:${limitColor}">${totalLimit.toFixed(2)}</b> 倍</span>
-          </div>
-        `;
+          conclusionHtml += `
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-3 bg-white border border-slate-200 rounded-lg shadow-sm gap-2">
+              <div class="font-bold text-slate-700 flex items-center gap-2 text-sm md:text-base">
+                <div class="w-3 h-3 rounded-full" style="background-color: ${colorCfg.actualColor};"></div>
+                ${locGroup}
+              </div>
+              <div class="flex items-center gap-4 text-xs md:text-sm">
+                <span class="text-slate-500 font-medium border-b-2 border-dashed pb-0.5 ${limitLineColorClass}">申請上限：${limitValue.toFixed(2)} 倍</span>
+                <div class="font-bold ${statusColor} bg-slate-50 px-2 py-1 rounded">
+                  ${statusText} (實際: ${lastVal.toFixed(2)} 倍)
+                </div>
+              </div>
+            </div>
+          `;
+        }
       });
 
-      DOM.trendConclusion.innerHTML = conclusionHtml;
+      DOM.trendConclusions.innerHTML = conclusionHtml;
 
       if (state.trendChartInstance) state.trendChartInstance.destroy();
-      state.trendChartInstance = new Chart(DOM.trendChartCanvas, {
-        type: 'bar',
-        data: { labels: allDates, datasets: datasets },
+      state.trendChartInstance = new Chart(canvas, {
+        data: { labels: dates, datasets: datasets },
         options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          interaction: { mode: 'index', intersect: false },
+          responsive: true, maintainAspectRatio: false,
           plugins: { 
-            legend: { position: 'top', labels: { boxWidth: 12 } },
-            tooltip: { callbacks: { label: c => `${c.dataset.label}: ${c.parsed.y} 倍` } }
+            legend: { position: 'top' }, 
+            tooltip: { callbacks: { label: c => c.dataset.type === 'bar' ? `${c.dataset.label}: ${c.parsed.y.toFixed(2)} 倍` : '' } }
           },
-          scales: { 
-            y: { beginAtZero: true, title: { display: true, text: '總倍數' } }, 
-            x: { title: { display: false } } 
-          }
-        },
-        plugins: [{
-          id: 'horizontalLinePlugin',
-          afterDatasetsDraw(chart) {
-            const { ctx, chartArea: { left, right }, scales: { y } } = chart;
-            chart.data.datasets.forEach((dataset, i) => {
-              if (dataset.customLimitLine && chart.isDatasetVisible(i)) {
-                ctx.save();
-                ctx.beginPath();
-                const yPos = y.getPixelForValue(dataset.customLimitLine.value);
-                ctx.moveTo(left, yPos);
-                ctx.lineTo(right, yPos);
-                ctx.lineWidth = dataset.customLimitLine.width;
-                ctx.strokeStyle = dataset.customLimitLine.color;
-                ctx.setLineDash([8, 6]);
-                ctx.stroke();
-                ctx.restore();
-              }
-            });
-          }
-        }]
+          scales: { y: { beginAtZero: true, grace: '20%', title: { display: true, text: '總倍數' } }, x: { title: { display: false } } }
+        }
       });
     }
 
+    // --- STREAMING_CHUNK:Event Listeners & Actions... ---
     function updateDropdown() {
       const loc = DOM.inputLocation.value;
       if (!loc) {
         DOM.chemDropdown.innerHTML = `<div class="px-4 py-3 text-sm text-amber-600 text-center font-medium">請先選擇上方的「儲存區域」</div>`;
         return;
       }
-
       const searchStr = DOM.chemSearchInput.value.toLowerCase();
       const filtered = state.chemicals.filter(c => c.location === loc && (c.name.toLowerCase().includes(searchStr) || c.category.includes(searchStr)));
       
       if (searchStr) DOM.btnClearChem.classList.remove('hidden');
       else DOM.btnClearChem.classList.add('hidden');
 
-      if (filtered.length === 0) {
-        DOM.chemDropdown.innerHTML = `<div class="px-4 py-3 text-sm text-slate-500 text-center">該區域查無符合的化學品</div>`;
-      } else {
+      if (filtered.length === 0) DOM.chemDropdown.innerHTML = `<div class="px-4 py-3 text-sm text-slate-500 text-center">該區域查無符合的化學品</div>`;
+      else {
         DOM.chemDropdown.innerHTML = filtered.map(c => `
           <div onclick="selectChem('${c.id}', '${c.name}')" class="px-4 py-2 hover:bg-purple-50 cursor-pointer border-b border-slate-100 last:border-0">
             <div class="font-medium text-slate-800">${c.name}</div>
@@ -1251,11 +1187,7 @@
       DOM.inputDate.value = record.date;
       DOM.inputStorageAmt.value = record.storageAmt;
       const c = state.chemicals.find(x => x.id === record.chemId);
-      if (c) {
-        DOM.inputLocation.value = c.location;
-        DOM.chemSearchInput.value = c.name;
-        updateChemInfoPanel();
-      }
+      if (c) { DOM.inputLocation.value = c.location; DOM.chemSearchInput.value = c.name; updateChemInfoPanel(); }
       DOM.btnSubmit.innerText = '儲存修改';
       DOM.btnSubmit.classList.replace('bg-benq-main', 'bg-amber-600');
       DOM.btnSubmit.classList.replace('hover:bg-benq-dark', 'hover:bg-amber-700');
@@ -1265,8 +1197,7 @@
     window.handleDelete = function(id) {
       if (confirm('確定要刪除這筆庫存紀錄嗎？這將無法復原。')) {
         state.inventoryData = state.inventoryData.filter(r => r.id !== id);
-        saveDataToStorage();
-        processData();
+        saveDataToStorage(); processData();
       }
     };
 
@@ -1282,8 +1213,7 @@
             if (isChecked) state.selectedRecordIds.add(row.id);
             else state.selectedRecordIds.delete(row.id);
           });
-          renderList();
-          lucide.createIcons();
+          renderList(); lucide.createIcons();
         });
       }
 
@@ -1292,91 +1222,42 @@
           if (confirm(`確定要刪除選定的 ${state.selectedRecordIds.size} 筆庫存紀錄嗎？\n(此操作無法復原)`)) {
             state.inventoryData = state.inventoryData.filter(r => !state.selectedRecordIds.has(r.id));
             state.selectedRecordIds.clear();
-            saveDataToStorage();
-            processData(); 
+            saveDataToStorage(); processData(); 
           }
         });
       }
 
-      if (DOM.btnToggleLocFilter) {
-        DOM.btnToggleLocFilter.addEventListener('click', (e) => {
-          e.stopPropagation();
-          DOM.locFilterDropdownPanel.classList.toggle('hidden');
+      if (DOM.toggleCompliance) {
+        DOM.toggleCompliance.addEventListener('change', (e) => {
+          state.showCompliance = e.target.checked;
+          renderSummary();
         });
       }
 
-      if (DOM.btnToggleChartChem) {
-        DOM.btnToggleChartChem.addEventListener('click', (e) => {
-          e.stopPropagation();
-          DOM.chartChemDropdownPanel.classList.toggle('hidden');
-        });
-      }
-
-      if (DOM.btnToggleTrendLoc) {
-        DOM.btnToggleTrendLoc.addEventListener('click', (e) => {
-          e.stopPropagation();
-          DOM.trendLocDropdownPanel.classList.toggle('hidden');
-        });
-      }
+      if (DOM.btnToggleLocFilter) DOM.btnToggleLocFilter.addEventListener('click', (e) => { e.stopPropagation(); DOM.locFilterDropdownPanel.classList.toggle('hidden'); });
+      if (DOM.btnToggleChartChem) DOM.btnToggleChartChem.addEventListener('click', (e) => { e.stopPropagation(); DOM.chartChemDropdownPanel.classList.toggle('hidden'); });
+      if (DOM.btnToggleTrendLoc) DOM.btnToggleTrendLoc.addEventListener('click', (e) => { e.stopPropagation(); DOM.trendLocDropdownPanel.classList.toggle('hidden'); });
 
       document.addEventListener('mousedown', (e) => {
-        if (DOM.locFilterDropdownPanel && !DOM.btnToggleLocFilter.contains(e.target) && !DOM.locFilterDropdownPanel.contains(e.target)) {
-          DOM.locFilterDropdownPanel.classList.add('hidden');
-        }
-        if (DOM.chartChemDropdownContainer && !DOM.chartChemDropdownContainer.contains(e.target)) {
-          DOM.chartChemDropdownPanel.classList.add('hidden');
-        }
-        if (DOM.trendLocDropdownContainer && !DOM.trendLocDropdownContainer.contains(e.target)) {
-          DOM.trendLocDropdownPanel.classList.add('hidden');
-        }
+        if (DOM.locFilterDropdownPanel && !DOM.btnToggleLocFilter.contains(e.target) && !DOM.locFilterDropdownPanel.contains(e.target)) DOM.locFilterDropdownPanel.classList.add('hidden');
+        if (DOM.chartChemDropdownContainer && !DOM.chartChemDropdownContainer.contains(e.target)) DOM.chartChemDropdownPanel.classList.add('hidden');
+        if (DOM.trendLocDropdownContainer && !DOM.trendLocDropdownContainer.contains(e.target)) DOM.trendLocDropdownPanel.classList.add('hidden');
       });
 
-      if (DOM.btnSelectAllChems) {
-        DOM.btnSelectAllChems.addEventListener('click', () => {
-          document.querySelectorAll('.chem-checkbox').forEach(cb => cb.checked = true);
-          renderChart();
-        });
-      }
-      if (DOM.btnClearAllChems) {
-        DOM.btnClearAllChems.addEventListener('click', () => {
-          document.querySelectorAll('.chem-checkbox').forEach(cb => cb.checked = false);
-          renderChart();
-        });
-      }
-
-      if (DOM.btnSelectAllTrendLocs) {
-        DOM.btnSelectAllTrendLocs.addEventListener('click', () => {
-          document.querySelectorAll('.trend-loc-checkbox').forEach(cb => cb.checked = true);
-          renderTrendChart();
-        });
-      }
-      if (DOM.btnClearAllTrendLocs) {
-        DOM.btnClearAllTrendLocs.addEventListener('click', () => {
-          document.querySelectorAll('.trend-loc-checkbox').forEach(cb => cb.checked = false);
-          renderTrendChart();
-        });
-      }
-
-      document.querySelectorAll('.trend-loc-checkbox').forEach(cb => {
-        cb.addEventListener('change', renderTrendChart);
-      });
+      if (DOM.btnSelectAllChems) DOM.btnSelectAllChems.addEventListener('click', () => { document.querySelectorAll('.chem-checkbox').forEach(cb => cb.checked = true); renderChart(); });
+      if (DOM.btnClearAllChems) DOM.btnClearAllChems.addEventListener('click', () => { document.querySelectorAll('.chem-checkbox').forEach(cb => cb.checked = false); renderChart(); });
+      
+      if (DOM.btnSelectAllTrendLoc) DOM.btnSelectAllTrendLoc.addEventListener('click', () => { document.querySelectorAll('.trend-loc-checkbox').forEach(cb => cb.checked = true); renderChart(); });
+      if (DOM.btnClearAllTrendLoc) DOM.btnClearAllTrendLoc.addEventListener('click', () => { document.querySelectorAll('.trend-loc-checkbox').forEach(cb => cb.checked = false); renderChart(); });
 
       DOM.inputLocation.addEventListener('change', () => {
-        DOM.chemSearchInput.value = '';
-        state.formData.chemId = '';
-        DOM.chemInfoPanel.classList.add('hidden');
-        DOM.chemDropdown.classList.remove('hidden');
-        updateDropdown();
+        DOM.chemSearchInput.value = ''; state.formData.chemId = ''; DOM.chemInfoPanel.classList.add('hidden');
+        DOM.chemDropdown.classList.remove('hidden'); updateDropdown();
       });
 
       DOM.chemSearchInput.addEventListener('focus', () => { 
-        if(!DOM.inputLocation.value) {
-          alert('請先選擇上方的「儲存區域」');
-          DOM.inputLocation.focus();
-          return;
-        }
-        DOM.chemDropdown.classList.remove('hidden'); 
-        updateDropdown(); 
+        if(!DOM.inputLocation.value) { alert('請先選擇上方的「儲存區域」'); DOM.inputLocation.focus(); return; }
+        DOM.chemDropdown.classList.remove('hidden'); updateDropdown(); 
       });
       DOM.chemSearchInput.addEventListener('input', () => { state.formData.chemId = ''; DOM.chemInfoPanel.classList.add('hidden'); updateDropdown(); });
       DOM.btnClearChem.addEventListener('click', () => { DOM.chemSearchInput.value = ''; state.formData.chemId = ''; DOM.chemDropdown.classList.add('hidden'); DOM.btnClearChem.classList.add('hidden'); DOM.chemInfoPanel.classList.add('hidden'); });
@@ -1388,29 +1269,17 @@
       DOM.btnClearStorage.addEventListener('click', () => { DOM.inputStorageAmt.value = ''; DOM.btnClearStorage.classList.add('hidden'); });
 
       DOM.btnClearForm.addEventListener('click', () => {
-        state.formData = { date: todayStr, chemId: '', storageAmt: '' };
-        state.editingId = null;
-        DOM.inputDate.value = todayStr;
-        DOM.inputLocation.value = '';
-        DOM.chemSearchInput.value = '';
-        DOM.inputStorageAmt.value = '';
-        DOM.chemInfoPanel.classList.add('hidden');
-        DOM.btnClearChem.classList.add('hidden');
-        DOM.btnClearStorage.classList.add('hidden');
-        DOM.btnSubmit.innerText = '儲存資料';
-        DOM.btnSubmit.classList.replace('bg-amber-600', 'bg-benq-main');
-        DOM.btnSubmit.classList.replace('hover:bg-amber-700', 'hover:bg-benq-dark');
+        state.formData = { date: todayStr, chemId: '', storageAmt: '' }; state.editingId = null;
+        DOM.inputDate.value = todayStr; DOM.inputLocation.value = ''; DOM.chemSearchInput.value = ''; DOM.inputStorageAmt.value = '';
+        DOM.chemInfoPanel.classList.add('hidden'); DOM.btnClearChem.classList.add('hidden'); DOM.btnClearStorage.classList.add('hidden');
+        DOM.btnSubmit.innerText = '儲存資料'; DOM.btnSubmit.classList.replace('bg-amber-600', 'bg-benq-main'); DOM.btnSubmit.classList.replace('hover:bg-amber-700', 'hover:bg-benq-dark');
         DOM.editingBadge.classList.add('hidden');
       });
 
       document.getElementById('inputForm').addEventListener('submit', (e) => {
         e.preventDefault();
-        state.formData.date = DOM.inputDate.value;
-        state.formData.storageAmt = DOM.inputStorageAmt.value;
-        
-        if (!DOM.inputLocation.value || !state.formData.date || !state.formData.chemId || !state.formData.storageAmt) {
-          return alert('請填寫完整資料 (請先選擇區域與化學品)');
-        }
+        state.formData.date = DOM.inputDate.value; state.formData.storageAmt = DOM.inputStorageAmt.value;
+        if (!DOM.inputLocation.value || !state.formData.date || !state.formData.chemId || !state.formData.storageAmt) return alert('請填寫完整資料 (請先選擇區域與化學品)');
 
         const chem = state.chemicals.find(c => c.id === state.formData.chemId);
         const ruleLocGroup = chem.location.includes('原膠室') ? '原膠室(C4+P1)' : chem.location;
@@ -1421,12 +1290,7 @@
           const currentItems = state.inventoryData.filter(d => d.date === state.formData.date && d.id !== state.editingId);
           const currentTotal = currentItems.reduce((sum, item) => {
             const cInfo = state.chemicals.find(c => c.id === item.chemId);
-            if (cInfo && 
-                (cInfo.location === chem.location || (ruleLocGroup === '原膠室(C4+P1)' && cInfo.location.includes('原膠室'))) && 
-                cInfo.category === chem.category && 
-                cInfo.petroleumClass === chem.petroleumClass) {
-              return sum + item.storageAmt;
-            }
+            if (cInfo && (cInfo.location === chem.location || (ruleLocGroup === '原膠室(C4+P1)' && cInfo.location.includes('原膠室'))) && cInfo.category === chem.category && cInfo.petroleumClass === chem.petroleumClass) return sum + item.storageAmt;
             return sum;
           }, 0);
 
@@ -1441,9 +1305,7 @@
             DOM.modalInputAmt.innerText = `+${inputAmt.toFixed(2)}`;
             DOM.modalProjected.innerText = projectedTotal.toFixed(2);
             DOM.modalExcess.innerText = (projectedTotal - rule.applyAmt).toFixed(2);
-            DOM.warningModal.classList.remove('hidden');
-            DOM.warningModal.classList.add('flex');
-            
+            DOM.warningModal.classList.remove('hidden'); DOM.warningModal.classList.add('flex');
             state.pendingSaveAction = () => executeSave();
             return;
           }
@@ -1461,59 +1323,26 @@
       DOM.btnClearFilterName.addEventListener('click', () => { DOM.filterName.value = ''; window.applyFilters(); });
       
       DOM.btnClearFilters.addEventListener('click', () => {
-        DOM.filterStart.value = todayStr;
-        DOM.filterEnd.value = todayStr;
-        DOM.filterClass.value = '';
-        DOM.filterName.value = '';
-        
+        DOM.filterStart.value = todayStr; DOM.filterEnd.value = todayStr; DOM.filterClass.value = ''; DOM.filterName.value = '';
         document.querySelectorAll('.loc-checkbox').forEach(cb => cb.checked = false);
-        state.filters.locations = [];
-        DOM.locFilterBtnText.innerText = '全區域';
-        
+        state.filters.locations = []; DOM.locFilterBtnText.innerText = '全區域';
         window.applyFilters();
       });
 
-      DOM.reportDateSelect.addEventListener('change', (e) => {
-        state.selectedReportDate = e.target.value;
-        renderSummary();
-        lucide.createIcons();
-      });
-
+      DOM.reportDateSelect.addEventListener('change', (e) => { state.selectedReportDate = e.target.value; renderSummary(); lucide.createIcons(); });
       DOM.btnExportExcel.addEventListener('click', exportExcel);
       DOM.fileUpload.addEventListener('change', handleFileUpload);
       DOM.btnShareLine.addEventListener('click', shareToLine);
     }
 
     function executeSave() {
-      if (state.editingId) {
-        state.inventoryData = state.inventoryData.map(item => item.id === state.editingId ? { ...item, date: state.formData.date, chemId: state.formData.chemId, storageAmt: parseFloat(state.formData.storageAmt) } : item);
-      } else {
-        state.inventoryData.unshift({ 
-          id: crypto.randomUUID(), 
-          createdAt: Date.now(),
-          date: state.formData.date, 
-          chemId: state.formData.chemId, 
-          storageAmt: parseFloat(state.formData.storageAmt) 
-        });
-      }
+      if (state.editingId) state.inventoryData = state.inventoryData.map(item => item.id === state.editingId ? { ...item, date: state.formData.date, chemId: state.formData.chemId, storageAmt: parseFloat(state.formData.storageAmt) } : item);
+      else state.inventoryData.unshift({ id: crypto.randomUUID(), createdAt: Date.now(), date: state.formData.date, chemId: state.formData.chemId, storageAmt: parseFloat(state.formData.storageAmt) });
       
       saveDataToStorage();
-
-      state.formData.chemId = '';
-      state.formData.storageAmt = '';
-      state.editingId = null;
-
-      DOM.chemSearchInput.value = '';
-      DOM.inputStorageAmt.value = '';
-      DOM.chemInfoPanel.classList.add('hidden');
-      DOM.btnClearChem.classList.add('hidden');
-      DOM.btnClearStorage.classList.add('hidden');
-
-      DOM.btnSubmit.innerText = '儲存資料';
-      DOM.btnSubmit.classList.replace('bg-amber-600', 'bg-benq-main');
-      DOM.btnSubmit.classList.replace('hover:bg-amber-700', 'hover:bg-benq-dark');
-      DOM.editingBadge.classList.add('hidden');
-      
+      state.formData.chemId = ''; state.formData.storageAmt = ''; state.editingId = null;
+      DOM.chemSearchInput.value = ''; DOM.inputStorageAmt.value = ''; DOM.chemInfoPanel.classList.add('hidden'); DOM.btnClearChem.classList.add('hidden'); DOM.btnClearStorage.classList.add('hidden');
+      DOM.btnSubmit.innerText = '儲存資料'; DOM.btnSubmit.classList.replace('bg-amber-600', 'bg-benq-main'); DOM.btnSubmit.classList.replace('hover:bg-amber-700', 'hover:bg-benq-dark'); DOM.editingBadge.classList.add('hidden');
       DOM.warningModal.classList.remove('flex'); DOM.warningModal.classList.add('hidden');
       processData();
     }
@@ -1521,12 +1350,8 @@
     function exportExcel() {
       if (!window.XLSX) return alert('Excel 引擎載入中，請稍候重試');
       const ws_data = [['盤點日期', '儲存場所', '標示版歸類', '類別', '化學品名稱', '閃火點', '管制量(L)', '儲存量(kg/L)', '倍數']];
-      state.filteredData.forEach(row => {
-        ws_data.push([row.date, row.location, row.category, row.petroleumClass, row.chemName, row.flashPoint, row.controlAmt, row.storageAmt, row.multiple]);
-      });
-      const ws = XLSX.utils.aoa_to_sheet(ws_data);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "化學品庫存");
+      state.filteredData.forEach(row => ws_data.push([row.date, row.location, row.category, row.petroleumClass, row.chemName, row.flashPoint, row.controlAmt, row.storageAmt, row.multiple]));
+      const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(ws_data), "化學品庫存");
       XLSX.writeFile(wb, `BML_公共危險品庫存_${new Date().toISOString().split('T')[0]}.xlsx`);
     }
 
@@ -1536,23 +1361,15 @@
       const reader = new FileReader();
       reader.onload = (event) => {
         try {
-          const data = new Uint8Array(event.target.result);
-          const workbook = XLSX.read(data, { type: 'array' });
-          const rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1 });
+          const rows = XLSX.utils.sheet_to_json(XLSX.read(new Uint8Array(event.target.result), { type: 'array' }).Sheets[XLSX.read(new Uint8Array(event.target.result), { type: 'array' }).SheetNames[0]], { header: 1 });
           if (rows.length < 2) return alert('Excel 內無資料');
-          
           const h = rows[0];
           const idx = {
-            date: h.findIndex(x => typeof x === 'string' && x.includes('日期')),
-            loc: h.findIndex(x => typeof x === 'string' && x.includes('場所')),
-            name: h.findIndex(x => typeof x === 'string' && x.includes('名稱')),
-            cat: h.findIndex(x => typeof x === 'string' && x.includes('標示版歸類')),
-            petro: h.findIndex(x => typeof x === 'string' && (x.includes('類別') || x.includes('種類'))),
-            flash: h.findIndex(x => typeof x === 'string' && x.includes('閃火點')),
-            ctrl: h.findIndex(x => typeof x === 'string' && x.includes('管制量')),
-            storage: h.findIndex(x => typeof x === 'string' && x.includes('儲存量'))
+            date: h.findIndex(x => typeof x === 'string' && x.includes('日期')), loc: h.findIndex(x => typeof x === 'string' && x.includes('場所')),
+            name: h.findIndex(x => typeof x === 'string' && x.includes('名稱')), cat: h.findIndex(x => typeof x === 'string' && x.includes('標示版歸類')),
+            petro: h.findIndex(x => typeof x === 'string' && (x.includes('類別') || x.includes('種類'))), flash: h.findIndex(x => typeof x === 'string' && x.includes('閃火點')),
+            ctrl: h.findIndex(x => typeof x === 'string' && x.includes('管制量')), storage: h.findIndex(x => typeof x === 'string' && x.includes('儲存量'))
           };
-
           if (idx.date === -1 || idx.name === -1 || idx.storage === -1) return alert('Excel 欄位標題不符');
 
           const imported = [];
@@ -1561,61 +1378,40 @@
             let dStr = c[idx.date];
             if (typeof dStr === 'number') dStr = new Date(new Date(Date.UTC(1899, 11, 30)).getTime() + dStr * 86400000).toISOString().split('T')[0];
             else if (typeof dStr === 'string') dStr = dStr.trim().replace(/\//g, '-').split(' ')[0];
-
-            const name = c[idx.name]?.toString().trim();
-            const amt = parseFloat(c[idx.storage]);
+            const name = c[idx.name]?.toString().trim(); const amt = parseFloat(c[idx.storage]);
             if (!dStr || !name || isNaN(amt)) continue;
 
             const loc = idx.loc !== -1 ? c[idx.loc]?.toString().trim() : '未分類';
-            const cat = idx.cat !== -1 ? c[idx.cat]?.toString().trim() : '未分類';
-            const petro = idx.petro !== -1 ? c[idx.petro]?.toString().trim() : '未分類';
-            const flash = idx.flash !== -1 ? c[idx.flash]?.toString().trim() : '';
-            const ctrl = idx.ctrl !== -1 ? parseFloat(c[idx.ctrl]) : 0;
-
             let chem = state.chemicals.find(x => x.name === name && x.location === loc);
             if (!chem) {
-              chem = { id: crypto.randomUUID(), name, location: loc, category: cat, petroleumClass: petro, flashPoint: flash, controlAmt: ctrl };
+              chem = { id: crypto.randomUUID(), name, location: loc, category: idx.cat !== -1 ? c[idx.cat]?.toString().trim() : '未分類', petroleumClass: idx.petro !== -1 ? c[idx.petro]?.toString().trim() : '未分類', flashPoint: idx.flash !== -1 ? c[idx.flash]?.toString().trim() : '', controlAmt: idx.ctrl !== -1 ? parseFloat(c[idx.ctrl]) : 0 };
               state.chemicals.push(chem);
             }
             imported.push({ id: crypto.randomUUID(), createdAt: Date.now() + i, date: dStr, chemId: chem.id, storageAmt: amt });
           }
-          state.inventoryData.push(...imported);
-          saveDataToStorage(); 
-          processData();
-          alert(`成功從 Excel 匯入 ${imported.length} 筆紀錄`);
+          state.inventoryData.push(...imported); saveDataToStorage(); processData(); alert(`成功從 Excel 匯入 ${imported.length} 筆紀錄`);
         } catch(err) { alert('匯入失敗，請確認檔案格式'); }
       };
-      reader.readAsArrayBuffer(file);
-      e.target.value = null;
+      reader.readAsArrayBuffer(file); e.target.value = null;
     }
 
     async function shareToLine() {
       if (!window.XLSX) return alert('Excel 引擎載入中');
       const ws_data = [['盤點日期', '儲存場所', '標示版歸類', '類別', '化學品名稱', '閃火點', '管制量(L)', '儲存量(kg/L)', '倍數']];
       state.filteredData.forEach(row => ws_data.push([row.date, row.location, row.category, row.petroleumClass, row.chemName, row.flashPoint, row.controlAmt, row.storageAmt, row.multiple]));
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(ws_data), "化學品庫存");
+      const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(ws_data), "化學品庫存");
       const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
       const fileName = `BML_公共危險品庫存_${new Date().toISOString().split('T')[0]}.xlsx`;
       const file = new File([excelBuffer], fileName, { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-
       const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
       if (isMobile && navigator.canShare && navigator.canShare({ files: [file] })) {
-        try { 
-          await navigator.share({ title: 'BML 庫存報表', text: '請查收公共危險品庫存資料。', files: [file] }); 
-          return; 
-        } 
+        try { await navigator.share({ title: 'BML 庫存報表', text: '請查收公共危險品庫存資料。', files: [file] }); return; } 
         catch (err) { console.log('原生分享取消或失敗', err); }
       } 
-      
       XLSX.writeFile(wb, fileName);
-      
-      const lineText = encodeURIComponent('您好，這是我剛剛匯出的「BML 公共危險品庫存報表」。\n(請稍後查收我手動上傳的 Excel 檔案)');
-      const confirmMsg = '【系統提示】\n由於 LINE 系統限制，無法直接透過網頁夾帶檔案。\n\n系統已為您「自動下載」Excel 檔案！\n點擊「確定」將會開啟 LINE，請您在 LINE 中手動上傳剛剛下載的檔案。';
-      
-      if (confirm(confirmMsg)) {
-        window.open(`https://line.me/R/msg/text/?${lineText}`, '_blank');
+      if (confirm('【系統提示】\n由於 LINE 系統限制，無法直接透過網頁夾帶檔案。\n\n系統已為您「自動下載」Excel 檔案！\n點擊「確定」將會開啟 LINE，請您在 LINE 中手動上傳剛剛下載的檔案。')) {
+        window.open(`https://line.me/R/msg/text/?${encodeURIComponent('您好，這是我剛剛匯出的「BML 公共危險品庫存報表」。\n(請稍後查收我手動上傳的 Excel 檔案)')}`, '_blank');
       }
     }
 
