@@ -2028,40 +2028,39 @@
         };
 
         const bindDatalistAutoUpdate = () => {
+            let datalistTimer; // 加入計時器變數
             document.addEventListener('input', (e) => {
                 const target = e.target;
                 if (target.hasAttribute('list')) {
-                    const listId = target.getAttribute('list');
-                    const listEl = document.getElementById(listId);
-                    if (!listEl) return;
-                    
-                    const val = target.value.trim();
-                    if (val.length === 0) {
-                        listEl.innerHTML = '';
-                        return;
-                    }
-                    
-                    const isNameList = listId === 'stock-names-list';
-                    const source = isNameList ? state.nameToCode : state.codeToName;
-                    
-                    let matches = [];
-                    for (const key of Object.keys(source)) {
-                        if (key.includes(val)) {
-                            matches.push(key);
-                            if (matches.length > 20) break;
+                    // 每次輸入時先清除上一次的計時器
+                    clearTimeout(datalistTimer);
+                    // 延遲 100 毫秒後再更新選單，避開瀏覽器輸入法衝突
+                    datalistTimer = setTimeout(() => {
+                        const listId = target.getAttribute('list');
+                        const listEl = document.getElementById(listId);
+                        if (!listEl) return;
+                        
+                        const val = target.value.trim();
+                        if (val.length === 0) {
+                            listEl.innerHTML = '';
+                            return;
                         }
-                    }
-                    listEl.innerHTML = matches.map(m => `<option value="${escapeHTML(m)}">${escapeHTML(source[m])}</option>`).join('');
+                        
+                        const isNameList = listId === 'stock-names-list';
+                        const source = isNameList ? state.nameToCode : state.codeToName;
+                        
+                        let matches = [];
+                        for (const key of Object.keys(source)) {
+                            if (key.includes(val)) {
+                                matches.push(key);
+                                if (matches.length > 20) break; // 最多顯示 20 筆以保持效能
+                            }
+                        }
+                        listEl.innerHTML = matches.map(m => `<option value="${escapeHTML(m)}">${escapeHTML(source[m])}</option>`).join('');
+                    }, 100);
                 }
             });
         };
-
-        bindAutoFill('j-code', 'j-name', updatePreview);     
-        bindAutoFill('c-code', 'c-name');                    
-        bindAutoFill('r-code', 'r-name');                    
-        bindAutoFill('rep-code', 'rep-name');                
-        bindAutoFill('p-stock', 'p-name');                   
-        bindAutoFill('modal-plan-stock', 'modal-plan-name'); 
 
         document.addEventListener('DOMContentLoaded', async () => {
             const html = document.documentElement;
