@@ -2076,6 +2076,13 @@
             loadLocalData();
             bindDatalistAutoUpdate();
 
+            bindAutoFill('j-code', 'j-name', updatePreview);
+            bindAutoFill('c-code', 'c-name');
+            bindAutoFill('r-code', 'r-name');
+            bindAutoFill('rep-code', 'rep-name');
+            bindAutoFill('p-stock', 'p-name');
+            bindAutoFill('modal-plan-stock', 'modal-plan-name');
+
             const todayDate = new Date();
             const pastWeekDate = new Date(todayDate.getTime() - 7 * 24 * 60 * 60 * 1000);
             const today = getToday();
