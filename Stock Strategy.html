@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>萊恩飆股起漲手札 - 跨裝置交易決策系統</title>
+    <title>萊恩飆股起漲手札</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
@@ -1841,20 +1841,23 @@
                 if(isFav) data = data.filter(j => j.isFavorite);
 
                 let dStr = currentFilters.start === currentFilters.end ? (currentFilters.start ? currentFilters.start.replace(/-/g, '/') : '全區間') : `${currentFilters.start.replace(/-/g, '/')}~${currentFilters.end.replace(/-/g, '/')}`;
+                
+                let tagLogicStr = currentFilters.tagLogic === 'AND' ? ' 且 ' : ' 或 ';
+                let tagFilterStr = currentFilters.tags.length > 0 ? ` [標籤條件: ${currentFilters.tags.join(tagLogicStr)}]` : '';
 
                 if (mode === 'selected') {
                     let checkedIds = selectedIds[listType];
                     if(checkedIds.size === 0) return showToast('請先在清單中勾選要複製的標的', 'error');
                     data = data.filter(j => checkedIds.has(j.id));
                     data.sort((a,b) => { const d = new Date(a.date) - new Date(b.date); return d !== 0 ? d : (a.createdAt||0) - (b.createdAt||0); });
-                    let text = `| ${dStr} 多重篩選漏斗 |\n\n`;
+                    let text = `| ${dStr} 多重篩選漏斗${tagFilterStr} |\n\n`;
                     data.forEach(j => { text += `${j.code} ${j.name}\n`; });
                     executeCopy(text.trim() + copyFootnote); return;
                 }
 
                 data = data.filter(j => !(j.tags && j.tags.includes('特別追蹤')));
                 if(data.length===0) return showToast('清單為空 (已排除特別關注)','error');
-                let text = `| ${dStr} 多重篩選漏斗 |\n\n`;
+                let text = `| ${dStr} 多重篩選漏斗${tagFilterStr} |\n\n`;
 
                 if(mode === 'strategy') {
                     const sm = {}; data.forEach(j => { if(j.tags) j.tags.forEach(t => { if(currentFilters.tags.length>0 ? currentFilters.tags.includes(t) : t !== '特別追蹤') { if(!sm[t]) sm[t]=[]; sm[t].push(j); }}); });
