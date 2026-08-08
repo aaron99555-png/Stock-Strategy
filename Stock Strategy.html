@@ -67,10 +67,10 @@ input[type="date"]::-webkit-calendar-picker-indicator, input[type="month"]::-web
             </div>
             <div class="hidden lg:flex flex-1 justify-center space-x-1 sm:space-x-2 relative z-10">
                 <button class="nav-btn active-blue" data-target="module-journal" data-color="blue"><i class="fa-solid fa-book-journal-whills mr-1.5 sm:mr-2"></i>選股日誌</button>
-                <button class="nav-btn" data-target="module-calculator" data-color="purple"><i class="fa-solid fa-calculator mr-1.5 sm:mr-2"></i>支撐壓力</button>
-                <button class="nav-btn" data-target="module-revenue" data-color="pink"><i class="fa-solid fa-money-bill-trend-up mr-1.5 sm:mr-2"></i>營收創高</button>
-                <button class="nav-btn" data-target="module-report" data-color="indigo"><i class="fa-solid fa-file-invoice mr-1.5 sm:mr-2"></i>法人報告</button>
                 <button class="nav-btn" data-target="module-checklist" data-color="cyan"><i class="fa-solid fa-clipboard-check mr-1.5 sm:mr-2"></i>進場查核</button>
+                <button class="nav-btn" data-target="module-calculator" data-color="purple"><i class="fa-solid fa-calculator mr-1.5 sm:mr-2"></i>支撐壓力</button>
+                <button class="nav-btn" data-target="module-report" data-color="indigo"><i class="fa-solid fa-file-invoice mr-1.5 sm:mr-2"></i>法人報告</button>
+                <button class="nav-btn" data-target="module-revenue" data-color="pink"><i class="fa-solid fa-money-bill-trend-up mr-1.5 sm:mr-2"></i>營收創高</button>
                 <button class="nav-btn" data-target="module-plan" data-color="green"><i class="fa-solid fa-chess-knight mr-1.5 sm:mr-2"></i>交易規劃</button>
                 <button class="nav-btn" data-target="module-favorites" data-color="yellow"><i class="fa-solid fa-star mr-1.5 sm:mr-2"></i>追蹤清單</button>
             </div>
@@ -87,10 +87,10 @@ input[type="date"]::-webkit-calendar-picker-indicator, input[type="month"]::-web
     </div>
     <div class="lg:hidden border-t border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-800/95 px-2 py-2 flex gap-2 overflow-x-auto scrollbar-hide">
         <button class="nav-btn-mobile active-blue" data-target="module-journal" data-color="blue">日誌</button>
-        <button class="nav-btn-mobile" data-target="module-calculator" data-color="purple">支撐壓力</button>
-        <button class="nav-btn-mobile" data-target="module-revenue" data-color="pink">營收</button>
-        <button class="nav-btn-mobile" data-target="module-report" data-color="indigo">報告</button>
         <button class="nav-btn-mobile" data-target="module-checklist" data-color="cyan">查核</button>
+        <button class="nav-btn-mobile" data-target="module-calculator" data-color="purple">支撐壓力</button>
+        <button class="nav-btn-mobile" data-target="module-report" data-color="indigo">報告</button>
+        <button class="nav-btn-mobile" data-target="module-revenue" data-color="pink">營收</button>
         <button class="nav-btn-mobile" data-target="module-plan" data-color="green">規劃</button>
         <button class="nav-btn-mobile" data-target="module-favorites" data-color="yellow">追蹤</button>
     </div>
@@ -884,6 +884,62 @@ document.addEventListener('DOMContentLoaded',async()=>{
     const ht=document.documentElement,sv=localStorage.getItem('ryan_theme')||'dark';if(sv==='light')ht.classList.remove('dark');else ht.classList.add('dark');
     document.getElementById('theme-toggle')?.addEventListener('click',()=>{ht.classList.toggle('dark');localStorage.setItem('ryan_theme',ht.classList.contains('dark')?'dark':'light');});
     
+    // --- 跨裝置同步功能綁定 ---
+    const updateSyncStatusUI = () => {
+        const syncBtn = document.getElementById('btn-sync-modal');
+        if (!syncBtn) return;
+        if (isCloudMode()) {
+            syncBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up sm:mr-1.5 text-green-300"></i><span class="hidden sm:inline">已連線</span>';
+            syncBtn.classList.add('bg-blue-800', 'border-blue-400');
+        } else {
+            syncBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up sm:mr-1.5"></i><span class="hidden sm:inline">跨裝置同步</span>';
+            syncBtn.classList.remove('bg-blue-800', 'border-blue-400');
+        }
+    };
+    updateSyncStatusUI(); // 初始化時更新按鈕狀態
+
+    const syncModal = document.getElementById('sync-modal');
+    document.getElementById('btn-sync-modal')?.addEventListener('click', () => {
+        document.getElementById('sync-key-input').value = localStorage.getItem('ryan_sync_key') || '';
+        syncModal.classList.remove('hidden');
+    });
+    
+    document.getElementById('btn-cancel-sync')?.addEventListener('click', () => {
+        syncModal.classList.add('hidden');
+    });
+    
+    document.getElementById('btn-save-sync')?.addEventListener('click', async () => {
+        const val = document.getElementById('sync-key-input').value.trim();
+        if (val) {
+            localStorage.setItem('ryan_sync_key', val);
+            syncModal.classList.add('hidden');
+            showToast('🔄 正在同步雲端資料...');
+            updateSyncStatusUI();
+            await loadFromCloud();
+            showToast('✅ 雲端資料載入/建立完成');
+        } else {
+            localStorage.removeItem('ryan_sync_key');
+            syncModal.classList.add('hidden');
+            updateSyncStatusUI();
+            showToast('已切換為單機模式');
+        }
+    });
+
+    document.getElementById('toggle-sync-visibility')?.addEventListener('click', function() {
+        const input = document.getElementById('sync-key-input');
+        const icon = this.querySelector('i');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    });
+    // --- 跨裝置同步功能綁定結束 ---
+
     // 初始化導航列按鈕事件 (修正"按下去沒反應"的關鍵區塊)
     document.querySelectorAll('.nav-btn, .nav-btn-mobile').forEach(btn=>{
         btn.addEventListener('click',(e)=>{
@@ -913,6 +969,34 @@ document.addEventListener('DOMContentLoaded',async()=>{
     document.querySelectorAll('.revenue-sortable').forEach(th=>th.addEventListener('click',e=>handleTableSorting(e,'revenue','revenueSortConfig',renderRevenueRecords)));
     document.querySelectorAll('.report-sortable').forEach(th=>th.addEventListener('click',e=>handleTableSorting(e,'report','reportSortConfig',renderReports)));
     document.querySelectorAll('.chk-sortable').forEach(th=>th.addEventListener('click',e=>handleTableSorting(e,'chk','checklistSortConfig',renderChecklists)));
+
+    document.getElementById('btn-export-backup')?.addEventListener('click', () => {
+        try {
+            if(typeof XLSX === 'undefined') return showToast('匯出套件載入中，請稍後', 'error');
+            const wb = XLSX.utils.book_new();
+            
+            const wsJournals = XLSX.utils.json_to_sheet(state.journals.map(j => ({'日期':j.date,'代號':j.code,'股名':j.name,'策略標籤':j.tags?j.tags.join(', '):'','追蹤等級':j.isFavorite===true?1:(j.isFavorite||0),'備註':j.notes||''})));
+            XLSX.utils.book_append_sheet(wb, wsJournals, '選股日誌');
+            
+            const wsRevenue = XLSX.utils.json_to_sheet(state.revenueRecords.map(r => ({'創高月份':r.month,'代號':r.code,'股名':r.name,'備註':r.notes||''})));
+            XLSX.utils.book_append_sheet(wb, wsRevenue, '營收創高');
+            
+            const wsReport = XLSX.utils.json_to_sheet(state.reports.map(r => ({'報告日期':r.date,'代號':r.code,'股名':r.name,'摘要內容':r.content||''})));
+            XLSX.utils.book_append_sheet(wb, wsReport, '法人報告');
+            
+            const wsChecklist = XLSX.utils.json_to_sheet(state.checklists.map(c => ({'查核日期':c.date,'方向':c.direction==='long'?'多方':'空方','代號':c.code,'股名':c.name,'符合條件':c.checkedItems?c.checkedItems.join(', '):'','壓力':c.details?.pressure||'','支撐':c.details?.support||'','目標價':c.details?.target||'','法人籌碼':c.details?.chipsInst||'','集中度':c.details?.chipsConc||'','主力成本':c.details?.cost||'','本益比':c.details?.pe||'','獲利狀況':c.details?.profit||'','備註':c.details?.notes||''})));
+            XLSX.utils.book_append_sheet(wb, wsChecklist, '進場查核');
+            
+            const wsPlan = XLSX.utils.json_to_sheet(state.plans.map(p => ({'進場日期':p.entryDate,'狀態':p.status,'代號':p.stock,'股名':p.name,'部位(張)':p.qty,'進場價':p.entry,'停損防守':p.stop,'停利目標':p.target||'','實際出場':p.exitPrice||'','實現損益':p.pnl||0,'權證/備註':p.note||''})));
+            XLSX.utils.book_append_sheet(wb, wsPlan, '交易規劃');
+            
+            XLSX.writeFile(wb, `萊恩手札備份_${getToday().replace(/-/g,'')}.xlsx`);
+            showToast('匯出成功！檔案已下載');
+        } catch (e) {
+            console.error(e);
+            showToast('匯出失敗，請稍後再試', 'error');
+        }
+    });
 
     if(isCloudMode())await loadFromCloud(); else{ processAndRenderJournals(); renderFavorites(); renderPlans(); renderRevenueRecords(); renderReports(); renderChecklists(); }
 });
