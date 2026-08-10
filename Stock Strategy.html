@@ -828,7 +828,7 @@ const filterFields=[{key:'start',cls:'filter-start',type:'value'},{key:'end',cls
 const handleFilterChange=debounce((f,el)=>{let v=el.type==='checkbox'?el.checked:el.value;if(f.isInt)v=parseInt(v)||0;if(f.type==='value'&&el.type==='text')v=v.trim();state.filters[f.key]=v;state.favFilters[f.key]=v;document.querySelectorAll(`.${f.cls}`).forEach(o=>{if(f.type==='checked')o.checked=v;else o.value=v;});processAndRenderJournals();renderFavorites();saveLocalData();},300);
 filterFields.forEach(f=>{document.querySelectorAll(`.${f.cls}`).forEach(el=>{const evt=(f.type==='value'&&el.type==='text')?'input':'change';if(evt==='input'){el.addEventListener('input',e=>handleFilterChange(f,e.target));}else{el.addEventListener('change',e=>{let v=e.target.type==='checkbox'?e.target.checked:e.target.value;if(f.isInt)v=parseInt(v)||0;state.filters[f.key]=v;state.favFilters[f.key]=v;document.querySelectorAll(`.${f.cls}`).forEach(o=>{if(f.type==='checked')o.checked=v;else o.value=v;});processAndRenderJournals();renderFavorites();saveLocalData();});}});});
 
-['btn-clear-filters','btn-clear-filters-fav'].forEach(bId=>{document.getElementById(bId)?.addEventListener('click',()=>{const t=getToday();state.filters={start:t,end:t,code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,minScore:0,tags:[],tagLogic:'OR'};state.favFilters={start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,minScore:0,tags:[],tagLogic:'OR'};document.querySelectorAll('.filter-start').forEach(el=>el.value=el.id==='filter-start-fav'?'':t);document.querySelectorAll('.filter-end').forEach(el=>el.value=el.id==='filter-end-fav'?'':t);document.querySelectorAll('.filter-code').forEach(el=>el.value='');document.querySelectorAll('.filter-futures, .filter-exclude-negative-growth, .filter-revenue-high').forEach(el=>el.checked=false);document.querySelectorAll('.filter-score').forEach(el=>el.value="0");document.querySelectorAll('.filter-tag-cb').forEach(cb=>cb.checked=false);document.querySelectorAll('.logic-btn, .logic-btn-fav').forEach(b=>{if(b.dataset.logic==='OR'){b.classList.remove('text-gray-500','dark:text-gray-400');b.classList.add('bg-white','dark:bg-gray-700','text-blue-600','dark:text-blue-400','shadow-sm');}else{b.classList.remove('bg-white','dark:bg-gray-700','text-blue-600','dark:text-blue-400','shadow-sm');b.classList.add('text-gray-500','dark:text-gray-400');}});renderFilterTags();processAndRenderJournals();renderFavorites();saveLocalData();showToast('已清除篩選');});});
+['btn-clear-filters','btn-clear-filters-fav'].forEach(bId=>{document.getElementById(bId)?.addEventListener('click',()=>{const t=getToday();state.filters={start:t,end:t,code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,minScore:0,tags:[],tagLogic:'OR'};state.favFilters={start:t,end:t,code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,minScore:0,tags:[],tagLogic:'OR'};document.querySelectorAll('.filter-start').forEach(el=>el.value=t);document.querySelectorAll('.filter-end').forEach(el=>el.value=t);document.querySelectorAll('.filter-code').forEach(el=>el.value='');document.querySelectorAll('.filter-futures, .filter-exclude-negative-growth, .filter-revenue-high').forEach(el=>el.checked=false);document.querySelectorAll('.filter-score').forEach(el=>el.value="0");document.querySelectorAll('.filter-tag-cb').forEach(cb=>cb.checked=false);document.querySelectorAll('.logic-btn, .logic-btn-fav').forEach(b=>{if(b.dataset.logic==='OR'){b.classList.remove('text-gray-500','dark:text-gray-400');b.classList.add('bg-white','dark:bg-gray-700','text-blue-600','dark:text-blue-400','shadow-sm');}else{b.classList.remove('bg-white','dark:bg-gray-700','text-blue-600','dark:text-blue-400','shadow-sm');b.classList.add('text-gray-500','dark:text-gray-400');}});renderFilterTags();processAndRenderJournals();renderFavorites();saveLocalData();showToast('已清除篩選');});});
 
 const handleRevenueFilterChange = debounce(() => { state.revenueFilters.month = document.getElementById('filter-revenue-month').value; state.revenueFilters.code = document.getElementById('filter-revenue-code').value.trim(); renderRevenueRecords(); saveLocalData(); }, 300);
 document.getElementById('filter-revenue-month')?.addEventListener('change', handleRevenueFilterChange);
@@ -839,7 +839,7 @@ const handleReportFilterChange = debounce(() => { state.reportFilters.start = do
 document.getElementById('filter-rep-start')?.addEventListener('change', handleReportFilterChange);
 document.getElementById('filter-rep-end')?.addEventListener('change', handleReportFilterChange);
 document.getElementById('filter-rep-code')?.addEventListener('input', handleReportFilterChange);
-document.getElementById('btn-clear-rep-filters')?.addEventListener('click', () => { state.reportFilters = { start: '', end: '', code: '' }; document.getElementById('filter-rep-start').value = ''; document.getElementById('filter-rep-end').value = ''; document.getElementById('filter-rep-code').value = ''; renderReports(); saveLocalData(); showToast('已清除篩選'); });
+document.getElementById('btn-clear-rep-filters')?.addEventListener('click', () => { const t = getToday(); state.reportFilters = { start: t, end: t, code: '' }; document.getElementById('filter-rep-start').value = t; document.getElementById('filter-rep-end').value = t; document.getElementById('filter-rep-code').value = ''; renderReports(); saveLocalData(); showToast('已清除篩選'); });
 
 document.getElementById('journal-form')?.addEventListener('submit', async e => {
     e.preventDefault();
@@ -850,30 +850,50 @@ document.getElementById('journal-form')?.addEventListener('submit', async e => {
     if (!c || !n || !d) return showToast('請填寫完整資訊', 'error');
 
     const tags = Array.from(document.querySelectorAll('.tag-input:checked')).map(cb => cb.value);
-    const id = generateId();
     
-    const p = {
-        id,
-        date: d,
-        code: c,
-        name: n,
-        notes: nt,
-        tags: tags,
-        isFavorite: 0,
-        createdAt: Date.now(),
-        updatedAt: Date.now()
-    };
-
     state.codeToName[c] = n;
     state.nameToCode[n] = c;
 
-    state.journals.push(p);
-    saveLocalData();
-    processAndRenderJournals();
-    if (document.getElementById('module-favorites').classList.contains('active')) renderFavorites();
-    await putDataToCloud(`journals/${id}`, p);
+    // 檢查同一天、同一檔股票是否已經存在
+    const existingIdx = state.journals.findIndex(x => x.date === d && x.code === c);
     
-    showToast('選股條件已加入');
+    if (existingIdx !== -1) {
+        // 如果存在，則合併標籤與備註
+        const existing = state.journals[existingIdx];
+        const newTags = new Set([...(existing.tags || []), ...tags]);
+        existing.tags = Array.from(newTags);
+        
+        if (nt && existing.notes !== nt && !(existing.notes || '').includes(nt)) {
+            existing.notes = existing.notes ? existing.notes + '；' + nt : nt;
+        }
+        existing.updatedAt = Date.now();
+        
+        saveLocalData();
+        processAndRenderJournals();
+        if (document.getElementById('module-favorites').classList.contains('active')) renderFavorites();
+        await putDataToCloud(`journals/${existing.id}`, existing);
+        showToast('選股條件已合併更新');
+    } else {
+        // 如果不存在，則建立新資料
+        const id = generateId();
+        const p = {
+            id,
+            date: d,
+            code: c,
+            name: n,
+            notes: nt,
+            tags: tags,
+            isFavorite: 0,
+            createdAt: Date.now(),
+            updatedAt: Date.now()
+        };
+        state.journals.push(p);
+        saveLocalData();
+        processAndRenderJournals();
+        if (document.getElementById('module-favorites').classList.contains('active')) renderFavorites();
+        await putDataToCloud(`journals/${id}`, p);
+        showToast('選股條件已加入');
+    }
     
     document.getElementById('j-code').value = '';
     document.getElementById('j-name').value = '';
@@ -1039,15 +1059,16 @@ document.addEventListener('DOMContentLoaded',async()=>{
 
     renderDynamicTags(); loadLocalData(); bindDatalistAutoUpdate();
     bindAutoFill('j-code','j-name',c=>updatePreview(c,'j-preview','blue')); bindAutoFill('c-code','c-name'); bindAutoFill('r-code','r-name'); bindAutoFill('rep-code','rep-name'); bindAutoFill('p-stock','p-name'); bindAutoFill('modal-plan-stock','modal-plan-name'); bindAutoFill('chk-code','chk-name',c=>updatePreview(c,'chk-preview','cyan'));
-    initToggleWithPin('toggle-journal-form-btn','journal-form-wrapper','journal-form-chevron','pin-journal-btn','ryan_journal_pinned'); initToggleWithPin('toggle-tags-btn','form-tags-wrapper','tags-chevron','pin-tags-btn','ryan_tags_pinned');
-    
-    const d=new Date(),pw=new Date(d.getTime()-7*86400000),tD=getToday(),lW=`${pw.getFullYear()}-${String(pw.getMonth()+1).padStart(2,'0')}-${String(pw.getDate()).padStart(2,'0')}`;
-    document.getElementById('filter-start').value=tD; document.getElementById('filter-end').value=tD; document.getElementById('filter-start-fav').value=''; document.getElementById('filter-end-fav').value=''; document.getElementById('r-month').value=getCurrentMonth(); document.getElementById('rep-date').value=tD; document.getElementById('p-date').value=tD; document.getElementById('chk-date').value=tD; document.getElementById('j-date').value=tD;
-    document.getElementById('filter-revenue-month').value=state.revenueFilters.month||''; document.getElementById('filter-revenue-code').value=state.revenueFilters.code||'';
-    document.getElementById('filter-rep-start').value=state.reportFilters.start||''; document.getElementById('filter-rep-end').value=state.reportFilters.end||''; document.getElementById('filter-rep-code').value=state.reportFilters.code||'';
-    document.querySelectorAll('.filter-futures, .filter-exclude-negative-growth, .filter-revenue-high').forEach(el=>el.checked=false); document.querySelectorAll('.filter-score').forEach(el=>el.value="0"); document.querySelectorAll('.filter-tag-cb').forEach(cb=>cb.checked=false); renderFilterTags();
+initToggleWithPin('toggle-journal-form-btn','journal-form-wrapper','journal-form-chevron','pin-journal-btn','ryan_journal_pinned'); initToggleWithPin('toggle-tags-btn','form-tags-wrapper','tags-chevron','pin-tags-btn','ryan_tags_pinned');
 
-    setChkDirection('long');
+const d=new Date(),tD=getToday();
+state.filters.start = tD; state.filters.end = tD;
+state.favFilters.start = tD; state.favFilters.end = tD;
+state.reportFilters.start = tD; state.reportFilters.end = tD;
+document.getElementById('filter-start').value=tD; document.getElementById('filter-end').value=tD; document.getElementById('filter-start-fav').value=tD; document.getElementById('filter-end-fav').value=tD; document.getElementById('r-month').value=getCurrentMonth(); document.getElementById('rep-date').value=tD; document.getElementById('p-date').value=tD; document.getElementById('chk-date').value=tD; document.getElementById('filter-rep-start').value=tD; document.getElementById('filter-rep-end').value=tD; document.getElementById('j-date').value=tD;
+document.querySelectorAll('.filter-futures, .filter-exclude-negative-growth, .filter-revenue-high').forEach(el=>el.checked=false); document.querySelectorAll('.filter-score').forEach(el=>el.value="0"); document.querySelectorAll('.filter-tag-cb').forEach(cb=>cb.checked=false); renderFilterTags();
+
+setChkDirection('long');
 
     ['journal-form','calc-form','revenue-form','plan-form','report-form'].forEach(id=>{const f=document.getElementById(id);if(f)f.querySelectorAll('input').forEach(i=>i.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();if(id==='journal-form')document.getElementById('btn-journal-submit').click();else if(id==='revenue-form')document.getElementById('btn-revenue-submit').click();else if(id==='report-form')document.getElementById('btn-report-submit').click();else if(id!=='edit-plan-form')f.querySelector('button[type="submit"]')?.click();}}));});
 
