@@ -63,7 +63,7 @@ input[type="date"]::-webkit-calendar-picker-indicator, input[type="month"]::-web
             <div class="flex items-center gap-1.5 sm:gap-3 flex-shrink-0 relative z-10 max-w-[65%] sm:max-w-none overflow-hidden">
                 <div class="bg-blue-600/10 dark:bg-blue-600/20 p-1.5 sm:p-2 rounded-lg flex-shrink-0"><i class="fa-solid fa-chart-line text-blue-600 dark:text-blue-500 text-sm sm:text-xl"></i></div>
                 <span class="cool-title font-bold text-[15px] sm:text-xl md:text-2xl tracking-wider truncate">萊恩飆股起漲手札</span>
-                <span id="auth-status" class="hidden md:flex ml-1 sm:ml-2 w-7 h-7 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-full shadow-sm items-center justify-center cursor-help flex-shrink-0"><i class="fa-solid fa-spinner fa-spin text-yellow-500 text-xs"></i></span>
+                <span id="auth-status" class="hidden ml-1 sm:ml-2 w-7 h-7 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-full shadow-sm items-center justify-center cursor-help flex-shrink-0"><i class="fa-solid fa-spinner fa-spin text-yellow-500 text-xs"></i></span>
             </div>
             <div class="hidden lg:flex flex-1 justify-center space-x-1 sm:space-x-2 relative z-10">
                 <button class="nav-btn active-blue" data-target="module-journal" data-color="blue"><i class="fa-solid fa-book-journal-whills mr-1.5 sm:mr-2"></i>選股日誌</button>
@@ -1105,6 +1105,195 @@ setChkDirection('long');
             console.error(e);
             showToast('匯出失敗，請稍後再試', 'error');
         }
+    });
+
+    // 處理資料庫上傳 (excel-upload)
+    document.getElementById('excel-upload')?.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        try {
+            if (typeof XLSX === 'undefined') return showToast('匯入套件載入中，請稍後', 'error');
+            const data = await file.arrayBuffer();
+            const workbook = XLSX.read(data);
+            const firstSheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[firstSheetName];
+            const json = XLSX.utils.sheet_to_json(worksheet, { defval: null });
+            
+            let count = 0;
+            json.forEach(row => {
+                const code = row['代號'] || row['股票代號'] || row['Code'];
+                const name = row['股名'] || row['股票名稱'] || row['Name'];
+                if (code && name) {
+                    const cStr = String(code).trim();
+                    const nStr = String(name).trim();
+                    state.codeToName[cStr] = nStr;
+                    state.nameToCode[nStr] = cStr;
+                    
+                    state.epsData[cStr] = {
+                        code: cStr,
+                        name: nStr,
+                        eps2025: row['25 EPS'] ?? row['2025 EPS'] ?? null,
+                        eps2026: row['26 EPS'] ?? row['預26 EPS'] ?? row['2026 EPS'] ?? null,
+                        epsGrowth: row['EPS成長率'] ?? row['成長率'] ?? null,
+                        targetPrice: row['最高目標價'] ?? row['目標價'] ?? null,
+                        broker: row['券商'] ?? null,
+                        futures: row['股期'] === '●' || row['股期'] === '是' || row['股期'] === 'Y' ? '●' : null
+                    };
+                    count++;
+                }
+            });
+            
+            saveLocalData();
+            if (isCloudMode()) await patchDataToCloud('epsData', state.epsData);
+            processAndRenderJournals();
+            if (document.getElementById('module-favorites').classList.contains('active')) renderFavorites();
+            
+            showToast(`成功匯入 ${count} 筆資料庫紀錄`);
+        } catch (err) {
+            console.error(err);
+            showToast('資料庫匯入失敗，請確認格式', 'error');
+        }
+        e.target.value = ''; // 清除 input 狀態允許重複選取相同檔案
+    });
+
+    // 處理手札備份匯入 (backup-file)
+    document.getElementById('backup-file')?.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        try {
+            if (typeof XLSX === 'undefined') return showToast('匯入套件載入中，請稍後', 'error');
+            const data = await file.arrayBuffer();
+            const workbook = XLSX.read(data);
+            
+            let importCount = 0;
+
+            if (workbook.SheetNames.includes('選股日誌')) {
+                const ws = workbook.Sheets['選股日誌'];
+                const json = XLSX.utils.sheet_to_json(ws);
+                json.forEach(row => {
+                    if(row['代號'] && row['股名'] && row['日期']) {
+                        const id = generateId();
+                        const c = String(row['代號']).trim();
+                        const n = String(row['股名']).trim();
+                        state.codeToName[c] = n;
+                        state.nameToCode[n] = c;
+                        const tagsStr = row['策略標籤'];
+                        const tags = tagsStr ? tagsStr.split(',').map(t => t.trim()).filter(Boolean) : [];
+                        const isFavVal = row['追蹤等級'] ? parseInt(row['追蹤等級']) : (row['已追蹤'] === '是' ? 1 : 0);
+                        state.journals.push({
+                            id, date: row['日期'], code: c, name: n, notes: row['備註'] || '',
+                            tags: tags, isFavorite: isFavVal, createdAt: Date.now(), updatedAt: Date.now()
+                        });
+                        importCount++;
+                    }
+                });
+            }
+            
+            if (workbook.SheetNames.includes('營收創高')) {
+                const ws = workbook.Sheets['營收創高'];
+                const json = XLSX.utils.sheet_to_json(ws);
+                json.forEach(row => {
+                    if(row['代號'] && row['創高月份']) {
+                        const c = String(row['代號']).trim();
+                        const n = String(row['股名']).trim();
+                        const m = row['創高月份'];
+                        const id = `${c}_${m}`;
+                        if(!state.revenueRecords.find(x => x.id === id)) {
+                            state.revenueRecords.push({
+                                id, month: m, code: c, name: n, notes: row['備註'] || '',
+                                createdAt: Date.now(), updatedAt: Date.now()
+                            });
+                            importCount++;
+                        }
+                    }
+                });
+            }
+            
+            if (workbook.SheetNames.includes('法人報告')) {
+                 const ws = workbook.Sheets['法人報告'];
+                 const json = XLSX.utils.sheet_to_json(ws);
+                 json.forEach(row => {
+                     if(row['代號'] && row['報告日期']) {
+                         const c = String(row['代號']).trim();
+                         const n = String(row['股名']).trim();
+                         const id = `${c}_${Date.now()}_${Math.random().toString(36).substr(2,5)}`;
+                         state.reports.push({
+                             id, date: row['報告日期'], code: c, name: n, content: row['摘要內容'] || '',
+                             createdAt: Date.now(), updatedAt: Date.now()
+                         });
+                         importCount++;
+                     }
+                 });
+            }
+            
+            if (workbook.SheetNames.includes('進場查核')) {
+                 const ws = workbook.Sheets['進場查核'];
+                 const json = XLSX.utils.sheet_to_json(ws);
+                 json.forEach(row => {
+                     if(row['代號'] && row['查核日期']) {
+                         const c = String(row['代號']).trim();
+                         const n = String(row['股名']).trim();
+                         const dir = row['方向'] === '空方' ? 'short' : 'long';
+                         const checkedItemsStr = row['符合條件'];
+                         const checkedItems = checkedItemsStr ? checkedItemsStr.split(',').map(t => t.trim()).filter(Boolean) : [];
+                         state.checklists.push({
+                             id: generateId(), date: row['查核日期'], code: c, name: n, direction: dir, checkedItems: checkedItems,
+                             details: {
+                                 pressure: row['壓力'] || '', support: row['支撐'] || '', target: row['目標價'] || '',
+                                 chipsInst: row['法人籌碼'] || '', chipsConc: row['集中度'] || '', cost: row['主力成本'] || '',
+                                 pe: row['本益比'] || '', profit: row['獲利狀況'] || '', notes: row['備註'] || ''
+                             },
+                             createdAt: Date.now(), updatedAt: Date.now()
+                         });
+                         importCount++;
+                     }
+                 });
+            }
+            
+            if (workbook.SheetNames.includes('交易規劃')) {
+                 const ws = workbook.Sheets['交易規劃'];
+                 const json = XLSX.utils.sheet_to_json(ws);
+                 json.forEach(row => {
+                     if(row['代號'] && row['進場日期']) {
+                         const c = String(row['代號']).trim();
+                         const n = String(row['股名']).trim();
+                         state.plans.push({
+                             id: generateId(), entryDate: row['進場日期'], status: row['狀態'] || '持倉中', stock: c, name: n,
+                             qty: parseInt(row['部位(張)']) || 1, entry: parseFloat(row['進場價']) || 0,
+                             stop: parseFloat(row['停損防守']) || 0, target: parseFloat(row['停利目標']) || null,
+                             exitPrice: row['實際出場'] ? parseFloat(row['實際出場']) : null, pnl: row['實現損益'] ? parseFloat(row['實現損益']) : 0,
+                             note: row['權證/備註'] || '',
+                             createdAt: Date.now(), updatedAt: Date.now()
+                         });
+                         importCount++;
+                     }
+                 });
+            }
+            
+            saveLocalData();
+            if (isCloudMode()) {
+                await putDataToCloud('journals', Object.fromEntries(state.journals.map(x => [x.id, x])));
+                await putDataToCloud('revenueRecords', Object.fromEntries(state.revenueRecords.map(x => [x.id, x])));
+                await putDataToCloud('reports', Object.fromEntries(state.reports.map(x => [x.id, x])));
+                await putDataToCloud('checklists', Object.fromEntries(state.checklists.map(x => [x.id, x])));
+                await putDataToCloud('plans', Object.fromEntries(state.plans.map(x => [x.id, x])));
+            }
+            
+            processAndRenderJournals();
+            renderFavorites();
+            renderRevenueRecords();
+            renderReports();
+            renderChecklists();
+            renderPlans();
+            
+            showToast(`成功匯入 ${importCount} 筆手札備份紀錄`);
+        } catch (err) {
+            console.error(err);
+            showToast('備份匯入失敗，請確認格式', 'error');
+        }
+        e.target.value = '';
     });
 
     if(isCloudMode())await loadFromCloud(); else{ processAndRenderJournals(); renderFavorites(); renderPlans(); renderRevenueRecords(); renderReports(); renderChecklists(); }
