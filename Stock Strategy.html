@@ -63,7 +63,7 @@ input[type="date"]::-webkit-calendar-picker-indicator, input[type="month"]::-web
             <div class="flex items-center gap-1.5 sm:gap-3 flex-shrink-0 relative z-10 max-w-[65%] sm:max-w-none overflow-hidden">
                 <div class="bg-blue-600/10 dark:bg-blue-600/20 p-1.5 sm:p-2 rounded-lg flex-shrink-0"><i class="fa-solid fa-chart-line text-blue-600 dark:text-blue-500 text-sm sm:text-xl"></i></div>
                 <span class="cool-title font-bold text-[15px] sm:text-xl md:text-2xl tracking-wider truncate">萊恩飆股起漲手札</span>
-                <span id="auth-status" class="hidden ml-1 sm:ml-2 w-7 h-7 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-full shadow-sm items-center justify-center cursor-help flex-shrink-0"><i class="fa-solid fa-spinner fa-spin text-yellow-500 text-xs"></i></span>
+                <span id="auth-status" class="hidden md:flex ml-1 sm:ml-2 w-7 h-7 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-full shadow-sm items-center justify-center cursor-help flex-shrink-0"><i class="fa-solid fa-spinner fa-spin text-yellow-500 text-xs"></i></span>
             </div>
             <div class="hidden lg:flex flex-1 justify-center space-x-1 sm:space-x-2 relative z-10">
                 <button class="nav-btn active-blue" data-target="module-journal" data-color="blue"><i class="fa-solid fa-book-journal-whills mr-1.5 sm:mr-2"></i>選股日誌</button>
@@ -1122,8 +1122,8 @@ setChkDirection('long');
             
             let count = 0;
             json.forEach(row => {
-                const code = row['代號'] || row['股票代號'] || row['Code'];
-                const name = row['股名'] || row['股票名稱'] || row['Name'];
+                const code = row['代號'] || row['股票代號'] || row['Code'] || row['stock_id'];
+                const name = row['股名'] || row['股票名稱'] || row['Name'] || row['stock_name'];
                 if (code && name) {
                     const cStr = String(code).trim();
                     const nStr = String(name).trim();
@@ -1133,12 +1133,12 @@ setChkDirection('long');
                     state.epsData[cStr] = {
                         code: cStr,
                         name: nStr,
-                        eps2025: row['25 EPS'] ?? row['2025 EPS'] ?? null,
-                        eps2026: row['26 EPS'] ?? row['預26 EPS'] ?? row['2026 EPS'] ?? null,
-                        epsGrowth: row['EPS成長率'] ?? row['成長率'] ?? null,
-                        targetPrice: row['最高目標價'] ?? row['目標價'] ?? null,
-                        broker: row['券商'] ?? null,
-                        futures: row['股期'] === '●' || row['股期'] === '是' || row['股期'] === 'Y' ? '●' : null
+                        eps2025: row['25 EPS'] ?? row['2025 EPS'] ?? row['25EPS'] ?? row['2025EPS'] ?? row['2025'] ?? row['今年EPS'] ?? row['本年EPS'] ?? null,
+                        eps2026: row['26 EPS'] ?? row['預26 EPS'] ?? row['2026 EPS'] ?? row['26EPS'] ?? row['2026EPS'] ?? row['預估26EPS'] ?? row['預估2026EPS'] ?? row['2026'] ?? row['明年EPS'] ?? null,
+                        epsGrowth: row['EPS成長率'] ?? row['成長率'] ?? row['預估成長率'] ?? row['YoY'] ?? row['YOY'] ?? null,
+                        targetPrice: row['最高目標價'] ?? row['目標價'] ?? row['Target Price'] ?? row['TP'] ?? null,
+                        broker: row['券商'] ?? row['發布券商'] ?? row['Broker'] ?? null,
+                        futures: row['股期'] === '●' || row['股期'] === '是' || row['股期'] === 'Y' || row['期貨'] === '●' ? '●' : null
                     };
                     count++;
                 }
