@@ -814,7 +814,8 @@ const bindAutoFill=(cId,nId,cb=null)=>{
     const resolveMatch=(source,value)=>{
         if(source[value])return value;
         const keyword=value.toLowerCase();
-        return Object.keys(source).find(key=>key.toLowerCase().startsWith(keyword))||Object.keys(source).find(key=>key.toLowerCase().includes(keyword))||'';
+        const matches=Object.keys(source).filter(key=>key.toLowerCase().startsWith(keyword));
+        return matches.length===1?matches[0]:'';
     };
     const syncFromCode=(useFirstMatch=false)=>{
         const raw=codeInput.value.trim(),code=useFirstMatch&&raw?resolveMatch(state.codeToName,raw):raw;
@@ -840,18 +841,21 @@ const bindDatalistAutoUpdate=()=>{
         const input=e.target;
         if(!input.hasAttribute('list'))return;
         clearTimeout(t);
+        const listId=input.getAttribute('list'),list=document.getElementById(listId);
+        if(!list)return;
+        list.innerHTML='';
         t=setTimeout(()=>{
-            const listId=input.getAttribute('list'),list=document.getElementById(listId);
-            if(!list)return;
             const value=input.value.trim().toLowerCase();
             if(!value){list.innerHTML='';return;}
-            const source=listId==='stock-names-list'?state.nameToCode:state.codeToName;
+            const isNameList=listId==='stock-names-list';
+            if(!isNameList&&value.length<3)return;
+            const source=isNameList?state.nameToCode:state.codeToName;
             const matches=Object.entries(source)
-                .filter(([key,other])=>key.toLowerCase().includes(value)||String(other).toLowerCase().includes(value))
+                .filter(([key])=>isNameList?key.toLowerCase().includes(value):key.toLowerCase().startsWith(value))
                 .sort((a,b)=>Number(!a[0].toLowerCase().startsWith(value))-Number(!b[0].toLowerCase().startsWith(value)))
-                .slice(0,20);
+                .slice(0,6);
             list.innerHTML=matches.map(([key,other])=>`<option value="${escapeHTML(key)}">${escapeHTML(other)}</option>`).join('');
-        },100);
+        },80);
     });
 };
 
