@@ -90,14 +90,6 @@ button { touch-action: manipulation; }
 </style>
 
 
-<style id="market-price-ui">
-.market-price{display:inline-flex;align-items:center;gap:5px;font-variant-numeric:tabular-nums;white-space:nowrap}
-.market-price .price{font-weight:800}.market-price .chg{font-size:.78em;font-weight:700}
-.market-up{color:#ef4444}.market-down{color:#22c55e}.market-flat{color:#94a3b8}
-.market-time{font-size:.68em;color:#94a3b8;margin-left:3px}.market-loading{opacity:.55}
-.market-stale{opacity:.72}.market-badge{display:inline-flex;align-items:center;gap:4px;margin-top:3px;font-size:10px;line-height:1.2}
-.market-refresh{cursor:pointer}.market-refresh:hover{opacity:.85}
-</style>
 <style id="market-index-style">
 #market-index-status{min-height:1.25rem}
 .market-index-source{font-size:.72rem;opacity:.72}
@@ -173,7 +165,7 @@ button { touch-action: manipulation; }
                         </div>
                         <div class="bg-gray-50 dark:bg-gray-900/40 px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700/50 flex flex-col shadow-inner">
                             <div id="toggle-tags-btn" class="flex justify-between items-center w-full cursor-pointer group">
-                                <span class="block text-xs text-gray-500 dark:text-gray-400 font-medium tracking-wide group-hover:text-blue-500 transition-colors select-none pointer-events-none">策略標籤 <span class="text-gray-400 dark:text-gray-500 font-normal ml-1 hidden sm:inline">(點擊展開)</span></span>
+                                <span class="block text-xs text-gray-500 dark:text-gray-400 font-medium tracking-wide group-hover:text-blue-500 transition-colors select-none pointer-events-none">策略標籤 <span class="text-gray-400 dark:text-gray-500 font-normal ml-1 hidden sm:inline">(單選，可不選)</span></span>
                                 <div class="flex items-center gap-3">
                                     <button type="button" id="pin-tags-btn" class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-2 py-1 rounded text-[10px] font-bold transition-all flex items-center shadow-sm">
                                         <i class="fa-solid fa-thumbtack sm:mr-1"></i> <span class="hidden sm:inline">釘選</span>
@@ -430,7 +422,7 @@ button { touch-action: manipulation; }
                 </div>
                 <div class="flex items-center justify-end gap-1.5 sm:gap-2 w-full lg:w-auto border-t lg:border-t-0 border-gray-200 dark:border-gray-700 pt-3 lg:pt-0">
                     <button type="button" id="btn-clear-rep-filters" class="text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-red-600 text-gray-700 dark:text-gray-300 hover:text-white border border-gray-300 dark:border-gray-600 hover:border-red-500 px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center whitespace-nowrap mr-2"><i class="fa-solid fa-eraser sm:mr-1.5"></i><span class="hidden sm:inline">清除篩選</span></button>
-                    <button id="btn-copy-report" class="text-xs font-medium bg-indigo-50 dark:bg-indigo-900/40 hover:bg-indigo-600 border border-indigo-200 dark:border-indigo-700/50 text-indigo-700 dark:text-indigo-200 px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center active:scale-95"><i class="fa-solid fa-copy mr-1.5"></i>複製清單</button><button type="button" onclick="refreshMarketPrices(true)" class="text-xs font-medium bg-gray-100 dark:bg-gray-800 hover:bg-blue-600 hover:text-white border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center"><i class="fa-solid fa-chart-line mr-1.5"></i>更新行情</button>
+                    <button id="btn-copy-report" class="text-xs font-medium bg-indigo-50 dark:bg-indigo-900/40 hover:bg-indigo-600 border border-indigo-200 dark:border-indigo-700/50 text-indigo-700 dark:text-indigo-200 px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center active:scale-95"><i class="fa-solid fa-copy mr-1.5"></i>複製清單</button>
                 </div>
             </div>
             <div id="batch-bar-report" class="hidden bg-red-50 dark:bg-red-900/20 border-b border-gray-200 dark:border-gray-700/50 p-2 sm:p-3 justify-between items-center transition-all">
@@ -444,7 +436,7 @@ button { touch-action: manipulation; }
                             <th class="py-3 px-2 sm:px-3 w-8 text-center sticky top-0 bg-gray-50 dark:bg-gray-900 z-40"><input type="checkbox" class="select-all-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" data-type="report"></th>
                             <th class="py-3 px-3 sm:px-4 report-sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer sticky top-0 bg-gray-50 dark:bg-gray-900 z-40 w-[100px]" data-sort="date">日期 <i class="fa-solid fa-sort-down ml-1 text-xs text-blue-500"></i></th>
                             <th class="py-3 px-3 sm:px-4 report-sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer sticky top-0 bg-gray-50 dark:bg-gray-900 z-40 w-[120px]" data-sort="code">代號/股名 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
-                            <th class="py-3 px-3 sm:px-4 text-right sticky top-0 bg-gray-50 dark:bg-gray-900 z-40 min-w-[150px]">最新行情</th><th class="py-3 px-3 sm:px-4 w-full min-w-[280px] sm:min-w-[400px] sticky top-0 bg-gray-50 dark:bg-gray-900 z-40">報告摘要</th>
+                            <th class="py-3 px-3 sm:px-4 w-full min-w-[280px] sm:min-w-[400px] sticky top-0 bg-gray-50 dark:bg-gray-900 z-40">報告摘要</th>
                             <th class="py-3 px-3 sm:px-4 text-center sticky top-0 bg-gray-50 dark:bg-gray-900 z-40">操作</th>
                         </tr>
                     </thead>
@@ -735,76 +727,6 @@ button { touch-action: manipulation; }
 <datalist id="stock-codes-list"></datalist><datalist id="stock-names-list"></datalist>
 
 <!-- 核心 JavaScript -->
-<script id="market-price-engine">
-(function(){
-'use strict';
-const MP_KEY='ryan_market_prices_v2';
-const MP_TTL=45000;
-const MP_BATCH=25;
-const mpCache=()=>{try{return JSON.parse(localStorage.getItem(MP_KEY)||'{}')}catch(e){return {}}};
-const mpSave=x=>{try{localStorage.setItem(MP_KEY,JSON.stringify(x))}catch(e){}};
-const mpCode=v=>{const m=String(v||'').match(/\\b\\d{4,6}\\b/);return m?m[0]:''};
-const mpNum=v=>{const n=Number(v);return Number.isFinite(n)?n:null};
-const mpFmt=n=>n==null?'—':n.toLocaleString('zh-TW',{minimumFractionDigits:0,maximumFractionDigits:2});
-const mpIsTrading=()=>{const d=new Date(),day=d.getDay(),m=d.getHours()*60+d.getMinutes();return day>=1&&day<=5&&m>=540&&m<=813};
-const mpEscape=v=>typeof escapeHTML==='function'?escapeHTML(v):String(v??'');
-
-function mpRecordFromMsg(m){
- const z=mpNum(m.z),y=mpNum(m.y);
- if(z==null && y==null)return null;
- const ch=z!=null&&y!=null?z-y:null, pct=ch!=null&&y?ch/y*100:null;
- const date=m.d||'',time=m.t||'';
- return {code:m.c,name:m.n||'',price:z,close:z,prevClose:y,change:ch,changePercent:pct,date,time,source:'TWSE-MIS',updatedAt:Date.now(),isRealtime:mpIsTrading()};
-}
-
-async function mpFetch(codes){
- const uniq=[...new Set(codes.map(mpCode).filter(Boolean))];if(!uniq.length)return{};
- const cache=mpCache(),result={};
- const need=uniq.filter(c=>!cache[c]||Date.now()-(cache[c].updatedAt||0)>MP_TTL);
- uniq.forEach(c=>{if(cache[c])result[c]=cache[c]});
- for(let i=0;i<need.length;i+=MP_BATCH){
-  const batch=need.slice(i,i+MP_BATCH);
-  const qs=batch.map(c=>`tse_${encodeURIComponent(c)}.tw|otc_${encodeURIComponent(c)}.tw`).join('|');
-  try{
-   const u=`https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=${qs}&json=1&delay=0&_=${Date.now()}`;
-   const r=await fetch(u,{cache:'no-store'});
-   if(!r.ok)throw new Error('行情服務無回應');
-   const j=await r.json();
-   (j.msgArray||[]).forEach(m=>{const rec=mpRecordFromMsg(m);if(rec){result[m.c]=rec;cache[m.c]=rec}});
-  }catch(e){console.warn('行情取得失敗',e);}
- }
- mpSave(cache);return result;
-}
-
-function mpBadge(r){
- if(!r||r.price==null)return `<span class="market-price market-flat market-loading"><i class="fa-solid fa-spinner fa-spin"></i> 行情載入中</span>`;
- const ch=Number(r.change),pct=Number(r.changePercent);let cls='market-flat',arrow='';
- if(ch>0){cls='market-up';arrow='▲ '}else if(ch<0){cls='market-down';arrow='▼ ';}
- const label=r.isRealtime?'即時價':'收盤';
- const c=Number.isFinite(ch)?`${arrow}${ch>0?'+':''}${mpFmt(ch)}`:'';
- const p=Number.isFinite(pct)?` ${pct>0?'+':''}${pct.toFixed(2)}%`:'';
- const tm=r.time?`<span class="market-time">${mpEscape(r.date||'')} ${mpEscape(r.time)}</span>`:'';
- return `<span class="market-price ${cls}"><span class="price">${label} ${mpFmt(Number(r.price))}</span>${c?`<span class="chg">${c}${p}</span>`:''}${tm}</span>`;
-}
-
-function mpApply(records){
- document.querySelectorAll('[data-market-code]').forEach(el=>{const c=mpCode(el.dataset.marketCode);el.innerHTML=mpBadge(records[c]);});
-}
-
-window.refreshMarketPrices=async function(showMsg=true){
- const codes=[...document.querySelectorAll('[data-market-code]')].map(x=>x.dataset.marketCode);
- if(!codes.length)return;
- const rs=await mpFetch(codes);mpApply(rs);
- if(showMsg&&typeof showToast==='function')showToast(`行情更新完成，共 ${Object.keys(rs).length} 檔`);
-};
-window.marketPriceBadge=(code)=>`<span class="market-badge" data-market-code="${mpEscape(code)}">${mpBadge(mpCache()[mpCode(code)])}</span>`;
-window.marketPriceRefreshButton='<button type="button" class="market-refresh text-gray-400 hover:text-blue-500 ml-1" title="更新行情" onclick="refreshMarketPrices(true)"><i class="fa-solid fa-rotate"></i></button>';
-
-// Periodic refresh while visible; table renders trigger explicit refresh hooks.
-setInterval(()=>{if(document.visibilityState==='visible')window.refreshMarketPrices(false)},60000);
-window.addEventListener('load',()=>setTimeout(()=>window.refreshMarketPrices(false),800));
-})();
-</script>
 <script>
 const originalDateSetter=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set;
 Object.defineProperty(HTMLInputElement.prototype,'value',{set:function(val){originalDateSetter.call(this,val);if(this.type==='date'||this.type==='month')this.setAttribute('data-date',(val||'').replace(/-/g,'/'));},get:Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').get});
@@ -846,6 +768,16 @@ const TAG_CATEGORIES = [
     {title: "📈 技術指標", theme: "teal", tags: ["OBV突破", "MACD突破", "KD金叉"]}
 ];
 
+const normalizeSingleStrategyTags=items=>{
+    let changed=false;
+    (items||[]).forEach(item=>{
+        const tags=Array.isArray(item.tags)?item.tags.filter(Boolean):[];
+        const single=tags.length?[tags[tags.length-1]]:[];
+        if(tags.length!==single.length||tags[0]!==single[0]){item.tags=single;changed=true;}
+    });
+    return changed;
+};
+
 const getTagStyle = (t, active=true) => {
     for(const c of TAG_CATEGORIES){
         if(c.tags.includes(t)) return active ? THEME_MAP[c.theme].active : THEME_MAP[c.theme].inactive;
@@ -877,12 +809,50 @@ const updatePreview=(c,tId='j-preview',col='blue')=>{
 window.copyPreviewData=c=>{const d=state.epsData[c];if(!d)return;const sn=state.codeToName[c]||d.name||'';let t=`【${c} ${sn}】參考資料\n25 EPS: ${d.eps2025??'-'}\n預26 EPS: ${d.eps2026??'-'}\nEPS成長率: ${d.epsGrowth!=null?(d.epsGrowth*100).toFixed(2)+'%':'-'}\n法人最高目標價: ${d.targetPrice??'-'}\n券商: ${d.broker??'-'}\n`;if(d.futures==='●')t+=`*含股期`;executeCopy(t.trim());};
 
 const bindAutoFill=(cId,nId,cb=null)=>{
-    document.getElementById(cId)?.addEventListener('change',e=>{const v=e.target.value.trim(),ni=document.getElementById(nId);if(state.codeToName[v]&&ni)ni.value=state.codeToName[v];if(cb)cb(v);});
-    document.getElementById(nId)?.addEventListener('change',e=>{const v=e.target.value.trim(),ci=document.getElementById(cId);if(state.nameToCode[v]&&ci)ci.value=state.nameToCode[v];if(cb)cb(state.nameToCode[v]||'');});
+    const codeInput=document.getElementById(cId),nameInput=document.getElementById(nId);
+    if(!codeInput||!nameInput)return;
+    const resolveMatch=(source,value)=>{
+        if(source[value])return value;
+        const keyword=value.toLowerCase();
+        return Object.keys(source).find(key=>key.toLowerCase().startsWith(keyword))||Object.keys(source).find(key=>key.toLowerCase().includes(keyword))||'';
+    };
+    const syncFromCode=(useFirstMatch=false)=>{
+        const raw=codeInput.value.trim(),code=useFirstMatch&&raw?resolveMatch(state.codeToName,raw):raw;
+        if(code&&state.codeToName[code]){codeInput.value=code;nameInput.value=state.codeToName[code];}
+        if(cb)cb(code);
+    };
+    const syncFromName=(useFirstMatch=false)=>{
+        const raw=nameInput.value.trim(),name=useFirstMatch&&raw?resolveMatch(state.nameToCode,raw):raw,code=state.nameToCode[name]||'';
+        if(code){nameInput.value=name;codeInput.value=code;}
+        if(cb)cb(code);
+    };
+    codeInput.addEventListener('input',syncFromCode);
+    codeInput.addEventListener('change',syncFromCode);
+    nameInput.addEventListener('input',syncFromName);
+    nameInput.addEventListener('change',syncFromName);
+    codeInput.addEventListener('keydown',e=>{if(e.key==='Enter')syncFromCode(true);});
+    nameInput.addEventListener('keydown',e=>{if(e.key==='Enter')syncFromName(true);});
 };
 
 const bindDatalistAutoUpdate=()=>{
-    let t;document.addEventListener('input',e=>{if(e.target.hasAttribute('list')){clearTimeout(t);t=setTimeout(()=>{const lId=e.target.getAttribute('list'),l=document.getElementById(lId);if(!l)return;const v=e.target.value.trim();if(v.length===0){l.innerHTML='';return;}const src=lId==='stock-names-list'?state.nameToCode:state.codeToName;let m=[];for(const k of Object.keys(src)){if(k.includes(v)){m.push(k);if(m.length>20)break;}}l.innerHTML=m.map(x=>`<option value="${escapeHTML(x)}">${escapeHTML(src[x])}</option>`).join('');},300);}});
+    let t;
+    document.addEventListener('input',e=>{
+        const input=e.target;
+        if(!input.hasAttribute('list'))return;
+        clearTimeout(t);
+        t=setTimeout(()=>{
+            const listId=input.getAttribute('list'),list=document.getElementById(listId);
+            if(!list)return;
+            const value=input.value.trim().toLowerCase();
+            if(!value){list.innerHTML='';return;}
+            const source=listId==='stock-names-list'?state.nameToCode:state.codeToName;
+            const matches=Object.entries(source)
+                .filter(([key,other])=>key.toLowerCase().includes(value)||String(other).toLowerCase().includes(value))
+                .sort((a,b)=>Number(!a[0].toLowerCase().startsWith(value))-Number(!b[0].toLowerCase().startsWith(value)))
+                .slice(0,20);
+            list.innerHTML=matches.map(([key,other])=>`<option value="${escapeHTML(key)}">${escapeHTML(other)}</option>`).join('');
+        },100);
+    });
 };
 
 const initToggleWithPin=(bId,wId,cId,pId,sKey)=>{
@@ -907,20 +877,20 @@ function renderDynamicTags(){
         container.innerHTML=TAG_CATEGORIES.map(cat=>`<div class="text-[10px] font-bold text-gray-400 border-b border-gray-300 dark:border-gray-700 pb-1 mb-1.5 mt-2 first:mt-0">${cat.title}</div><div class="grid grid-cols-2 gap-1 mb-1">${cat.tags.map(t=>`<label class="flex items-center gap-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700/50 p-1.5 rounded transition"><input type="checkbox" value="${t}" class="filter-tag-cb w-3.5 h-3.5 cursor-pointer"><span class="text-xs font-medium text-gray-700 dark:text-gray-300">${t}</span></label>`).join('')}</div>`).join('');
     });
     
+    const updateTagInputVisual=box=>{
+        const btn=box.nextElementSibling,th=box.dataset.theme;
+        const activeClasses=THEME_MAP[th].active.split(' '),inactiveClasses=THEME_MAP[th].inactive.split(' ');
+        if(box.checked){btn.classList.remove(...inactiveClasses);btn.classList.add(...activeClasses,'shadow-md');}
+        else{btn.classList.remove(...activeClasses,'shadow-md');btn.classList.add(...inactiveClasses);}
+    };
     document.querySelectorAll('.tag-input').forEach(cb=>{
         cb.addEventListener('change',function(){
-            const isC=this.checked;
-            const btn=this.nextElementSibling;
-            const th=this.dataset.theme;
-            const activeClasses=THEME_MAP[th].active.split(' ');
-            const inactiveClasses=THEME_MAP[th].inactive.split(' ');
-            if(isC){
-                btn.classList.remove(...inactiveClasses);
-                btn.classList.add(...activeClasses,'shadow-md');
-            }else{
-                btn.classList.remove(...activeClasses,'shadow-md');
-                btn.classList.add(...inactiveClasses);
+            if(this.checked){
+                document.querySelectorAll('.tag-input').forEach(other=>{
+                    if(other!==this&&other.checked){other.checked=false;updateTagInputVisual(other);}
+                });
             }
+            updateTagInputVisual(this);
         });
     });
     
@@ -967,7 +937,7 @@ async function loadFromCloud(showError=true){
         if(!r.ok)throw new Error(`雲端讀取失敗 (${r.status})`);
         const d=await r.json();
         if(d){
-            state.journals=cloudCollection(d.journals);state.plans=cloudCollection(d.plans);state.revenueRecords=cloudCollection(d.revenueRecords);state.reports=cloudCollection(d.reports);state.checklists=cloudCollection(d.checklists);state.epsData=d.epsData||{};
+            state.journals=cloudCollection(d.journals);normalizeSingleStrategyTags(state.journals);state.plans=cloudCollection(d.plans);state.revenueRecords=cloudCollection(d.revenueRecords);state.reports=cloudCollection(d.reports);state.checklists=cloudCollection(d.checklists);state.epsData=d.epsData||{};
             state.codeToName={};state.nameToCode={};
             [...state.journals,...state.plans.map(p=>({code:p.stock,name:p.name})),...state.revenueRecords,...state.reports,...state.checklists,...Object.values(state.epsData)].forEach(dt=>{if(dt&&dt.code&&dt.name){state.codeToName[dt.code]=dt.name;state.nameToCode[dt.name]=dt.code;}});
         }else{
@@ -995,6 +965,7 @@ async function deleteDataFromCloud(p){return cloudWrite(p,{method:'DELETE'});}
 function loadLocalData(){
     const sd=localStorage.getItem(LOCAL_STORAGE_KEY);
     if(sd){try{state={...state,...JSON.parse(sd)};}catch(e){}}else{const ts={"2330":"台積電","2317":"鴻海","2454":"聯發科","2382":"廣達","2603":"長榮"};Object.entries(ts).forEach(([c,n])=>{state.codeToName[c]=n;state.nameToCode[n]=c;});}
+    normalizeSingleStrategyTags(state.journals);
     if(!state.revenueRecords)state.revenueRecords=[]; if(!state.reports)state.reports=[]; if(!state.checklists)state.checklists=[];
     if(!state.filters)state.filters={start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,tags:[],minScore:0,tagLogic:'OR'};
     if(!state.favFilters)state.favFilters={start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,tags:[],minScore:0,tagLogic:'OR'};
@@ -1033,7 +1004,7 @@ const renderTableRows=(data,tbId,emId,isFav=false)=>{
         let fl=i.isFavorite===true?1:(parseInt(i.isFavorite)||0),fc='text-gray-400 dark:text-gray-500 hover:text-yellow-500',fi='<i class="fa-solid fa-star pointer-events-none"></i>',ft='加入追蹤';
         if(fl===1){fc='text-yellow-500';ft='一星追蹤';}else if(fl===2){fc='text-orange-500';fi='<i class="fa-solid fa-star pointer-events-none"></i><span class="ml-1 text-[10px] font-bold pointer-events-none">2</span>';ft='二次追蹤';}else if(fl===3){fc='text-red-500';fi='<i class="fa-solid fa-star pointer-events-none"></i><span class="ml-1 text-[10px] font-bold pointer-events-none">3</span>';ft='三次追蹤';}
         const fd=i.date?i.date.replace(/-/g,'/'):'', rbh=getRevenueMonthsHtml(i.code), hr=state.reports.some(r=>r.code===i.code), rb=hr?`<span class="bg-indigo-600 text-white text-[9px] px-1 rounded ml-1 shadow-sm">法</span>`:'';
-        rh+=`<tr class="table-row-hover transition border-b border-gray-200 dark:border-gray-700/50 text-gray-900 dark:text-white text-sm ${ei.futures?"bg-sky-50 dark:bg-sky-900 hover:bg-sky-100 dark:hover:bg-sky-800":"bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800"}"><td class="table-sticky-bg py-3 px-2 w-[40px] min-w-[40px] max-w-[40px] text-center sticky left-0 z-20 ${ei.futures?"!bg-sky-50 dark:!bg-sky-900":""}"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${i.id}" data-type="${lt}" ${selectedIds[lt].has(i.id)?'checked':''}></td><td class="table-sticky-bg py-3 px-1 sm:px-2 w-[85px] min-w-[85px] max-w-[85px] text-center sticky left-[40px] z-20 font-medium whitespace-nowrap text-xs sm:text-sm text-gray-600 dark:text-gray-400 ${ei.futures?"!bg-sky-50 dark:!bg-sky-900":""}">${escapeHTML(fd)}</td><td class="table-sticky-bg py-2 px-2 sm:px-3 w-[95px] min-w-[95px] max-w-[95px] sticky left-[125px] z-20 border-r border-gray-200 dark:border-gray-700/50 overflow-hidden ${ei.futures?"!bg-sky-50 dark:!bg-sky-900":""}"><div class="text-[10px] sm:text-[11px] text-gray-500 dark:text-gray-400 mb-0.5 leading-none flex items-center">${ei.futures?'<span class="bg-sky-600 text-white text-[9px] px-1 rounded mr-1">期</span>':''}${escapeHTML(i.code)}${rb}</div><div class="font-bold text-[14px] sm:text-[15px] leading-tight truncate tracking-wide text-gray-800 dark:text-gray-200" title="${escapeHTML(i.name)}">${escapeHTML(i.name)}</div><div class="market-badge" data-market-code="${escapeHTML(i.code)}">行情載入中</div></td><td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2025)}</td><td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2026)}</td><td class="py-3 px-3 sm:px-4 text-right">${formatNumColor(ei.epsGrowth,true)}</td><td class="py-3 px-3 sm:px-4 text-center font-bold">${sc}</td><td class="py-3 px-3 sm:px-4 text-right">${formatTargetPrice(ei.targetPrice)}</td><td class="py-2 px-3 whitespace-normal w-[100px] min-w-[100px] text-center">${rbh}</td><td class="py-2 px-3 whitespace-normal min-w-[120px] sm:min-w-[140px] lg:max-w-[280px]">${th}</td>${!isFav?`<td class="py-3 px-3 text-gray-600 dark:text-gray-300 max-w-[80px] sm:max-w-[150px] lg:max-w-[250px] xl:max-w-[400px] truncate text-xs w-full" title="${escapeHTML(i.notes||'')}">${escapeHTML(i.notes||'')}</td>`:''}<td class="py-3 px-3 text-center whitespace-nowrap"><button class="mr-1 hover:scale-110 text-green-600 dark:text-green-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="add-plan" data-code="${escapeHTML(i.code)}" title="加入交易規劃"><i class="fa-solid fa-chess-knight pointer-events-none"></i></button><button class="mr-1 hover:scale-110 ${fc} bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="toggle-fav" data-id="${i.id}" title="${ft}">${fi}</button><button class="mr-1 hover:scale-110 text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="edit-notes" data-id="${i.id}" title="修改備註"><i class="fa-solid fa-comment-dots pointer-events-none"></i></button><button class="text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="delete-journal" data-id="${i.id}" title="刪除"><i class="fa-solid fa-trash pointer-events-none"></i></button></td></tr>`;
+        rh+=`<tr class="table-row-hover transition border-b border-gray-200 dark:border-gray-700/50 text-gray-900 dark:text-white text-sm ${ei.futures?"bg-sky-50 dark:bg-sky-900 hover:bg-sky-100 dark:hover:bg-sky-800":"bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800"}"><td class="table-sticky-bg py-3 px-2 w-[40px] min-w-[40px] max-w-[40px] text-center sticky left-0 z-20 ${ei.futures?"!bg-sky-50 dark:!bg-sky-900":""}"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${i.id}" data-type="${lt}" ${selectedIds[lt].has(i.id)?'checked':''}></td><td class="table-sticky-bg py-3 px-1 sm:px-2 w-[85px] min-w-[85px] max-w-[85px] text-center sticky left-[40px] z-20 font-medium whitespace-nowrap text-xs sm:text-sm text-gray-600 dark:text-gray-400 ${ei.futures?"!bg-sky-50 dark:!bg-sky-900":""}">${escapeHTML(fd)}</td><td class="table-sticky-bg py-2 px-2 sm:px-3 w-[95px] min-w-[95px] max-w-[95px] sticky left-[125px] z-20 border-r border-gray-200 dark:border-gray-700/50 overflow-hidden ${ei.futures?"!bg-sky-50 dark:!bg-sky-900":""}"><div class="text-[10px] sm:text-[11px] text-gray-500 dark:text-gray-400 mb-0.5 leading-none flex items-center">${ei.futures?'<span class="bg-sky-600 text-white text-[9px] px-1 rounded mr-1">期</span>':''}${escapeHTML(i.code)}${rb}</div><div class="font-bold text-[14px] sm:text-[15px] leading-tight truncate tracking-wide text-gray-800 dark:text-gray-200" title="${escapeHTML(i.name)}">${escapeHTML(i.name)}</div></td><td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2025)}</td><td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2026)}</td><td class="py-3 px-3 sm:px-4 text-right">${formatNumColor(ei.epsGrowth,true)}</td><td class="py-3 px-3 sm:px-4 text-center font-bold">${sc}</td><td class="py-3 px-3 sm:px-4 text-right">${formatTargetPrice(ei.targetPrice)}</td><td class="py-2 px-3 whitespace-normal w-[100px] min-w-[100px] text-center">${rbh}</td><td class="py-2 px-3 whitespace-normal min-w-[120px] sm:min-w-[140px] lg:max-w-[280px]">${th}</td>${!isFav?`<td class="py-3 px-3 text-gray-600 dark:text-gray-300 max-w-[80px] sm:max-w-[150px] lg:max-w-[250px] xl:max-w-[400px] truncate text-xs w-full" title="${escapeHTML(i.notes||'')}">${escapeHTML(i.notes||'')}</td>`:''}<td class="py-3 px-3 text-center whitespace-nowrap"><button class="mr-1 hover:scale-110 text-green-600 dark:text-green-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="add-plan" data-code="${escapeHTML(i.code)}" title="加入交易規劃"><i class="fa-solid fa-chess-knight pointer-events-none"></i></button><button class="mr-1 hover:scale-110 ${fc} bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="toggle-fav" data-id="${i.id}" title="${ft}">${fi}</button><button class="mr-1 hover:scale-110 text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="edit-notes" data-id="${i.id}" title="修改備註"><i class="fa-solid fa-comment-dots pointer-events-none"></i></button><button class="text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="delete-journal" data-id="${i.id}" title="刪除"><i class="fa-solid fa-trash pointer-events-none"></i></button></td></tr>`;
     });
     tb.innerHTML=rh; updateBatchUI(lt);
 };
@@ -1047,8 +1018,8 @@ const handleJournalTableAction=async(e)=>{
     else if(a==='delete-journal'){window.openConfirmModal('確定要刪除這筆紀錄嗎？',async()=>{state.journals=state.journals.filter(x=>x.id!==id);saveLocalData();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();await deleteDataFromCloud(`journals/${id}`);showToast('紀錄已刪除');});}
 };
 document.getElementById('journal-table-body')?.addEventListener('click',handleJournalTableAction); document.getElementById('fav-table-body')?.addEventListener('click',handleJournalTableAction);
-function processAndRenderJournals(){renderTableRows(getFilteredAndSortedData(state.journals,state.filters,state.sortConfig),'journal-table-body','journal-empty');setTimeout(()=>window.refreshMarketPrices(false),80);}
-function renderFavorites(){renderTableRows(getFilteredAndSortedData(state.journals,state.favFilters,state.favSortConfig).filter(j=>j.isFavorite),'fav-table-body','fav-empty',true);setTimeout(()=>window.refreshMarketPrices(false),80);}
+function processAndRenderJournals(){renderTableRows(getFilteredAndSortedData(state.journals,state.filters,state.sortConfig),'journal-table-body','journal-empty');}
+function renderFavorites(){renderTableRows(getFilteredAndSortedData(state.journals,state.favFilters,state.favSortConfig).filter(j=>j.isFavorite),'fav-table-body','fav-empty',true);}
 function updateBatchUI(t){const b=document.getElementById(`batch-bar-${t}`),c=document.getElementById(`batch-count-${t}`);if(!b||!c)return;const sz=selectedIds[t].size;if(sz>0){b.classList.remove('hidden');b.classList.add('flex');c.textContent=sz;}else{b.classList.add('hidden');b.classList.remove('flex');}const sa=document.querySelector(`.select-all-cb[data-type="${t}"]`);if(sa){const tot=document.querySelectorAll(`.row-cb[data-type="${t}"]`).length;sa.checked=(tot>0&&sz===tot);sa.indeterminate=(sz>0&&sz<tot);}}
 
 document.addEventListener('change',e=>{if(e.target.classList.contains('row-cb')){const t=e.target.dataset.type;if(e.target.checked)selectedIds[t].add(e.target.value);else selectedIds[t].delete(e.target.value);updateBatchUI(t);}if(e.target.classList.contains('select-all-cb')){const t=e.target.dataset.type,ic=e.target.checked;document.querySelectorAll(`.row-cb[data-type="${t}"]`).forEach(cb=>{cb.checked=ic;if(ic)selectedIds[t].add(cb.value);else selectedIds[t].delete(cb.value);});updateBatchUI(t);}});
@@ -1088,7 +1059,7 @@ document.getElementById('journal-form')?.addEventListener('submit', async e => {
     const nt = document.getElementById('j-notes').value.trim();
     if (!c || !n || !d) return showToast('請填寫完整資訊', 'error');
 
-    const tags = Array.from(document.querySelectorAll('.tag-input:checked')).map(cb => cb.value);
+    const tags = Array.from(document.querySelectorAll('.tag-input:checked')).map(cb => cb.value).slice(-1);
     
     state.codeToName[c] = n;
     state.nameToCode[n] = c;
@@ -1097,10 +1068,10 @@ document.getElementById('journal-form')?.addEventListener('submit', async e => {
     const existingIdx = state.journals.findIndex(x => x.date === d && x.code === c);
     
     if (existingIdx !== -1) {
-        // 如果存在，則合併標籤與備註
+        // 同日同股維持一列；新選策略會取代舊策略。
         const existing = state.journals[existingIdx];
-        const newTags = new Set([...(existing.tags || []), ...tags]);
-        existing.tags = Array.from(newTags);
+        if(tags.length)existing.tags=[tags[0]];
+        else normalizeSingleStrategyTags([existing]);
         
         if (nt && existing.notes !== nt && !(existing.notes || '').includes(nt)) {
             existing.notes = existing.notes ? existing.notes + '；' + nt : nt;
@@ -1162,7 +1133,7 @@ function renderPlans(){const tb=document.getElementById('plan-table-body');if(!t
 
 document.getElementById('report-form')?.addEventListener('submit',async e=>{e.preventDefault();const d=document.getElementById('rep-date').value,c=document.getElementById('rep-code').value.trim(),n=document.getElementById('rep-name').value.trim(),con=document.getElementById('rep-content').value.trim();if(!c||!n||!con||!d)return;const id=`${c}_${Date.now()}`,p={id,date:d,code:c,name:n,content:con,createdAt:Date.now(),updatedAt:Date.now()};state.reports.push(p);saveLocalData();renderReports();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();await putDataToCloud(`reports/${id}`,p);showToast('報告已加入');e.target.reset();document.getElementById('rep-date').value=d;setTimeout(()=>document.getElementById('rep-code').focus(),15);});
 document.getElementById('report-table-body')?.addEventListener('click',async e=>{const b=e.target.closest('[data-action]');if(!b)return;const a=b.dataset.action,id=b.dataset.id;if(a==='copy-report'){const r=state.reports.find(x=>x.id===id);if(r)executeCopy(`[${r.date||''}] ${r.code} / ${r.name}\n${r.content||''}`);}else if(a==='edit-report'){const r=state.reports.find(x=>x.id===id);if(r)window.openPromptModal("修改",r.content||"",async nc=>{if(nc!==null&&nc.trim()!==""){r.content=nc.trim();r.updatedAt=Date.now();saveLocalData();renderReports();await putDataToCloud(`reports/${id}`,r);showToast("修改成功");}});}else if(a==='delete-report'){window.openConfirmModal('確定刪除？',async()=>{state.reports=state.reports.filter(x=>x.id!==id);saveLocalData();renderReports();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();await deleteDataFromCloud(`reports/${id}`);showToast('已刪除');});}});
-function renderReports(){const tb=document.getElementById('report-table-body'),em=document.getElementById('report-empty');if(!tb||!em)return;let fr=state.reports||[];if(state.reportFilters){if(state.reportFilters.start)fr=fr.filter(r=>r.date>=state.reportFilters.start);if(state.reportFilters.end)fr=fr.filter(r=>r.date<=state.reportFilters.end);if(state.reportFilters.code){const c=state.reportFilters.code;fr=fr.filter(r=>(r.code&&r.code.includes(c))||(r.name&&r.name.includes(c)));}}if(fr.length===0){tb.innerHTML='';em.classList.remove('hidden');updateBatchUI('report');return;}em.classList.add('hidden');const sr=[...fr].sort((a,b)=>{let vA,vB;switch(state.reportSortConfig?state.reportSortConfig.key:'date'){case'date':vA=a.date;vB=b.date;break;case'code':vA=a.code;vB=b.code;break;default:vA=a.createdAt||0;vB=b.createdAt||0;break;}if(vA===vB)return(b.createdAt||0)-(a.createdAt||0);return (state.reportSortConfig?state.reportSortConfig.asc:false)?(vA>vB?1:-1):(vA>vB?-1:1);});let rh='';sr.forEach(r=>{const fd=r.date?r.date.replace(/-/g,'/'):'';rh+=`<tr class="table-row-hover border-b border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-sm"><td class="table-sticky-bg py-3 px-2 sm:px-3 text-center sticky left-0 z-20"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${r.id}" data-type="report" ${selectedIds['report']&&selectedIds['report'].has(r.id)?'checked':''}></td><td class="py-3 px-3 sm:px-4 font-medium text-gray-600 dark:text-gray-400">${escapeHTML(fd)}</td><td class="py-3 px-3 sm:px-4"><span class="font-bold mr-2 text-gray-800 dark:text-gray-200">${escapeHTML(r.code)}</span><span class="text-gray-600 dark:text-gray-400">${escapeHTML(r.name)}</span></td><td class="py-3 px-3 sm:px-4 text-right"><span class="market-badge" data-market-code="${escapeHTML(r.code)}">行情載入中</span></td><td class="py-3 px-3 sm:px-4 text-gray-800 dark:text-gray-100 font-medium w-full min-w-[280px] whitespace-normal leading-relaxed">${escapeHTML(r.content||'')}</td><td class="py-3 px-3 sm:px-4 text-center whitespace-nowrap"><button class="mr-1 text-teal-600 dark:text-teal-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" data-action="copy-report" data-id="${r.id}"><i class="fa-solid fa-copy pointer-events-none"></i></button><button class="mr-1 text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" data-action="edit-report" data-id="${r.id}"><i class="fa-solid fa-pen pointer-events-none"></i></button><button class="text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" data-action="delete-report" data-id="${r.id}"><i class="fa-solid fa-trash pointer-events-none"></i></button></td></tr>`;});tb.innerHTML=rh;updateBatchUI('report');setTimeout(()=>window.refreshMarketPrices(false),80);}
+function renderReports(){const tb=document.getElementById('report-table-body'),em=document.getElementById('report-empty');if(!tb||!em)return;let fr=state.reports||[];if(state.reportFilters){if(state.reportFilters.start)fr=fr.filter(r=>r.date>=state.reportFilters.start);if(state.reportFilters.end)fr=fr.filter(r=>r.date<=state.reportFilters.end);if(state.reportFilters.code){const c=state.reportFilters.code;fr=fr.filter(r=>(r.code&&r.code.includes(c))||(r.name&&r.name.includes(c)));}}if(fr.length===0){tb.innerHTML='';em.classList.remove('hidden');updateBatchUI('report');return;}em.classList.add('hidden');const sr=[...fr].sort((a,b)=>{let vA,vB;switch(state.reportSortConfig?state.reportSortConfig.key:'date'){case'date':vA=a.date;vB=b.date;break;case'code':vA=a.code;vB=b.code;break;default:vA=a.createdAt||0;vB=b.createdAt||0;break;}if(vA===vB)return(b.createdAt||0)-(a.createdAt||0);return (state.reportSortConfig?state.reportSortConfig.asc:false)?(vA>vB?1:-1):(vA>vB?-1:1);});let rh='';sr.forEach(r=>{const fd=r.date?r.date.replace(/-/g,'/'):'';rh+=`<tr class="table-row-hover border-b border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-sm"><td class="table-sticky-bg py-3 px-2 sm:px-3 text-center sticky left-0 z-20"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${r.id}" data-type="report" ${selectedIds['report']&&selectedIds['report'].has(r.id)?'checked':''}></td><td class="py-3 px-3 sm:px-4 font-medium text-gray-600 dark:text-gray-400">${escapeHTML(fd)}</td><td class="py-3 px-3 sm:px-4"><span class="font-bold mr-2 text-gray-800 dark:text-gray-200">${escapeHTML(r.code)}</span><span class="text-gray-600 dark:text-gray-400">${escapeHTML(r.name)}</span></td><td class="py-3 px-3 sm:px-4 text-gray-800 dark:text-gray-100 font-medium w-full min-w-[280px] whitespace-normal leading-relaxed">${escapeHTML(r.content||'')}</td><td class="py-3 px-3 sm:px-4 text-center whitespace-nowrap"><button class="mr-1 text-teal-600 dark:text-teal-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" data-action="copy-report" data-id="${r.id}"><i class="fa-solid fa-copy pointer-events-none"></i></button><button class="mr-1 text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" data-action="edit-report" data-id="${r.id}"><i class="fa-solid fa-pen pointer-events-none"></i></button><button class="text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" data-action="delete-report" data-id="${r.id}"><i class="fa-solid fa-trash pointer-events-none"></i></button></td></tr>`;});tb.innerHTML=rh;updateBatchUI('report');}
 
 const CHK_CONFIG={'long':['低位階','頭頭高底底高','成交量2倍以上','突破前壓','突破上軌 開布林','均線多排','量價齊揚','紅K線收盤上5MA','20MA向上','KD金叉','MACD金叉','上升通道','突破下降切線','突破整理區間','紅K站上20MA','紅K站上60MA'],'short':['高位階','頭頭低底底低','跌破前壓','跌破上軌','均線空排','綠K線收盤跌破5MA','20MA向下','KD死叉','MACD死叉','下降通道','跌破上升切線','跌破整理區間','綠K跌破20MA','綠K跌破60MA']};
 let chkCurrentDirection='long',chkSelectedItems=new Set(),chkEditingId=null;
@@ -1322,6 +1293,12 @@ document.addEventListener('DOMContentLoaded',async()=>{
             tp.value = '';
         }
     });
+    ['chk-code','chk-name'].forEach(id=>document.getElementById(id)?.addEventListener('keydown',e=>{
+        if(e.key==='Enter'){
+            e.preventDefault();
+            document.getElementById('chk-btn-submit')?.click();
+        }
+    }));
     initToggleWithPin('toggle-journal-form-btn','journal-form-wrapper','journal-form-chevron','pin-journal-btn','ryan_journal_pinned'); initToggleWithPin('toggle-tags-btn','form-tags-wrapper','tags-chevron','pin-tags-btn','ryan_tags_pinned');
     setupLogicBtns('.logic-btn', 'filters', processAndRenderJournals);
     setupLogicBtns('.logic-btn-fav', 'favFilters', renderFavorites);
@@ -1348,7 +1325,7 @@ setChkDirection('long');
             if(typeof XLSX === 'undefined') return showToast('匯出套件載入中，請稍後', 'error');
             const wb = XLSX.utils.book_new();
             
-            const wsJournals = XLSX.utils.json_to_sheet(state.journals.map(j => ({'日期':j.date,'代號':j.code,'股名':j.name,'策略標籤':j.tags?j.tags.join(', '):'','追蹤等級':j.isFavorite===true?1:(j.isFavorite||0),'備註':j.notes||''})));
+            const wsJournals = XLSX.utils.json_to_sheet(state.journals.map(j => ({'日期':j.date,'代號':j.code,'股名':j.name,'策略標籤':j.tags?j.tags.slice(-1).join(', '):'','追蹤等級':j.isFavorite===true?1:(j.isFavorite||0),'備註':j.notes||''})));
             XLSX.utils.book_append_sheet(wb, wsJournals, '選股日誌');
             
             const wsRevenue = XLSX.utils.json_to_sheet(state.revenueRecords.map(r => ({'創高月份':r.month,'代號':r.code,'股名':r.name,'備註':r.notes||''})));
@@ -1444,7 +1421,7 @@ setChkDirection('long');
                         state.codeToName[c] = n;
                         state.nameToCode[n] = c;
                         const tagsStr = row['策略標籤'];
-                        const tags = tagsStr ? tagsStr.split(',').map(t => t.trim()).filter(Boolean) : [];
+                        const tags = tagsStr ? tagsStr.split(',').map(t => t.trim()).filter(Boolean).slice(-1) : [];
                         const isFavVal = row['追蹤等級'] ? parseInt(row['追蹤等級']) : (row['已追蹤'] === '是' ? 1 : 0);
                         state.journals.push({
                             id, date: row['日期'], code: c, name: n, notes: row['備註'] || '',
@@ -1633,7 +1610,6 @@ setChkDirection('long');
 })();
 </script>
 
-<script>setTimeout(()=>window.refreshMarketPrices(false),900);</script><!-- 行情整合：日誌／法人報告／追蹤共用 TWSE MIS 行情；盤中顯示即時價，收盤後顯示最新收盤價，並以 localStorage 快取避免重複查詢。 -->
 <script id="market-index-module">
 (function(){
   'use strict';
