@@ -770,13 +770,12 @@ const TAG_CATEGORIES = [
 
 const normalizeStrategyTagName=tag=>tag==='一條根'?'一陽指':tag;
 
-const normalizeSingleStrategyTags=items=>{
+const normalizeStrategyTags=items=>{
     let changed=false;
     (items||[]).forEach(item=>{
         const originalTags=Array.isArray(item.tags)?item.tags.filter(Boolean):[];
-        const tags=originalTags.map(normalizeStrategyTagName);
-        const single=tags.length?[tags[tags.length-1]]:[];
-        if(originalTags.length!==single.length||originalTags.some((tag,index)=>tag!==single[index])){item.tags=single;changed=true;}
+        const normalized=[...new Set(originalTags.map(normalizeStrategyTagName).filter(Boolean))];
+        if(originalTags.length!==normalized.length||originalTags.some((tag,index)=>tag!==normalized[index])){item.tags=normalized;changed=true;}
     });
     return changed;
 };
@@ -954,7 +953,7 @@ async function loadFromCloud(showError=true){
         const d=await r.json();
         if(d){
             state.journals=cloudCollection(d.journals);
-            const migratedStrategyTags=normalizeSingleStrategyTags(state.journals);
+            const migratedStrategyTags=normalizeStrategyTags(state.journals);
             state.plans=cloudCollection(d.plans);state.revenueRecords=cloudCollection(d.revenueRecords);state.reports=cloudCollection(d.reports);state.checklists=cloudCollection(d.checklists);state.epsData=d.epsData||{};
             state.codeToName={};state.nameToCode={};
             [...state.journals,...state.plans.map(p=>({code:p.stock,name:p.name})),...state.revenueRecords,...state.reports,...state.checklists,...Object.values(state.epsData)].forEach(dt=>{if(dt&&dt.code&&dt.name){state.codeToName[dt.code]=dt.name;state.nameToCode[dt.name]=dt.code;}});
@@ -984,7 +983,7 @@ async function deleteDataFromCloud(p){return cloudWrite(p,{method:'DELETE'});}
 function loadLocalData(){
     const sd=localStorage.getItem(LOCAL_STORAGE_KEY);
     if(sd){try{state={...state,...JSON.parse(sd)};}catch(e){}}else{const ts={"2330":"台積電","2317":"鴻海","2454":"聯發科","2382":"廣達","2603":"長榮"};Object.entries(ts).forEach(([c,n])=>{state.codeToName[c]=n;state.nameToCode[n]=c;});}
-    const migratedStrategyTags=normalizeSingleStrategyTags(state.journals);
+    const migratedStrategyTags=normalizeStrategyTags(state.journals);
     if(!state.revenueRecords)state.revenueRecords=[]; if(!state.reports)state.reports=[]; if(!state.checklists)state.checklists=[];
     if(!state.filters)state.filters={start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,tags:[],minScore:0,tagLogic:'OR'};
     if(!state.favFilters)state.favFilters={start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,tags:[],minScore:0,tagLogic:'OR'};
@@ -1089,10 +1088,10 @@ document.getElementById('journal-form')?.addEventListener('submit', async e => {
     const existingIdx = state.journals.findIndex(x => x.date === d && x.code === c);
     
     if (existingIdx !== -1) {
-        // 同日同股維持一列；新選策略會取代舊策略。
+        // 同日同股維持一列；每次只選一個策略，但不同策略會累加顯示。
         const existing = state.journals[existingIdx];
-        if(tags.length)existing.tags=[tags[0]];
-        else normalizeSingleStrategyTags([existing]);
+        normalizeStrategyTags([existing]);
+        if(tags.length)existing.tags=[...new Set([...(existing.tags||[]),normalizeStrategyTagName(tags[0])])];
         
         if (nt && existing.notes !== nt && !(existing.notes || '').includes(nt)) {
             existing.notes = existing.notes ? existing.notes + '；' + nt : nt;
@@ -1103,7 +1102,7 @@ document.getElementById('journal-form')?.addEventListener('submit', async e => {
         processAndRenderJournals();
         if (document.getElementById('module-favorites').classList.contains('active')) renderFavorites();
         await putDataToCloud(`journals/${existing.id}`, existing);
-        showToast('選股條件已合併更新');
+        showToast('策略標籤已合併至同一列');
     } else {
         // 如果不存在，則建立新資料
         const id = generateId();
@@ -1346,7 +1345,7 @@ setChkDirection('long');
             if(typeof XLSX === 'undefined') return showToast('匯出套件載入中，請稍後', 'error');
             const wb = XLSX.utils.book_new();
             
-            const wsJournals = XLSX.utils.json_to_sheet(state.journals.map(j => ({'日期':j.date,'代號':j.code,'股名':j.name,'策略標籤':j.tags?j.tags.slice(-1).join(', '):'','追蹤等級':j.isFavorite===true?1:(j.isFavorite||0),'備註':j.notes||''})));
+            const wsJournals = XLSX.utils.json_to_sheet(state.journals.map(j => ({'日期':j.date,'代號':j.code,'股名':j.name,'策略標籤':j.tags?j.tags.join(', '):'','追蹤等級':j.isFavorite===true?1:(j.isFavorite||0),'備註':j.notes||''})));
             XLSX.utils.book_append_sheet(wb, wsJournals, '選股日誌');
             
             const wsRevenue = XLSX.utils.json_to_sheet(state.revenueRecords.map(r => ({'創高月份':r.month,'代號':r.code,'股名':r.name,'備註':r.notes||''})));
@@ -1442,7 +1441,7 @@ setChkDirection('long');
                         state.codeToName[c] = n;
                         state.nameToCode[n] = c;
                         const tagsStr = row['策略標籤'];
-                        const tags = tagsStr ? tagsStr.split(',').map(t => normalizeStrategyTagName(t.trim())).filter(Boolean).slice(-1) : [];
+                        const tags = tagsStr ? [...new Set(tagsStr.split(',').map(t => normalizeStrategyTagName(t.trim())).filter(Boolean))] : [];
                         const isFavVal = row['追蹤等級'] ? parseInt(row['追蹤等級']) : (row['已追蹤'] === '是' ? 1 : 0);
                         state.journals.push({
                             id, date: row['日期'], code: c, name: n, notes: row['備註'] || '',
