@@ -761,20 +761,32 @@ const THEME_MAP = {
 };
 
 const TAG_CATEGORIES = [
-    {title: "🌟 特別關注", theme: "rose", tags: ["特別追蹤", "一條根"]},
+    {title: "🌟 特別關注", theme: "rose", tags: ["特別追蹤", "一陽指"]},
     {title: "📊 基本面佳", theme: "blue", tags: ["多頭營收創高"]},
     {title: "🔥 動能與型態", theme: "amber", tags: ["金包銀", "披荊斬棘", "破繭而出", "月來越好", "季不可失", "守株待兔", "跳空缺口", "小碎步", "多排破上關"]},
     {title: "💰 量價與籌碼", theme: "purple", tags: ["量價齊揚", "高成交值", "法人加持", "1日籌碼集中", "5日籌碼集中", "20日籌碼集中"]},
     {title: "📈 技術指標", theme: "teal", tags: ["OBV突破", "MACD突破", "KD金叉"]}
 ];
 
+const normalizeStrategyTagName=tag=>tag==='一條根'?'一陽指':tag;
+
 const normalizeSingleStrategyTags=items=>{
     let changed=false;
     (items||[]).forEach(item=>{
-        const tags=Array.isArray(item.tags)?item.tags.filter(Boolean):[];
+        const originalTags=Array.isArray(item.tags)?item.tags.filter(Boolean):[];
+        const tags=originalTags.map(normalizeStrategyTagName);
         const single=tags.length?[tags[tags.length-1]]:[];
-        if(tags.length!==single.length||tags[0]!==single[0]){item.tags=single;changed=true;}
+        if(originalTags.length!==single.length||originalTags.some((tag,index)=>tag!==single[index])){item.tags=single;changed=true;}
     });
+    return changed;
+};
+
+const normalizeFilterStrategyTags=filter=>{
+    if(!filter)return false;
+    const original=Array.isArray(filter.tags)?filter.tags:[];
+    const normalized=[...new Set(original.map(normalizeStrategyTagName).filter(Boolean))];
+    const changed=original.length!==normalized.length||original.some((tag,index)=>tag!==normalized[index]);
+    if(changed)filter.tags=normalized;
     return changed;
 };
 
@@ -941,9 +953,12 @@ async function loadFromCloud(showError=true){
         if(!r.ok)throw new Error(`雲端讀取失敗 (${r.status})`);
         const d=await r.json();
         if(d){
-            state.journals=cloudCollection(d.journals);normalizeSingleStrategyTags(state.journals);state.plans=cloudCollection(d.plans);state.revenueRecords=cloudCollection(d.revenueRecords);state.reports=cloudCollection(d.reports);state.checklists=cloudCollection(d.checklists);state.epsData=d.epsData||{};
+            state.journals=cloudCollection(d.journals);
+            const migratedStrategyTags=normalizeSingleStrategyTags(state.journals);
+            state.plans=cloudCollection(d.plans);state.revenueRecords=cloudCollection(d.revenueRecords);state.reports=cloudCollection(d.reports);state.checklists=cloudCollection(d.checklists);state.epsData=d.epsData||{};
             state.codeToName={};state.nameToCode={};
             [...state.journals,...state.plans.map(p=>({code:p.stock,name:p.name})),...state.revenueRecords,...state.reports,...state.checklists,...Object.values(state.epsData)].forEach(dt=>{if(dt&&dt.code&&dt.name){state.codeToName[dt.code]=dt.name;state.nameToCode[dt.name]=dt.code;}});
+            if(migratedStrategyTags)await putDataToCloud('journals',Object.fromEntries(state.journals.map(x=>[x.id,x])));
         }else{
             const init=await fetch(`${DB_URL}/data/${getSyncPath()}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(cloudSnapshot())});
             if(!init.ok)throw new Error(`雲端建立失敗 (${init.status})`);
@@ -969,15 +984,17 @@ async function deleteDataFromCloud(p){return cloudWrite(p,{method:'DELETE'});}
 function loadLocalData(){
     const sd=localStorage.getItem(LOCAL_STORAGE_KEY);
     if(sd){try{state={...state,...JSON.parse(sd)};}catch(e){}}else{const ts={"2330":"台積電","2317":"鴻海","2454":"聯發科","2382":"廣達","2603":"長榮"};Object.entries(ts).forEach(([c,n])=>{state.codeToName[c]=n;state.nameToCode[n]=c;});}
-    normalizeSingleStrategyTags(state.journals);
+    const migratedStrategyTags=normalizeSingleStrategyTags(state.journals);
     if(!state.revenueRecords)state.revenueRecords=[]; if(!state.reports)state.reports=[]; if(!state.checklists)state.checklists=[];
     if(!state.filters)state.filters={start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,tags:[],minScore:0,tagLogic:'OR'};
     if(!state.favFilters)state.favFilters={start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,tags:[],minScore:0,tagLogic:'OR'};
+    const migratedFilterTags=normalizeFilterStrategyTags(state.filters)|normalizeFilterStrategyTags(state.favFilters);
     if(!state.revenueFilters)state.revenueFilters={month:'',code:''}; if(!state.reportFilters)state.reportFilters={start:'',end:'',code:''};
     if(state.filters.tagLogic===undefined)state.filters.tagLogic='OR'; if(state.favFilters.tagLogic===undefined)state.favFilters.tagLogic='OR';
     if(state.filters.revenueHigh===undefined)state.filters.revenueHigh=false; if(state.favFilters.revenueHigh===undefined)state.favFilters.revenueHigh=false;
     if(state.filters.code===undefined)state.filters.code=''; if(state.favFilters.code===undefined)state.favFilters.code='';
     if(!state.reportSortConfig)state.reportSortConfig={key:'date',asc:false}; if(!state.checklistSortConfig)state.checklistSortConfig={key:'date',asc:false};
+    if(migratedStrategyTags||migratedFilterTags)saveLocalData();
     const applyLogicState=(lv,sel)=>{document.querySelectorAll(sel).forEach(b=>{if(b.dataset.logic===lv){b.classList.remove('text-gray-500','dark:text-gray-400','hover:text-gray-700','dark:hover:text-gray-200');b.classList.add('bg-white','dark:bg-gray-700','text-blue-600','dark:text-blue-400','shadow-sm');}else{b.classList.remove('bg-white','dark:bg-gray-700','text-blue-600','dark:text-blue-400','shadow-sm');b.classList.add('text-gray-500','dark:text-gray-400','hover:text-gray-700','dark:hover:text-gray-200');}});};
     applyLogicState(state.filters.tagLogic,'.logic-btn'); applyLogicState(state.favFilters.tagLogic,'.logic-btn-fav');
 }
@@ -1425,7 +1442,7 @@ setChkDirection('long');
                         state.codeToName[c] = n;
                         state.nameToCode[n] = c;
                         const tagsStr = row['策略標籤'];
-                        const tags = tagsStr ? tagsStr.split(',').map(t => t.trim()).filter(Boolean).slice(-1) : [];
+                        const tags = tagsStr ? tagsStr.split(',').map(t => normalizeStrategyTagName(t.trim())).filter(Boolean).slice(-1) : [];
                         const isFavVal = row['追蹤等級'] ? parseInt(row['追蹤等級']) : (row['已追蹤'] === '是' ? 1 : 0);
                         state.journals.push({
                             id, date: row['日期'], code: c, name: n, notes: row['備註'] || '',
