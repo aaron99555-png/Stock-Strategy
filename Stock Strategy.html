@@ -239,7 +239,7 @@ button { touch-action: manipulation; }
             </div>
             <div id="batch-bar-journal" class="hidden bg-red-50 dark:bg-red-900/20 border-b border-gray-200 dark:border-gray-700/50 p-2 sm:p-3 justify-between items-center transition-all">
                 <span class="text-xs sm:text-sm text-red-600 dark:text-red-400 font-medium"><i class="fa-solid fa-check-double mr-1.5"></i>已選擇 <span id="batch-count-journal" class="font-bold">0</span> 筆資料</span>
-                <button onclick="confirmBatchDelete('journal')" class="bg-red-600 hover:bg-red-500 text-white text-xs sm:text-sm font-medium px-3 sm:px-4 py-1.5 rounded-lg transition shadow-sm active:scale-95">批次刪除</button>
+                <button type="button" data-batch-delete-type="journal" class="bg-red-600 hover:bg-red-500 text-white text-xs sm:text-sm font-medium px-3 sm:px-4 py-1.5 rounded-lg transition shadow-sm active:scale-95">批次刪除</button>
             </div>
             <div class="overflow-x-auto overflow-y-auto max-h-[65vh] 2xl:max-h-[70vh] flex-grow relative rounded-b-xl w-full">
                 <table class="min-w-full text-left text-sm whitespace-nowrap table-auto w-full">
@@ -375,7 +375,7 @@ button { touch-action: manipulation; }
             </div>
             <div id="batch-bar-revenue" class="hidden bg-red-50 dark:bg-red-900/20 border-b border-gray-200 dark:border-gray-700/50 p-2 sm:p-3 justify-between items-center transition-all">
                 <span class="text-xs sm:text-sm text-red-600 dark:text-red-400 font-medium"><i class="fa-solid fa-check-double mr-1.5"></i>已選擇 <span id="batch-count-revenue" class="font-bold">0</span> 筆資料</span>
-                <button onclick="confirmBatchDelete('revenue')" class="bg-red-600 hover:bg-red-500 text-white text-xs sm:text-sm font-medium px-3 sm:px-4 py-1.5 rounded-lg transition shadow-sm active:scale-95">批次刪除</button>
+                <button type="button" data-batch-delete-type="revenue" class="bg-red-600 hover:bg-red-500 text-white text-xs sm:text-sm font-medium px-3 sm:px-4 py-1.5 rounded-lg transition shadow-sm active:scale-95">批次刪除</button>
             </div>
             <div class="overflow-x-auto overflow-y-auto max-h-[65vh] 2xl:max-h-[70vh] rounded-b-xl w-full flex-grow relative">
                 <table class="min-w-full text-left text-sm whitespace-nowrap table-auto w-full">
@@ -432,7 +432,7 @@ button { touch-action: manipulation; }
             </div>
             <div id="batch-bar-report" class="hidden bg-red-50 dark:bg-red-900/20 border-b border-gray-200 dark:border-gray-700/50 p-2 sm:p-3 justify-between items-center transition-all">
                 <span class="text-xs sm:text-sm text-red-600 dark:text-red-400 font-medium"><i class="fa-solid fa-check-double mr-1.5"></i>已選擇 <span id="batch-count-report" class="font-bold">0</span> 筆資料</span>
-                <button onclick="confirmBatchDelete('report')" class="bg-red-600 hover:bg-red-500 text-white text-xs sm:text-sm font-medium px-3 sm:px-4 py-1.5 rounded-lg transition shadow-sm active:scale-95">批次刪除</button>
+                <button type="button" data-batch-delete-type="report" class="bg-red-600 hover:bg-red-500 text-white text-xs sm:text-sm font-medium px-3 sm:px-4 py-1.5 rounded-lg transition shadow-sm active:scale-95">批次刪除</button>
             </div>
             <div class="overflow-x-auto overflow-y-auto max-h-[65vh] 2xl:max-h-[70vh] rounded-b-xl w-full flex-grow relative">
                 <table class="min-w-full text-left text-sm whitespace-nowrap table-auto w-full">
@@ -501,7 +501,7 @@ button { touch-action: manipulation; }
             </div>
             <div id="batch-bar-checklist" class="hidden bg-red-50 dark:bg-red-900/20 border-b border-gray-200 dark:border-gray-700/50 p-2 sm:p-3 justify-between items-center transition-all">
                 <span class="text-xs sm:text-sm text-red-600 dark:text-red-400 font-medium"><i class="fa-solid fa-check-double mr-1.5"></i>已選擇 <span id="batch-count-checklist" class="font-bold">0</span> 筆資料</span>
-                <button onclick="confirmBatchDelete('checklist')" class="bg-red-600 hover:bg-red-500 text-white text-xs sm:text-sm font-medium px-3 sm:px-4 py-1.5 rounded-lg transition shadow-sm active:scale-95">批次刪除</button>
+                <button type="button" data-batch-delete-type="checklist" class="bg-red-600 hover:bg-red-500 text-white text-xs sm:text-sm font-medium px-3 sm:px-4 py-1.5 rounded-lg transition shadow-sm active:scale-95">批次刪除</button>
             </div>
             <div class="overflow-x-auto overflow-y-auto max-h-[65vh] rounded-b-xl w-full flex-grow relative">
                 <table class="min-w-full text-left text-sm whitespace-nowrap table-auto w-full">
@@ -548,7 +548,7 @@ button { touch-action: manipulation; }
             </div>
             <div id="batch-bar-plan" class="hidden bg-red-50 dark:bg-red-900/20 border-b border-gray-200 dark:border-gray-700/50 p-2 sm:p-3 justify-between items-center transition-all">
                 <span class="text-xs sm:text-sm text-red-600 dark:text-red-400 font-medium"><i class="fa-solid fa-check-double mr-1.5"></i>已選擇 <span id="batch-count-plan" class="font-bold">0</span> 筆資料</span>
-                <button onclick="confirmBatchDelete('plan')" class="bg-red-600 hover:bg-red-500 text-white text-xs sm:text-sm font-medium px-3 sm:px-4 py-1.5 rounded-lg transition shadow-sm active:scale-95">批次刪除</button>
+                <button type="button" data-batch-delete-type="plan" class="bg-red-600 hover:bg-red-500 text-white text-xs sm:text-sm font-medium px-3 sm:px-4 py-1.5 rounded-lg transition shadow-sm active:scale-95">批次刪除</button>
             </div>
             <div class="overflow-x-auto overflow-y-auto max-h-[65vh] rounded-b-xl w-full">
                 <table class="min-w-full text-left text-sm whitespace-nowrap table-auto w-full">
@@ -635,7 +635,7 @@ button { touch-action: manipulation; }
             </div>
             <div id="batch-bar-fav" class="hidden bg-red-50 dark:bg-red-900/20 border-b border-gray-200 dark:border-gray-700/50 p-2 sm:p-3 justify-between items-center transition-all">
                 <span class="text-xs sm:text-sm text-red-600 dark:text-red-400 font-medium"><i class="fa-solid fa-check-double mr-1.5"></i>已選擇 <span id="batch-count-fav" class="font-bold">0</span> 筆資料</span>
-                <button onclick="confirmBatchDelete('fav')" class="bg-red-600 hover:bg-red-500 text-white text-xs sm:text-sm font-medium px-3 sm:px-4 py-1.5 rounded-lg transition shadow-sm active:scale-95">批次刪除</button>
+                <button type="button" data-batch-delete-type="fav" class="bg-red-600 hover:bg-red-500 text-white text-xs sm:text-sm font-medium px-3 sm:px-4 py-1.5 rounded-lg transition shadow-sm active:scale-95">批次刪除</button>
             </div>
             <div class="overflow-x-auto overflow-y-auto max-h-[65vh] 2xl:max-h-[70vh] flex-grow relative rounded-b-xl w-full">
                 <table class="min-w-full text-left text-sm whitespace-nowrap table-auto w-full">
@@ -708,8 +708,8 @@ button { touch-action: manipulation; }
         <h3 class="font-bold mb-3 text-red-500 dark:text-red-400 text-xl flex items-center"><i class="fa-solid fa-triangle-exclamation mr-2"></i>確認批次刪除</h3>
         <input type="hidden" id="batch-delete-type">
         <p id="batch-delete-msg" class="text-sm text-gray-600 dark:text-gray-300 mb-5 leading-relaxed bg-red-50 dark:bg-red-900/20 p-3 rounded-lg border border-red-200 dark:border-red-800/30 shadow-inner"></p>
-        <div class="flex gap-3"><button onclick="executeBatchDelete()" class="flex-1 bg-red-600 hover:bg-red-50 text-white py-2.5 rounded-lg text-sm font-bold transition shadow-md active:scale-95">確定刪除</button></div>
-        <button onclick="document.getElementById('batch-delete-modal').classList.add('hidden')" class="w-full mt-3 bg-gray-100 dark:bg-transparent hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 py-2.5 rounded-lg text-sm transition active:scale-95">取消</button>
+        <div class="flex gap-3"><button type="button" id="btn-batch-delete-confirm" class="flex-1 bg-red-600 hover:bg-red-50 text-white py-2.5 rounded-lg text-sm font-bold transition shadow-md active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed">確定刪除</button></div>
+        <button type="button" id="btn-batch-delete-cancel" class="w-full mt-3 bg-gray-100 dark:bg-transparent hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 py-2.5 rounded-lg text-sm transition active:scale-95">取消</button>
     </div>
 </div>
 <div id="confirm-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center z-[100] hidden transition-opacity duration-300">
@@ -1077,19 +1077,67 @@ const handleJournalTableAction=async(e)=>{
 document.getElementById('journal-table-body')?.addEventListener('click',handleJournalTableAction); document.getElementById('fav-table-body')?.addEventListener('click',handleJournalTableAction);
 function processAndRenderJournals(){renderTableRows(getFilteredAndSortedData(state.journals,state.filters,state.sortConfig),'journal-table-body','journal-empty');}
 function renderFavorites(){renderTableRows(getFilteredAndSortedData(state.journals,state.favFilters,state.favSortConfig).filter(j=>j.isFavorite),'fav-table-body','fav-empty',true);}
-function updateBatchUI(t){const b=document.getElementById(`batch-bar-${t}`),c=document.getElementById(`batch-count-${t}`);if(!b||!c)return;const sz=selectedIds[t].size;if(sz>0){b.classList.remove('hidden');b.classList.add('flex');c.textContent=sz;}else{b.classList.add('hidden');b.classList.remove('flex');}const sa=document.querySelector(`.select-all-cb[data-type="${t}"]`);if(sa){const tot=document.querySelectorAll(`.row-cb[data-type="${t}"]`).length;sa.checked=(tot>0&&sz===tot);sa.indeterminate=(sz>0&&sz<tot);}}
+const getVisibleRowCheckboxes=t=>Array.from(document.querySelectorAll(`.row-cb[data-type="${t}"]`));
+function updateBatchUI(t){
+    const b=document.getElementById(`batch-bar-${t}`),c=document.getElementById(`batch-count-${t}`);
+    if(!b||!c||!selectedIds[t])return;
+    selectedIds[t]=new Set(Array.from(selectedIds[t],id=>String(id)));
+    const rows=getVisibleRowCheckboxes(t),visibleIds=new Set(rows.map(cb=>String(cb.value)));
+    Array.from(selectedIds[t]).forEach(id=>{if(!visibleIds.has(id))selectedIds[t].delete(id);});
+    rows.forEach(cb=>{cb.checked=selectedIds[t].has(String(cb.value));});
+    const sz=selectedIds[t].size,tot=visibleIds.size;
+    if(sz>0){b.classList.remove('hidden');b.classList.add('flex');c.textContent=sz;}else{b.classList.add('hidden');b.classList.remove('flex');c.textContent='0';}
+    const sa=document.querySelector(`.select-all-cb[data-type="${t}"]`);
+    if(sa){sa.checked=(tot>0&&sz===tot);sa.indeterminate=(sz>0&&sz<tot);}
+}
 
-document.addEventListener('change',e=>{if(e.target.classList.contains('row-cb')){const t=e.target.dataset.type;if(e.target.checked)selectedIds[t].add(e.target.value);else selectedIds[t].delete(e.target.value);updateBatchUI(t);}if(e.target.classList.contains('select-all-cb')){const t=e.target.dataset.type,ic=e.target.checked;document.querySelectorAll(`.row-cb[data-type="${t}"]`).forEach(cb=>{cb.checked=ic;if(ic)selectedIds[t].add(cb.value);else selectedIds[t].delete(cb.value);});updateBatchUI(t);}});
-window.confirmBatchDelete=t=>{if(selectedIds[t].size===0)return;document.getElementById('batch-delete-type').value=t;document.getElementById('batch-delete-msg').textContent=`確定要刪除這 ${selectedIds[t].size} 筆資料嗎？`;document.getElementById('batch-delete-modal').classList.remove('hidden');};
-window.executeBatchDelete=async()=>{
-    const t=document.getElementById('batch-delete-type').value,ids=Array.from(selectedIds[t]);
-    if(t==='journal'||t==='fav'){state.journals=state.journals.filter(j=>!ids.includes(j.id));ids.forEach(id=>deleteDataFromCloud(`journals/${id}`).catch(()=>{}));selectedIds.journal.clear();selectedIds.fav.clear();processAndRenderJournals();renderFavorites();}
-    else if(t==='plan'){state.plans=state.plans.filter(p=>!ids.includes(p.id));ids.forEach(id=>deleteDataFromCloud(`plans/${id}`).catch(()=>{}));selectedIds.plan.clear();renderPlans();}
-    else if(t==='revenue'){state.revenueRecords=state.revenueRecords.filter(r=>!ids.includes(r.id));ids.forEach(id=>deleteDataFromCloud(`revenueRecords/${id}`).catch(()=>{}));selectedIds.revenue.clear();renderRevenueRecords();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();}
-    else if(t==='report'){state.reports=state.reports.filter(r=>!ids.includes(r.id));ids.forEach(id=>deleteDataFromCloud(`reports/${id}`).catch(()=>{}));selectedIds.report.clear();renderReports();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();}
-    else if(t==='checklist'){state.checklists=state.checklists.filter(c=>!ids.includes(c.id));ids.forEach(id=>deleteDataFromCloud(`checklists/${id}`).catch(()=>{}));selectedIds.checklist.clear();renderChecklists();}
-    saveLocalData();document.getElementById('batch-delete-modal').classList.add('hidden');showToast(`刪除 ${ids.length} 筆`);
+document.addEventListener('change',e=>{
+    if(e.target.classList.contains('row-cb')){
+        const t=e.target.dataset.type,id=String(e.target.value);
+        if(!selectedIds[t])return;
+        if(e.target.checked)selectedIds[t].add(id);else selectedIds[t].delete(id);
+        updateBatchUI(t);
+    }else if(e.target.classList.contains('select-all-cb')){
+        const t=e.target.dataset.type,checked=e.target.checked;
+        if(!selectedIds[t])return;
+        getVisibleRowCheckboxes(t).forEach(cb=>{const id=String(cb.value);cb.checked=checked;if(checked)selectedIds[t].add(id);else selectedIds[t].delete(id);});
+        updateBatchUI(t);
+    }
+});
+window.confirmBatchDelete=t=>{
+    updateBatchUI(t);
+    if(!selectedIds[t]||selectedIds[t].size===0)return showToast('請先勾選要刪除的資料','error');
+    document.getElementById('batch-delete-type').value=t;
+    document.getElementById('batch-delete-msg').textContent=`確定要刪除這 ${selectedIds[t].size} 筆資料嗎？`;
+    document.getElementById('batch-delete-modal').classList.remove('hidden');
 };
+window.executeBatchDelete=async()=>{
+    const confirmBtn=document.getElementById('btn-batch-delete-confirm');
+    if(confirmBtn?.disabled)return;
+    const t=document.getElementById('batch-delete-type').value;
+    updateBatchUI(t);
+    const ids=Array.from(selectedIds[t]||[],id=>String(id));
+    if(ids.length===0){document.getElementById('batch-delete-modal').classList.add('hidden');return showToast('沒有可刪除的資料','error');}
+    const idSet=new Set(ids),keep=item=>!idSet.has(String(item.id));
+    let cloudFolder='';
+    if(confirmBtn)confirmBtn.disabled=true;
+    try{
+        if(t==='journal'||t==='fav'){state.journals=state.journals.filter(keep);cloudFolder='journals';selectedIds.journal.clear();selectedIds.fav.clear();processAndRenderJournals();renderFavorites();}
+        else if(t==='plan'){state.plans=state.plans.filter(keep);cloudFolder='plans';selectedIds.plan.clear();renderPlans();}
+        else if(t==='revenue'){state.revenueRecords=state.revenueRecords.filter(keep);cloudFolder='revenueRecords';selectedIds.revenue.clear();renderRevenueRecords();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();}
+        else if(t==='report'){state.reports=state.reports.filter(keep);cloudFolder='reports';selectedIds.report.clear();renderReports();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();}
+        else if(t==='checklist'){state.checklists=state.checklists.filter(keep);cloudFolder='checklists';selectedIds.checklist.clear();renderChecklists();}
+        else throw new Error('不支援的清單類型');
+        saveLocalData();
+        document.getElementById('batch-delete-modal').classList.add('hidden');
+        await Promise.allSettled(ids.map(id=>deleteDataFromCloud(`${cloudFolder}/${id}`)));
+        showToast(`已刪除 ${ids.length} 筆資料`);
+    }catch(err){console.error(err);showToast('批次刪除失敗，請重試','error');}
+    finally{if(confirmBtn)confirmBtn.disabled=false;}
+};
+document.addEventListener('click',e=>{const b=e.target.closest('[data-batch-delete-type]');if(b){e.preventDefault();window.confirmBatchDelete(b.dataset.batchDeleteType);}});
+document.getElementById('btn-batch-delete-confirm')?.addEventListener('click',window.executeBatchDelete);
+document.getElementById('btn-batch-delete-cancel')?.addEventListener('click',()=>document.getElementById('batch-delete-modal').classList.add('hidden'));
 
 const filterFields=[{key:'start',cls:'filter-start',type:'value'},{key:'end',cls:'filter-end',type:'value'},{key:'code',cls:'filter-code',type:'value'},{key:'futuresOnly',cls:'filter-futures',type:'checked'},{key:'excludeNegativeGrowth',cls:'filter-exclude-negative-growth',type:'checked'},{key:'revenueHigh',cls:'filter-revenue-high',type:'checked'},{key:'minScore',cls:'filter-score',type:'value',isInt:true}];
 const handleFilterChange=debounce((f,el)=>{let v=el.type==='checkbox'?el.checked:el.value;if(f.isInt)v=parseInt(v)||0;if(f.type==='value'&&el.type==='text')v=v.trim();state.filters[f.key]=v;state.favFilters[f.key]=v;document.querySelectorAll(`.${f.cls}`).forEach(o=>{if(f.type==='checked')o.checked=v;else o.value=v;});processAndRenderJournals();renderFavorites();saveLocalData();},300);
