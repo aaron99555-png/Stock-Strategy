@@ -55,6 +55,10 @@ input[type="date"]::-webkit-calendar-picker-indicator, input[type="month"]::-web
 @keyframes modalEnter { from { opacity:0; transform:scale(0.95); } to { opacity:1; transform:scale(1); } }
 .table-sticky-bg { @apply bg-white dark:bg-gray-900; } .table-row-hover:hover .table-sticky-bg { @apply bg-gray-50 dark:bg-gray-800; }
 .check-card { transition:all 0.2s cubic-bezier(0.4,0,0.2,1); } .check-card:active { transform:scale(0.97); }
+.filter-copy-layout { display:grid !important; grid-template-columns:minmax(0,1fr) !important; grid-template-rows:auto auto !important; gap:0.75rem !important; width:100% !important; }
+.filter-toolbar { grid-row:1; min-width:0; width:100%; }
+.copy-toolbar { grid-row:2; min-width:0; width:100% !important; clear:both; background:rgba(239,246,255,0.92); border:1px solid #bfdbfe !important; border-radius:0.75rem; padding:0.65rem 0.75rem !important; }
+.dark .copy-toolbar { background:rgba(30,58,138,0.18); border-color:rgba(59,130,246,0.38) !important; }
 .report-summary-col { width:86vw; min-width:86vw; max-width:86vw; }
 .report-summary-cell { white-space:pre-wrap !important; overflow-wrap:anywhere; word-break:break-word; }
 @media (min-width:640px) {
@@ -188,8 +192,8 @@ button { touch-action: manipulation; }
         </div>
 
         <div class="card-panel border-t-4 border-t-blue-500 flex flex-col h-full min-h-[500px]">
-            <div class="p-4 border-b border-gray-200 dark:border-gray-700/50 bg-gray-50/80 dark:bg-gray-800/80 rounded-t-xl flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-                <div class="flex flex-wrap items-center gap-2 sm:gap-3 w-full lg:w-auto">
+            <div class="filter-copy-layout p-4 border-b border-gray-200 dark:border-gray-700/50 bg-gray-50/80 dark:bg-gray-800/80 rounded-t-xl">
+                <div class="filter-toolbar flex flex-wrap items-center gap-2 sm:gap-3 w-full">
                     <div class="flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 max-w-[180px] sm:max-w-none h-[38px] sm:h-auto box-border">
                         <span class="text-xs text-gray-500 dark:text-gray-400 px-1 sm:px-2 hidden sm:inline"><i class="fa-solid fa-filter mr-1"></i>區間</span>
                         <input type="date" id="filter-start" class="filter-start bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-0.5 sm:px-1 w-[75px] sm:w-auto text-center h-full box-border m-0">
@@ -226,8 +230,12 @@ button { touch-action: manipulation; }
                     <div id="filter-tags-display" class="flex flex-wrap gap-1.5 w-full md:w-auto mt-2 lg:mt-0"></div>
                 </div>
 
-                <div class="flex items-center justify-start lg:justify-end gap-1.5 sm:gap-2 w-full lg:w-auto border-t lg:border-t-0 border-gray-200 dark:border-gray-700 pt-3 lg:pt-0 overflow-x-auto scrollbar-hide">
-                    <span class="text-xs text-gray-400 dark:text-gray-500 mr-1 flex items-center font-medium hidden sm:flex flex-shrink-0">複製:</span>
+                <div class="copy-toolbar flex items-center justify-start gap-1.5 sm:gap-2 overflow-x-auto scrollbar-hide">
+                    <span class="text-xs text-blue-600 dark:text-blue-300 mr-1 flex items-center font-bold flex-shrink-0"><i class="fa-solid fa-copy mr-1.5"></i>複製功能</span>
+                    <label class="flex-shrink-0 flex items-center gap-1.5 cursor-pointer bg-purple-50 dark:bg-purple-900/40 border border-purple-200 dark:border-purple-700/50 text-purple-700 dark:text-purple-200 rounded-lg px-2.5 py-1.5 text-xs font-medium" title="按策略複製時，以 🔁 標示出現在不同策略的重複股票">
+                        <input type="checkbox" class="copy-compare-duplicates rounded border-purple-300 dark:border-purple-600 accent-purple-600 w-3.5 h-3.5">
+                        <span>比對重複</span>
+                    </label>
                     <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="selected">獨選</button>
                     <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="strategy">策略</button>
                     <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="score">分數</button>
@@ -578,8 +586,8 @@ button { touch-action: manipulation; }
                 <h2 class="font-bold text-yellow-600 dark:text-yellow-400 text-lg sm:text-xl flex items-center"><div class="bg-yellow-500/10 dark:bg-yellow-500/20 p-1.5 rounded mr-2"><i class="fa-solid fa-star"></i></div> 追蹤清單</h2>
                 <span class="text-xs sm:text-sm text-gray-400 bg-white dark:bg-gray-900/50 px-2 sm:px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700/50 shadow-inner">清單與主日誌同步連動</span>
             </div>
-            <div class="p-4 border-b border-gray-200 dark:border-gray-700/50 bg-gray-50/80 dark:bg-gray-800/80 flex flex-col lg:flex-row items-start lg:items-center gap-4 w-full justify-between">
-                <div class="flex flex-wrap items-center gap-2 sm:gap-3 w-full lg:w-auto">
+            <div class="filter-copy-layout p-4 border-b border-gray-200 dark:border-gray-700/50 bg-gray-50/80 dark:bg-gray-800/80 w-full">
+                <div class="filter-toolbar flex flex-wrap items-center gap-2 sm:gap-3 w-full">
                     <div class="flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 max-w-[180px] sm:max-w-none h-[38px] sm:h-auto box-border">
                         <span class="text-xs text-gray-500 dark:text-gray-400 px-1 sm:px-2 hidden sm:inline"><i class="fa-solid fa-filter mr-1"></i>區間</span>
                         <input type="date" id="filter-start-fav" class="filter-start bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-0.5 sm:px-1 w-[75px] sm:w-auto text-center h-full box-border m-0">
@@ -622,8 +630,12 @@ button { touch-action: manipulation; }
                     <div id="filter-tags-display-fav" class="flex flex-wrap gap-1.5 w-full md:w-auto mt-2 lg:mt-0"></div>
                 </div>
 
-                <div class="flex items-center justify-start lg:justify-end gap-1.5 sm:gap-2 w-full lg:w-auto border-t lg:border-t-0 border-gray-200 dark:border-gray-700 pt-3 lg:pt-0 overflow-x-auto scrollbar-hide">
-                    <span class="text-xs text-gray-400 dark:text-gray-500 mr-1 flex items-center font-medium hidden sm:flex flex-shrink-0">複製:</span>
+                <div class="copy-toolbar flex items-center justify-start gap-1.5 sm:gap-2 overflow-x-auto scrollbar-hide">
+                    <span class="text-xs text-blue-600 dark:text-blue-300 mr-1 flex items-center font-bold flex-shrink-0"><i class="fa-solid fa-copy mr-1.5"></i>複製功能</span>
+                    <label class="flex-shrink-0 flex items-center gap-1.5 cursor-pointer bg-purple-50 dark:bg-purple-900/40 border border-purple-200 dark:border-purple-700/50 text-purple-700 dark:text-purple-200 rounded-lg px-2.5 py-1.5 text-xs font-medium" title="按策略複製時，以 🔁 標示出現在不同策略的重複股票">
+                        <input type="checkbox" class="copy-compare-duplicates rounded border-purple-300 dark:border-purple-600 accent-purple-600 w-3.5 h-3.5">
+                        <span>比對重複</span>
+                    </label>
                     <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="selected">獨選</button>
                     <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="strategy">策略</button>
                     <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="score">分數</button>
@@ -741,7 +753,7 @@ const DB_URL="https://stockstrategy-492a1-default-rtdb.firebaseio.com", LOCAL_ST
 const getSyncKey=()=>localStorage.getItem('ryan_sync_key')||'default_local_user';
 const getSyncPath=()=>encodeURIComponent(getSyncKey());
 const isCloudMode=()=>!!localStorage.getItem('ryan_sync_key');
-let cloudSyncInterval=null, state={journals:[],plans:[],revenueRecords:[],reports:[],checklists:[],epsData:{},codeToName:{},nameToCode:{},filters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,tags:[],minScore:0,tagLogic:'OR'},favFilters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,tags:[],minScore:0,tagLogic:'OR'},revenueFilters:{month:'',code:''},reportFilters:{start:'',end:'',code:''},sortConfig:{key:'createdAt',asc:false},favSortConfig:{key:'createdAt',asc:false},planSortConfig:{key:'createdAt',asc:false},revenueSortConfig:{key:'month',asc:false},reportSortConfig:{key:'date',asc:false},checklistSortConfig:{key:'createdAt',asc:false}};
+let cloudSyncInterval=null, state={journals:[],plans:[],revenueRecords:[],reports:[],checklists:[],epsData:{},codeToName:{},nameToCode:{},copyCompareDuplicates:false,filters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,tags:[],minScore:0,tagLogic:'OR'},favFilters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,tags:[],minScore:0,tagLogic:'OR'},revenueFilters:{month:'',code:''},reportFilters:{start:'',end:'',code:''},sortConfig:{key:'createdAt',asc:false},favSortConfig:{key:'createdAt',asc:false},planSortConfig:{key:'createdAt',asc:false},revenueSortConfig:{key:'month',asc:false},reportSortConfig:{key:'date',asc:false},checklistSortConfig:{key:'createdAt',asc:false}};
 const selectedIds={journal:new Set(),fav:new Set(),plan:new Set(),revenue:new Set(),report:new Set(),checklist:new Set()};
 
 const escapeHTML=str=>(!str&&str!==0)?'':String(str).replace(/[&<>'"]/g,tag=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[tag]||tag));
@@ -1024,6 +1036,7 @@ function loadLocalData(){
     if(!state.favFilters)state.favFilters={start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,tags:[],minScore:0,tagLogic:'OR'};
     const migratedFilterTags=normalizeFilterStrategyTags(state.filters)|normalizeFilterStrategyTags(state.favFilters);
     if(!state.revenueFilters)state.revenueFilters={month:'',code:''}; if(!state.reportFilters)state.reportFilters={start:'',end:'',code:''};
+    if(state.copyCompareDuplicates===undefined)state.copyCompareDuplicates=false;
     let migratedReportFilter=false;
     if(!state.reportFiltersDefaultAllV1){state.reportFilters={start:'',end:'',code:''};state.reportFiltersDefaultAllV1=true;migratedReportFilter=true;}
     if(state.filters.tagLogic===undefined)state.filters.tagLogic='OR'; if(state.favFilters.tagLogic===undefined)state.favFilters.tagLogic='OR';
@@ -1260,10 +1273,26 @@ const orderTagsForCopy=(tags,selectedTags=[])=>{
     const order=new Map(selectedTags.map((tag,index)=>[tag,index]));
     return list.sort((a,b)=>(order.get(a)??Number.MAX_SAFE_INTEGER)-(order.get(b)??Number.MAX_SAFE_INTEGER));
 };
+const getDuplicateStrategyCodes=strategyMap=>{
+    const codeTags=new Map();
+    Object.entries(strategyMap||{}).forEach(([tag,items])=>{
+        const seenInTag=new Set();
+        (items||[]).forEach(item=>{
+            const code=String(item.code||'').trim();
+            if(!code||seenInTag.has(code))return;
+            seenInTag.add(code);
+            if(!codeTags.has(code))codeTags.set(code,new Set());
+            codeTags.get(code).add(tag);
+        });
+    });
+    return new Set(Array.from(codeTags.entries()).filter(([,tags])=>tags.size>1).map(([code])=>code));
+};
+const syncDuplicateCompareToggles=()=>document.querySelectorAll('.copy-compare-duplicates').forEach(cb=>cb.checked=!!state.copyCompareDuplicates);
+document.querySelectorAll('.copy-compare-duplicates').forEach(cb=>cb.addEventListener('change',e=>{state.copyCompareDuplicates=e.target.checked;syncDuplicateCompareToggles();saveLocalData();showToast(state.copyCompareDuplicates?'已開啟重複比對':'已關閉重複比對');}));
 const executeCopy=async t=>{if(navigator.clipboard&&window.isSecureContext){try{const ok=await window.copyTextOptimized(t);if(ok)return showToast('複製成功');}catch(e){console.warn('剪貼簿 API 無法使用，改用相容模式',e);}}fallbackCopy(t);};
 const fallbackCopy=t=>{const x=document.createElement("textarea");x.value=t;x.style.position="fixed";document.body.appendChild(x);x.focus();x.select();try{document.execCommand('copy');showToast('複製成功');}catch(e){showToast('複製失敗','error');}document.body.removeChild(x);};
 
-document.querySelectorAll('.btn-copy').forEach(b=>{b.addEventListener('click',e=>{const m=e.currentTarget.dataset.mode,at=document.querySelector('.tab-content.active').id,iF=at==='module-favorites',cf=iF?state.favFilters:state.filters,lt=iF?'fav':'journal';let d=getFilteredAndSortedData(state.journals,cf,iF?state.favSortConfig:state.sortConfig);if(iF)d=d.filter(j=>j.isFavorite);let ds=cf.start===cf.end?(cf.start?cf.start.replace(/-/g,'/'):'全區間'):`${cf.start.replace(/-/g,'/')}~${cf.end.replace(/-/g,'/')}`,ts=cf.tags.length>0?` [標籤條件: ${cf.tags.join(cf.tagLogic==='AND'?' 且 ':' 或 ')}]`:'';if(m==='selected'){let ci=selectedIds[lt];if(ci.size===0)return showToast('請先勾選','error');d=d.filter(j=>ci.has(j.id));d.sort((a,b)=>{const dt=new Date(a.date)-new Date(b.date);return dt!==0?dt:(a.createdAt||0)-(b.createdAt||0);});let tx=`| ${ds} 多重篩選漏斗${ts} |\n\n`;d.forEach(j=>tx+=`${j.code} ${j.name}\n`);executeCopy(tx.trim()+copyFootnote);return;}d=d.filter(j=>!(j.tags&&j.tags.includes('特別追蹤')));if(d.length===0)return showToast('清單為空','error');let tx=`| ${ds} 多重篩選漏斗${ts} |\n\n`;if(m==='strategy'){const sm={};d.forEach(j=>{if(j.tags)j.tags.forEach(t=>{if(cf.tags.length>0?cf.tags.includes(t):t!=='特別追蹤'){if(!sm[t])sm[t]=[];sm[t].push(j);}});});const ord=cf.tags.length?[...cf.tags]:['跳空缺口','大腸包小腸','多頭營收創高','破繭而出','月來越好','季不可失','守株待兔','量價齊揚','OBV突破'];Object.keys(sm).sort((a,b)=>{const iA=ord.indexOf(a),iB=ord.indexOf(b);if(iA!==-1&&iB!==-1)return iA-iB;if(iA!==-1)return -1;if(iB!==-1)return 1;return a.localeCompare(b);}).forEach(s=>{tx+=`🎯 [${s}] (共 ${sm[s].length} 檔)\n`;sm[s].forEach(a=>tx+=`${a.code} ${a.name}\n`);tx+='\n';});}else if(m==='score'){
+document.querySelectorAll('.btn-copy').forEach(b=>{b.addEventListener('click',e=>{const m=e.currentTarget.dataset.mode,at=document.querySelector('.tab-content.active').id,iF=at==='module-favorites',cf=iF?state.favFilters:state.filters,lt=iF?'fav':'journal';let d=getFilteredAndSortedData(state.journals,cf,iF?state.favSortConfig:state.sortConfig);if(iF)d=d.filter(j=>j.isFavorite);let ds=cf.start===cf.end?(cf.start?cf.start.replace(/-/g,'/'):'全區間'):`${cf.start.replace(/-/g,'/')}~${cf.end.replace(/-/g,'/')}`,ts=cf.tags.length>0?` [標籤條件: ${cf.tags.join(cf.tagLogic==='AND'?' 且 ':' 或 ')}]`:'';if(m==='selected'){let ci=selectedIds[lt];if(ci.size===0)return showToast('請先勾選','error');d=d.filter(j=>ci.has(j.id));d.sort((a,b)=>{const dt=new Date(a.date)-new Date(b.date);return dt!==0?dt:(a.createdAt||0)-(b.createdAt||0);});let tx=`| ${ds} 多重篩選漏斗${ts} |\n\n`;d.forEach(j=>tx+=`${j.code} ${j.name}\n`);executeCopy(tx.trim()+copyFootnote);return;}d=d.filter(j=>!(j.tags&&j.tags.includes('特別追蹤')));if(d.length===0)return showToast('清單為空','error');let tx=`| ${ds} 多重篩選漏斗${ts} |\n\n`;if(m==='strategy'){const sm={};d.forEach(j=>{if(j.tags)j.tags.forEach(t=>{if(cf.tags.length>0?cf.tags.includes(t):t!=='特別追蹤'){if(!sm[t])sm[t]=[];sm[t].push(j);}});});const duplicateCodes=state.copyCompareDuplicates?getDuplicateStrategyCodes(sm):new Set();const ord=cf.tags.length?[...cf.tags]:['跳空缺口','大腸包小腸','多頭營收創高','破繭而出','月來越好','季不可失','守株待兔','量價齊揚','OBV突破'];Object.keys(sm).sort((a,b)=>{const iA=ord.indexOf(a),iB=ord.indexOf(b);if(iA!==-1&&iB!==-1)return iA-iB;if(iA!==-1)return -1;if(iB!==-1)return 1;return a.localeCompare(b);}).forEach(s=>{tx+=`🎯 [${s}] (共 ${sm[s].length} 檔)\n`;sm[s].forEach(a=>tx+=`${duplicateCodes.has(String(a.code||'').trim())?'🔁 ':''}${a.code} ${a.name}\n`);tx+='\n';});}else if(m==='score'){
     // --- 這裡合併分數 ---
     const scoreMap = {};
     d.forEach(j => {
@@ -1393,7 +1422,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
         });
     });
 
-    loadLocalData(); renderDynamicTags(); bindDatalistAutoUpdate();
+    loadLocalData(); syncDuplicateCompareToggles(); renderDynamicTags(); bindDatalistAutoUpdate();
     bindAutoFill('j-code','j-name',c=>updatePreview(c,'j-preview','blue')); bindAutoFill('c-code','c-name'); bindAutoFill('r-code','r-name'); bindAutoFill('rep-code','rep-name'); bindAutoFill('p-stock','p-name'); bindAutoFill('modal-plan-stock','modal-plan-name'); 
     bindAutoFill('chk-code','chk-name',c=>{
         updatePreview(c,'chk-preview','cyan');
