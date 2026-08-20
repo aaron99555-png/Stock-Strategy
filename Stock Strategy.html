@@ -236,6 +236,7 @@ button { touch-action: manipulation; }
                         <input type="checkbox" class="copy-compare-duplicates rounded border-purple-300 dark:border-purple-600 accent-purple-600 w-3.5 h-3.5">
                         <span>比對重複</span>
                     </label>
+                    <button class="flex-shrink-0 btn-copy-base bg-rose-50 dark:bg-rose-900/40 hover:bg-rose-600 border-rose-200 dark:border-rose-700/50 text-rose-700 dark:text-rose-200 btn-copy" data-mode="feifan">非凡重點</button>
                     <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="selected">獨選</button>
                     <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="strategy">策略</button>
                     <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="score">分數</button>
@@ -636,6 +637,7 @@ button { touch-action: manipulation; }
                         <input type="checkbox" class="copy-compare-duplicates rounded border-purple-300 dark:border-purple-600 accent-purple-600 w-3.5 h-3.5">
                         <span>比對重複</span>
                     </label>
+                    <button class="flex-shrink-0 btn-copy-base bg-rose-50 dark:bg-rose-900/40 hover:bg-rose-600 border-rose-200 dark:border-rose-700/50 text-rose-700 dark:text-rose-200 btn-copy" data-mode="feifan">非凡重點</button>
                     <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="selected">獨選</button>
                     <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="strategy">策略</button>
                     <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="score">分數</button>
@@ -778,7 +780,7 @@ const THEME_MAP = {
 };
 
 const TAG_CATEGORIES = [
-    {title: "🌟 特別關注", theme: "rose", tags: ["特別追蹤"]},
+    {title: "🌟 特別關注", theme: "rose", tags: ["特別追蹤", "非凡重點"]},
     {title: "📊 基本面佳", theme: "blue", tags: ["多頭營收創高", "赤兔馬", "千里馬"]},
     {title: "🔥 動能與型態", theme: "amber", tags: ["一陽指", "金包銀", "披荊斬棘", "破繭而出", "月來越好", "季不可失", "守株待兔", "跳空缺口", "小碎步", "多排破上關"]},
     {title: "💰 量價與籌碼", theme: "purple", tags: ["量價齊揚", "高成交值", "法人加持", "1日籌碼集中", "5日籌碼集中", "20日籌碼集中"]},
@@ -837,7 +839,8 @@ const normalizeReportDate=value=>{
 const formatNumColor=(val,isP=false)=>{if(val==null||val==='-'||val==='')return'<span class="text-gray-400 dark:text-gray-500">-</span>';const n=parseFloat(val);if(isNaN(n))return'<span class="text-gray-400 dark:text-gray-500">-</span>';return`<span class="font-bold ${n>0?'tw-red':(n<0?'tw-green':'text-gray-900 dark:text-white')}">${isP?(n*100).toFixed(2)+'%':n.toString()}</span>`;};
 const formatTargetPrice=val=>(val==null||val==='-'||val===''||isNaN(val))?'<span class="text-gray-400 dark:text-gray-500">-</span>':`<span class="font-bold text-yellow-600 dark:text-yellow-400">${escapeHTML(val)}</span>`;
 const getEpsInfo=(c,j)=>{const e=state.epsData[c]||{};return{eps2025:e.eps2025??j?.eps2025??null,eps2026:e.eps2026??j?.eps2026??null,epsGrowth:e.epsGrowth??j?.epsGrowth??null,futures:e.futures==='●'||j?.futures==='●',targetPrice:e.targetPrice??j?.targetPrice??null,broker:e.broker??j?.broker??null,reportDate:e.reportDate??j?.reportDate??null};};
-const getScore=(t,e)=>{let s=0;if(t)s=t.filter(x=>x!=='特別追蹤').length;const g=parseFloat(e?.epsGrowth),e26=parseFloat(e?.eps2026);if(!isNaN(g)&&g>0&&!isNaN(e26)&&e26>0)s+=1;return s;};
+const NON_STRATEGY_COPY_TAGS=new Set(['特別追蹤','非凡重點']);
+const getScore=(t,e)=>{let s=0;if(t)s=t.filter(x=>!NON_STRATEGY_COPY_TAGS.has(x)).length;const g=parseFloat(e?.epsGrowth),e26=parseFloat(e?.eps2026);if(!isNaN(g)&&g>0&&!isNaN(e26)&&e26>0)s+=1;return s;};
 const getRevenueMonthsHtml=c=>{const r=state.revenueRecords.filter(x=>x.code===c);if(r.length===0)return'<span class="text-gray-300 dark:text-gray-600 text-xs">-</span>';r.sort((a,b)=>b.month.localeCompare(a.month));return r.map(x=>{const p=x.month.split('-'),m=parseInt(p[1],10);return`<span class="inline-block ${MONTH_BG_COLORS[(m-1)%12]} text-[10px] font-bold px-1.5 py-0.5 rounded mr-1 mb-1 border shadow-sm" title="${escapeHTML(x.month)}">${escapeHTML(p[0].substring(2)+'/'+p[1])}</span>`;}).join('');};
 
 const updatePreview=(c,tId='j-preview',col='blue')=>{
@@ -1292,15 +1295,15 @@ document.querySelectorAll('.copy-compare-duplicates').forEach(cb=>cb.addEventLis
 const executeCopy=async t=>{if(navigator.clipboard&&window.isSecureContext){try{const ok=await window.copyTextOptimized(t);if(ok)return showToast('複製成功');}catch(e){console.warn('剪貼簿 API 無法使用，改用相容模式',e);}}fallbackCopy(t);};
 const fallbackCopy=t=>{const x=document.createElement("textarea");x.value=t;x.style.position="fixed";document.body.appendChild(x);x.focus();x.select();try{document.execCommand('copy');showToast('複製成功');}catch(e){showToast('複製失敗','error');}document.body.removeChild(x);};
 
-document.querySelectorAll('.btn-copy').forEach(b=>{b.addEventListener('click',e=>{const m=e.currentTarget.dataset.mode,at=document.querySelector('.tab-content.active').id,iF=at==='module-favorites',cf=iF?state.favFilters:state.filters,lt=iF?'fav':'journal';let d=getFilteredAndSortedData(state.journals,cf,iF?state.favSortConfig:state.sortConfig);if(iF)d=d.filter(j=>j.isFavorite);let ds=cf.start===cf.end?(cf.start?cf.start.replace(/-/g,'/'):'全區間'):`${cf.start.replace(/-/g,'/')}~${cf.end.replace(/-/g,'/')}`,ts=cf.tags.length>0?` [標籤條件: ${cf.tags.join(cf.tagLogic==='AND'?' 且 ':' 或 ')}]`:'';if(m==='selected'){let ci=selectedIds[lt];if(ci.size===0)return showToast('請先勾選','error');d=d.filter(j=>ci.has(j.id));d.sort((a,b)=>{const dt=new Date(a.date)-new Date(b.date);return dt!==0?dt:(a.createdAt||0)-(b.createdAt||0);});let tx=`| ${ds} 多重篩選漏斗${ts} |\n\n`;d.forEach(j=>tx+=`${j.code} ${j.name}\n`);executeCopy(tx.trim()+copyFootnote);return;}d=d.filter(j=>!(j.tags&&j.tags.includes('特別追蹤')));if(d.length===0)return showToast('清單為空','error');let tx=`| ${ds} 多重篩選漏斗${ts} |\n\n`;if(m==='strategy'){const sm={};d.forEach(j=>{if(j.tags)j.tags.forEach(t=>{if(cf.tags.length>0?cf.tags.includes(t):t!=='特別追蹤'){if(!sm[t])sm[t]=[];sm[t].push(j);}});});const duplicateCodes=state.copyCompareDuplicates?getDuplicateStrategyCodes(sm):new Set();const ord=cf.tags.length?[...cf.tags]:['跳空缺口','大腸包小腸','多頭營收創高','破繭而出','月來越好','季不可失','守株待兔','量價齊揚','OBV突破'];Object.keys(sm).sort((a,b)=>{const iA=ord.indexOf(a),iB=ord.indexOf(b);if(iA!==-1&&iB!==-1)return iA-iB;if(iA!==-1)return -1;if(iB!==-1)return 1;return a.localeCompare(b);}).forEach(s=>{tx+=`🎯 [${s}] (共 ${sm[s].length} 檔)\n`;sm[s].forEach(a=>tx+=`${duplicateCodes.has(String(a.code||'').trim())?'🔁 ':''}${a.code} ${a.name}\n`);tx+='\n';});}else if(m==='score'){
+document.querySelectorAll('.btn-copy').forEach(b=>{b.addEventListener('click',e=>{const m=e.currentTarget.dataset.mode,at=document.querySelector('.tab-content.active').id,iF=at==='module-favorites',cf=iF?state.favFilters:state.filters,lt=iF?'fav':'journal';let d=getFilteredAndSortedData(state.journals,cf,iF?state.favSortConfig:state.sortConfig);if(iF)d=d.filter(j=>j.isFavorite);let ds=cf.start===cf.end?(cf.start?cf.start.replace(/-/g,'/'):'全區間'):`${cf.start.replace(/-/g,'/')}~${cf.end.replace(/-/g,'/')}`,ts=cf.tags.length>0?` [標籤條件: ${cf.tags.join(cf.tagLogic==='AND'?' 且 ':' 或 ')}]`:'';if(m==='selected'){let ci=selectedIds[lt];if(ci.size===0)return showToast('請先勾選','error');d=d.filter(j=>ci.has(j.id));d.sort((a,b)=>{const dt=new Date(a.date)-new Date(b.date);return dt!==0?dt:(a.createdAt||0)-(b.createdAt||0);});let tx=`| ${ds} 多重篩選漏斗${ts} |\n\n`;d.forEach(j=>tx+=`${j.code} ${j.name}\n`);executeCopy(tx.trim()+copyFootnote);return;}if(m==='feifan'){const seen=new Set(),ff=d.filter(j=>j.tags&&j.tags.includes('非凡重點')).filter(j=>{const code=String(j.code||'').trim();if(!code||seen.has(code))return false;seen.add(code);return true;});if(ff.length===0)return showToast('無非凡重點標的','error');let tx=`| ${ds} 非凡重點 (共 ${ff.length} 檔) |\n\n`;ff.forEach(j=>tx+=`${j.code} ${j.name}\n`);executeCopy(tx.trim()+copyFootnote);return;}d=d.filter(j=>!(j.tags||[]).some(t=>NON_STRATEGY_COPY_TAGS.has(t)));if(d.length===0)return showToast('清單為空','error');let tx=`| ${ds} 多重篩選漏斗${ts} |\n\n`;if(m==='strategy'){const sm={};d.forEach(j=>{if(j.tags)j.tags.forEach(t=>{if(!NON_STRATEGY_COPY_TAGS.has(t)&&(cf.tags.length===0||cf.tags.includes(t))){if(!sm[t])sm[t]=[];sm[t].push(j);}});});const duplicateCodes=state.copyCompareDuplicates?getDuplicateStrategyCodes(sm):new Set();const ord=cf.tags.length?[...cf.tags]:['跳空缺口','大腸包小腸','多頭營收創高','破繭而出','月來越好','季不可失','守株待兔','量價齊揚','OBV突破'];Object.keys(sm).sort((a,b)=>{const iA=ord.indexOf(a),iB=ord.indexOf(b);if(iA!==-1&&iB!==-1)return iA-iB;if(iA!==-1)return -1;if(iB!==-1)return 1;return a.localeCompare(b);}).forEach(s=>{tx+=`🎯 [${s}] (共 ${sm[s].length} 檔)\n`;sm[s].forEach(a=>tx+=`${duplicateCodes.has(String(a.code||'').trim())?'🔁 ':''}${a.code} ${a.name}\n`);tx+='\n';});}else if(m==='score'){
     // --- 這裡合併分數 ---
     const scoreMap = {};
     d.forEach(j => {
         if(!scoreMap[j.code]) {
-            scoreMap[j.code] = { ...j, totalScore: j.score, tags: new Set(cf.tags.length>0?(j.tags||[]).filter(t=>cf.tags.includes(t)):(j.tags||[]).filter(t=>t!=='特別追蹤')) };
+            scoreMap[j.code] = { ...j, totalScore: j.score, tags: new Set(cf.tags.length>0?(j.tags||[]).filter(t=>cf.tags.includes(t)&&!NON_STRATEGY_COPY_TAGS.has(t)):(j.tags||[]).filter(t=>!NON_STRATEGY_COPY_TAGS.has(t))) };
         } else {
             scoreMap[j.code].totalScore += j.score;
-            let tg=cf.tags.length>0?(j.tags||[]).filter(t=>cf.tags.includes(t)):(j.tags||[]).filter(t=>t!=='特別追蹤');
+            let tg=cf.tags.length>0?(j.tags||[]).filter(t=>cf.tags.includes(t)&&!NON_STRATEGY_COPY_TAGS.has(t)):(j.tags||[]).filter(t=>!NON_STRATEGY_COPY_TAGS.has(t));
             tg.forEach(t=>scoreMap[j.code].tags.add(t));
         }
     });
@@ -1314,10 +1317,10 @@ document.querySelectorAll('.btn-copy').forEach(b=>{b.addEventListener('click',e=
     const scoreMap = {};
     d.filter(j=>j.ei?.futures).forEach(j=>{
         if(!scoreMap[j.code]) {
-             scoreMap[j.code] = { ...j, totalScore: j.score, tags: new Set(cf.tags.length>0?(j.tags||[]).filter(t=>cf.tags.includes(t)):(j.tags||[]).filter(t=>t!=='特別追蹤')) };
+             scoreMap[j.code] = { ...j, totalScore: j.score, tags: new Set(cf.tags.length>0?(j.tags||[]).filter(t=>cf.tags.includes(t)&&!NON_STRATEGY_COPY_TAGS.has(t)):(j.tags||[]).filter(t=>!NON_STRATEGY_COPY_TAGS.has(t))) };
         } else {
              scoreMap[j.code].totalScore += j.score;
-             let tg=cf.tags.length>0?(j.tags||[]).filter(t=>cf.tags.includes(t)):(j.tags||[]).filter(t=>t!=='特別追蹤');
+             let tg=cf.tags.length>0?(j.tags||[]).filter(t=>cf.tags.includes(t)&&!NON_STRATEGY_COPY_TAGS.has(t)):(j.tags||[]).filter(t=>!NON_STRATEGY_COPY_TAGS.has(t));
              tg.forEach(t=>scoreMap[j.code].tags.add(t));
         }
     });
