@@ -272,6 +272,9 @@ button { touch-action: manipulation; }
                 </table>
                 <div id="journal-empty" class="text-center py-16 text-gray-400 dark:text-gray-500 hidden absolute inset-0 flex items-center justify-center bg-white dark:bg-gray-800 text-sm z-0">查無符合條件的資料。</div>
             </div>
+            <div class="border-t border-gray-200 dark:border-gray-700/50 bg-gray-50/90 dark:bg-gray-800/90 px-4 py-2.5 text-right rounded-b-xl">
+                <span id="journal-stock-count" class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-blue-600 dark:text-blue-300"><i class="fa-solid fa-chart-simple"></i>目前顯示 0 檔股票</span>
+            </div>
         </div>
     </div>
 
@@ -672,6 +675,9 @@ button { touch-action: manipulation; }
                 </table>
                 <div id="fav-empty" class="text-center py-16 text-gray-400 dark:text-gray-500 hidden absolute inset-0 flex items-center justify-center bg-white dark:bg-gray-800 text-sm z-0">目前尚無追蹤標的。</div>
             </div>
+            <div class="border-t border-gray-200 dark:border-gray-700/50 bg-gray-50/90 dark:bg-gray-800/90 px-4 py-2.5 text-right rounded-b-xl">
+                <span id="fav-stock-count" class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-yellow-600 dark:text-yellow-300"><i class="fa-solid fa-chart-simple"></i>目前顯示 0 檔股票</span>
+            </div>
         </div>
     </div>
 </main>
@@ -1068,7 +1074,9 @@ const getFilteredAndSortedData=(dl,cf,cs)=>{
 };
 
 const renderTableRows=(data,tbId,emId,isFav=false)=>{
-    const tb=document.getElementById(tbId),em=document.getElementById(emId),lt=isFav?'fav':'journal';
+    const tb=document.getElementById(tbId),em=document.getElementById(emId),lt=isFav?'fav':'journal',countEl=document.getElementById(`${lt}-stock-count`);
+    const stockCount=new Set(data.map(item=>String(item.code||'').trim()).filter(Boolean)).size;
+    if(countEl)countEl.innerHTML=`<i class="fa-solid fa-chart-simple"></i>目前顯示 ${stockCount} 檔股票`;
     if(data.length===0){tb.innerHTML='';em.classList.remove('hidden');updateBatchUI(lt);return;}
     em.classList.add('hidden'); let rh='';
     data.forEach(i=>{
@@ -1277,7 +1285,7 @@ const orderTagsForCopy=(tags,selectedTags=[])=>{
     return list.sort((a,b)=>(order.get(a)??Number.MAX_SAFE_INTEGER)-(order.get(b)??Number.MAX_SAFE_INTEGER));
 };
 const COPY_TAG_ICONS={
-    '多頭營收創高':'📈','赤兔馬':'🐎','千里馬':'🏇','一陽指':'☝️','金包銀':'🥇','披荊斬棘':'⚔️','破繭而出':'🦋','月來越好':'🌙','季不可失':'🗓️','守株待兔':'🐇','跳空缺口':'🚀','小碎步':'👣','多排破上關':'🧱',
+    '多頭營收創高':'📈','赤兔馬':'🐴','千里馬':'🐴💨','一陽指':'☝️','金包銀':'🥇','披荊斬棘':'⚔️','破繭而出':'🦋','月來越好':'🌙','季不可失':'🗓️','守株待兔':'🐇','跳空缺口':'🚀','小碎步':'👣','多排破上關':'🧱',
     '量價齊揚':'📊','高成交值':'💰','法人加持':'🏦','1日籌碼集中':'1️⃣','5日籌碼集中':'5️⃣','20日籌碼集中':'2️⃣0️⃣','OBV突破':'🌊','MACD突破':'〽️','KD金叉':'✨','大腸包小腸':'🌭'
 };
 const COPY_TAG_ICON_POOL=['🔹','🔸','🔺','🔻','🟠','🟡','🟢','🔵','🟣','⚪','⚫','💠','🔷','🔶','▪️','▫️','♦️','♣️','♠️','♥️','🧩','🧭','🪄','🪙','🛡️','⚡','🔥','🌟','🎯','📌'];
