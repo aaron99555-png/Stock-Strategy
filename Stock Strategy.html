@@ -1276,6 +1276,23 @@ const orderTagsForCopy=(tags,selectedTags=[])=>{
     const order=new Map(selectedTags.map((tag,index)=>[tag,index]));
     return list.sort((a,b)=>(order.get(a)??Number.MAX_SAFE_INTEGER)-(order.get(b)??Number.MAX_SAFE_INTEGER));
 };
+const COPY_TAG_ICONS={
+    '多頭營收創高':'📈','赤兔馬':'🐎','千里馬':'🏇','一陽指':'☝️','金包銀':'🥇','披荊斬棘':'⚔️','破繭而出':'🦋','月來越好':'🌙','季不可失':'🗓️','守株待兔':'🐇','跳空缺口':'🚀','小碎步':'👣','多排破上關':'🧱',
+    '量價齊揚':'📊','高成交值':'💰','法人加持':'🏦','1日籌碼集中':'1️⃣','5日籌碼集中':'5️⃣','20日籌碼集中':'2️⃣0️⃣','OBV突破':'🌊','MACD突破':'〽️','KD金叉':'✨','大腸包小腸':'🌭'
+};
+const COPY_TAG_ICON_POOL=['🔹','🔸','🔺','🔻','🟠','🟡','🟢','🔵','🟣','⚪','⚫','💠','🔷','🔶','▪️','▫️','♦️','♣️','♠️','♥️','🧩','🧭','🪄','🪙','🛡️','⚡','🔥','🌟','🎯','📌'];
+const buildCopyTagIconMap=tags=>{
+    const result=new Map(),used=new Set();let poolIndex=0;
+    Array.from(tags||[]).forEach((tag,index)=>{
+        let icon=COPY_TAG_ICONS[tag];
+        if(!icon||used.has(icon)){
+            while(poolIndex<COPY_TAG_ICON_POOL.length&&used.has(COPY_TAG_ICON_POOL[poolIndex]))poolIndex++;
+            icon=COPY_TAG_ICON_POOL[poolIndex++]||`▫${index+1}`;
+        }
+        used.add(icon);result.set(tag,icon);
+    });
+    return result;
+};
 const getDuplicateStrategyCodes=strategyMap=>{
     const codeTags=new Map();
     Object.entries(strategyMap||{}).forEach(([tag,items])=>{
@@ -1295,7 +1312,7 @@ document.querySelectorAll('.copy-compare-duplicates').forEach(cb=>cb.addEventLis
 const executeCopy=async t=>{if(navigator.clipboard&&window.isSecureContext){try{const ok=await window.copyTextOptimized(t);if(ok)return showToast('複製成功');}catch(e){console.warn('剪貼簿 API 無法使用，改用相容模式',e);}}fallbackCopy(t);};
 const fallbackCopy=t=>{const x=document.createElement("textarea");x.value=t;x.style.position="fixed";document.body.appendChild(x);x.focus();x.select();try{document.execCommand('copy');showToast('複製成功');}catch(e){showToast('複製失敗','error');}document.body.removeChild(x);};
 
-document.querySelectorAll('.btn-copy').forEach(b=>{b.addEventListener('click',e=>{const m=e.currentTarget.dataset.mode,at=document.querySelector('.tab-content.active').id,iF=at==='module-favorites',cf=iF?state.favFilters:state.filters,lt=iF?'fav':'journal';let d=getFilteredAndSortedData(state.journals,cf,iF?state.favSortConfig:state.sortConfig);if(iF)d=d.filter(j=>j.isFavorite);let ds=cf.start===cf.end?(cf.start?cf.start.replace(/-/g,'/'):'全區間'):`${cf.start.replace(/-/g,'/')}~${cf.end.replace(/-/g,'/')}`,ts=cf.tags.length>0?` [標籤條件: ${cf.tags.join(cf.tagLogic==='AND'?' 且 ':' 或 ')}]`:'';if(m==='selected'){let ci=selectedIds[lt];if(ci.size===0)return showToast('請先勾選','error');d=d.filter(j=>ci.has(j.id));d.sort((a,b)=>{const dt=new Date(a.date)-new Date(b.date);return dt!==0?dt:(a.createdAt||0)-(b.createdAt||0);});let tx=`| ${ds} 多重篩選漏斗${ts} |\n\n`;d.forEach(j=>tx+=`${j.code} ${j.name}\n`);executeCopy(tx.trim()+copyFootnote);return;}if(m==='feifan'){const seen=new Set(),ff=d.filter(j=>j.tags&&j.tags.includes('非凡重點')).filter(j=>{const code=String(j.code||'').trim();if(!code||seen.has(code))return false;seen.add(code);return true;});if(ff.length===0)return showToast('無非凡重點標的','error');let tx=`| ${ds} 非凡重點 (共 ${ff.length} 檔) |\n\n`;ff.forEach(j=>tx+=`${j.code} ${j.name}\n`);executeCopy(tx.trim()+copyFootnote);return;}d=d.filter(j=>!(j.tags||[]).some(t=>NON_STRATEGY_COPY_TAGS.has(t)));if(d.length===0)return showToast('清單為空','error');let tx=`| ${ds} 多重篩選漏斗${ts} |\n\n`;if(m==='strategy'){const sm={};d.forEach(j=>{if(j.tags)j.tags.forEach(t=>{if(!NON_STRATEGY_COPY_TAGS.has(t)&&(cf.tags.length===0||cf.tags.includes(t))){if(!sm[t])sm[t]=[];sm[t].push(j);}});});const duplicateCodes=state.copyCompareDuplicates?getDuplicateStrategyCodes(sm):new Set();const ord=cf.tags.length?[...cf.tags]:['跳空缺口','大腸包小腸','多頭營收創高','破繭而出','月來越好','季不可失','守株待兔','量價齊揚','OBV突破'];Object.keys(sm).sort((a,b)=>{const iA=ord.indexOf(a),iB=ord.indexOf(b);if(iA!==-1&&iB!==-1)return iA-iB;if(iA!==-1)return -1;if(iB!==-1)return 1;return a.localeCompare(b);}).forEach(s=>{tx+=`🎯 [${s}] (共 ${sm[s].length} 檔)\n`;sm[s].forEach(a=>tx+=`${duplicateCodes.has(String(a.code||'').trim())?'🔁 ':''}${a.code} ${a.name}\n`);tx+='\n';});}else if(m==='score'){
+document.querySelectorAll('.btn-copy').forEach(b=>{b.addEventListener('click',e=>{const m=e.currentTarget.dataset.mode,at=document.querySelector('.tab-content.active').id,iF=at==='module-favorites',cf=iF?state.favFilters:state.filters,lt=iF?'fav':'journal';let d=getFilteredAndSortedData(state.journals,cf,iF?state.favSortConfig:state.sortConfig);if(iF)d=d.filter(j=>j.isFavorite);let ds=cf.start===cf.end?(cf.start?cf.start.replace(/-/g,'/'):'全區間'):`${cf.start.replace(/-/g,'/')}~${cf.end.replace(/-/g,'/')}`,ts=cf.tags.length>0?` [標籤條件: ${cf.tags.join(cf.tagLogic==='AND'?' 且 ':' 或 ')}]`:'';if(m==='selected'){let ci=selectedIds[lt];if(ci.size===0)return showToast('請先勾選','error');d=d.filter(j=>ci.has(j.id));d.sort((a,b)=>{const dt=new Date(a.date)-new Date(b.date);return dt!==0?dt:(a.createdAt||0)-(b.createdAt||0);});let tx=`| ${ds} 多重篩選漏斗${ts} |\n\n`;d.forEach(j=>tx+=`${j.code} ${j.name}\n`);executeCopy(tx.trim()+copyFootnote);return;}if(m==='feifan'){const seen=new Set(),ff=d.filter(j=>j.tags&&j.tags.includes('非凡重點')).filter(j=>{const code=String(j.code||'').trim();if(!code||seen.has(code))return false;seen.add(code);return true;});if(ff.length===0)return showToast('無非凡重點標的','error');let tx=`| ${ds} 非凡重點 (共 ${ff.length} 檔) |\n\n`;ff.forEach(j=>tx+=`${j.code} ${j.name}\n`);executeCopy(tx.trim()+copyFootnote);return;}d=d.filter(j=>!(j.tags||[]).some(t=>NON_STRATEGY_COPY_TAGS.has(t)));if(d.length===0)return showToast('清單為空','error');let tx=`| ${ds} 多重篩選漏斗${ts} |\n\n`;if(m==='strategy'){const sm={};d.forEach(j=>{if(j.tags)j.tags.forEach(t=>{if(!NON_STRATEGY_COPY_TAGS.has(t)&&(cf.tags.length===0||cf.tags.includes(t))){if(!sm[t])sm[t]=[];sm[t].push(j);}});});const duplicateCodes=state.copyCompareDuplicates?getDuplicateStrategyCodes(sm):new Set(),tagIcons=buildCopyTagIconMap(Object.keys(sm));const ord=cf.tags.length?[...cf.tags]:['跳空缺口','大腸包小腸','多頭營收創高','破繭而出','月來越好','季不可失','守株待兔','量價齊揚','OBV突破'];Object.keys(sm).sort((a,b)=>{const iA=ord.indexOf(a),iB=ord.indexOf(b);if(iA!==-1&&iB!==-1)return iA-iB;if(iA!==-1)return -1;if(iB!==-1)return 1;return a.localeCompare(b);}).forEach(s=>{tx+=`${tagIcons.get(s)||'🏷️'} [${s}] (共 ${sm[s].length} 檔)\n`;sm[s].forEach(a=>tx+=`${a.code} ${a.name}${duplicateCodes.has(String(a.code||'').trim())?' 🔁':''}\n`);tx+='\n';});}else if(m==='score'){
     // --- 這裡合併分數 ---
     const scoreMap = {};
     d.forEach(j => {
