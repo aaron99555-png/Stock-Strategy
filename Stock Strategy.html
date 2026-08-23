@@ -1737,7 +1737,14 @@ document.getElementById('btn-copy-calc-compact')?.addEventListener('click',()=>{
     const s=lastSupportSummary,intro=getCalcCopyIntro();let t=intro.text+'\n\n[綜合關鍵價位]\n';
     t+=s.pressure?`最近壓力: ${formatCalcPrice(s.pressure.value,s.isTX)}｜${formatCalcDistance(s.pressure.value,s.close,s.isTX)}｜${s.pressure.method} ${s.pressure.label}\n`:'最近壓力: -\n';
     t+=s.support?`最近支撐: ${formatCalcPrice(s.support.value,s.isTX)}｜${formatCalcDistance(s.support.value,s.close,s.isTX)}｜${s.support.method} ${s.support.label}\n`:'最近支撐: -\n';
-    if(s.confluences.length){t+='共振區:\n';s.confluences.forEach(x=>{t+=`- ${x.type==='pressure'?'壓力':'支撐'} ${formatCalcPrice(x.value,s.isTX)}｜${x.strength}｜${x.methods.join('+')}\n`;});}else t+='共振區: 無\n';
+    if(s.confluences.length){
+        const ordered=[...s.confluences].sort((a,b)=>{
+            const typeOrder=(a.type==='pressure'?0:1)-(b.type==='pressure'?0:1);
+            return typeOrder||b.value-a.value;
+        });
+        t+='共振區:\n';
+        ordered.forEach(x=>{t+=`- ${x.type==='pressure'?'壓力':'支撐'} ${formatCalcPrice(x.value,s.isTX)}｜${x.strength}｜${x.methods.join('+')}\n`;});
+    }else t+='共振區: 無\n';
     executeCopy(t.trim()+copyFootnote);
 });
 document.getElementById('btn-copy-calc-selected')?.addEventListener('click',()=>{
