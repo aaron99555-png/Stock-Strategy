@@ -327,11 +327,11 @@ button { touch-action: manipulation; }
             <div class="card-panel p-4 sm:p-5 border border-gray-200 dark:border-gray-700/50 shadow-md relative group hover:border-blue-300 dark:hover:border-blue-600">
                 <div class="flex justify-between items-center mb-4 border-b border-gray-200 dark:border-gray-700/50 pb-2"><h3 class="font-bold text-blue-600 dark:text-blue-400 text-base sm:text-lg">CDP</h3><button class="btn-copy-calc text-gray-400 hover:text-gray-700 bg-gray-100 dark:bg-gray-700 w-7 h-7 sm:w-8 sm:h-8 rounded flex items-center justify-center transition" data-target="cdp"><i class="fa-solid fa-copy"></i></button></div>
                 <div class="space-y-2 sm:space-y-2.5 text-sm">
-                    <div class="flex justify-between"><span class="text-gray-500 dark:text-gray-400">追買(AH)</span><span class="font-bold tw-red" id="cdp-ah">-</span></div>
-                    <div class="flex justify-between"><span class="text-gray-500 dark:text-gray-400">賣出(NH)</span><span class="font-bold tw-red" id="cdp-nh">-</span></div>
+                    <div class="flex justify-between"><span class="text-gray-500 dark:text-gray-400">AH</span><span class="font-bold tw-red" id="cdp-ah">-</span></div>
+                    <div class="flex justify-between"><span class="text-gray-500 dark:text-gray-400">NH</span><span class="font-bold tw-red" id="cdp-nh">-</span></div>
                     <div class="flex justify-between border-y border-gray-200 dark:border-gray-600/50 py-1.5 my-1.5 bg-gray-50 dark:bg-gray-900/30 px-2 rounded"><span class="text-gray-700 dark:text-gray-300 font-medium">均價(CDP)</span><span class="font-bold text-gray-900 dark:text-white" id="cdp-cdp">-</span></div>
-                    <div class="flex justify-between"><span class="text-gray-500 dark:text-gray-400">買進(NL)</span><span class="font-bold tw-green" id="cdp-nl">-</span></div>
-                    <div class="flex justify-between"><span class="text-gray-500 dark:text-gray-400">追賣(AL)</span><span class="font-bold tw-green" id="cdp-al">-</span></div>
+                    <div class="flex justify-between"><span class="text-gray-500 dark:text-gray-400">NL</span><span class="font-bold tw-green" id="cdp-nl">-</span></div>
+                    <div class="flex justify-between"><span class="text-gray-500 dark:text-gray-400">AL</span><span class="font-bold tw-green" id="cdp-al">-</span></div>
                 </div>
             </div>
             <div class="card-panel p-4 sm:p-5 border border-gray-200 dark:border-gray-700/50 shadow-md relative group hover:border-indigo-300 dark:hover:border-indigo-600">
@@ -1400,7 +1400,7 @@ document.getElementById('calc-form')?.addEventListener('submit',e=>{e.preventDef
 const getCalcText=t=>{
     if(document.getElementById('cdp-cdp').textContent==='-')return null;
     const c=document.getElementById('c-code').value.trim(),n=document.getElementById('c-name').value.trim(),s=(c||n)?`${c} ${n}`.trim():'';
-    const tC=`[CDP]\n追買(AH): ${document.getElementById('cdp-ah').textContent}\n賣出(NH): ${document.getElementById('cdp-nh').textContent}\n均價(CDP): ${document.getElementById('cdp-cdp').textContent}\n買進(NL):  ${document.getElementById('cdp-nl').textContent}\n追賣(AL):  ${document.getElementById('cdp-al').textContent}`;
+    const tC=`[CDP]\nAH: ${document.getElementById('cdp-ah').textContent}\nNH: ${document.getElementById('cdp-nh').textContent}\n均價(CDP): ${document.getElementById('cdp-cdp').textContent}\nNL: ${document.getElementById('cdp-nl').textContent}\nAL: ${document.getElementById('cdp-al').textContent}`;
     const tP=`[Pivot Points]\nR2: ${document.getElementById('pv-r2').textContent}\nR1: ${document.getElementById('pv-r1').textContent}\n樞軸點(PP): ${document.getElementById('pv-pp').textContent}\nS1: ${document.getElementById('pv-s1').textContent}\nS2: ${document.getElementById('pv-s2').textContent}`;
     const tG=`[Golden Ratio]\n0.191: ${document.getElementById('gr-191').textContent}\n0.382: ${document.getElementById('gr-382').textContent}\n0.500: ${document.getElementById('gr-500').textContent}\n0.618: ${document.getElementById('gr-618').textContent}\n0.809: ${document.getElementById('gr-809').textContent}`;
     const tFib=`[Fibonacci ratios]\nR3 (1.000): ${document.getElementById('fib-r3').textContent}\nR2 (0.618): ${document.getElementById('fib-r2').textContent}\nR1 (0.382): ${document.getElementById('fib-r1').textContent}\n基準點(PP): ${document.getElementById('fib-pp').textContent}\nS1 (0.382): ${document.getElementById('fib-s1').textContent}\nS2 (0.618): ${document.getElementById('fib-s2').textContent}\nS3 (1.000): ${document.getElementById('fib-s3').textContent}`;
