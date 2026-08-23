@@ -60,6 +60,9 @@ input[type="date"]::-webkit-calendar-picker-indicator, input[type="month"]::-web
 #module-journal table :is(th,td):nth-child(6), #module-journal table :is(th,td):nth-child(8),
 #module-favorites table :is(th,td):nth-child(6), #module-favorites table :is(th,td):nth-child(8) { width:80px; min-width:80px; max-width:80px; padding-left:0.375rem !important; padding-right:0.375rem !important; text-align:center !important; }
 #module-journal table :is(th,td):nth-child(7), #module-favorites table :is(th,td):nth-child(7) { width:60px; min-width:60px; max-width:60px; padding-left:0.25rem !important; padding-right:0.25rem !important; text-align:center !important; }
+@media (max-width:639px) {
+  #module-journal table :is(th,td):nth-child(10) { width:200px; min-width:200px; max-width:220px; white-space:normal; }
+}
 .check-card { transition:all 0.2s cubic-bezier(0.4,0,0.2,1); } .check-card:active { transform:scale(0.97); }
 .filter-toolbar { min-width:0; width:100%; }
 .copy-section { width:100%; clear:both; background:rgba(239,246,255,0.55); }
@@ -583,7 +586,8 @@ button { touch-action: manipulation; }
                     </div>
                 </div>
                 <div class="flex items-center justify-end gap-1.5 sm:gap-2 w-full lg:w-auto border-t lg:border-t-0 border-gray-200 dark:border-gray-700 pt-3 lg:pt-0">
-                    <button type="button" id="btn-clear-rep-filters" class="text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-red-600 text-gray-700 dark:text-gray-300 hover:text-white border border-gray-300 dark:border-gray-600 hover:border-red-500 px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center whitespace-nowrap mr-2"><i class="fa-solid fa-eraser sm:mr-1.5"></i><span class="hidden sm:inline">清除篩選</span></button>
+                    <button type="button" id="btn-clear-rep-filters" class="text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-red-600 text-gray-700 dark:text-gray-300 hover:text-white border border-gray-300 dark:border-gray-600 hover:border-red-500 px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center whitespace-nowrap"><i class="fa-solid fa-eraser sm:mr-1.5"></i><span class="hidden sm:inline">清除篩選</span></button>
+                    <button type="button" id="btn-open-report-reader" disabled class="text-xs sm:text-sm bg-indigo-600 hover:bg-indigo-500 text-white border border-indigo-600 px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm inline-flex items-center whitespace-nowrap active:scale-95 disabled:bg-gray-200 dark:disabled:bg-gray-700 disabled:text-gray-400 disabled:border-gray-300 dark:disabled:border-gray-600 disabled:cursor-not-allowed disabled:opacity-60"><i class="fa-solid fa-expand mr-1.5"></i>閱讀模式</button>
                     <button id="btn-copy-report" class="text-xs font-medium bg-indigo-50 dark:bg-indigo-900/40 hover:bg-indigo-600 border border-indigo-200 dark:border-indigo-700/50 text-indigo-700 dark:text-indigo-200 px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center active:scale-95"><i class="fa-solid fa-copy mr-1.5"></i>複製清單</button>
                 </div>
             </div>
@@ -599,7 +603,7 @@ button { touch-action: manipulation; }
                             <th class="py-3 px-3 sm:px-4 report-sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer sticky top-0 bg-gray-50 dark:bg-gray-900 z-40 w-[100px]" data-sort="date">日期 <i class="fa-solid fa-sort-down ml-1 text-xs text-blue-500"></i></th>
                             <th class="py-3 px-3 sm:px-4 report-sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer sticky top-0 bg-gray-50 dark:bg-gray-900 z-40 w-[120px]" data-sort="code">代號/股名 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
                             <th class="report-summary-col py-3 px-3 sm:px-4 sticky top-0 bg-gray-50 dark:bg-gray-900 z-40">報告摘要</th>
-                            <th class="py-3 px-3 sm:px-4 text-center sticky top-0 bg-gray-50 dark:bg-gray-900 z-40">操作</th>
+                            <th class="py-3 px-2 text-center sticky top-0 bg-gray-50 dark:bg-gray-900 z-40 w-[56px] min-w-[56px]">操作</th>
                         </tr>
                     </thead>
                     <tbody id="report-table-body" class="divide-y divide-gray-200 dark:divide-gray-700/50 text-gray-900 dark:text-gray-100"></tbody>
@@ -1646,6 +1650,9 @@ const openReportReader=id=>{
     reportReaderBodyOverflow=document.body.style.overflow;document.body.style.overflow='hidden';modal.classList.remove('hidden');renderReportReader();requestReportBrowserFullscreen();
     setTimeout(()=>document.getElementById('report-reader-close-btn')?.focus(),50);
 };
+document.getElementById('btn-open-report-reader')?.addEventListener('click',()=>{
+    const reports=getReportReaderItems();if(!reports.length)return showToast('目前沒有可閱讀的法人報告','error');openReportReader(reports[0].id);
+});
 const closeReportReader=()=>{
     const modal=document.getElementById('report-reader-modal');if(!modal||modal.classList.contains('hidden'))return;
     modal.classList.add('hidden');document.body.style.overflow=reportReaderBodyOverflow;reportReaderTouchStart=null;
@@ -1665,20 +1672,20 @@ document.getElementById('report-form')?.addEventListener('submit',async e=>{e.pr
 document.getElementById('report-table-body')?.addEventListener('click',async e=>{
     const button=e.target.closest('[data-action]');if(!button)return;
     const action=button.dataset.action,id=button.dataset.id;
-    if(action==='open-report-reader')openReportReader(id);
-    else if(action==='copy-report'){const report=state.reports.find(item=>item.id===id);if(report)executeCopy(`[${report.date||''}] ${report.code} / ${report.name}\n${report.content||''}`);}
+    if(action==='copy-report'){const report=state.reports.find(item=>item.id===id);if(report)executeCopy(`[${report.date||''}] ${report.code} / ${report.name}\n${report.content||''}`);}
     else if(action==='edit-report'){const report=state.reports.find(item=>item.id===id);if(report)window.openPromptModal("修改",report.content||"",async newContent=>{if(newContent!==null&&newContent.trim()!==""){report.content=newContent.trim();report.updatedAt=Date.now();saveLocalData();renderReports();await putDataToCloud(`reports/${id}`,report);showToast("修改成功");}});}
     else if(action==='delete-report'){window.openConfirmModal('確定刪除？',async()=>{state.reports=state.reports.filter(item=>item.id!==id);saveLocalData();renderReports();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();await deleteDataFromCloud(`reports/${id}`);showToast('已刪除');});}
 });
 function renderReports(){
-    const tableBody=document.getElementById('report-table-body'),emptyState=document.getElementById('report-empty');if(!tableBody||!emptyState)return;
+    const tableBody=document.getElementById('report-table-body'),emptyState=document.getElementById('report-empty'),readerButton=document.getElementById('btn-open-report-reader');if(!tableBody||!emptyState)return;
     const reports=getReportReaderItems();
+    if(readerButton)readerButton.disabled=reports.length===0;
     if(!reports.length){tableBody.innerHTML='';emptyState.classList.remove('hidden');updateBatchUI('report');return;}
     emptyState.classList.add('hidden');
     tableBody.innerHTML=reports.map(report=>{
         const formattedDate=report.date?report.date.replace(/-/g,'/'):'';
         const reportId=escapeHTML(report.id);
-        return`<tr class="table-row-hover border-b border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-sm"><td class="table-sticky-bg py-3 px-2 sm:px-3 text-center sticky left-0 z-20"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${reportId}" data-type="report" ${selectedIds.report&&selectedIds.report.has(report.id)?'checked':''}></td><td class="py-3 px-3 sm:px-4 font-medium text-gray-600 dark:text-gray-400">${escapeHTML(formattedDate)}</td><td class="py-3 px-3 sm:px-4"><span class="font-bold mr-2 text-gray-800 dark:text-gray-200">${escapeHTML(report.code)}</span><span class="text-gray-600 dark:text-gray-400">${escapeHTML(report.name)}</span></td><td class="report-summary-col report-summary-cell py-3 px-3 sm:px-4 text-gray-800 dark:text-gray-100 font-medium leading-relaxed">${escapeHTML(report.content||'')}</td><td class="py-3 px-3 sm:px-4 text-center whitespace-nowrap"><button type="button" title="全螢幕閱讀" aria-label="全螢幕閱讀 ${escapeHTML(report.code)} ${escapeHTML(report.name)}" class="mr-1 text-indigo-600 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/40 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" data-action="open-report-reader" data-id="${reportId}"><i class="fa-solid fa-expand pointer-events-none"></i></button><button type="button" title="複製報告" class="mr-1 text-teal-600 dark:text-teal-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" data-action="copy-report" data-id="${reportId}"><i class="fa-solid fa-copy pointer-events-none"></i></button><button type="button" title="修改報告" class="mr-1 text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" data-action="edit-report" data-id="${reportId}"><i class="fa-solid fa-pen pointer-events-none"></i></button><button type="button" title="刪除報告" class="text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" data-action="delete-report" data-id="${reportId}"><i class="fa-solid fa-trash pointer-events-none"></i></button></td></tr>`;
+        return`<tr class="table-row-hover border-b border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-sm"><td class="table-sticky-bg py-3 px-2 sm:px-3 text-center sticky left-0 z-20"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${reportId}" data-type="report" ${selectedIds.report&&selectedIds.report.has(report.id)?'checked':''}></td><td class="py-3 px-3 sm:px-4 font-medium text-gray-600 dark:text-gray-400">${escapeHTML(formattedDate)}</td><td class="py-3 px-3 sm:px-4"><span class="font-bold mr-2 text-gray-800 dark:text-gray-200">${escapeHTML(report.code)}</span><span class="text-gray-600 dark:text-gray-400">${escapeHTML(report.name)}</span></td><td class="report-summary-col report-summary-cell py-3 px-3 sm:px-4 text-gray-800 dark:text-gray-100 font-medium leading-relaxed">${escapeHTML(report.content||'')}</td><td class="py-3 px-2 text-center align-middle"><div class="flex flex-col items-center justify-center gap-1.5"><button type="button" title="複製報告" aria-label="複製 ${escapeHTML(report.code)} ${escapeHTML(report.name)} 報告" class="w-8 h-8 text-teal-600 dark:text-teal-400 bg-gray-100 dark:bg-gray-800 rounded-lg inline-flex items-center justify-center transition hover:scale-110" data-action="copy-report" data-id="${reportId}"><i class="fa-solid fa-copy pointer-events-none"></i></button><button type="button" title="修改報告" aria-label="修改 ${escapeHTML(report.code)} ${escapeHTML(report.name)} 報告" class="w-8 h-8 text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 rounded-lg inline-flex items-center justify-center transition hover:scale-110" data-action="edit-report" data-id="${reportId}"><i class="fa-solid fa-pen pointer-events-none"></i></button><button type="button" title="刪除報告" aria-label="刪除 ${escapeHTML(report.code)} ${escapeHTML(report.name)} 報告" class="w-8 h-8 text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-gray-800 rounded-lg inline-flex items-center justify-center transition hover:scale-110" data-action="delete-report" data-id="${reportId}"><i class="fa-solid fa-trash pointer-events-none"></i></button></div></td></tr>`;
     }).join('');
     updateBatchUI('report');
 }
