@@ -357,13 +357,13 @@ button { touch-action: manipulation; }
             <div class="card-panel p-4 sm:p-5 border border-gray-200 dark:border-gray-700/50 shadow-md relative group hover:border-emerald-300 dark:hover:border-emerald-600">
                 <div class="flex justify-between items-center mb-4 border-b border-gray-200 dark:border-gray-700/50 pb-2"><h3 class="font-bold text-emerald-600 dark:text-emerald-400 text-base sm:text-lg">Fibonacci ratios</h3><button class="btn-copy-calc text-gray-400 hover:text-gray-700 bg-gray-100 dark:bg-gray-700 w-7 h-7 sm:w-8 sm:h-8 rounded flex items-center justify-center transition" data-target="fib"><i class="fa-solid fa-copy"></i></button></div>
                 <div class="space-y-2 sm:space-y-2.5 text-sm">
-                    <div class="flex justify-between"><span class="text-gray-500 dark:text-gray-400">壓力三 R3 <small>(1.000)</small></span><span class="font-bold tw-red" id="fib-r3">-</span></div>
-                    <div class="flex justify-between"><span class="text-gray-500 dark:text-gray-400">壓力二 R2 <small>(0.618)</small></span><span class="font-bold tw-red" id="fib-r2">-</span></div>
-                    <div class="flex justify-between"><span class="text-gray-500 dark:text-gray-400">壓力一 R1 <small>(0.382)</small></span><span class="font-bold tw-red" id="fib-r1">-</span></div>
+                    <div class="flex justify-between"><span class="text-gray-500 dark:text-gray-400">R3 <small>(1.000)</small></span><span class="font-bold tw-red" id="fib-r3">-</span></div>
+                    <div class="flex justify-between"><span class="text-gray-500 dark:text-gray-400">R2 <small>(0.618)</small></span><span class="font-bold tw-red" id="fib-r2">-</span></div>
+                    <div class="flex justify-between"><span class="text-gray-500 dark:text-gray-400">R1 <small>(0.382)</small></span><span class="font-bold tw-red" id="fib-r1">-</span></div>
                     <div class="flex justify-between border-y border-emerald-200 dark:border-emerald-900/50 py-1.5 my-1.5 bg-emerald-50 dark:bg-emerald-900/20 px-2 rounded"><span class="text-emerald-700 dark:text-emerald-400 font-medium">基準點 PP</span><span class="font-bold text-gray-900 dark:text-white" id="fib-pp">-</span></div>
-                    <div class="flex justify-between"><span class="text-gray-500 dark:text-gray-400">支撐一 S1 <small>(0.382)</small></span><span class="font-bold tw-green" id="fib-s1">-</span></div>
-                    <div class="flex justify-between"><span class="text-gray-500 dark:text-gray-400">支撐二 S2 <small>(0.618)</small></span><span class="font-bold tw-green" id="fib-s2">-</span></div>
-                    <div class="flex justify-between"><span class="text-gray-500 dark:text-gray-400">支撐三 S3 <small>(1.000)</small></span><span class="font-bold tw-green" id="fib-s3">-</span></div>
+                    <div class="flex justify-between"><span class="text-gray-500 dark:text-gray-400">S1 <small>(0.382)</small></span><span class="font-bold tw-green" id="fib-s1">-</span></div>
+                    <div class="flex justify-between"><span class="text-gray-500 dark:text-gray-400">S2 <small>(0.618)</small></span><span class="font-bold tw-green" id="fib-s2">-</span></div>
+                    <div class="flex justify-between"><span class="text-gray-500 dark:text-gray-400">S3 <small>(1.000)</small></span><span class="font-bold tw-green" id="fib-s3">-</span></div>
                 </div>
             </div>
         </div>
@@ -1403,7 +1403,7 @@ const getCalcText=t=>{
     const tC=`[CDP]\n追買(AH): ${document.getElementById('cdp-ah').textContent}\n賣出(NH): ${document.getElementById('cdp-nh').textContent}\n均價(CDP): ${document.getElementById('cdp-cdp').textContent}\n買進(NL):  ${document.getElementById('cdp-nl').textContent}\n追賣(AL):  ${document.getElementById('cdp-al').textContent}`;
     const tP=`[Pivot Points]\n壓力二(R2): ${document.getElementById('pv-r2').textContent}\n壓力一(R1): ${document.getElementById('pv-r1').textContent}\n樞軸點(PP): ${document.getElementById('pv-pp').textContent}\n支撐一(S1): ${document.getElementById('pv-s1').textContent}\n支撐二(S2): ${document.getElementById('pv-s2').textContent}`;
     const tG=`[Golden Ratio]\n0.191: ${document.getElementById('gr-191').textContent}\n0.382: ${document.getElementById('gr-382').textContent}\n0.500: ${document.getElementById('gr-500').textContent}\n0.618: ${document.getElementById('gr-618').textContent}\n0.809: ${document.getElementById('gr-809').textContent}`;
-    const tFib=`[Fibonacci ratios]\n壓力三(R3 / 1.000): ${document.getElementById('fib-r3').textContent}\n壓力二(R2 / 0.618): ${document.getElementById('fib-r2').textContent}\n壓力一(R1 / 0.382): ${document.getElementById('fib-r1').textContent}\n基準點(PP): ${document.getElementById('fib-pp').textContent}\n支撐一(S1 / 0.382): ${document.getElementById('fib-s1').textContent}\n支撐二(S2 / 0.618): ${document.getElementById('fib-s2').textContent}\n支撐三(S3 / 1.000): ${document.getElementById('fib-s3').textContent}`;
+    const tFib=`[Fibonacci ratios]\nR3 (1.000): ${document.getElementById('fib-r3').textContent}\nR2 (0.618): ${document.getElementById('fib-r2').textContent}\nR1 (0.382): ${document.getElementById('fib-r1').textContent}\n基準點(PP): ${document.getElementById('fib-pp').textContent}\nS1 (0.382): ${document.getElementById('fib-s1').textContent}\nS2 (0.618): ${document.getElementById('fib-s2').textContent}\nS3 (1.000): ${document.getElementById('fib-s3').textContent}`;
     if(t==='cdp')return(s?`【${s}】\n`:'')+tC;
     if(t==='pivot')return(s?`【${s}】\n`:'')+tP;
     if(t==='gr')return(s?`【${s}】\n`:'')+tG;
