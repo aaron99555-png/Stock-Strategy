@@ -312,9 +312,10 @@ button { touch-action: manipulation; }
                 </div>
                 <div class="col-span-2 md:col-span-5 flex flex-wrap gap-4 items-center mt-2 mb-1 border-t border-gray-200 dark:border-gray-700/50 pt-4">
                     <span class="text-xs text-gray-500 dark:text-gray-400 font-medium"><i class="fa-solid fa-list-check mr-1"></i>複製選項:</span>
-                    <label class="flex items-center gap-1.5 cursor-pointer hover:opacity-80 transition-opacity"><input type="checkbox" id="copy-opt-cdp" checked class="rounded border-gray-300 dark:border-gray-600 text-purple-600 focus:ring-purple-500 w-3.5 h-3.5 accent-purple-600 cursor-pointer"><span class="text-xs text-gray-700 dark:text-gray-300 font-medium">CDP 當沖</span></label>
-                    <label class="flex items-center gap-1.5 cursor-pointer hover:opacity-80 transition-opacity"><input type="checkbox" id="copy-opt-pivot" checked class="rounded border-gray-300 dark:border-gray-600 text-purple-600 focus:ring-purple-500 w-3.5 h-3.5 accent-purple-600 cursor-pointer"><span class="text-xs text-gray-700 dark:text-gray-300 font-medium">Pivot 樞軸</span></label>
-                    <label class="flex items-center gap-1.5 cursor-pointer hover:opacity-80 transition-opacity"><input type="checkbox" id="copy-opt-gr" checked class="rounded border-gray-300 dark:border-gray-600 text-purple-600 focus:ring-purple-500 w-3.5 h-3.5 accent-purple-600 cursor-pointer"><span class="text-xs text-gray-700 dark:text-gray-300 font-medium">黃金切割率</span></label>
+                    <label class="flex items-center gap-1.5 cursor-pointer hover:opacity-80 transition-opacity"><input type="checkbox" id="copy-opt-cdp" checked class="rounded border-gray-300 dark:border-gray-600 text-purple-600 focus:ring-purple-500 w-3.5 h-3.5 accent-purple-600 cursor-pointer"><span class="text-xs text-gray-700 dark:text-gray-300 font-medium">CDP</span></label>
+                    <label class="flex items-center gap-1.5 cursor-pointer hover:opacity-80 transition-opacity"><input type="checkbox" id="copy-opt-pivot" checked class="rounded border-gray-300 dark:border-gray-600 text-purple-600 focus:ring-purple-500 w-3.5 h-3.5 accent-purple-600 cursor-pointer"><span class="text-xs text-gray-700 dark:text-gray-300 font-medium">Pivot Points</span></label>
+                    <label class="flex items-center gap-1.5 cursor-pointer hover:opacity-80 transition-opacity"><input type="checkbox" id="copy-opt-gr" checked class="rounded border-gray-300 dark:border-gray-600 text-purple-600 focus:ring-purple-500 w-3.5 h-3.5 accent-purple-600 cursor-pointer"><span class="text-xs text-gray-700 dark:text-gray-300 font-medium">Golden Ratio</span></label>
+                    <label class="flex items-center gap-1.5 cursor-pointer hover:opacity-80 transition-opacity"><input type="checkbox" id="copy-opt-fib" checked class="rounded border-gray-300 dark:border-gray-600 text-purple-600 focus:ring-purple-500 w-3.5 h-3.5 accent-purple-600 cursor-pointer"><span class="text-xs text-gray-700 dark:text-gray-300 font-medium">Fibonacci ratios</span></label>
                 </div>
                 <div class="col-span-2 md:col-span-5 flex flex-col sm:flex-row gap-2 sm:gap-3">
                     <button type="submit" id="btn-calc-submit" class="w-full sm:flex-1 bg-purple-600 hover:bg-purple-500 text-white font-bold py-2.5 rounded-lg transition text-base sm:text-sm shadow-md active:scale-95">計算</button>
@@ -322,9 +323,9 @@ button { touch-action: manipulation; }
                 </div>
             </form>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6">
             <div class="card-panel p-4 sm:p-5 border border-gray-200 dark:border-gray-700/50 shadow-md relative group hover:border-blue-300 dark:hover:border-blue-600">
-                <div class="flex justify-between items-center mb-4 border-b border-gray-200 dark:border-gray-700/50 pb-2"><h3 class="font-bold text-blue-600 dark:text-blue-400 text-base sm:text-lg">CDP 短線當沖</h3><button class="btn-copy-calc text-gray-400 hover:text-gray-700 bg-gray-100 dark:bg-gray-700 w-7 h-7 sm:w-8 sm:h-8 rounded flex items-center justify-center transition" data-target="cdp"><i class="fa-solid fa-copy"></i></button></div>
+                <div class="flex justify-between items-center mb-4 border-b border-gray-200 dark:border-gray-700/50 pb-2"><h3 class="font-bold text-blue-600 dark:text-blue-400 text-base sm:text-lg">CDP</h3><button class="btn-copy-calc text-gray-400 hover:text-gray-700 bg-gray-100 dark:bg-gray-700 w-7 h-7 sm:w-8 sm:h-8 rounded flex items-center justify-center transition" data-target="cdp"><i class="fa-solid fa-copy"></i></button></div>
                 <div class="space-y-2 sm:space-y-2.5 text-sm">
                     <div class="flex justify-between"><span class="text-gray-500 dark:text-gray-400">追買(AH)</span><span class="font-bold tw-red" id="cdp-ah">-</span></div>
                     <div class="flex justify-between"><span class="text-gray-500 dark:text-gray-400">賣出(NH)</span><span class="font-bold tw-red" id="cdp-nh">-</span></div>
@@ -334,7 +335,7 @@ button { touch-action: manipulation; }
                 </div>
             </div>
             <div class="card-panel p-4 sm:p-5 border border-gray-200 dark:border-gray-700/50 shadow-md relative group hover:border-indigo-300 dark:hover:border-indigo-600">
-                <div class="flex justify-between items-center mb-4 border-b border-gray-200 dark:border-gray-700/50 pb-2"><h3 class="font-bold text-indigo-600 dark:text-indigo-400 text-base sm:text-lg">Pivot 波段樞軸</h3><button class="btn-copy-calc text-gray-400 hover:text-gray-700 bg-gray-100 dark:bg-gray-700 w-7 h-7 sm:w-8 sm:h-8 rounded flex items-center justify-center transition" data-target="pivot"><i class="fa-solid fa-copy"></i></button></div>
+                <div class="flex justify-between items-center mb-4 border-b border-gray-200 dark:border-gray-700/50 pb-2"><h3 class="font-bold text-indigo-600 dark:text-indigo-400 text-base sm:text-lg">Pivot Points</h3><button class="btn-copy-calc text-gray-400 hover:text-gray-700 bg-gray-100 dark:bg-gray-700 w-7 h-7 sm:w-8 sm:h-8 rounded flex items-center justify-center transition" data-target="pivot"><i class="fa-solid fa-copy"></i></button></div>
                 <div class="space-y-2 sm:space-y-2.5 text-sm">
                     <div class="flex justify-between"><span class="text-gray-500 dark:text-gray-400">壓力二(R2)</span><span class="font-bold tw-red" id="pv-r2">-</span></div>
                     <div class="flex justify-between"><span class="text-gray-500 dark:text-gray-400">壓力一(R1)</span><span class="font-bold tw-red" id="pv-r1">-</span></div>
@@ -343,14 +344,26 @@ button { touch-action: manipulation; }
                     <div class="flex justify-between"><span class="text-gray-500 dark:text-gray-400">支撐二(S2)</span><span class="font-bold tw-green" id="pv-s2">-</span></div>
                 </div>
             </div>
-            <div class="card-panel p-4 sm:p-5 border border-gray-200 dark:border-gray-700/50 shadow-md relative group hover:border-amber-300 dark:hover:border-amber-600 md:col-span-2 lg:col-span-1">
-                <div class="flex justify-between items-center mb-4 border-b border-gray-200 dark:border-gray-700/50 pb-2"><h3 class="font-bold text-amber-600 dark:text-amber-400 text-base sm:text-lg">黃金切割率</h3><button class="btn-copy-calc text-gray-400 hover:text-gray-700 bg-gray-100 dark:bg-gray-700 w-7 h-7 sm:w-8 sm:h-8 rounded flex items-center justify-center transition" data-target="gr"><i class="fa-solid fa-copy"></i></button></div>
+            <div class="card-panel p-4 sm:p-5 border border-gray-200 dark:border-gray-700/50 shadow-md relative group hover:border-amber-300 dark:hover:border-amber-600">
+                <div class="flex justify-between items-center mb-4 border-b border-gray-200 dark:border-gray-700/50 pb-2"><h3 class="font-bold text-amber-600 dark:text-amber-400 text-base sm:text-lg">Golden Ratio</h3><button class="btn-copy-calc text-gray-400 hover:text-gray-700 bg-gray-100 dark:bg-gray-700 w-7 h-7 sm:w-8 sm:h-8 rounded flex items-center justify-center transition" data-target="gr"><i class="fa-solid fa-copy"></i></button></div>
                 <div class="space-y-2 sm:space-y-2.5 text-sm">
                     <div class="flex justify-between"><span class="text-gray-500 dark:text-gray-400">0.191</span><span class="font-bold text-gray-900 dark:text-white" id="gr-191">-</span></div>
                     <div class="flex justify-between"><span class="text-gray-500 dark:text-gray-400">0.382</span><span class="font-bold text-gray-900 dark:text-white" id="gr-382">-</span></div>
                     <div class="flex justify-between border-y border-amber-200 dark:border-amber-900/50 py-1.5 my-1.5 bg-amber-50 dark:bg-amber-900/20 px-2 rounded"><span class="text-amber-700 dark:text-amber-400 font-medium">0.500</span><span class="font-bold text-gray-900 dark:text-white" id="gr-500">-</span></div>
                     <div class="flex justify-between"><span class="text-gray-500 dark:text-gray-400">0.618</span><span class="font-bold text-gray-900 dark:text-white" id="gr-618">-</span></div>
                     <div class="flex justify-between"><span class="text-gray-500 dark:text-gray-400">0.809</span><span class="font-bold text-gray-900 dark:text-white" id="gr-809">-</span></div>
+                </div>
+            </div>
+            <div class="card-panel p-4 sm:p-5 border border-gray-200 dark:border-gray-700/50 shadow-md relative group hover:border-emerald-300 dark:hover:border-emerald-600">
+                <div class="flex justify-between items-center mb-4 border-b border-gray-200 dark:border-gray-700/50 pb-2"><h3 class="font-bold text-emerald-600 dark:text-emerald-400 text-base sm:text-lg">Fibonacci ratios</h3><button class="btn-copy-calc text-gray-400 hover:text-gray-700 bg-gray-100 dark:bg-gray-700 w-7 h-7 sm:w-8 sm:h-8 rounded flex items-center justify-center transition" data-target="fib"><i class="fa-solid fa-copy"></i></button></div>
+                <div class="space-y-2 sm:space-y-2.5 text-sm">
+                    <div class="flex justify-between"><span class="text-gray-500 dark:text-gray-400">壓力三 R3 <small>(1.000)</small></span><span class="font-bold tw-red" id="fib-r3">-</span></div>
+                    <div class="flex justify-between"><span class="text-gray-500 dark:text-gray-400">壓力二 R2 <small>(0.618)</small></span><span class="font-bold tw-red" id="fib-r2">-</span></div>
+                    <div class="flex justify-between"><span class="text-gray-500 dark:text-gray-400">壓力一 R1 <small>(0.382)</small></span><span class="font-bold tw-red" id="fib-r1">-</span></div>
+                    <div class="flex justify-between border-y border-emerald-200 dark:border-emerald-900/50 py-1.5 my-1.5 bg-emerald-50 dark:bg-emerald-900/20 px-2 rounded"><span class="text-emerald-700 dark:text-emerald-400 font-medium">基準點 PP</span><span class="font-bold text-gray-900 dark:text-white" id="fib-pp">-</span></div>
+                    <div class="flex justify-between"><span class="text-gray-500 dark:text-gray-400">支撐一 S1 <small>(0.382)</small></span><span class="font-bold tw-green" id="fib-s1">-</span></div>
+                    <div class="flex justify-between"><span class="text-gray-500 dark:text-gray-400">支撐二 S2 <small>(0.618)</small></span><span class="font-bold tw-green" id="fib-s2">-</span></div>
+                    <div class="flex justify-between"><span class="text-gray-500 dark:text-gray-400">支撐三 S3 <small>(1.000)</small></span><span class="font-bold tw-green" id="fib-s3">-</span></div>
                 </div>
             </div>
         </div>
@@ -1356,13 +1369,68 @@ document.querySelectorAll('.btn-copy').forEach(b=>{b.addEventListener('click',e=
     // --- 合併股期分數結束 ---
 }else if(m==='chip'){const cd=d.filter(j=>j.tags&&(j.tags.includes('1日籌碼集中')||j.tags.includes('5日籌碼集中')||j.tags.includes('20日籌碼集中')));if(cd.length===0)return showToast('無籌碼集中標的','error');tx=`| ${ds} 籌碼集中漏斗 |\n\n`;cd.forEach(j=>tx+=`${j.code} ${j.name} [${orderTagsForCopy(j.tags.filter(t=>t.includes('籌碼集中')),cf.tags).join('+')}]\n`);}executeCopy(tx.trim()+copyFootnote);});});
 
-document.getElementById('calc-form')?.addEventListener('submit',e=>{e.preventDefault();const h=parseFloat(document.getElementById('c-high').value),l=parseFloat(document.getElementById('c-low').value),c=parseFloat(document.getElementById('c-close').value);if(isNaN(h)||isNaN(l)||isNaN(c)||h<l)return showToast('輸入無效','error');const pp=(h+l+c)/3,cdp=(h+l+2*c)/4,df=h-l;document.getElementById('pv-pp').textContent=pp.toFixed(2);document.getElementById('pv-r1').textContent=((2*pp)-l).toFixed(2);document.getElementById('pv-r2').textContent=(pp+df).toFixed(2);document.getElementById('pv-s1').textContent=((2*pp)-h).toFixed(2);document.getElementById('pv-s2').textContent=(pp-df).toFixed(2);document.getElementById('cdp-cdp').textContent=cdp.toFixed(2);document.getElementById('cdp-ah').textContent=(cdp+df).toFixed(2);document.getElementById('cdp-nh').textContent=((2*cdp)-l).toFixed(2);document.getElementById('cdp-nl').textContent=((2*cdp)-h).toFixed(2);document.getElementById('cdp-al').textContent=(cdp-df).toFixed(2);[0.191,0.382,0.500,0.618,0.809].forEach(f=>document.getElementById(`gr-${f.toFixed(3).substring(2)}`).textContent=(h-df*f).toFixed(2));showToast('計算完成');});
-const getCalcText=t=>{if(document.getElementById('cdp-cdp').textContent==='-')return null;const c=document.getElementById('c-code').value.trim(),n=document.getElementById('c-name').value.trim(),s=(c||n)?`${c} ${n}`.trim():'';const tC=`[CDP 短線當沖]\n追買(AH): ${document.getElementById('cdp-ah').textContent}\n賣出(NH): ${document.getElementById('cdp-nh').textContent}\n均價(CDP): ${document.getElementById('cdp-cdp').textContent}\n買進(NL):  ${document.getElementById('cdp-nl').textContent}\n追賣(AL):  ${document.getElementById('cdp-al').textContent}`;const tP=`[Pivot 波段樞軸]\n壓力二(R2): ${document.getElementById('pv-r2').textContent}\n壓力一(R1): ${document.getElementById('pv-r1').textContent}\n樞軸點(PP): ${document.getElementById('pv-pp').textContent}\n支撐一(S1): ${document.getElementById('pv-s1').textContent}\n支撐二(S2): ${document.getElementById('pv-s2').textContent}`;const tF=`[黃金切割率]\n0.191: ${document.getElementById('gr-191').textContent}\n0.382: ${document.getElementById('gr-382').textContent}\n0.500: ${document.getElementById('gr-500').textContent}\n0.618: ${document.getElementById('gr-618').textContent}\n0.809: ${document.getElementById('gr-809').textContent}`;if(t==='cdp')return(s?`【${s}】\n`:'')+tC;if(t==='pivot')return(s?`【${s}】\n`:'')+tP;if(t==='gr')return(s?`【${s}】\n`:'')+tF;if(t==='cdp_raw')return tC;if(t==='pivot_raw')return tP;if(t==='gr_raw')return tF;if(t==='all')return`【計算結果】${s?' '+s:''}\n高:${document.getElementById('c-high').value} 低:${document.getElementById('c-low').value} 收:${document.getElementById('c-close').value}\n\n${tC}\n\n${tP}\n\n${tF}`;};
+const calculateSupportPressure=(silent=false)=>{
+    const h=parseFloat(document.getElementById('c-high').value),l=parseFloat(document.getElementById('c-low').value),c=parseFloat(document.getElementById('c-close').value);
+    if(!Number.isFinite(h)||!Number.isFinite(l)||!Number.isFinite(c)||h<l){if(!silent)showToast('輸入無效','error');return false;}
+    const pp=(h+l+c)/3,cdp=(h+l+2*c)/4,df=h-l;
+    document.getElementById('pv-pp').textContent=pp.toFixed(2);
+    document.getElementById('pv-r1').textContent=((2*pp)-l).toFixed(2);
+    document.getElementById('pv-r2').textContent=(pp+df).toFixed(2);
+    document.getElementById('pv-s1').textContent=((2*pp)-h).toFixed(2);
+    document.getElementById('pv-s2').textContent=(pp-df).toFixed(2);
+    document.getElementById('cdp-cdp').textContent=cdp.toFixed(2);
+    document.getElementById('cdp-ah').textContent=(cdp+df).toFixed(2);
+    document.getElementById('cdp-nh').textContent=((2*cdp)-l).toFixed(2);
+    document.getElementById('cdp-nl').textContent=((2*cdp)-h).toFixed(2);
+    document.getElementById('cdp-al').textContent=(cdp-df).toFixed(2);
+    [0.191,0.382,0.500,0.618,0.809].forEach(f=>document.getElementById(`gr-${f.toFixed(3).substring(2)}`).textContent=(h-df*f).toFixed(2));
+    document.getElementById('fib-pp').textContent=pp.toFixed(2);
+    document.getElementById('fib-r1').textContent=(pp+df*0.382).toFixed(2);
+    document.getElementById('fib-r2').textContent=(pp+df*0.618).toFixed(2);
+    document.getElementById('fib-r3').textContent=(pp+df).toFixed(2);
+    document.getElementById('fib-s1').textContent=(pp-df*0.382).toFixed(2);
+    document.getElementById('fib-s2').textContent=(pp-df*0.618).toFixed(2);
+    document.getElementById('fib-s3').textContent=(pp-df).toFixed(2);
+    if(!silent)showToast('計算完成');
+    return true;
+};
+document.getElementById('calc-form')?.addEventListener('submit',e=>{e.preventDefault();calculateSupportPressure(false);});
+['c-high','c-low','c-close'].forEach(id=>document.getElementById(id)?.addEventListener('input',()=>calculateSupportPressure(true)));
+
+const getCalcText=t=>{
+    if(document.getElementById('cdp-cdp').textContent==='-')return null;
+    const c=document.getElementById('c-code').value.trim(),n=document.getElementById('c-name').value.trim(),s=(c||n)?`${c} ${n}`.trim():'';
+    const tC=`[CDP]\n追買(AH): ${document.getElementById('cdp-ah').textContent}\n賣出(NH): ${document.getElementById('cdp-nh').textContent}\n均價(CDP): ${document.getElementById('cdp-cdp').textContent}\n買進(NL):  ${document.getElementById('cdp-nl').textContent}\n追賣(AL):  ${document.getElementById('cdp-al').textContent}`;
+    const tP=`[Pivot Points]\n壓力二(R2): ${document.getElementById('pv-r2').textContent}\n壓力一(R1): ${document.getElementById('pv-r1').textContent}\n樞軸點(PP): ${document.getElementById('pv-pp').textContent}\n支撐一(S1): ${document.getElementById('pv-s1').textContent}\n支撐二(S2): ${document.getElementById('pv-s2').textContent}`;
+    const tG=`[Golden Ratio]\n0.191: ${document.getElementById('gr-191').textContent}\n0.382: ${document.getElementById('gr-382').textContent}\n0.500: ${document.getElementById('gr-500').textContent}\n0.618: ${document.getElementById('gr-618').textContent}\n0.809: ${document.getElementById('gr-809').textContent}`;
+    const tFib=`[Fibonacci ratios]\n壓力三(R3 / 1.000): ${document.getElementById('fib-r3').textContent}\n壓力二(R2 / 0.618): ${document.getElementById('fib-r2').textContent}\n壓力一(R1 / 0.382): ${document.getElementById('fib-r1').textContent}\n基準點(PP): ${document.getElementById('fib-pp').textContent}\n支撐一(S1 / 0.382): ${document.getElementById('fib-s1').textContent}\n支撐二(S2 / 0.618): ${document.getElementById('fib-s2').textContent}\n支撐三(S3 / 1.000): ${document.getElementById('fib-s3').textContent}`;
+    if(t==='cdp')return(s?`【${s}】\n`:'')+tC;
+    if(t==='pivot')return(s?`【${s}】\n`:'')+tP;
+    if(t==='gr')return(s?`【${s}】\n`:'')+tG;
+    if(t==='fib')return(s?`【${s}】\n`:'')+tFib;
+    if(t==='cdp_raw')return tC;
+    if(t==='pivot_raw')return tP;
+    if(t==='gr_raw')return tG;
+    if(t==='fib_raw')return tFib;
+    if(t==='all')return`【計算結果】${s?' '+s:''}\n高:${document.getElementById('c-high').value} 低:${document.getElementById('c-low').value} 收:${document.getElementById('c-close').value}\n\n${tC}\n\n${tP}\n\n${tG}\n\n${tFib}`;
+};
 
 document.getElementById('c-code')?.addEventListener('input',()=>{const f=document.getElementById('calc-form');if(document.getElementById('c-code').value.trim()!=='TX'){delete f.dataset.marketSession;delete f.dataset.marketDate;}});
 document.getElementById('c-name')?.addEventListener('input',()=>{const f=document.getElementById('calc-form');if(!document.getElementById('c-name').value.includes('臺指期')){delete f.dataset.marketSession;delete f.dataset.marketDate;}});
 document.querySelectorAll('.btn-copy-calc').forEach(b=>b.addEventListener('click',e=>{const t=getCalcText(e.currentTarget.dataset.target);t?executeCopy(t+copyFootnote):showToast('請先計算','error');}));
-document.getElementById('btn-copy-calc-selected')?.addEventListener('click',()=>{if(document.getElementById('cdp-cdp').textContent==='-')return showToast('請先計算','error');const iC=document.getElementById('copy-opt-cdp').checked,iP=document.getElementById('copy-opt-pivot').checked,iG=document.getElementById('copy-opt-gr').checked;if(!iC&&!iP&&!iG)return showToast('請至少勾選一項','error');const c=document.getElementById('c-code').value.trim(),n=document.getElementById('c-name').value.trim(),s=(c||n)?`${c} / ${n}`.trim():'';const form=document.getElementById('calc-form');const isTX=c==='TX'||n.includes('臺指期');const session=isTX?(form.dataset.marketSession||''):'';const sessionText=session==='day'?'日盤':session==='night'?'夜盤':'';const date=(isTX&&form.dataset.marketDate)?form.dataset.marketDate:new Date().toLocaleDateString('sv-SE',{timeZone:'Asia/Taipei'});let t=`[${date}]${sessionText?' ['+sessionText+']':''} 支撐壓力\n${s?`${s}\n`:''}高:${document.getElementById('c-high').value} 低:${document.getElementById('c-low').value} 收:${document.getElementById('c-close').value}\n\n`;if(iC)t+=getCalcText('cdp_raw')+'\n\n';if(iP)t+=getCalcText('pivot_raw')+'\n\n';if(iG)t+=getCalcText('gr_raw')+'\n\n';executeCopy(t.trim()+copyFootnote);});
+document.getElementById('btn-copy-calc-selected')?.addEventListener('click',()=>{
+    if(document.getElementById('cdp-cdp').textContent==='-')return showToast('請先計算','error');
+    const iC=document.getElementById('copy-opt-cdp').checked,iP=document.getElementById('copy-opt-pivot').checked,iG=document.getElementById('copy-opt-gr').checked,iFib=document.getElementById('copy-opt-fib').checked;
+    if(!iC&&!iP&&!iG&&!iFib)return showToast('請至少勾選一項','error');
+    const c=document.getElementById('c-code').value.trim(),n=document.getElementById('c-name').value.trim(),s=(c||n)?`${c} / ${n}`.trim():'';
+    const form=document.getElementById('calc-form'),isTX=c==='TX'||n.includes('臺指期'),session=isTX?(form.dataset.marketSession||''):'',sessionText=session==='day'?'日盤':session==='night'?'夜盤':'',date=(isTX&&form.dataset.marketDate)?form.dataset.marketDate:new Date().toLocaleDateString('sv-SE',{timeZone:'Asia/Taipei'});
+    let t=`[${date}]${sessionText?' ['+sessionText+']':''} 支撐壓力\n${s?`${s}\n`:''}高:${document.getElementById('c-high').value} 低:${document.getElementById('c-low').value} 收:${document.getElementById('c-close').value}\n\n`;
+    if(iC)t+=getCalcText('cdp_raw')+'\n\n';
+    if(iP)t+=getCalcText('pivot_raw')+'\n\n';
+    if(iG)t+=getCalcText('gr_raw')+'\n\n';
+    if(iFib)t+=getCalcText('fib_raw')+'\n\n';
+    executeCopy(t.trim()+copyFootnote);
+});
 
 const handleTableSorting=(e,mp,sk,fn)=>{const th=e.currentTarget,k=th.dataset.sort,c=state[sk];if(c.key===k)c.asc=!c.asc;else{c.key=k;c.asc=false;}document.querySelectorAll(`.${mp}-sortable i, .sortable[data-module="${mp==='sortable'?'journal':mp}"] i`).forEach(ic=>{ic.className='fa-solid fa-sort ml-1 text-xs opacity-50';});const ic=th.querySelector('i');if(ic)ic.className=`fa-solid fa-sort-${c.asc?'up':'down'} ml-1 text-xs text-blue-500`;fn();saveLocalData();};
 
