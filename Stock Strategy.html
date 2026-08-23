@@ -896,15 +896,16 @@ button { touch-action: manipulation; }
 <div id="report-reader-modal" class="fixed inset-0 z-[180] hidden bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-white" role="dialog" aria-modal="true" aria-label="法人報告全螢幕閱讀" style="height:100vh;height:100dvh;">
     <div class="h-full flex flex-col">
         <header class="report-reader-header shrink-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur border-b border-gray-200 dark:border-gray-700 px-3 sm:px-6 pb-3 sm:pb-4 shadow-sm">
-            <div class="flex items-center justify-between gap-3">
-                <div class="min-w-0 flex items-center gap-3">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3">
+                <div class="min-w-0 w-full sm:w-auto flex items-start sm:items-center gap-3">
                     <span class="w-10 h-10 sm:w-12 sm:h-12 shrink-0 rounded-xl bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300 flex items-center justify-center"><i class="fa-solid fa-file-lines text-lg sm:text-xl"></i></span>
-                    <div class="min-w-0">
-                        <div class="flex items-baseline gap-2 min-w-0"><span id="report-reader-code" class="font-black text-indigo-700 dark:text-indigo-300 text-lg sm:text-2xl shrink-0"></span><span id="report-reader-name" class="font-bold text-gray-800 dark:text-gray-100 text-base sm:text-xl truncate"></span></div>
-                        <div id="report-reader-date" class="text-[11px] sm:text-sm text-gray-500 dark:text-gray-400 mt-0.5 tabular-nums"></div>
+                    <div class="min-w-0 flex-1 grid grid-cols-2 sm:flex sm:items-center gap-x-4 sm:gap-x-6 gap-y-2">
+                        <div class="shrink-0"><div class="text-[10px] sm:text-xs font-bold text-gray-400 dark:text-gray-500 mb-0.5">代號</div><div id="report-reader-code" class="font-black text-indigo-700 dark:text-indigo-300 text-lg sm:text-2xl leading-tight"></div></div>
+                        <div class="min-w-0"><div class="text-[10px] sm:text-xs font-bold text-gray-400 dark:text-gray-500 mb-0.5">股名</div><div id="report-reader-name" class="font-bold text-gray-800 dark:text-gray-100 text-base sm:text-xl truncate leading-tight"></div></div>
+                        <div class="col-span-2 sm:col-span-1 sm:border-l sm:border-gray-200 dark:sm:border-gray-700 sm:pl-6"><div class="text-[10px] sm:text-xs font-bold text-gray-400 dark:text-gray-500 mb-0.5">報告日期</div><div id="report-reader-date" class="text-sm sm:text-base font-bold text-gray-700 dark:text-gray-200 tabular-nums leading-tight"></div></div>
                     </div>
                 </div>
-                <div class="shrink-0 flex items-center gap-1.5 sm:gap-2">
+                <div class="shrink-0 self-end sm:self-auto flex items-center gap-1.5 sm:gap-2">
                     <span id="report-reader-counter" class="text-[11px] sm:text-sm font-bold text-gray-500 dark:text-gray-400 px-2" aria-live="polite"></span>
                     <button type="button" id="report-reader-copy-btn" title="複製目前報告" aria-label="複製目前報告" class="w-10 h-10 sm:w-11 sm:h-11 inline-flex items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/70 transition active:scale-95"><i class="fa-solid fa-copy"></i></button>
                     <button type="button" id="report-reader-close-btn" title="關閉全螢幕" aria-label="關閉全螢幕" class="w-10 h-10 sm:w-11 sm:h-11 inline-flex items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-300 hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900/40 dark:hover:text-red-300 transition active:scale-95"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -966,12 +967,12 @@ const THEME_MAP = {
 const TAG_CATEGORIES = [
     {title: "🌟 特別關注", theme: "rose", tags: ["特別追蹤", "非凡重點"]},
     {title: "📊 基本面佳", theme: "blue", tags: ["多頭營收創高", "赤兔馬", "千里馬"]},
-    {title: "🔥 動能與型態", theme: "amber", tags: ["一陽指", "金包銀", "披荊斬棘", "破繭而出", "月來越好", "季不可失", "守株待兔", "缺口", "小碎步", "多排破上關"]},
+    {title: "🔥 動能與型態", theme: "amber", tags: ["一陽指", "金包銀", "披荊斬棘", "破繭而出", "月來越好", "季不可失", "守株待兔", "缺口", "阿婆散步", "多排破上關"]},
     {title: "💰 量價與籌碼", theme: "purple", tags: ["量價齊揚", "高成交值", "法人加持", "1日籌碼集中度", "5日籌碼集中", "20日籌碼集中"]},
     {title: "📈 技術指標", theme: "teal", tags: ["OBV突破", "MACD突破", "KD金叉"]}
 ];
 
-const STRATEGY_TAG_ALIASES={'一條根':'一陽指','跳空缺口':'缺口','1日籌碼集中':'1日籌碼集中度'};
+const STRATEGY_TAG_ALIASES={'一條根':'一陽指','跳空缺口':'缺口','1日籌碼集中':'1日籌碼集中度','小碎步':'阿婆散步','阿甘步伐':'阿婆散步'};
 const normalizeStrategyTagName=tag=>STRATEGY_TAG_ALIASES[tag]||tag;
 
 const normalizeStrategyTags=items=>{
@@ -1603,7 +1604,7 @@ const renderReportReader=()=>{
     const report=reportReaderItems[reportReaderIndex];if(!report)return;
     document.getElementById('report-reader-code').textContent=report.code||'';
     document.getElementById('report-reader-name').textContent=report.name||'';
-    document.getElementById('report-reader-date').textContent=`報告日期｜${(report.date||'未填寫').replace(/-/g,'/')}`;
+    document.getElementById('report-reader-date').textContent=(report.date||'未填寫').replace(/-/g,'/');
     document.getElementById('report-reader-content').textContent=report.content||'';
     document.getElementById('report-reader-counter').textContent=`${reportReaderIndex+1} / ${reportReaderItems.length}`;
     document.getElementById('report-reader-prev-btn').disabled=reportReaderIndex<=0;
@@ -1854,7 +1855,7 @@ const orderTagsForCopy=(tags,selectedTags=[])=>{
     return list.sort((a,b)=>(order.get(a)??Number.MAX_SAFE_INTEGER)-(order.get(b)??Number.MAX_SAFE_INTEGER));
 };
 const COPY_TAG_ICONS={
-    '多頭營收創高':'📈','赤兔馬':'🐎','千里馬':'🏇','一陽指':'☝️','金包銀':'🥇','披荊斬棘':'⚔️','破繭而出':'🦋','月來越好':'🌙','季不可失':'🗓️','守株待兔':'🐇','缺口':'🚀','小碎步':'👣','多排破上關':'🧱',
+    '多頭營收創高':'📈','赤兔馬':'🐎','千里馬':'🏇','一陽指':'☝️','金包銀':'🥇','披荊斬棘':'⚔️','破繭而出':'🦋','月來越好':'🌙','季不可失':'🗓️','守株待兔':'🐇','缺口':'🚀','阿婆散步':'👣','多排破上關':'🧱',
     '量價齊揚':'📊','高成交值':'💰','法人加持':'🏦','1日籌碼集中度':'1️⃣','5日籌碼集中':'5️⃣','20日籌碼集中':'2️⃣0️⃣','OBV突破':'🌊','MACD突破':'〽️','KD金叉':'✨','大腸包小腸':'🌭'
 };
 const COPY_TAG_ICON_POOL=['🔹','🔸','🔺','🔻','🟠','🟡','🟢','🔵','🟣','⚪','⚫','💠','🔷','🔶','▪️','▫️','♦️','♣️','♠️','♥️','🧩','🧭','🪄','🪙','🛡️','⚡','🔥','🌟','🎯','📌'];
