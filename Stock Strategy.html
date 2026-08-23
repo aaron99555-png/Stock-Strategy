@@ -62,6 +62,9 @@ input[type="date"]::-webkit-calendar-picker-indicator, input[type="month"]::-web
 .dark .copy-toolbar { background:rgba(30,58,138,0.18); border-color:rgba(59,130,246,0.38) !important; }
 .report-summary-col { width:86vw; min-width:86vw; max-width:86vw; }
 .report-summary-cell { white-space:pre-wrap !important; overflow-wrap:anywhere; word-break:break-word; }
+.report-reader-header { padding-top:max(0.75rem,env(safe-area-inset-top)); }
+.report-reader-footer { padding-bottom:max(0.75rem,env(safe-area-inset-bottom)); }
+#report-reader-content-wrap { touch-action:pan-y; overscroll-behavior:contain; }
 @media (min-width:640px) {
   .report-summary-col { width:auto; min-width:520px; max-width:none; }
 }
@@ -890,6 +893,39 @@ button { touch-action: manipulation; }
         <button id="btn-prompt-cancel" class="w-full mt-3 bg-gray-100 dark:bg-transparent hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 py-2.5 rounded-lg text-sm transition active:scale-95">取消</button>
     </div>
 </div>
+<div id="report-reader-modal" class="fixed inset-0 z-[180] hidden bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-white" role="dialog" aria-modal="true" aria-label="法人報告全螢幕閱讀" style="height:100vh;height:100dvh;">
+    <div class="h-full flex flex-col">
+        <header class="report-reader-header shrink-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur border-b border-gray-200 dark:border-gray-700 px-3 sm:px-6 pb-3 sm:pb-4 shadow-sm">
+            <div class="flex items-center justify-between gap-3">
+                <div class="min-w-0 flex items-center gap-3">
+                    <span class="w-10 h-10 sm:w-12 sm:h-12 shrink-0 rounded-xl bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300 flex items-center justify-center"><i class="fa-solid fa-file-lines text-lg sm:text-xl"></i></span>
+                    <div class="min-w-0">
+                        <div class="flex items-baseline gap-2 min-w-0"><span id="report-reader-code" class="font-black text-indigo-700 dark:text-indigo-300 text-lg sm:text-2xl shrink-0"></span><span id="report-reader-name" class="font-bold text-gray-800 dark:text-gray-100 text-base sm:text-xl truncate"></span></div>
+                        <div id="report-reader-date" class="text-[11px] sm:text-sm text-gray-500 dark:text-gray-400 mt-0.5 tabular-nums"></div>
+                    </div>
+                </div>
+                <div class="shrink-0 flex items-center gap-1.5 sm:gap-2">
+                    <span id="report-reader-counter" class="text-[11px] sm:text-sm font-bold text-gray-500 dark:text-gray-400 px-2" aria-live="polite"></span>
+                    <button type="button" id="report-reader-copy-btn" title="複製目前報告" aria-label="複製目前報告" class="w-10 h-10 sm:w-11 sm:h-11 inline-flex items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/70 transition active:scale-95"><i class="fa-solid fa-copy"></i></button>
+                    <button type="button" id="report-reader-close-btn" title="關閉全螢幕" aria-label="關閉全螢幕" class="w-10 h-10 sm:w-11 sm:h-11 inline-flex items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-300 hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900/40 dark:hover:text-red-300 transition active:scale-95"><i class="fa-solid fa-xmark text-lg"></i></button>
+                </div>
+            </div>
+        </header>
+        <div id="report-reader-content-wrap" class="flex-1 min-h-0 overflow-y-auto px-3 py-4 sm:px-8 sm:py-7 lg:px-14">
+            <article class="max-w-5xl mx-auto bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-lg p-5 sm:p-8 lg:p-10 min-h-full">
+                <div class="text-xs sm:text-sm font-bold text-indigo-600 dark:text-indigo-300 mb-4 pb-3 border-b border-gray-200 dark:border-gray-700"><i class="fa-solid fa-align-left mr-2"></i>報告摘要</div>
+                <div id="report-reader-content" class="whitespace-pre-wrap break-words text-base sm:text-lg lg:text-xl leading-8 sm:leading-9 lg:leading-10 font-medium text-gray-800 dark:text-gray-100"></div>
+            </article>
+        </div>
+        <footer class="report-reader-footer shrink-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur border-t border-gray-200 dark:border-gray-700 px-3 sm:px-6 pt-3 shadow-[0_-4px_12px_rgba(0,0,0,0.06)]">
+            <div class="max-w-5xl mx-auto grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4 items-center">
+                <button type="button" id="report-reader-prev-btn" class="h-12 sm:h-14 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-gray-700 dark:text-gray-200 hover:text-indigo-700 dark:hover:text-indigo-300 font-bold transition active:scale-95 disabled:opacity-35 disabled:cursor-not-allowed disabled:active:scale-100"><i class="fa-solid fa-chevron-left mr-2"></i>上一檔</button>
+                <div class="hidden sm:block text-center text-xs text-gray-400 dark:text-gray-500"><i class="fa-solid fa-keyboard mr-1.5"></i>方向鍵或左右滑動切換</div>
+                <button type="button" id="report-reader-next-btn" class="h-12 sm:h-14 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold shadow-md transition active:scale-95 disabled:opacity-35 disabled:cursor-not-allowed disabled:active:scale-100">下一檔<i class="fa-solid fa-chevron-right ml-2"></i></button>
+            </div>
+        </footer>
+    </div>
+</div>
 <div id="toast-container" class="fixed bottom-5 right-5 z-[200] flex flex-col-reverse gap-3 pointer-events-none"></div>
 <datalist id="stock-names-list"></datalist>
 
@@ -1544,9 +1580,93 @@ document.getElementById('btn-win')?.addEventListener('click',()=>closeTrade('已
 document.getElementById('plan-table-body')?.addEventListener('click',async e=>{const b=e.target.closest('[data-action]');if(!b)return;const a=b.dataset.action,id=b.dataset.id;if(a==='delete-plan'){window.openConfirmModal('確定刪除？',async()=>{state.plans=state.plans.filter(x=>x.id!==id);saveLocalData();renderPlans();await deleteDataFromCloud(`plans/${id}`);showToast('已刪除');});}else if(a==='edit-plan'){window.openCloseModal(id,null,'edit');}else if(a==='close-plan'){const p=state.plans.find(x=>x.id===id);window.openCloseModal(id,p?.target||p?.entry,'close');}});
 function renderPlans(){const tb=document.getElementById('plan-table-body');if(!tb)return;tb.innerHTML='';let cc=0,wc=0,tp=0,rh='';const sp=[...state.plans].sort((a,b)=>{let vA,vB;switch(state.planSortConfig.key){case'entryDate':vA=a.entryDate||'';vB=b.entryDate||'';break;case'stock':vA=a.stock;vB=b.stock;break;case'qty':vA=a.qty;vB=b.qty;break;case'entry':vA=a.entry;vB=b.entry;break;case'target':vA=a.target||0;vB=b.target||0;break;case'stop':vA=a.stop;vB=b.stop;break;case'status':const o={'持倉中':1,'已停利':2,'已停損':3};vA=o[a.status]||99;vB=o[b.status]||99;break;default:vA=a.createdAt||0;vB=b.createdAt||0;break;}if(vA===vB)return(a.createdAt||0)-(b.createdAt||0);return state.planSortConfig.asc?(vA>vB?1:-1):(vA>vB?-1:1);});sp.forEach(i=>{const isC=i.status!=='持倉中';if(isC){cc++;if(i.status==='已停利')wc++;tp+=i.pnl||0;}const cm=i.stock.match(/\d{4}/),isF=cm?getEpsInfo(cm[0],{}).futures:false,dn=i.name||state.codeToName[i.stock]||'',fd=i.entryDate?i.entryDate.replace(/-/g,'/'):'';rh+=`<tr class="table-row-hover border-b border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-sm ${isC?'opacity-50':''}"><td class="table-sticky-bg py-3 px-2 sm:px-3 text-center sticky left-0 z-20"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${i.id}" data-type="plan" ${selectedIds['plan'].has(i.id)?'checked':''}></td><td class="py-3 px-3 sm:px-4 font-medium text-gray-600 dark:text-gray-400">${escapeHTML(fd)}</td><td class="py-3 px-3 sm:px-4 font-medium">${isF?'<span class="bg-sky-600 text-white text-[10px] px-1.5 py-0.5 rounded mr-1.5 shadow-sm">期</span>':''}<span class="font-bold mr-1.5 text-gray-800 dark:text-gray-200">${escapeHTML(i.stock)}</span><span class="text-gray-600 dark:text-gray-400">${escapeHTML(dn)}</span><div class="text-[10px] text-gray-400 mt-0.5">${escapeHTML(i.note||'')}</div></td><td class="py-3 px-3 sm:px-4">${i.qty}</td><td class="py-3 px-3 sm:px-4">${i.entry}</td><td class="py-3 px-3 sm:px-4 tw-red font-bold">${i.target||'-'}</td><td class="py-3 px-3 sm:px-4 tw-green font-bold">${i.stop}</td><td class="py-3 px-3 sm:px-4"><span class="px-2 py-1 rounded-md text-xs font-medium ${i.status==='持倉中'?'bg-blue-100 text-blue-700':(i.status==='已停利'?'bg-red-100 text-red-700':'bg-green-100 text-green-700')}">${i.status}</span></td><td class="py-3 px-3 sm:px-4 whitespace-nowrap">${!isC?`<button data-action="close-plan" data-id="${i.id}" class="text-xs bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 px-3 py-1.5 rounded-lg transition shadow-sm mr-2 active:scale-95">結算</button>`:`<span class="mr-3 ${i.pnl>0?'tw-red':'tw-green'} font-bold">${formatNumColor(i.pnl)}</span>`}<button data-action="edit-plan" data-id="${i.id}" class="text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110 mr-1"><i class="fa-solid fa-pen pointer-events-none"></i></button><button data-action="delete-plan" data-id="${i.id}" class="text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110"><i class="fa-solid fa-trash pointer-events-none"></i></button></td></tr>`;});tb.innerHTML=rh;document.getElementById('stat-total').textContent=cc;document.getElementById('stat-winrate').textContent=cc>0?Math.round((wc/cc)*100)+'%':'0%';document.getElementById('stat-pnl').textContent=tp.toString();document.getElementById('stat-pnl').className=`text-2xl font-bold ${tp>0?'tw-red':(tp<0?'tw-green':'text-gray-900 dark:text-white')} transition-colors duration-300`;updateBatchUI('plan');}
 
+let reportReaderItems=[],reportReaderIndex=0,reportReaderTouchStart=null,reportReaderBodyOverflow='',reportReaderEnteredFullscreen=false;
+const getReportReaderItems=()=>{
+    let reports=state.reports||[];
+    if(state.reportFilters){
+        if(state.reportFilters.start)reports=reports.filter(report=>report.date>=state.reportFilters.start);
+        if(state.reportFilters.end)reports=reports.filter(report=>report.date<=state.reportFilters.end);
+        if(state.reportFilters.code){const query=state.reportFilters.code;reports=reports.filter(report=>(report.code&&report.code.includes(query))||(report.name&&report.name.includes(query)));}
+    }
+    return[...reports].sort((a,b)=>{
+        let valueA,valueB;
+        switch(state.reportSortConfig?state.reportSortConfig.key:'date'){
+            case'date':valueA=a.date;valueB=b.date;break;
+            case'code':valueA=a.code;valueB=b.code;break;
+            default:valueA=a.createdAt||0;valueB=b.createdAt||0;break;
+        }
+        if(valueA===valueB)return(b.createdAt||0)-(a.createdAt||0);
+        return(state.reportSortConfig?state.reportSortConfig.asc:false)?(valueA>valueB?1:-1):(valueA>valueB?-1:1);
+    });
+};
+const renderReportReader=()=>{
+    const report=reportReaderItems[reportReaderIndex];if(!report)return;
+    document.getElementById('report-reader-code').textContent=report.code||'';
+    document.getElementById('report-reader-name').textContent=report.name||'';
+    document.getElementById('report-reader-date').textContent=`報告日期｜${(report.date||'未填寫').replace(/-/g,'/')}`;
+    document.getElementById('report-reader-content').textContent=report.content||'';
+    document.getElementById('report-reader-counter').textContent=`${reportReaderIndex+1} / ${reportReaderItems.length}`;
+    document.getElementById('report-reader-prev-btn').disabled=reportReaderIndex<=0;
+    document.getElementById('report-reader-next-btn').disabled=reportReaderIndex>=reportReaderItems.length-1;
+    const contentWrap=document.getElementById('report-reader-content-wrap');if(contentWrap)contentWrap.scrollTop=0;
+};
+const moveReportReader=step=>{
+    const next=Math.max(0,Math.min(reportReaderItems.length-1,reportReaderIndex+step));if(next===reportReaderIndex)return;
+    reportReaderIndex=next;renderReportReader();
+};
+const requestReportBrowserFullscreen=()=>{
+    if(document.fullscreenElement||document.webkitFullscreenElement)return;
+    try{
+        let requestResult;
+        if(document.documentElement.requestFullscreen)requestResult=document.documentElement.requestFullscreen({navigationUI:'hide'});
+        else if(document.documentElement.webkitRequestFullscreen){document.documentElement.webkitRequestFullscreen();reportReaderEnteredFullscreen=true;return;}
+        if(requestResult&&typeof requestResult.then==='function')requestResult.then(()=>{reportReaderEnteredFullscreen=true;}).catch(()=>{});
+        else if(requestResult!==undefined)reportReaderEnteredFullscreen=true;
+    }catch(e){}
+};
+const openReportReader=id=>{
+    reportReaderItems=getReportReaderItems();reportReaderIndex=reportReaderItems.findIndex(report=>String(report.id)===String(id));
+    if(reportReaderIndex<0)return showToast('找不到這筆報告','error');
+    const modal=document.getElementById('report-reader-modal');if(!modal)return;
+    reportReaderBodyOverflow=document.body.style.overflow;document.body.style.overflow='hidden';modal.classList.remove('hidden');renderReportReader();requestReportBrowserFullscreen();
+    setTimeout(()=>document.getElementById('report-reader-close-btn')?.focus(),50);
+};
+const closeReportReader=()=>{
+    const modal=document.getElementById('report-reader-modal');if(!modal||modal.classList.contains('hidden'))return;
+    modal.classList.add('hidden');document.body.style.overflow=reportReaderBodyOverflow;reportReaderTouchStart=null;
+    const fullscreenElement=document.fullscreenElement||document.webkitFullscreenElement;
+    if(reportReaderEnteredFullscreen&&fullscreenElement){try{const result=document.exitFullscreen?document.exitFullscreen():document.webkitExitFullscreen?.();if(result&&typeof result.catch==='function')result.catch(()=>{});}catch(e){}}
+    reportReaderEnteredFullscreen=false;
+};
+document.getElementById('report-reader-prev-btn')?.addEventListener('click',()=>moveReportReader(-1));
+document.getElementById('report-reader-next-btn')?.addEventListener('click',()=>moveReportReader(1));
+document.getElementById('report-reader-close-btn')?.addEventListener('click',closeReportReader);
+document.getElementById('report-reader-copy-btn')?.addEventListener('click',()=>{const report=reportReaderItems[reportReaderIndex];if(report)executeCopy(`[${report.date||''}] ${report.code} / ${report.name}\n${report.content||''}`);});
+document.getElementById('report-reader-content-wrap')?.addEventListener('touchstart',e=>{const touch=e.changedTouches[0];reportReaderTouchStart=touch?{x:touch.clientX,y:touch.clientY}:null;},{passive:true});
+document.getElementById('report-reader-content-wrap')?.addEventListener('touchend',e=>{if(!reportReaderTouchStart)return;const touch=e.changedTouches[0];if(!touch)return;const dx=touch.clientX-reportReaderTouchStart.x,dy=touch.clientY-reportReaderTouchStart.y;reportReaderTouchStart=null;if(Math.abs(dx)>=55&&Math.abs(dx)>Math.abs(dy))moveReportReader(dx>0?-1:1);},{passive:true});
+document.addEventListener('keydown',e=>{const modal=document.getElementById('report-reader-modal');if(!modal||modal.classList.contains('hidden'))return;if(e.key==='ArrowLeft'){e.preventDefault();moveReportReader(-1);}else if(e.key==='ArrowRight'){e.preventDefault();moveReportReader(1);}else if(e.key==='Escape'){e.preventDefault();closeReportReader();}});
+
 document.getElementById('report-form')?.addEventListener('submit',async e=>{e.preventDefault();const d=document.getElementById('rep-date').value,c=document.getElementById('rep-code').value.trim(),n=document.getElementById('rep-name').value.trim(),con=document.getElementById('rep-content').value.trim();if(!c||!n||!con||!d)return;const id=`${c}_${Date.now()}`,p={id,date:d,code:c,name:n,content:con,createdAt:Date.now(),updatedAt:Date.now()};state.reports.push(p);saveLocalData();renderReports();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();await putDataToCloud(`reports/${id}`,p);showToast('報告已加入');e.target.reset();document.getElementById('rep-date').value=d;setTimeout(()=>document.getElementById('rep-code').focus(),15);});
-document.getElementById('report-table-body')?.addEventListener('click',async e=>{const b=e.target.closest('[data-action]');if(!b)return;const a=b.dataset.action,id=b.dataset.id;if(a==='copy-report'){const r=state.reports.find(x=>x.id===id);if(r)executeCopy(`[${r.date||''}] ${r.code} / ${r.name}\n${r.content||''}`);}else if(a==='edit-report'){const r=state.reports.find(x=>x.id===id);if(r)window.openPromptModal("修改",r.content||"",async nc=>{if(nc!==null&&nc.trim()!==""){r.content=nc.trim();r.updatedAt=Date.now();saveLocalData();renderReports();await putDataToCloud(`reports/${id}`,r);showToast("修改成功");}});}else if(a==='delete-report'){window.openConfirmModal('確定刪除？',async()=>{state.reports=state.reports.filter(x=>x.id!==id);saveLocalData();renderReports();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();await deleteDataFromCloud(`reports/${id}`);showToast('已刪除');});}});
-function renderReports(){const tb=document.getElementById('report-table-body'),em=document.getElementById('report-empty');if(!tb||!em)return;let fr=state.reports||[];if(state.reportFilters){if(state.reportFilters.start)fr=fr.filter(r=>r.date>=state.reportFilters.start);if(state.reportFilters.end)fr=fr.filter(r=>r.date<=state.reportFilters.end);if(state.reportFilters.code){const c=state.reportFilters.code;fr=fr.filter(r=>(r.code&&r.code.includes(c))||(r.name&&r.name.includes(c)));}}if(fr.length===0){tb.innerHTML='';em.classList.remove('hidden');updateBatchUI('report');return;}em.classList.add('hidden');const sr=[...fr].sort((a,b)=>{let vA,vB;switch(state.reportSortConfig?state.reportSortConfig.key:'date'){case'date':vA=a.date;vB=b.date;break;case'code':vA=a.code;vB=b.code;break;default:vA=a.createdAt||0;vB=b.createdAt||0;break;}if(vA===vB)return(b.createdAt||0)-(a.createdAt||0);return (state.reportSortConfig?state.reportSortConfig.asc:false)?(vA>vB?1:-1):(vA>vB?-1:1);});let rh='';sr.forEach(r=>{const fd=r.date?r.date.replace(/-/g,'/'):'';rh+=`<tr class="table-row-hover border-b border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-sm"><td class="table-sticky-bg py-3 px-2 sm:px-3 text-center sticky left-0 z-20"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${r.id}" data-type="report" ${selectedIds['report']&&selectedIds['report'].has(r.id)?'checked':''}></td><td class="py-3 px-3 sm:px-4 font-medium text-gray-600 dark:text-gray-400">${escapeHTML(fd)}</td><td class="py-3 px-3 sm:px-4"><span class="font-bold mr-2 text-gray-800 dark:text-gray-200">${escapeHTML(r.code)}</span><span class="text-gray-600 dark:text-gray-400">${escapeHTML(r.name)}</span></td><td class="report-summary-col report-summary-cell py-3 px-3 sm:px-4 text-gray-800 dark:text-gray-100 font-medium leading-relaxed">${escapeHTML(r.content||'')}</td><td class="py-3 px-3 sm:px-4 text-center whitespace-nowrap"><button class="mr-1 text-teal-600 dark:text-teal-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" data-action="copy-report" data-id="${r.id}"><i class="fa-solid fa-copy pointer-events-none"></i></button><button class="mr-1 text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" data-action="edit-report" data-id="${r.id}"><i class="fa-solid fa-pen pointer-events-none"></i></button><button class="text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" data-action="delete-report" data-id="${r.id}"><i class="fa-solid fa-trash pointer-events-none"></i></button></td></tr>`;});tb.innerHTML=rh;updateBatchUI('report');}
+document.getElementById('report-table-body')?.addEventListener('click',async e=>{
+    const button=e.target.closest('[data-action]');if(!button)return;
+    const action=button.dataset.action,id=button.dataset.id;
+    if(action==='open-report-reader')openReportReader(id);
+    else if(action==='copy-report'){const report=state.reports.find(item=>item.id===id);if(report)executeCopy(`[${report.date||''}] ${report.code} / ${report.name}\n${report.content||''}`);}
+    else if(action==='edit-report'){const report=state.reports.find(item=>item.id===id);if(report)window.openPromptModal("修改",report.content||"",async newContent=>{if(newContent!==null&&newContent.trim()!==""){report.content=newContent.trim();report.updatedAt=Date.now();saveLocalData();renderReports();await putDataToCloud(`reports/${id}`,report);showToast("修改成功");}});}
+    else if(action==='delete-report'){window.openConfirmModal('確定刪除？',async()=>{state.reports=state.reports.filter(item=>item.id!==id);saveLocalData();renderReports();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();await deleteDataFromCloud(`reports/${id}`);showToast('已刪除');});}
+});
+function renderReports(){
+    const tableBody=document.getElementById('report-table-body'),emptyState=document.getElementById('report-empty');if(!tableBody||!emptyState)return;
+    const reports=getReportReaderItems();
+    if(!reports.length){tableBody.innerHTML='';emptyState.classList.remove('hidden');updateBatchUI('report');return;}
+    emptyState.classList.add('hidden');
+    tableBody.innerHTML=reports.map(report=>{
+        const formattedDate=report.date?report.date.replace(/-/g,'/'):'';
+        const reportId=escapeHTML(report.id);
+        return`<tr class="table-row-hover border-b border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-sm"><td class="table-sticky-bg py-3 px-2 sm:px-3 text-center sticky left-0 z-20"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${reportId}" data-type="report" ${selectedIds.report&&selectedIds.report.has(report.id)?'checked':''}></td><td class="py-3 px-3 sm:px-4 font-medium text-gray-600 dark:text-gray-400">${escapeHTML(formattedDate)}</td><td class="py-3 px-3 sm:px-4"><span class="font-bold mr-2 text-gray-800 dark:text-gray-200">${escapeHTML(report.code)}</span><span class="text-gray-600 dark:text-gray-400">${escapeHTML(report.name)}</span></td><td class="report-summary-col report-summary-cell py-3 px-3 sm:px-4 text-gray-800 dark:text-gray-100 font-medium leading-relaxed">${escapeHTML(report.content||'')}</td><td class="py-3 px-3 sm:px-4 text-center whitespace-nowrap"><button type="button" title="全螢幕閱讀" aria-label="全螢幕閱讀 ${escapeHTML(report.code)} ${escapeHTML(report.name)}" class="mr-1 text-indigo-600 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/40 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" data-action="open-report-reader" data-id="${reportId}"><i class="fa-solid fa-expand pointer-events-none"></i></button><button type="button" title="複製報告" class="mr-1 text-teal-600 dark:text-teal-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" data-action="copy-report" data-id="${reportId}"><i class="fa-solid fa-copy pointer-events-none"></i></button><button type="button" title="修改報告" class="mr-1 text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" data-action="edit-report" data-id="${reportId}"><i class="fa-solid fa-pen pointer-events-none"></i></button><button type="button" title="刪除報告" class="text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" data-action="delete-report" data-id="${reportId}"><i class="fa-solid fa-trash pointer-events-none"></i></button></td></tr>`;
+    }).join('');
+    updateBatchUI('report');
+}
 
 const CHK_CONFIG={'long':['低位階','頭頭高底底高','成交量2倍以上','突破前壓','突破上軌 開布林','均線多排','量價齊揚','紅K線收盤上5MA','20MA向上','KD金叉','MACD金叉','上升通道','突破下降切線','突破整理區間','紅K站上20MA','紅K站上60MA'],'short':['高位階','頭頭低底底低','跌破前壓','跌破上軌','均線空排','綠K線收盤跌破5MA','20MA向下','KD死叉','MACD死叉','下降通道','跌破上升切線','跌破整理區間','綠K跌破20MA','綠K跌破60MA']};
 let chkCurrentDirection='long',chkSelectedItems=new Set(),chkEditingId=null;
