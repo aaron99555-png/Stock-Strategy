@@ -83,9 +83,13 @@ input[type="date"]::-webkit-calendar-picker-indicator, input[type="month"]::-web
 [data-yahoo-stock-code]:hover::after, [data-yahoo-stock-code]:focus-visible::after { color:#2563eb; opacity:1; transform:translate(.08rem,-.16rem); }
 .dark [data-yahoo-stock-code]:hover, .dark [data-yahoo-stock-code]:focus-visible { color:#60a5fa !important; background-color:rgba(30,58,138,.3) !important; }
 .dark [data-yahoo-stock-code]:hover::after, .dark [data-yahoo-stock-code]:focus-visible::after { color:#60a5fa; }
-/* 選股日誌／追蹤清單：日期縮窄並以「年份、月/日」分行 */
-#module-journal table :is(th,td):nth-child(2), #module-favorites table :is(th,td):nth-child(2) { width:55px !important; min-width:55px !important; max-width:55px !important; padding-left:0.25rem !important; padding-right:0.25rem !important; text-align:center !important; }
+/* 所有清單模組：日期縮窄並以「年份、月/日」分行 */
+#module-journal table :is(th,td):nth-child(2), #module-favorites table :is(th,td):nth-child(2),
+#module-revenue table :is(th,td):nth-child(2), #module-report table :is(th,td):nth-child(2),
+#module-checklist table :is(th,td):nth-child(2), #module-plan table :is(th,td):nth-child(2) { width:55px !important; min-width:55px !important; max-width:55px !important; padding-left:0.25rem !important; padding-right:0.25rem !important; text-align:center !important; }
+#module-revenue table th:nth-child(2), #module-report table th:nth-child(2), #module-checklist table th:nth-child(2), #module-plan table th:nth-child(2) { white-space:normal !important; line-height:1.15; }
 #journal-table-body td:nth-child(3), #fav-table-body td:nth-child(3) { left:95px !important; }
+.compact-date-cell { width:55px !important; min-width:55px !important; max-width:55px !important; padding-left:0.25rem !important; padding-right:0.25rem !important; text-align:center !important; }
 .compact-date-value { display:inline-flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; line-height:1.05; white-space:normal; }
 .compact-date-year { font-size:10px; color:#94a3b8; font-weight:700; letter-spacing:.02em; }
 .compact-date-month-day { font-size:12px; font-weight:800; color:#475569; }
@@ -1079,11 +1083,11 @@ const decorateYahooStockTable=tableBody=>{
 });
 const decorateCompactDateTable=tableBody=>{
     tableBody?.querySelectorAll('tr > td:nth-child(2):not([data-compact-date])').forEach(cell=>{
-        const raw=cell.textContent.trim(),match=raw.match(/^(\d{4})[\/-](\d{1,2})[\/-](\d{1,2})$/);if(!match)return;
-        const year=match[1],month=match[2].padStart(2,'0'),day=match[3].padStart(2,'0');cell.dataset.compactDate='true';cell.title=`${year}/${month}/${day}`;cell.setAttribute('aria-label',`${year}年${month}月${day}日`);cell.innerHTML=`<span class="compact-date-value"><span class="compact-date-year">${year}</span><span class="compact-date-month-day">${month}/${day}</span></span>`;
+        const raw=cell.textContent.trim(),match=raw.match(/^(\d{4})[\/-](\d{1,2})(?:[\/-](\d{1,2}))?$/);if(!match)return;
+        const year=match[1],month=match[2].padStart(2,'0'),day=match[3]?match[3].padStart(2,'0'):'',secondLine=day?`${month}/${day}`:`${month}月`,fullLabel=day?`${year}/${month}/${day}`:`${year}/${month}`;cell.dataset.compactDate='true';cell.classList.add('compact-date-cell');cell.title=fullLabel;cell.setAttribute('aria-label',day?`${year}年${month}月${day}日`:`${year}年${month}月`);cell.innerHTML=`<span class="compact-date-value"><span class="compact-date-year">${year}</span><span class="compact-date-month-day">${secondLine}</span></span>`;
     });
 };
-['journal-table-body','fav-table-body'].forEach(id=>{
+['journal-table-body','fav-table-body','revenue-table-body','report-table-body','checklist-table-body','plan-table-body'].forEach(id=>{
     const tableBody=document.getElementById(id);if(!tableBody)return;
     decorateCompactDateTable(tableBody);
     new MutationObserver(()=>decorateCompactDateTable(tableBody)).observe(tableBody,{childList:true,subtree:true});
