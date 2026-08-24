@@ -77,6 +77,12 @@ input[type="date"]::-webkit-calendar-picker-indicator, input[type="month"]::-web
 .report-reader-header { padding-top:max(0.75rem,env(safe-area-inset-top)); }
 .report-reader-footer { padding-bottom:max(0.75rem,env(safe-area-inset-bottom)); }
 #report-reader-content-wrap { touch-action:pan-y; overscroll-behavior:contain; }
+[data-yahoo-stock-code] { cursor:pointer; position:relative; transition:color .18s ease, background-color .18s ease, box-shadow .18s ease; }
+[data-yahoo-stock-code]::after { content:'↗'; display:inline-block; margin-left:.3rem; color:#9ca3af; font-size:.72em; font-weight:800; opacity:.75; transform:translateY(-.08em); transition:color .18s ease, opacity .18s ease, transform .18s ease; }
+[data-yahoo-stock-code]:hover, [data-yahoo-stock-code]:focus-visible { color:#2563eb !important; background-color:rgba(219,234,254,.68) !important; box-shadow:inset 0 0 0 1px rgba(96,165,250,.3); }
+[data-yahoo-stock-code]:hover::after, [data-yahoo-stock-code]:focus-visible::after { color:#2563eb; opacity:1; transform:translate(.08rem,-.16rem); }
+.dark [data-yahoo-stock-code]:hover, .dark [data-yahoo-stock-code]:focus-visible { color:#60a5fa !important; background-color:rgba(30,58,138,.3) !important; }
+.dark [data-yahoo-stock-code]:hover::after, .dark [data-yahoo-stock-code]:focus-visible::after { color:#60a5fa; }
 @media (min-width:640px) {
   .report-summary-col { width:auto; min-width:520px; max-width:none; }
 }
@@ -1017,6 +1023,53 @@ const MONTH_TEXT_COLORS=["text-red-600 dark:text-red-400","text-orange-600 dark:
 
 function showToast(msg,type='success'){const c=document.getElementById('toast-container'),el=document.createElement('div');el.className=`${type==='success'?'bg-green-600':'bg-red-600'} text-white px-4 py-3 rounded-lg shadow-xl text-sm font-medium flex items-center gap-2 transform transition-all duration-300 translate-x-full opacity-0 z-[250] pointer-events-auto min-w-[250px]`;el.innerHTML=`<i class="fa-solid ${type==='success'?'fa-check-circle':'fa-info-circle'}"></i> <span>${escapeHTML(msg)}</span>`;c.appendChild(el);void el.offsetWidth;el.classList.remove('translate-x-full','opacity-0');setTimeout(()=>{el.classList.add('opacity-0','translate-x-full');setTimeout(()=>el.remove(),300);},2500);}
 
+const normalizeYahooStockCode=code=>{
+    const raw=String(code||'').trim().toUpperCase(),match=raw.match(/^(\d{4,6}[A-Z]?)(?:\.(?:TW|TWO))?$/);
+    return match?match[1]:'';
+};
+const getYahooStockUrl=code=>{
+    const normalized=normalizeYahooStockCode(code);
+    return normalized?`https://tw.stock.yahoo.com/quote/${encodeURIComponent(normalized)}`:'';
+};
+const getYahooStockAttributes=code=>{
+    const normalized=normalizeYahooStockCode(code);
+    return normalized?` data-yahoo-stock-code="${escapeHTML(normalized)}" role="link" tabindex="0" title="開啟 Yahoo 股市 ${escapeHTML(normalized)} 走勢圖"`:'';
+};
+const openYahooStock=code=>{
+    const url=getYahooStockUrl(code);
+    if(!url)return showToast('這個代號無法連結 Yahoo 股市','error');
+    const popup=window.open(url,'_blank','noopener,noreferrer');
+    if(popup)popup.opener=null;
+};
+document.addEventListener('click',event=>{
+    const target=event.target.closest('[data-yahoo-stock-code]');
+    if(!target||event.target.closest('button,input,select,textarea,a,[data-action]'))return;
+    event.preventDefault();openYahooStock(target.dataset.yahooStockCode);
+});
+document.addEventListener('keydown',event=>{
+    const target=event.target.closest('[data-yahoo-stock-code]');
+    if(!target||(event.key!=='Enter'&&event.key!==' '))return;
+    event.preventDefault();openYahooStock(target.dataset.yahooStockCode);
+});
+const setYahooStockTarget=(element,code)=>{
+    if(!element)return;
+    const normalized=normalizeYahooStockCode(code);
+    if(!normalized){element.removeAttribute('data-yahoo-stock-code');element.removeAttribute('role');element.removeAttribute('tabindex');return;}
+    element.dataset.yahooStockCode=normalized;element.setAttribute('role','link');element.tabIndex=0;element.title=`開啟 Yahoo 股市 ${normalized} 走勢圖`;
+};
+const decorateYahooStockTable=tableBody=>{
+    tableBody?.querySelectorAll('tr > td:nth-child(3)').forEach(cell=>{
+        if(cell.hasAttribute('data-yahoo-stock-code'))return;
+        const match=cell.textContent.match(/(\d{4,6}[A-Z]?)/i);
+        if(match)setYahooStockTarget(cell,match[1]);
+    });
+};
+['revenue-table-body','report-table-body','checklist-table-body','plan-table-body'].forEach(id=>{
+    const tableBody=document.getElementById(id);if(!tableBody)return;
+    decorateYahooStockTable(tableBody);
+    new MutationObserver(()=>decorateYahooStockTable(tableBody)).observe(tableBody,{childList:true,subtree:true});
+});
+
 const getToday=()=>{const d=new Date();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;};
 const getCurrentMonth=()=>{const d=new Date();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;};
 const generateId=()=>Date.now().toString(36)+Math.random().toString(36).substring(2);
@@ -1281,7 +1334,7 @@ const renderTableRows=(data,tbId,emId,isFav=false)=>{
         let fl=i.isFavorite===true?1:(parseInt(i.isFavorite)||0),fc='text-gray-400 dark:text-gray-500 hover:text-yellow-500',fi='<i class="fa-solid fa-star pointer-events-none"></i>',ft='加入追蹤';
         if(fl===1){fc='text-yellow-500';ft='一星追蹤';}else if(fl===2){fc='text-orange-500';fi='<i class="fa-solid fa-star pointer-events-none"></i><span class="ml-1 text-[10px] font-bold pointer-events-none">2</span>';ft='二次追蹤';}else if(fl===3){fc='text-red-500';fi='<i class="fa-solid fa-star pointer-events-none"></i><span class="ml-1 text-[10px] font-bold pointer-events-none">3</span>';ft='三次追蹤';}
         const fd=i.date?i.date.replace(/-/g,'/'):'',rbh=getRevenueMonthsHtml(i.code),hr=state.reports.some(r=>String(r.code||'').trim()===String(i.code||'').trim()),rb=hr?renderReportIndicator():'',futuresBadge=ei.futures?'<span class="shrink-0 bg-sky-600 text-white text-[9px] px-1 rounded ml-1">期</span>':'';
-        rh+=`<tr class="table-row-hover transition border-b border-gray-200 dark:border-gray-700/50 text-gray-900 dark:text-white text-sm ${ei.futures?"bg-sky-50 dark:bg-sky-900 hover:bg-sky-100 dark:hover:bg-sky-800":"bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800"}"><td class="table-sticky-bg py-3 px-2 w-[40px] min-w-[40px] max-w-[40px] text-center sticky left-0 z-20 ${ei.futures?"!bg-sky-50 dark:!bg-sky-900":""}"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${i.id}" data-type="${lt}" ${selectedIds[lt].has(i.id)?'checked':''}></td><td class="table-sticky-bg py-3 px-1 sm:px-2 w-[85px] min-w-[85px] max-w-[85px] text-center sticky left-[40px] z-20 font-medium whitespace-nowrap text-xs sm:text-sm text-gray-600 dark:text-gray-400 ${ei.futures?"!bg-sky-50 dark:!bg-sky-900":""}">${escapeHTML(fd)}</td><td class="table-sticky-bg py-2 px-2 sm:px-3 w-[95px] min-w-[95px] max-w-[95px] sticky left-[125px] z-20 border-r border-gray-200 dark:border-gray-700/50 overflow-hidden ${ei.futures?"!bg-sky-50 dark:!bg-sky-900":""}"><div class="text-[10px] sm:text-[11px] text-gray-500 dark:text-gray-400 mb-0.5 leading-none flex items-center">${escapeHTML(i.code)}${rb}</div><div class="font-bold text-[14px] sm:text-[15px] leading-tight tracking-wide text-gray-800 dark:text-gray-200 flex items-center min-w-0" title="${escapeHTML(i.name)}"><span class="truncate">${escapeHTML(i.name)}</span>${futuresBadge}</div></td><td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2025)}</td><td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2026)}</td><td class="py-3 px-3 sm:px-4 text-right">${formatNumColor(ei.epsGrowth,true)}</td><td class="py-3 px-3 sm:px-4 text-center font-bold">${sc}</td><td class="py-3 px-3 sm:px-4 text-right">${formatTargetPrice(ei.targetPrice)}</td><td class="py-2 px-3 whitespace-normal w-[100px] min-w-[100px] text-center">${rbh}</td><td class="py-2 px-3 align-top whitespace-normal min-w-[120px] sm:min-w-[140px] lg:w-[320px] lg:min-w-[320px] xl:w-[380px] xl:min-w-[380px] lg:max-w-[460px]">${th}</td>${!isFav?`<td class="py-3 px-3 align-top text-gray-600 dark:text-gray-300 max-w-[80px] sm:max-w-[150px] lg:w-[190px] lg:min-w-[190px] lg:max-w-[220px] truncate lg:whitespace-pre-wrap lg:overflow-visible lg:text-clip lg:break-words text-xs leading-relaxed" title="${escapeHTML(i.notes||'')}">${escapeHTML(i.notes||'')}</td>`:''}<td class="py-3 px-3 text-center whitespace-nowrap"><button class="mr-1 hover:scale-110 text-green-600 dark:text-green-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="add-plan" data-code="${escapeHTML(i.code)}" title="加入交易規劃"><i class="fa-solid fa-chess-knight pointer-events-none"></i></button><button class="mr-1 hover:scale-110 ${fc} bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="toggle-fav" data-id="${i.id}" title="${ft}">${fi}</button><button class="mr-1 hover:scale-110 text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="edit-notes" data-id="${i.id}" title="修改備註"><i class="fa-solid fa-comment-dots pointer-events-none"></i></button><button class="text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="delete-journal" data-id="${i.id}" title="刪除"><i class="fa-solid fa-trash pointer-events-none"></i></button></td></tr>`;
+        rh+=`<tr class="table-row-hover transition border-b border-gray-200 dark:border-gray-700/50 text-gray-900 dark:text-white text-sm ${ei.futures?"bg-sky-50 dark:bg-sky-900 hover:bg-sky-100 dark:hover:bg-sky-800":"bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800"}"><td class="table-sticky-bg py-3 px-2 w-[40px] min-w-[40px] max-w-[40px] text-center sticky left-0 z-20 ${ei.futures?"!bg-sky-50 dark:!bg-sky-900":""}"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${i.id}" data-type="${lt}" ${selectedIds[lt].has(i.id)?'checked':''}></td><td class="table-sticky-bg py-3 px-1 sm:px-2 w-[85px] min-w-[85px] max-w-[85px] text-center sticky left-[40px] z-20 font-medium whitespace-nowrap text-xs sm:text-sm text-gray-600 dark:text-gray-400 ${ei.futures?"!bg-sky-50 dark:!bg-sky-900":""}">${escapeHTML(fd)}</td><td class="table-sticky-bg py-2 px-2 sm:px-3 w-[95px] min-w-[95px] max-w-[95px] sticky left-[125px] z-20 border-r border-gray-200 dark:border-gray-700/50 overflow-hidden ${ei.futures?"!bg-sky-50 dark:!bg-sky-900":""}"${getYahooStockAttributes(i.code)}><div class="text-[10px] sm:text-[11px] text-gray-500 dark:text-gray-400 mb-0.5 leading-none flex items-center">${escapeHTML(i.code)}${rb}</div><div class="font-bold text-[14px] sm:text-[15px] leading-tight tracking-wide text-gray-800 dark:text-gray-200 flex items-center min-w-0"><span class="truncate">${escapeHTML(i.name)}</span>${futuresBadge}</div></td><td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2025)}</td><td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2026)}</td><td class="py-3 px-3 sm:px-4 text-right">${formatNumColor(ei.epsGrowth,true)}</td><td class="py-3 px-3 sm:px-4 text-center font-bold">${sc}</td><td class="py-3 px-3 sm:px-4 text-right">${formatTargetPrice(ei.targetPrice)}</td><td class="py-2 px-3 whitespace-normal w-[100px] min-w-[100px] text-center">${rbh}</td><td class="py-2 px-3 align-top whitespace-normal min-w-[120px] sm:min-w-[140px] lg:w-[320px] lg:min-w-[320px] xl:w-[380px] xl:min-w-[380px] lg:max-w-[460px]">${th}</td>${!isFav?`<td class="py-3 px-3 align-top text-gray-600 dark:text-gray-300 max-w-[80px] sm:max-w-[150px] lg:w-[190px] lg:min-w-[190px] lg:max-w-[220px] truncate lg:whitespace-pre-wrap lg:overflow-visible lg:text-clip lg:break-words text-xs leading-relaxed" title="${escapeHTML(i.notes||'')}">${escapeHTML(i.notes||'')}</td>`:''}<td class="py-3 px-3 text-center whitespace-nowrap"><button class="mr-1 hover:scale-110 text-green-600 dark:text-green-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="add-plan" data-code="${escapeHTML(i.code)}" title="加入交易規劃"><i class="fa-solid fa-chess-knight pointer-events-none"></i></button><button class="mr-1 hover:scale-110 ${fc} bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="toggle-fav" data-id="${i.id}" title="${ft}">${fi}</button><button class="mr-1 hover:scale-110 text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="edit-notes" data-id="${i.id}" title="修改備註"><i class="fa-solid fa-comment-dots pointer-events-none"></i></button><button class="text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="delete-journal" data-id="${i.id}" title="刪除"><i class="fa-solid fa-trash pointer-events-none"></i></button></td></tr>`;
     });
     tb.innerHTML=rh; updateBatchUI(lt);
 };
@@ -1396,7 +1449,7 @@ function renderJournalStreaks(){
         const common=item.commonTags.length?item.commonTags.map(renderStreakTag).join(''):'<span class="text-[10px] text-gray-400">每日策略不同</span>';
         const infoIcons=renderStreakStockInfoIcons(item.code);
         const daily=item.days.map(day=>`<div class="flex items-start gap-2 py-1.5 border-t border-gray-100 dark:border-gray-700/60 first:border-t-0"><span class="w-[78px] shrink-0 text-[11px] font-bold text-gray-500 dark:text-gray-400 tabular-nums">${escapeHTML(day.date.replace(/-/g,'/'))}</span><div class="flex flex-wrap gap-1">${day.tags.length?day.tags.map(renderStreakTag).join(''):'<span class="text-[10px] text-gray-400">無策略標籤</span>'}</div></div>`).join('');
-        return`<article class="rounded-xl border border-violet-200 dark:border-violet-800/60 bg-white dark:bg-gray-900/35 p-3 sm:p-4 shadow-sm"><div class="flex items-start justify-between gap-3"><div class="min-w-0 flex flex-wrap items-center gap-1"><span class="font-black text-violet-700 dark:text-violet-300 mr-1">${escapeHTML(item.code)}</span><span class="font-bold text-gray-800 dark:text-gray-100">${escapeHTML(item.name||'未命名')}</span>${infoIcons}</div><span class="shrink-0 rounded-full bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 px-2.5 py-1 text-[10px] font-black">連續 ${item.streak} 日</span></div><div class="flex flex-wrap items-center gap-1 mt-3 mb-2"><span class="text-[10px] text-gray-500 dark:text-gray-400 mr-1">共同策略</span>${common}</div><div>${daily}</div></article>`;
+        return`<article class="rounded-xl border border-violet-200 dark:border-violet-800/60 bg-white dark:bg-gray-900/35 p-3 sm:p-4 shadow-sm"><div class="flex items-start justify-between gap-3"><div class="min-w-0 flex flex-wrap items-center gap-1 rounded-lg px-1 -mx-1"${getYahooStockAttributes(item.code)}><span class="font-black text-violet-700 dark:text-violet-300 mr-1">${escapeHTML(item.code)}</span><span class="font-bold text-gray-800 dark:text-gray-100">${escapeHTML(item.name||'未命名')}</span>${infoIcons}</div><span class="shrink-0 rounded-full bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 px-2.5 py-1 text-[10px] font-black">連續 ${item.streak} 日</span></div><div class="flex flex-wrap items-center gap-1 mt-3 mb-2"><span class="text-[10px] text-gray-500 dark:text-gray-400 mr-1">共同策略</span>${common}</div><div>${daily}</div></article>`;
     }).join('');
 }
 
@@ -1620,8 +1673,8 @@ const getReportReaderItems=()=>{
 const renderReportReader=()=>{
     const report=reportReaderItems[reportReaderIndex];if(!report)return;
     const codeEl=document.getElementById('report-reader-code'),nameEl=document.getElementById('report-reader-name'),dateEl=document.getElementById('report-reader-date');
-    codeEl.textContent=report.code||'';codeEl.title=report.code||'';
-    nameEl.textContent=report.name||'';nameEl.title=report.name||'';
+    codeEl.textContent=report.code||'';nameEl.textContent=report.name||'';
+    setYahooStockTarget(codeEl,report.code);setYahooStockTarget(nameEl,report.code);
     dateEl.textContent=(report.date||'未填寫').replace(/-/g,'/');dateEl.title=dateEl.textContent;
     document.getElementById('report-reader-content').textContent=report.content||'';
     document.getElementById('report-reader-counter').textContent=`${reportReaderIndex+1} / ${reportReaderItems.length}`;
@@ -1786,6 +1839,8 @@ function renderStockOverview(forcedCode=''){
     welcome.classList.add('hidden');content.classList.remove('hidden');
     setOverviewText('overview-stock-code',data.code);
     setOverviewText('overview-stock-name',data.name||'未命名');
+    setYahooStockTarget(document.getElementById('overview-stock-code'),data.code);
+    setYahooStockTarget(document.getElementById('overview-stock-name'),data.code);
     const favoriteEl=document.getElementById('overview-favorite');
     if(favoriteEl)favoriteEl.textContent=data.favorite?'★'.repeat(Math.min(data.favorite,3)):'';
     const allDates=[...data.journals,...data.reports,...data.checklists,...data.plans,...data.revenues].map(overviewDateValue).filter(Boolean).sort().reverse();
