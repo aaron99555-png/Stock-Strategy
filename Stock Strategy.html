@@ -83,6 +83,14 @@ input[type="date"]::-webkit-calendar-picker-indicator, input[type="month"]::-web
 [data-yahoo-stock-code]:hover::after, [data-yahoo-stock-code]:focus-visible::after { color:#2563eb; opacity:1; transform:translate(.08rem,-.16rem); }
 .dark [data-yahoo-stock-code]:hover, .dark [data-yahoo-stock-code]:focus-visible { color:#60a5fa !important; background-color:rgba(30,58,138,.3) !important; }
 .dark [data-yahoo-stock-code]:hover::after, .dark [data-yahoo-stock-code]:focus-visible::after { color:#60a5fa; }
+/* 選股日誌／追蹤清單：日期縮窄並以「年份、月/日」分行 */
+#module-journal table :is(th,td):nth-child(2), #module-favorites table :is(th,td):nth-child(2) { width:55px !important; min-width:55px !important; max-width:55px !important; padding-left:0.25rem !important; padding-right:0.25rem !important; text-align:center !important; }
+#journal-table-body td:nth-child(3), #fav-table-body td:nth-child(3) { left:95px !important; }
+.compact-date-value { display:inline-flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; line-height:1.05; white-space:normal; }
+.compact-date-year { font-size:10px; color:#94a3b8; font-weight:700; letter-spacing:.02em; }
+.compact-date-month-day { font-size:12px; font-weight:800; color:#475569; }
+.dark .compact-date-year { color:#64748b; }
+.dark .compact-date-month-day { color:#cbd5e1; }
 @media (min-width:640px) {
   .report-summary-col { width:auto; min-width:520px; max-width:none; }
 }
@@ -1068,6 +1076,17 @@ const decorateYahooStockTable=tableBody=>{
     const tableBody=document.getElementById(id);if(!tableBody)return;
     decorateYahooStockTable(tableBody);
     new MutationObserver(()=>decorateYahooStockTable(tableBody)).observe(tableBody,{childList:true,subtree:true});
+});
+const decorateCompactDateTable=tableBody=>{
+    tableBody?.querySelectorAll('tr > td:nth-child(2):not([data-compact-date])').forEach(cell=>{
+        const raw=cell.textContent.trim(),match=raw.match(/^(\d{4})[\/-](\d{1,2})[\/-](\d{1,2})$/);if(!match)return;
+        const year=match[1],month=match[2].padStart(2,'0'),day=match[3].padStart(2,'0');cell.dataset.compactDate='true';cell.title=`${year}/${month}/${day}`;cell.setAttribute('aria-label',`${year}年${month}月${day}日`);cell.innerHTML=`<span class="compact-date-value"><span class="compact-date-year">${year}</span><span class="compact-date-month-day">${month}/${day}</span></span>`;
+    });
+};
+['journal-table-body','fav-table-body'].forEach(id=>{
+    const tableBody=document.getElementById(id);if(!tableBody)return;
+    decorateCompactDateTable(tableBody);
+    new MutationObserver(()=>decorateCompactDateTable(tableBody)).observe(tableBody,{childList:true,subtree:true});
 });
 
 const getToday=()=>{const d=new Date();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;};
