@@ -991,7 +991,7 @@ const DB_URL="https://stockstrategy-492a1-default-rtdb.firebaseio.com", LOCAL_ST
 const getSyncKey=()=>localStorage.getItem('ryan_sync_key')||'default_local_user';
 const getSyncPath=()=>encodeURIComponent(getSyncKey());
 const isCloudMode=()=>!!localStorage.getItem('ryan_sync_key');
-let cloudSyncInterval=null, state={journals:[],plans:[],revenueRecords:[],reports:[],checklists:[],epsData:{},codeToName:{},nameToCode:{},customMarketHolidays:[],copyCompareDuplicates:false,filters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,tags:[],minScore:0,tagLogic:'OR'},favFilters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,tags:[],minScore:0,tagLogic:'OR'},revenueFilters:{month:'',code:''},reportFilters:{start:'',end:'',code:''},sortConfig:{key:'createdAt',asc:false},favSortConfig:{key:'createdAt',asc:false},planSortConfig:{key:'createdAt',asc:false},revenueSortConfig:{key:'month',asc:false},reportSortConfig:{key:'date',asc:false},checklistSortConfig:{key:'createdAt',asc:false}};
+let cloudSyncInterval=null, state={journals:[],plans:[],revenueRecords:[],reports:[],checklists:[],trash:[],tagSettings:null,epsData:{},codeToName:{},nameToCode:{},customMarketHolidays:[],copyCompareDuplicates:false,filters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,tags:[],minScore:0,tagLogic:'OR'},favFilters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,tags:[],minScore:0,tagLogic:'OR'},revenueFilters:{month:'',code:''},reportFilters:{start:'',end:'',code:''},sortConfig:{key:'createdAt',asc:false},favSortConfig:{key:'createdAt',asc:false},planSortConfig:{key:'createdAt',asc:false},revenueSortConfig:{key:'month',asc:false},reportSortConfig:{key:'date',asc:false},checklistSortConfig:{key:'createdAt',asc:false}};
 const selectedIds={journal:new Set(),fav:new Set(),plan:new Set(),revenue:new Set(),report:new Set(),checklist:new Set()};
 
 const escapeHTML=str=>(!str&&str!==0)?'':String(str).replace(/[&<>'"]/g,tag=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[tag]||tag));
@@ -1047,7 +1047,7 @@ const normalizeFilterStrategyTags=filter=>{
 
 const getTagStyle = (t, active=true) => {
     for(const c of TAG_CATEGORIES){
-        if(c.tags.includes(t)) return active ? THEME_MAP[c.theme].active : THEME_MAP[c.theme].inactive;
+        if(c.tags.includes(t)){const theme=window.getManagedTagTheme?.(t,c.theme)||c.theme;return active ? THEME_MAP[theme].active : THEME_MAP[theme].inactive;}
     }
     return active ? "bg-gray-600 text-white border-gray-700" : "bg-gray-50 text-gray-600 border-gray-300";
 };
@@ -1291,11 +1291,11 @@ const setupLogicBtns=(sel,fKey,cb)=>{
 
 function renderDynamicTags(){
     const fc=document.getElementById('form-tags-container');
-    if(fc)fc.innerHTML=TAG_CATEGORIES.map(c=>`<div><div class="text-xs font-bold text-gray-500 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 pb-1 mb-2">${c.title}</div><div class="flex flex-wrap gap-2">${c.tags.map(t=>`<label class="cursor-pointer"><input type="checkbox" value="${t}" class="hidden tag-input" data-theme="${c.theme}"><div class="px-3 py-1.5 rounded-lg text-xs font-bold border transition active:scale-95 ${THEME_MAP[c.theme].inactive}">${t}</div></label>`).join('')}</div></div>`).join('');
+    if(fc)fc.innerHTML=TAG_CATEGORIES.map(c=>`<div><div class="text-xs font-bold text-gray-500 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 pb-1 mb-2">${c.title}</div><div class="flex flex-wrap gap-2">${c.tags.map(t=>{const theme=window.getManagedTagTheme?.(t,c.theme)||c.theme;return`<label class="cursor-pointer"><input type="checkbox" value="${escapeHTML(t)}" class="hidden tag-input" data-theme="${theme}"><div class="px-3 py-1.5 rounded-lg text-xs font-bold border transition active:scale-95 ${THEME_MAP[theme].inactive}">${escapeHTML(t)}</div></label>`;}).join('')}</div></div>`).join('');
     
     document.querySelectorAll('#filter-tags-container, #filter-tags-container-fav').forEach(container=>{
         if(!container)return;
-        container.innerHTML=TAG_CATEGORIES.map(cat=>`<div class="text-[10px] font-bold text-gray-400 border-b border-gray-300 dark:border-gray-700 pb-1 mb-1.5 mt-2 first:mt-0">${cat.title}</div><div class="grid grid-cols-2 gap-1 mb-1">${cat.tags.map(t=>`<label class="flex items-center gap-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700/50 p-1.5 rounded transition"><input type="checkbox" value="${t}" class="filter-tag-cb w-3.5 h-3.5 cursor-pointer"><span class="text-xs font-medium text-gray-700 dark:text-gray-300">${t}</span></label>`).join('')}</div>`).join('');
+        container.innerHTML=TAG_CATEGORIES.map(cat=>`<div class="text-[10px] font-bold text-gray-400 border-b border-gray-300 dark:border-gray-700 pb-1 mb-1.5 mt-2 first:mt-0">${cat.title}</div><div class="grid grid-cols-2 gap-1 mb-1">${cat.tags.map(t=>`<label class="flex items-center gap-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700/50 p-1.5 rounded transition"><input type="checkbox" value="${escapeHTML(t)}" class="filter-tag-cb w-3.5 h-3.5 cursor-pointer"><span class="text-xs font-medium text-gray-700 dark:text-gray-300">${escapeHTML(t)}</span></label>`).join('')}</div>`).join('');
     });
     
     const updateTagInputVisual=box=>{
@@ -1349,7 +1349,7 @@ function renderFilterTags(){
 
 function saveLocalData(){localStorage.setItem(LOCAL_STORAGE_KEY,JSON.stringify(state));}
 const cloudCollection=v=>Array.isArray(v)?v.filter(Boolean):(v&&typeof v==='object'?Object.values(v).filter(Boolean):[]);
-const cloudSnapshot=()=>({journals:Object.fromEntries(state.journals.map(x=>[x.id,x])),plans:Object.fromEntries(state.plans.map(x=>[x.id,x])),revenueRecords:Object.fromEntries(state.revenueRecords.map(x=>[x.id,x])),reports:Object.fromEntries(state.reports.map(x=>[x.id,x])),checklists:Object.fromEntries(state.checklists.map(x=>[x.id,x])),epsData:state.epsData||{},customMarketHolidaySettings:{dates:[...(state.customMarketHolidays||[])],updatedAt:Date.now()}});
+const cloudSnapshot=()=>({journals:Object.fromEntries(state.journals.map(x=>[x.id,x])),plans:Object.fromEntries(state.plans.map(x=>[x.id,x])),revenueRecords:Object.fromEntries(state.revenueRecords.map(x=>[x.id,x])),reports:Object.fromEntries(state.reports.map(x=>[x.id,x])),checklists:Object.fromEntries(state.checklists.map(x=>[x.id,x])),trash:Object.fromEntries((state.trash||[]).map(x=>[x.id,x])),tagSettings:state.tagSettings||null,epsData:state.epsData||{},customMarketHolidaySettings:{dates:[...(state.customMarketHolidays||[])],updatedAt:Date.now()}});
 async function loadFromCloud(showError=true){
     if(!isCloudMode())return false;
     try{
@@ -1360,11 +1360,14 @@ async function loadFromCloud(showError=true){
         if(d){
             state.journals=cloudCollection(d.journals);
             const migratedStrategyTags=normalizeStrategyTags(state.journals);
-            state.plans=cloudCollection(d.plans);state.revenueRecords=cloudCollection(d.revenueRecords);state.reports=cloudCollection(d.reports);state.checklists=cloudCollection(d.checklists);state.epsData=d.epsData||{};
+            state.plans=cloudCollection(d.plans);state.revenueRecords=cloudCollection(d.revenueRecords);state.reports=cloudCollection(d.reports);state.checklists=cloudCollection(d.checklists);if(d.trash!==undefined)state.trash=cloudCollection(d.trash);if(d.tagSettings)state.tagSettings=d.tagSettings;state.epsData=d.epsData||{};
             state.customMarketHolidays=d.customMarketHolidaySettings?normalizeCustomMarketHolidays(cloudCollection(d.customMarketHolidaySettings.dates)):[];
             state.codeToName={};state.nameToCode={};
             [...state.journals,...state.plans.map(p=>({code:p.stock,name:p.name})),...state.revenueRecords,...state.reports,...state.checklists,...Object.values(state.epsData)].forEach(dt=>{if(dt&&dt.code&&dt.name){state.codeToName[dt.code]=dt.name;state.nameToCode[dt.name]=dt.code;}});
+            window.ensureOptimizationState?.();window.syncCustomTagSettings?.();window.renderTrashManager?.();
             if(migratedStrategyTags)await putDataToCloud('journals',Object.fromEntries(state.journals.map(x=>[x.id,x])));
+            if(!d.tagSettings&&state.tagSettings)await putDataToCloud('tagSettings',state.tagSettings);
+            if(d.trash===undefined&&state.trash?.length)await putDataToCloud('trash',Object.fromEntries(state.trash.map(x=>[x.id,x])));
         }else{
             const init=await fetch(`${DB_URL}/data/${getSyncPath()}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(cloudSnapshot())});
             if(!init.ok)throw new Error(`雲端建立失敗 (${init.status})`);
@@ -1393,7 +1396,7 @@ function loadLocalData(){
     const sd=localStorage.getItem(LOCAL_STORAGE_KEY);
     if(sd){try{state={...state,...JSON.parse(sd)};}catch(e){}}else{const ts={"2330":"台積電","2317":"鴻海","2454":"聯發科","2382":"廣達","2603":"長榮"};Object.entries(ts).forEach(([c,n])=>{state.codeToName[c]=n;state.nameToCode[n]=c;});}
     const migratedStrategyTags=normalizeStrategyTags(state.journals);
-    if(!state.revenueRecords)state.revenueRecords=[]; if(!state.reports)state.reports=[]; if(!state.checklists)state.checklists=[];
+    if(!state.revenueRecords)state.revenueRecords=[]; if(!state.reports)state.reports=[]; if(!state.checklists)state.checklists=[]; if(!Array.isArray(state.trash))state.trash=[];
     const normalizedMarketHolidays=normalizeCustomMarketHolidays(state.customMarketHolidays),migratedMarketHolidays=JSON.stringify(normalizedMarketHolidays)!==JSON.stringify(state.customMarketHolidays||[]);state.customMarketHolidays=normalizedMarketHolidays;
     if(!state.filters)state.filters={start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,tags:[],minScore:0,tagLogic:'OR'};
     if(!state.favFilters)state.favFilters={start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,tags:[],minScore:0,tagLogic:'OR'};
@@ -2045,7 +2048,7 @@ const COPY_TAG_ICON_POOL=['🔹','🔸','🔺','🔻','🟠','🟡','🟢','🔵
 const buildCopyTagIconMap=tags=>{
     const result=new Map(),used=new Set();let poolIndex=0;
     Array.from(tags||[]).forEach((tag,index)=>{
-        let icon=COPY_TAG_ICONS[tag];
+        let icon=window.getManagedTagIcon?.(tag)||COPY_TAG_ICONS[tag];
         if(!icon||used.has(icon)){
             while(poolIndex<COPY_TAG_ICON_POOL.length&&used.has(COPY_TAG_ICON_POOL[poolIndex]))poolIndex++;
             icon=COPY_TAG_ICON_POOL[poolIndex++]||`▫${index+1}`;
@@ -2073,7 +2076,7 @@ document.querySelectorAll('.copy-compare-duplicates').forEach(cb=>cb.addEventLis
 const executeCopy=async t=>{if(navigator.clipboard&&window.isSecureContext){try{const ok=await window.copyTextOptimized(t);if(ok)return showToast('複製成功');}catch(e){console.warn('剪貼簿 API 無法使用，改用相容模式',e);}}fallbackCopy(t);};
 const fallbackCopy=t=>{const x=document.createElement("textarea");x.value=t;x.style.position="fixed";document.body.appendChild(x);x.focus();x.select();try{document.execCommand('copy');showToast('複製成功');}catch(e){showToast('複製失敗','error');}document.body.removeChild(x);};
 
-document.querySelectorAll('.btn-copy').forEach(b=>{b.addEventListener('click',e=>{const m=e.currentTarget.dataset.mode,at=document.querySelector('.tab-content.active').id,iF=at==='module-favorites',cf=iF?state.favFilters:state.filters,lt=iF?'fav':'journal';let d=getFilteredAndSortedData(state.journals,cf,iF?state.favSortConfig:state.sortConfig);if(iF)d=d.filter(j=>j.isFavorite);let ds=cf.start===cf.end?(cf.start?cf.start.replace(/-/g,'/'):'全區間'):`${cf.start.replace(/-/g,'/')}~${cf.end.replace(/-/g,'/')}`,ts=cf.tags.length>0?` [標籤條件: ${cf.tags.join(cf.tagLogic==='AND'?' 且 ':' 或 ')}]`:'';if(m==='selected'){let ci=selectedIds[lt];if(ci.size===0)return showToast('請先勾選','error');d=d.filter(j=>ci.has(j.id));d.sort((a,b)=>{const dt=new Date(a.date)-new Date(b.date);return dt!==0?dt:(a.createdAt||0)-(b.createdAt||0);});let tx=`| ${ds} 多重篩選漏斗${ts} |\n\n`;d.forEach(j=>tx+=`${j.code} ${j.name}\n`);executeCopy(tx.trim()+copyFootnote);return;}if(m==='feifan'){const seen=new Set(),ff=d.filter(j=>j.tags&&j.tags.includes('非凡重點')).filter(j=>{const code=String(j.code||'').trim();if(!code||seen.has(code))return false;seen.add(code);return true;});if(ff.length===0)return showToast('無非凡重點標的','error');let tx=`| ${ds} 非凡重點 (共 ${ff.length} 檔) |\n\n`;ff.forEach(j=>tx+=`${j.code} ${j.name}\n`);executeCopy(tx.trim()+copyFootnote);return;}if(d.length===0)return showToast('清單為空','error');let tx=`| ${ds} 多重篩選漏斗${ts} |\n\n`;if(m==='strategy'){const sm={};d.forEach(j=>{if(j.tags)j.tags.forEach(t=>{if(!NON_STRATEGY_COPY_TAGS.has(t)&&(cf.tags.length===0||cf.tags.includes(t))){if(!sm[t])sm[t]=[];sm[t].push(j);}});});const duplicateCodes=state.copyCompareDuplicates?getDuplicateStrategyCodes(sm):new Set(),tagIcons=buildCopyTagIconMap(Object.keys(sm));const ord=cf.tags.length?[...cf.tags]:['缺口','大腸包小腸','多頭營收創高','破繭而出','月來越好','季不可失','守株待兔','量價齊揚','OBV突破'];Object.keys(sm).sort((a,b)=>{const iA=ord.indexOf(a),iB=ord.indexOf(b);if(iA!==-1&&iB!==-1)return iA-iB;if(iA!==-1)return -1;if(iB!==-1)return 1;return a.localeCompare(b);}).forEach(s=>{tx+=`${tagIcons.get(s)||'🏷️'} [${s}] (共 ${sm[s].length} 檔)\n`;sm[s].forEach(a=>tx+=`${a.code} ${a.name}${duplicateCodes.has(String(a.code||'').trim())?' 🔁':''}\n`);tx+='\n';});}else if(m==='score'){
+document.querySelectorAll('.btn-copy').forEach(b=>{b.addEventListener('click',e=>{const m=e.currentTarget.dataset.mode,at=document.querySelector('.tab-content.active').id,iF=at==='module-favorites',cf=iF?state.favFilters:state.filters,lt=iF?'fav':'journal';let d=getFilteredAndSortedData(state.journals,cf,iF?state.favSortConfig:state.sortConfig);if(iF)d=d.filter(j=>j.isFavorite);let ds=cf.start===cf.end?(cf.start?cf.start.replace(/-/g,'/'):'全區間'):`${cf.start.replace(/-/g,'/')}~${cf.end.replace(/-/g,'/')}`,ts=cf.tags.length>0?` [標籤條件: ${cf.tags.join(cf.tagLogic==='AND'?' 且 ':' 或 ')}]`:'';if(m==='selected'){let ci=selectedIds[lt];if(ci.size===0)return showToast('請先勾選','error');d=d.filter(j=>ci.has(j.id));d.sort((a,b)=>{const dt=new Date(a.date)-new Date(b.date);return dt!==0?dt:(a.createdAt||0)-(b.createdAt||0);});let tx=`| ${ds} 多重篩選漏斗${ts} |\n\n`;d.forEach(j=>tx+=`${j.code} ${j.name}\n`);executeCopy(tx.trim()+copyFootnote);return;}if(m==='feifan'){const seen=new Set(),ff=d.filter(j=>j.tags&&j.tags.includes('非凡重點')).filter(j=>{const code=String(j.code||'').trim();if(!code||seen.has(code))return false;seen.add(code);return true;});if(ff.length===0)return showToast('無非凡重點標的','error');let tx=`| ${ds} 非凡重點 (共 ${ff.length} 檔) |\n\n`;ff.forEach(j=>tx+=`${j.code} ${j.name}\n`);executeCopy(tx.trim()+copyFootnote);return;}if(d.length===0)return showToast('清單為空','error');let tx=`| ${ds} 多重篩選漏斗${ts} |\n\n`;if(m==='strategy'){const sm={};d.forEach(j=>{if(j.tags)j.tags.forEach(t=>{if(!NON_STRATEGY_COPY_TAGS.has(t)&&(cf.tags.length===0||cf.tags.includes(t))){if(!sm[t])sm[t]=[];sm[t].push(j);}});});const duplicateCodes=state.copyCompareDuplicates?getDuplicateStrategyCodes(sm):new Set(),tagIcons=buildCopyTagIconMap(Object.keys(sm));const ord=cf.tags.length?[...cf.tags]:TAG_CATEGORIES.flatMap(c=>c.tags);Object.keys(sm).sort((a,b)=>{const iA=ord.indexOf(a),iB=ord.indexOf(b);if(iA!==-1&&iB!==-1)return iA-iB;if(iA!==-1)return -1;if(iB!==-1)return 1;return a.localeCompare(b);}).forEach(s=>{tx+=`${tagIcons.get(s)||'🏷️'} [${s}] (共 ${sm[s].length} 檔)\n`;sm[s].forEach(a=>tx+=`${a.code} ${a.name}${duplicateCodes.has(String(a.code||'').trim())?' 🔁':''}\n`);tx+='\n';});}else if(m==='score'){
     // --- 這裡合併分數 ---
     const scoreMap = {};
     d.forEach(j => {
@@ -2379,6 +2382,10 @@ setChkDirection('long');
             
             const wsPlan = XLSX.utils.json_to_sheet(state.plans.map(p => ({'進場日期':p.entryDate,'狀態':p.status,'代號':p.stock,'股名':p.name,'部位(張)':p.qty,'進場價':p.entry,'停損防守':p.stop,'停利目標':p.target||'','實際出場':p.exitPrice||'','實現損益':p.pnl||0,'權證/備註':p.note||''})));
             XLSX.utils.book_append_sheet(wb, wsPlan, '交易規劃');
+
+            const tagRows=(state.tagSettings?.categories||TAG_CATEGORIES).flatMap((category,categoryIndex)=>(category.tags||[]).map((tag,tagIndex)=>{const meta=state.tagSettings?.meta?.[tag]||{};return{'分類順序':categoryIndex+1,'分類':category.title,'分類主題':category.theme,'標籤順序':tagIndex+1,'標籤':tag,'顏色':meta.theme||category.theme,'複製圖示':meta.icon||'','參與策略':meta.isStrategy===false?'否':'是'};}));
+            const wsTags=XLSX.utils.json_to_sheet(tagRows);
+            XLSX.utils.book_append_sheet(wb,wsTags,'標籤設定');
             
             XLSX.writeFile(wb, `萊恩手札備份_${getToday().replace(/-/g,'')}.xlsx`);
             showToast('匯出成功！檔案已下載');
@@ -2820,6 +2827,660 @@ const SESSION={
     }
     return `[${d}] 支撐壓力`;
   };
+})();
+</script>
+
+<script id="optimization-suite">
+(function(){
+  'use strict';
+
+  var DEFAULT_TAG_CATEGORIES=JSON.parse(JSON.stringify(TAG_CATEGORIES));
+  var VALID_THEMES=['rose','blue','amber','purple','teal'];
+  var pendingImport=null;
+  var TYPE_CONFIG={
+    journal:{stateKey:'journals',cloud:'journals',label:'策略日誌'},
+    plan:{stateKey:'plans',cloud:'plans',label:'交易規劃'},
+    revenue:{stateKey:'revenueRecords',cloud:'revenueRecords',label:'營收創高'},
+    report:{stateKey:'reports',cloud:'reports',label:'法人報告'},
+    checklist:{stateKey:'checklists',cloud:'checklists',label:'進場查核'}
+  };
+
+  function clone(value){return JSON.parse(JSON.stringify(value));}
+  function normalizeTagMeta(name,categoryTheme,meta){
+    var source=meta&&typeof meta==='object'?meta:{};
+    return{
+      isStrategy:source.isStrategy!==undefined?!!source.isStrategy:!NON_STRATEGY_COPY_TAGS.has(name),
+      icon:String(source.icon||COPY_TAG_ICONS[name]||'').trim().slice(0,12),
+      theme:VALID_THEMES.includes(source.theme)?source.theme:categoryTheme
+    };
+  }
+
+  window.ensureOptimizationState=function(){
+    var changed=false;
+    if(!Array.isArray(state.trash)){state.trash=[];changed=true;}
+    if(!state.tagSettings||!Array.isArray(state.tagSettings.categories)){
+      var meta={};
+      DEFAULT_TAG_CATEGORIES.forEach(function(category){
+        category.tags.forEach(function(tag){meta[tag]=normalizeTagMeta(tag,category.theme,null);});
+      });
+      state.tagSettings={version:1,categories:clone(DEFAULT_TAG_CATEGORIES),meta:meta,updatedAt:Date.now()};
+      changed=true;
+    }else{
+      var seen=new Set(),normalizedCategories=[];
+      state.tagSettings.categories.forEach(function(category,index){
+        var theme=VALID_THEMES.includes(category.theme)?category.theme:(DEFAULT_TAG_CATEGORIES[index]&&DEFAULT_TAG_CATEGORIES[index].theme)||'blue';
+        var tags=[];
+        (Array.isArray(category.tags)?category.tags:[]).forEach(function(rawTag){
+          var tag=String(rawTag||'').trim();
+          if(tag&&!seen.has(tag)){seen.add(tag);tags.push(tag);}
+        });
+        normalizedCategories.push({title:String(category.title||('分類 '+(index+1))),theme:theme,tags:tags});
+      });
+      if(!normalizedCategories.length)normalizedCategories=clone(DEFAULT_TAG_CATEGORIES);
+      var nextMeta={};
+      normalizedCategories.forEach(function(category){
+        category.tags.forEach(function(tag){nextMeta[tag]=normalizeTagMeta(tag,category.theme,state.tagSettings.meta&&state.tagSettings.meta[tag]);});
+      });
+      state.tagSettings.categories=normalizedCategories;
+      state.tagSettings.meta=nextMeta;
+      state.tagSettings.version=1;
+    }
+    return changed;
+  };
+
+  window.getManagedTagTheme=function(tag,fallback){
+    var meta=state.tagSettings&&state.tagSettings.meta&&state.tagSettings.meta[tag];
+    return meta&&VALID_THEMES.includes(meta.theme)?meta.theme:fallback;
+  };
+  window.getManagedTagIcon=function(tag){
+    var meta=state.tagSettings&&state.tagSettings.meta&&state.tagSettings.meta[tag];
+    return meta&&meta.icon?meta.icon:'';
+  };
+  window.syncCustomTagSettings=function(){
+    window.ensureOptimizationState();
+    var categories=clone(state.tagSettings.categories);
+    TAG_CATEGORIES.splice.apply(TAG_CATEGORIES,[0,TAG_CATEGORIES.length].concat(categories));
+    NON_STRATEGY_COPY_TAGS.clear();
+    Object.keys(state.tagSettings.meta||{}).forEach(function(tag){
+      if(!state.tagSettings.meta[tag].isStrategy)NON_STRATEGY_COPY_TAGS.add(tag);
+    });
+    if(document.getElementById('form-tags-container')){
+      renderDynamicTags();
+      document.querySelectorAll('.filter-tag-cb').forEach(function(cb){
+        cb.checked=(state.filters.tags||[]).includes(cb.value);
+      });
+      renderFilterTags();
+    }
+  };
+
+  function injectOptimizationUI(){
+    if(document.getElementById('btn-tag-manager'))return;
+    var importButton=document.getElementById('btn-import-backup');
+    if(importButton){
+      importButton.insertAdjacentHTML('beforebegin',[
+        '<button id="btn-tag-manager" type="button" class="relative text-xs sm:text-sm bg-rose-50 dark:bg-rose-900/40 hover:bg-rose-100 dark:hover:bg-rose-800/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-700/50 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center font-medium active:scale-95" title="自訂標籤管理"><i class="fa-solid fa-tags sm:mr-1.5"></i><span class="hidden sm:inline">標籤</span></button>',
+        '<button id="btn-trash-manager" type="button" class="relative text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center active:scale-95" title="垃圾桶與資料復原"><i class="fa-solid fa-trash-arrow-up sm:mr-1.5"></i><span class="hidden sm:inline">垃圾桶</span><span id="trash-nav-count" class="hidden absolute -top-2 -right-2 min-w-5 h-5 px-1 rounded-full bg-red-600 text-white text-[10px] font-black items-center justify-center border-2 border-white dark:border-gray-800"></span></button>'
+      ].join(''));
+    }
+    document.body.insertAdjacentHTML('beforeend',[
+      '<div id="tag-manager-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-[190] hidden items-center justify-center p-3">',
+      '<div class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-2xl border border-gray-200 dark:border-gray-700 shadow-2xl w-full max-w-4xl max-h-[92vh] flex flex-col modal-enter">',
+      '<div class="p-4 sm:p-5 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between gap-3"><div><h3 class="text-lg sm:text-xl font-black text-rose-600 dark:text-rose-300"><i class="fa-solid fa-tags mr-2"></i>自訂標籤管理</h3><p class="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 mt-1">可新增、改名、分類、排序、設定顏色與是否參與策略計分／複製。</p></div><button id="tag-manager-close" type="button" class="w-9 h-9 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-500 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button></div>',
+      '<div class="grid grid-cols-1 lg:grid-cols-12 min-h-0 flex-1">',
+      '<div class="lg:col-span-5 p-4 sm:p-5 border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-gray-700 bg-gray-50/70 dark:bg-gray-900/30">',
+      '<input type="hidden" id="tag-manager-original">',
+      '<div class="grid grid-cols-2 gap-3"><div class="col-span-2"><label class="block text-xs font-bold text-gray-500 mb-1">標籤名稱</label><input id="tag-manager-name" maxlength="20" class="input-base" placeholder="例如：總編認同"></div>',
+      '<div><label class="block text-xs font-bold text-gray-500 mb-1">分類</label><select id="tag-manager-category" class="input-base"></select></div>',
+      '<div><label class="block text-xs font-bold text-gray-500 mb-1">顏色</label><select id="tag-manager-theme" class="input-base"><option value="rose">紅色</option><option value="blue">藍色</option><option value="amber">橘色</option><option value="purple">紫色</option><option value="teal">綠色</option></select></div>',
+      '<div class="col-span-2"><label class="block text-xs font-bold text-gray-500 mb-1">複製圖示（選填）</label><input id="tag-manager-icon" maxlength="12" class="input-base" placeholder="例如：🎯"></div>',
+      '<label class="col-span-2 flex items-center gap-2 p-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 cursor-pointer"><input type="checkbox" id="tag-manager-strategy" class="w-4 h-4 accent-rose-600" checked><span class="text-xs sm:text-sm font-bold">納入策略計分及一般策略複製</span></label></div>',
+      '<div class="flex gap-2 mt-4"><button id="tag-manager-save" type="button" class="flex-1 h-10 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-bold text-sm"><i class="fa-solid fa-floppy-disk mr-1.5"></i>儲存標籤</button><button id="tag-manager-cancel-edit" type="button" class="hidden px-4 h-10 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-200 text-sm font-bold">取消編輯</button></div>',
+      '</div>',
+      '<div class="lg:col-span-7 min-h-0 p-4 sm:p-5 overflow-y-auto"><div id="tag-manager-list" class="space-y-4"></div></div>',
+      '</div></div></div>',
+
+      '<div id="trash-manager-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-[190] hidden items-center justify-center p-3">',
+      '<div class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-2xl border border-gray-200 dark:border-gray-700 shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col modal-enter">',
+      '<div class="p-4 sm:p-5 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between gap-3"><div><h3 class="text-lg sm:text-xl font-black text-gray-800 dark:text-gray-100"><i class="fa-solid fa-trash-arrow-up text-red-500 mr-2"></i>垃圾桶</h3><p class="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 mt-1">刪除資料會先移至此處，可復原或永久刪除。</p></div><div class="flex items-center gap-2"><button id="trash-empty-all" type="button" class="hidden h-9 px-3 rounded-lg border border-red-200 dark:border-red-800 text-red-600 dark:text-red-300 text-xs font-bold hover:bg-red-50 dark:hover:bg-red-900/30">清空垃圾桶</button><button id="trash-manager-close" type="button" class="w-9 h-9 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-500 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button></div></div>',
+      '<div id="trash-manager-list" class="p-4 sm:p-5 overflow-y-auto space-y-2"></div>',
+      '</div></div>',
+
+      '<div id="import-preview-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-[195] hidden items-center justify-center p-3">',
+      '<div class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-2xl border border-gray-200 dark:border-gray-700 shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col modal-enter">',
+      '<div class="p-4 sm:p-5 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between"><div><h3 id="import-preview-title" class="text-lg sm:text-xl font-black text-purple-600 dark:text-purple-300"><i class="fa-solid fa-file-import mr-2"></i>匯入預覽</h3><p class="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 mt-1">確認新增、重複與異常資料後再執行。</p></div><button id="import-preview-close" type="button" class="w-9 h-9 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-500 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button></div>',
+      '<div class="p-4 sm:p-5 overflow-y-auto"><div id="import-preview-summary" class="grid grid-cols-3 gap-2 sm:gap-3 mb-4"></div><div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-700"><table class="w-full text-xs sm:text-sm"><thead class="bg-gray-100 dark:bg-gray-900 text-gray-500"><tr><th class="p-3 text-left">資料類型</th><th class="p-3 text-center">新增</th><th class="p-3 text-center">重複</th><th class="p-3 text-center">異常</th></tr></thead><tbody id="import-preview-table"></tbody></table></div>',
+      '<label id="import-duplicate-option-wrap" class="mt-4 flex items-start gap-2 p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 cursor-pointer"><input type="checkbox" id="import-handle-duplicates" class="mt-0.5 w-4 h-4 accent-amber-600" checked><span><b class="block text-xs sm:text-sm text-amber-800 dark:text-amber-200">處理重複資料</b><span id="import-duplicate-option-text" class="text-[11px] text-amber-700/80 dark:text-amber-300/80">可合併資料會合併，其餘重複資料將略過。</span></span></label></div>',
+      '<div class="p-4 sm:p-5 border-t border-gray-200 dark:border-gray-700 flex gap-2"><button id="import-preview-cancel" type="button" class="flex-1 h-11 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-200 font-bold">取消</button><button id="import-preview-confirm" type="button" class="flex-[2] h-11 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-bold"><i class="fa-solid fa-check mr-1.5"></i>確認匯入</button></div>',
+      '</div></div>'
+    ].join(''));
+  }
+
+  function resetTagForm(){
+    document.getElementById('tag-manager-original').value='';
+    document.getElementById('tag-manager-name').value='';
+    document.getElementById('tag-manager-icon').value='';
+    var category=document.getElementById('tag-manager-category');if(category)category.value='0';
+    document.getElementById('tag-manager-strategy').checked=false;
+    document.getElementById('tag-manager-theme').value=(state.tagSettings?.categories?.[0]?.theme)||'rose';
+    document.getElementById('tag-manager-cancel-edit').classList.add('hidden');
+    document.getElementById('tag-manager-save').innerHTML='<i class="fa-solid fa-plus mr-1.5"></i>新增標籤';
+  }
+
+  function renderTagManager(){
+    window.ensureOptimizationState();
+    var select=document.getElementById('tag-manager-category');
+    var current=select?select.value:'0';
+    if(select){
+      select.innerHTML=state.tagSettings.categories.map(function(category,index){
+        return '<option value="'+index+'">'+escapeHTML(category.title)+'</option>';
+      }).join('');
+      select.value=state.tagSettings.categories[current]?current:'0';
+    }
+    var list=document.getElementById('tag-manager-list');
+    if(!list)return;
+    list.innerHTML=state.tagSettings.categories.map(function(category,categoryIndex){
+      var rows=category.tags.map(function(tag,index){
+        var meta=state.tagSettings.meta[tag]||normalizeTagMeta(tag,category.theme,null);
+        var encoded=encodeURIComponent(tag);
+        return '<div class="flex items-center gap-2 p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900/40">'+
+          '<span class="w-8 h-8 shrink-0 rounded-lg flex items-center justify-center border text-base '+getTagStyle(tag,true)+'">'+escapeHTML(meta.icon||'🏷️')+'</span>'+
+          '<div class="min-w-0 flex-1"><div class="font-bold text-sm truncate">'+escapeHTML(tag)+'</div><div class="flex flex-wrap gap-1 mt-1"><span class="text-[9px] px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-gray-500">'+escapeHTML(meta.theme)+'</span><span class="text-[9px] px-1.5 py-0.5 rounded '+(meta.isStrategy?'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300':'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300')+'">'+(meta.isStrategy?'參與策略':'僅關注')+'</span></div></div>'+
+          '<div class="flex items-center gap-1"><button type="button" data-tag-action="up" data-tag-name="'+encoded+'" title="往前" class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-500 disabled:opacity-30" '+(index===0?'disabled':'')+'><i class="fa-solid fa-arrow-up"></i></button><button type="button" data-tag-action="down" data-tag-name="'+encoded+'" title="往後" class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-500 disabled:opacity-30" '+(index===category.tags.length-1?'disabled':'')+'><i class="fa-solid fa-arrow-down"></i></button><button type="button" data-tag-action="edit" data-tag-name="'+encoded+'" title="編輯" class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300"><i class="fa-solid fa-pen"></i></button><button type="button" data-tag-action="delete" data-tag-name="'+encoded+'" title="刪除" class="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-900/30 text-red-500"><i class="fa-solid fa-trash"></i></button></div>'+
+          '</div>';
+      }).join('');
+      return '<section><div class="flex items-center justify-between pb-2 mb-2 border-b border-gray-200 dark:border-gray-700"><h4 class="font-black text-sm">'+escapeHTML(category.title)+'</h4><span class="text-[10px] text-gray-400">'+category.tags.length+' 個</span></div><div class="space-y-2">'+(rows||'<div class="text-xs text-gray-400 text-center py-4">此分類尚無標籤</div>')+'</div></section>';
+    }).join('');
+  }
+
+  function updateReferencesForRenamedTag(oldName,newName){
+    state.journals.forEach(function(item){
+      if(Array.isArray(item.tags)&&item.tags.includes(oldName)){
+        item.tags=Array.from(new Set(item.tags.map(function(tag){return tag===oldName?newName:tag;})));
+        item.updatedAt=Date.now();
+      }
+    });
+    ['filters','favFilters'].forEach(function(key){
+      state[key].tags=Array.from(new Set((state[key].tags||[]).map(function(tag){return tag===oldName?newName:tag;})));
+    });
+  }
+
+  async function persistTagSettings(syncJournals){
+    state.tagSettings.updatedAt=Date.now();
+    saveLocalData();
+    window.syncCustomTagSettings();
+    renderTagManager();
+    processAndRenderJournals();
+    renderFavorites();
+    await putDataToCloud('tagSettings',state.tagSettings);
+    if(syncJournals)await putDataToCloud('journals',Object.fromEntries(state.journals.map(function(item){return[item.id,item];})));
+  }
+
+  async function saveManagedTag(){
+    var original=document.getElementById('tag-manager-original').value;
+    var name=document.getElementById('tag-manager-name').value.trim();
+    var categoryIndex=parseInt(document.getElementById('tag-manager-category').value,10)||0;
+    var theme=document.getElementById('tag-manager-theme').value;
+    var icon=document.getElementById('tag-manager-icon').value.trim();
+    var isStrategy=document.getElementById('tag-manager-strategy').checked;
+    if(!name)return showToast('請輸入標籤名稱','error');
+    if(name.length>20||/[<>"']/.test(name))return showToast('標籤名稱格式不正確','error');
+    var allTags=state.tagSettings.categories.reduce(function(result,category){return result.concat(category.tags);},[]);
+    if(name!==original&&allTags.includes(name))return showToast('已有相同標籤','error');
+    var oldCategoryIndex=-1,oldPosition=-1;
+    state.tagSettings.categories.forEach(function(category,index){
+      var pos=category.tags.indexOf(original);
+      if(pos!==-1){oldCategoryIndex=index;oldPosition=pos;}
+      category.tags=category.tags.filter(function(tag){return tag!==original&&tag!==name;});
+    });
+    var target=state.tagSettings.categories[categoryIndex]||state.tagSettings.categories[0];
+    if(original&&oldCategoryIndex===categoryIndex&&oldPosition>=0)target.tags.splice(Math.min(oldPosition,target.tags.length),0,name);
+    else target.tags.push(name);
+    if(original&&original!==name){
+      updateReferencesForRenamedTag(original,name);
+      delete state.tagSettings.meta[original];
+    }
+    state.tagSettings.meta[name]={isStrategy:isStrategy,icon:icon.slice(0,12),theme:VALID_THEMES.includes(theme)?theme:target.theme};
+    resetTagForm();
+    await persistTagSettings(original&&original!==name);
+    showToast(original?'標籤已更新':'標籤已新增');
+  }
+
+  function editManagedTag(tag){
+    var categoryIndex=state.tagSettings.categories.findIndex(function(category){return category.tags.includes(tag);});
+    var meta=state.tagSettings.meta[tag]||normalizeTagMeta(tag,'blue',null);
+    document.getElementById('tag-manager-original').value=tag;
+    document.getElementById('tag-manager-name').value=tag;
+    document.getElementById('tag-manager-category').value=String(Math.max(0,categoryIndex));
+    document.getElementById('tag-manager-theme').value=meta.theme;
+    document.getElementById('tag-manager-icon').value=meta.icon||'';
+    document.getElementById('tag-manager-strategy').checked=!!meta.isStrategy;
+    document.getElementById('tag-manager-cancel-edit').classList.remove('hidden');
+    document.getElementById('tag-manager-save').innerHTML='<i class="fa-solid fa-floppy-disk mr-1.5"></i>儲存修改';
+    document.getElementById('tag-manager-name').focus();
+  }
+
+  async function moveManagedTag(tag,direction){
+    var category=state.tagSettings.categories.find(function(item){return item.tags.includes(tag);});
+    if(!category)return;
+    var index=category.tags.indexOf(tag),next=index+direction;
+    if(next<0||next>=category.tags.length)return;
+    var temp=category.tags[index];category.tags[index]=category.tags[next];category.tags[next]=temp;
+    await persistTagSettings(false);
+  }
+
+  function deleteManagedTag(tag){
+    openConfirmModal('確定刪除標籤「'+tag+'」？所有既有紀錄中的此標籤也會一併移除。',async function(){
+      state.tagSettings.categories.forEach(function(category){category.tags=category.tags.filter(function(item){return item!==tag;});});
+      delete state.tagSettings.meta[tag];
+      state.journals.forEach(function(item){item.tags=(item.tags||[]).filter(function(current){return current!==tag;});item.updatedAt=Date.now();});
+      state.filters.tags=(state.filters.tags||[]).filter(function(item){return item!==tag;});
+      state.favFilters.tags=(state.favFilters.tags||[]).filter(function(item){return item!==tag;});
+      resetTagForm();
+      await persistTagSettings(true);
+      showToast('標籤已刪除');
+    });
+  }
+
+  function renderAffectedModules(type){
+    if(type==='journal'){selectedIds.journal.clear();selectedIds.fav.clear();processAndRenderJournals();renderFavorites();}
+    if(type==='plan'){selectedIds.plan.clear();renderPlans();}
+    if(type==='revenue'){selectedIds.revenue.clear();renderRevenueRecords();processAndRenderJournals();renderFavorites();}
+    if(type==='report'){selectedIds.report.clear();renderReports();processAndRenderJournals();renderFavorites();}
+    if(type==='checklist'){selectedIds.checklist.clear();renderChecklists();}
+    if(document.getElementById('module-overview')&&document.getElementById('module-overview').classList.contains('active'))renderStockOverview();
+  }
+
+  async function moveItemsToTrash(rawType,ids){
+    var type=rawType==='fav'?'journal':rawType;
+    var config=TYPE_CONFIG[type];
+    if(!config)return;
+    var idSet=new Set((ids||[]).map(String));
+    var collection=state[config.stateKey]||[];
+    var removed=collection.filter(function(item){return idSet.has(String(item.id));});
+    if(!removed.length)return showToast('找不到可刪除的資料','error');
+    var now=Date.now();
+    var entries=removed.map(function(item,index){
+      return{id:'trash_'+type+'_'+generateId()+'_'+index,type:type,originalId:String(item.id),item:clone(item),deletedAt:now+index};
+    });
+    state[config.stateKey]=collection.filter(function(item){return !idSet.has(String(item.id));});
+    state.trash=(state.trash||[]).concat(entries);
+    saveLocalData();renderAffectedModules(type);window.renderTrashManager();
+    var tasks=[];
+    entries.forEach(function(entry){
+      tasks.push(putDataToCloud('trash/'+entry.id,entry));
+      tasks.push(deleteDataFromCloud(config.cloud+'/'+entry.originalId));
+    });
+    await Promise.allSettled(tasks);
+    showToast('已移至垃圾桶，可隨時復原');
+  }
+
+  function trashItemInfo(entry){
+    var item=entry.item||{};
+    return{
+      code:String(item.code||item.stock||'').trim(),
+      name:String(item.name||'').trim(),
+      date:String(item.date||item.entryDate||item.month||'').trim()
+    };
+  }
+
+  window.renderTrashManager=function(){
+    if(!Array.isArray(state.trash))state.trash=[];
+    var count=state.trash.length,badge=document.getElementById('trash-nav-count');
+    if(badge){
+      badge.textContent=count>99?'99+':String(count);
+      badge.classList.toggle('hidden',count===0);
+      badge.classList.toggle('flex',count>0);
+    }
+    var list=document.getElementById('trash-manager-list'),emptyButton=document.getElementById('trash-empty-all');
+    if(!list)return;
+    if(emptyButton)emptyButton.classList.toggle('hidden',count===0);
+    if(!count){list.innerHTML='<div class="min-h-[220px] flex flex-col items-center justify-center text-gray-400"><i class="fa-solid fa-trash-can text-4xl mb-3 opacity-40"></i><p class="font-bold">垃圾桶目前是空的</p></div>';return;}
+    list.innerHTML=[...state.trash].sort(function(a,b){return(b.deletedAt||0)-(a.deletedAt||0);}).map(function(entry){
+      var config=TYPE_CONFIG[entry.type]||{label:'資料'},info=trashItemInfo(entry),date=new Date(entry.deletedAt||Date.now());
+      var deletedLabel=date.getFullYear()+'/'+String(date.getMonth()+1).padStart(2,'0')+'/'+String(date.getDate()).padStart(2,'0')+' '+String(date.getHours()).padStart(2,'0')+':'+String(date.getMinutes()).padStart(2,'0');
+      return '<div class="flex flex-col sm:flex-row sm:items-center gap-3 p-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40"><div class="min-w-0 flex-1"><div class="flex flex-wrap items-center gap-2"><span class="px-2 py-1 rounded-md bg-gray-200 dark:bg-gray-700 text-[10px] font-bold">'+escapeHTML(config.label)+'</span><span class="font-black text-sm">'+escapeHTML(info.code)+' '+escapeHTML(info.name)+'</span><span class="text-xs text-gray-400">'+escapeHTML(info.date)+'</span></div><div class="text-[10px] text-gray-400 mt-1">刪除時間：'+escapeHTML(deletedLabel)+'</div></div><div class="flex gap-2"><button type="button" data-trash-action="restore" data-trash-id="'+escapeHTML(entry.id)+'" class="flex-1 sm:flex-none h-9 px-3 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold"><i class="fa-solid fa-rotate-left mr-1"></i>復原</button><button type="button" data-trash-action="delete" data-trash-id="'+escapeHTML(entry.id)+'" class="flex-1 sm:flex-none h-9 px-3 rounded-lg bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-300 border border-red-200 dark:border-red-800 text-xs font-bold">永久刪除</button></div></div>';
+    }).join('');
+  };
+
+  async function restoreTrashEntry(trashId){
+    var entry=state.trash.find(function(item){return String(item.id)===String(trashId);});
+    if(!entry)return;
+    var config=TYPE_CONFIG[entry.type],collection=state[config.stateKey]||[];
+    if(collection.some(function(item){return String(item.id)===String(entry.originalId);})){
+      return showToast('原清單已有相同資料，請先確認','error');
+    }
+    var restored=clone(entry.item);restored.updatedAt=Date.now();
+    collection.push(restored);state[config.stateKey]=collection;
+    state.trash=state.trash.filter(function(item){return String(item.id)!==String(trashId);});
+    saveLocalData();renderAffectedModules(entry.type);window.renderTrashManager();
+    await Promise.allSettled([putDataToCloud(config.cloud+'/'+entry.originalId,restored),deleteDataFromCloud('trash/'+entry.id)]);
+    showToast('資料已復原');
+  }
+
+  function permanentlyDeleteTrashEntry(trashId){
+    var entry=state.trash.find(function(item){return String(item.id)===String(trashId);});
+    if(!entry)return;
+    openConfirmModal('永久刪除後將無法復原，確定繼續？',async function(){
+      state.trash=state.trash.filter(function(item){return String(item.id)!==String(trashId);});
+      saveLocalData();window.renderTrashManager();await deleteDataFromCloud('trash/'+entry.id);showToast('已永久刪除');
+    });
+  }
+
+  function normalizeImportDate(value){
+    var result=normalizeReportDate(value);
+    return /^\d{4}-\d{2}-\d{2}$/.test(String(result||''))?String(result):'';
+  }
+  function normalizeImportMonth(value){
+    var text=String(value==null?'':value).trim();
+    if(/^\d{4}-\d{2}$/.test(text))return text;
+    var date=normalizeImportDate(value);
+    return date?date.slice(0,7):'';
+  }
+  function normalizedContent(value){return String(value||'').trim().replace(/\s+/g,' ');}
+  function mergeText(oldText,newText){
+    var oldValue=String(oldText||'').trim(),newValue=String(newText||'').trim();
+    if(!newValue||oldValue===newValue||oldValue.includes(newValue))return oldValue;
+    return oldValue?oldValue+'；'+newValue:newValue;
+  }
+  function journalKey(item){return String(item.date||'')+'|'+String(item.code||'');}
+  function revenueKey(item){return String(item.code||'')+'|'+String(item.month||'');}
+  function reportKey(item){return String(item.date||'')+'|'+String(item.code||'')+'|'+normalizedContent(item.content);}
+  function checklistKey(item){return String(item.date||'')+'|'+String(item.code||'')+'|'+String(item.direction||'long');}
+  function planKey(item){return String(item.entryDate||'')+'|'+String(item.stock||'')+'|'+String(item.entry||0)+'|'+String(item.qty||1)+'|'+String(item.status||'持倉中');}
+
+  function classifyModule(key,label,rows,builder,existingItems,keyFn){
+    var seen=new Set((existingItems||[]).map(keyFn)),entries=[],newCount=0,duplicateCount=0,invalidCount=0;
+    rows.forEach(function(row){
+      var item=builder(row);
+      if(!item){invalidCount++;return;}
+      var itemKey=keyFn(item),duplicate=seen.has(itemKey);
+      if(duplicate)duplicateCount++;else{newCount++;seen.add(itemKey);}
+      entries.push({item:item,key:itemKey,isDuplicate:duplicate});
+    });
+    return{key:key,label:label,entries:entries,newCount:newCount,duplicateCount:duplicateCount,invalidCount:invalidCount};
+  }
+
+  function parseBackupWorkbook(workbook){
+    var modules=[],journalSheet=workbook.SheetNames.includes('策略日誌')?'策略日誌':(workbook.SheetNames.includes('選股日誌')?'選股日誌':null);
+    if(journalSheet){
+      modules.push(classifyModule('journal','策略日誌',XLSX.utils.sheet_to_json(workbook.Sheets[journalSheet]),function(row){
+        var code=String(row['代號']||'').trim(),name=String(row['股名']||'').trim(),date=normalizeImportDate(row['日期']);
+        if(!code||!name||!date)return null;
+        var tags=String(row['策略標籤']||'').split(/[,，、]/).map(function(tag){return normalizeStrategyTagName(tag.trim());}).filter(Boolean);
+        return{id:generateId(),date:date,code:code,name:name,notes:String(row['備註']||'').trim(),tags:Array.from(new Set(tags)),isFavorite:row['追蹤等級']?parseInt(row['追蹤等級'],10):(row['已追蹤']==='是'?1:0),createdAt:Date.now(),updatedAt:Date.now()};
+      },state.journals,journalKey));
+    }
+    if(workbook.SheetNames.includes('營收創高')){
+      modules.push(classifyModule('revenue','營收創高',XLSX.utils.sheet_to_json(workbook.Sheets['營收創高']),function(row){
+        var code=String(row['代號']||'').trim(),name=String(row['股名']||'').trim(),month=normalizeImportMonth(row['創高月份']);
+        if(!code||!name||!month)return null;
+        return{id:code+'_'+month,month:month,code:code,name:name,notes:String(row['備註']||'').trim(),createdAt:Date.now(),updatedAt:Date.now()};
+      },state.revenueRecords,revenueKey));
+    }
+    if(workbook.SheetNames.includes('法人報告')){
+      modules.push(classifyModule('report','法人報告',XLSX.utils.sheet_to_json(workbook.Sheets['法人報告']),function(row){
+        var code=String(row['代號']||'').trim(),name=String(row['股名']||'').trim(),date=normalizeImportDate(row['報告日期']),content=String(row['摘要內容']||'').trim();
+        if(!code||!name||!date||!content)return null;
+        return{id:code+'_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),date:date,code:code,name:name,content:content,createdAt:Date.now(),updatedAt:Date.now()};
+      },state.reports,reportKey));
+    }
+    if(workbook.SheetNames.includes('進場查核')){
+      modules.push(classifyModule('checklist','進場查核',XLSX.utils.sheet_to_json(workbook.Sheets['進場查核']),function(row){
+        var code=String(row['代號']||'').trim(),name=String(row['股名']||'').trim(),date=normalizeImportDate(row['查核日期']);
+        if(!code||!name||!date)return null;
+        return{id:generateId(),date:date,code:code,name:name,direction:row['方向']==='空方'?'short':'long',checkedItems:String(row['符合條件']||'').split(/[,，]/).map(function(item){return item.trim();}).filter(Boolean),details:{pressure:row['壓力']||'',support:row['支撐']||'',target:row['目標價']||'',chipsInst:row['法人籌碼']||'',chipsConc:row['集中度']||'',cost:row['主力成本']||'',pe:row['本益比']||'',profit:row['獲利狀況']||'',notes:row['備註']||''},createdAt:Date.now(),updatedAt:Date.now()};
+      },state.checklists,checklistKey));
+    }
+    if(workbook.SheetNames.includes('交易規劃')){
+      modules.push(classifyModule('plan','交易規劃',XLSX.utils.sheet_to_json(workbook.Sheets['交易規劃']),function(row){
+        var code=String(row['代號']||'').trim(),name=String(row['股名']||'').trim(),date=normalizeImportDate(row['進場日期']);
+        if(!code||!name||!date)return null;
+        return{id:generateId(),entryDate:date,status:row['狀態']||'持倉中',stock:code,name:name,qty:parseInt(row['部位(張)'],10)||1,entry:parseFloat(row['進場價'])||0,stop:parseFloat(row['停損防守'])||0,target:row['停利目標']?parseFloat(row['停利目標']):null,exitPrice:row['實際出場']?parseFloat(row['實際出場']):null,pnl:row['實現損益']?parseFloat(row['實現損益']):0,note:row['權證/備註']||'',createdAt:Date.now(),updatedAt:Date.now()};
+      },state.plans,planKey));
+    }
+    var importedTagSettings=null;
+    if(workbook.SheetNames.includes('標籤設定')){
+      var tagRows=XLSX.utils.sheet_to_json(workbook.Sheets['標籤設定']),validRows=[],invalidTagRows=0;
+      tagRows.forEach(function(row){var tag=String(row['標籤']||'').trim(),title=String(row['分類']||'').trim();if(!tag||!title){invalidTagRows++;return;}validRows.push(row);});
+      validRows.sort(function(a,b){return(parseInt(a['分類順序'],10)||999)-(parseInt(b['分類順序'],10)||999)||(parseInt(a['標籤順序'],10)||999)-(parseInt(b['標籤順序'],10)||999);});
+      var categories=[],categoryMap=new Map(),meta={};
+      validRows.forEach(function(row){
+        var title=String(row['分類']).trim(),tag=String(row['標籤']).trim(),category=categoryMap.get(title),categoryTheme=VALID_THEMES.includes(row['分類主題'])?row['分類主題']:'blue';
+        if(!category){category={title:title,theme:categoryTheme,tags:[]};categoryMap.set(title,category);categories.push(category);}
+        if(!category.tags.includes(tag))category.tags.push(tag);
+        meta[tag]={theme:VALID_THEMES.includes(row['顏色'])?row['顏色']:category.theme,icon:String(row['複製圖示']||'').trim().slice(0,12),isStrategy:String(row['參與策略']||'是').trim()!=='否'};
+      });
+      importedTagSettings={version:1,categories:categories,meta:meta,updatedAt:Date.now()};
+      var currentTags=new Set(state.tagSettings?.categories?.flatMap(function(category){return category.tags;})||[]),newTags=0,duplicateTags=0;
+      Object.keys(meta).forEach(function(tag){if(currentTags.has(tag))duplicateTags++;else newTags++;});
+      modules.push({key:'tagSettings',label:'標籤設定',entries:[],newCount:newTags,duplicateCount:duplicateTags,invalidCount:invalidTagRows});
+    }
+    var preview=buildImportPreview('backup','手札備份匯入預覽',modules);preview.importedTagSettings=importedTagSettings;return preview;
+  }
+
+  function parseDatabaseWorkbook(workbook){
+    var sheet=workbook.Sheets[workbook.SheetNames[0]],rows=XLSX.utils.sheet_to_json(sheet,{defval:null}),existing=Object.keys(state.epsData||{}),modules=[];
+    modules.push(classifyModule('database','參考資料庫',rows,function(row){
+      var code=row['代號']||row['股票代號']||row['Code']||row['stock_id'];
+      var name=row['股名']||row['股票名稱']||row['Name']||row['stock_name'];
+      if(!code||!name)return null;
+      var c=String(code).trim(),n=String(name).trim();
+      return{code:c,name:n,eps2025:row['25 EPS']??row['2025 EPS']??row['25EPS']??row['2025EPS']??row['2025']??row['今年EPS']??row['本年EPS']??null,eps2026:row['26 EPS']??row['預26 EPS']??row['2026 EPS']??row['26EPS']??row['2026EPS']??row['預估26EPS']??row['預估2026EPS']??row['2026']??row['明年EPS']??null,epsGrowth:row['EPS成長率']??row['成長率']??row['預估成長率']??row['YoY']??row['YOY']??null,targetPrice:row['最高目標價']??row['目標價']??row['Target Price']??row['TP']??null,broker:row['券商']??row['發布券商']??row['Broker']??null,reportDate:normalizeReportDate(row['報告日期']??row['報告日']??row['Report Date']??row['report_date']??Object.values(row)[8]??null),futures:row['股期']==='●'||row['股期']==='是'||row['股期']==='Y'||row['期貨']==='●'?'●':null};
+    },existing.map(function(code){return{code:code};}),function(item){return String(item.code||'');}));
+    return buildImportPreview('database','資料庫匯入預覽',modules);
+  }
+
+  function buildImportPreview(type,title,modules){
+    return{type:type,title:title,modules:modules,newCount:modules.reduce(function(sum,module){return sum+module.newCount;},0),duplicateCount:modules.reduce(function(sum,module){return sum+module.duplicateCount;},0),invalidCount:modules.reduce(function(sum,module){return sum+module.invalidCount;},0)};
+  }
+
+  function renderImportPreview(preview){
+    pendingImport=preview;
+    document.getElementById('import-preview-title').innerHTML='<i class="fa-solid fa-file-import mr-2"></i>'+escapeHTML(preview.title);
+    document.getElementById('import-preview-summary').innerHTML=[
+      '<div class="rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 p-3 text-center"><div class="text-2xl font-black text-green-600 dark:text-green-300">'+preview.newCount+'</div><div class="text-[10px] font-bold text-green-700 dark:text-green-400">新增</div></div>',
+      '<div class="rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 p-3 text-center"><div class="text-2xl font-black text-amber-600 dark:text-amber-300">'+preview.duplicateCount+'</div><div class="text-[10px] font-bold text-amber-700 dark:text-amber-400">重複</div></div>',
+      '<div class="rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-3 text-center"><div class="text-2xl font-black text-red-600 dark:text-red-300">'+preview.invalidCount+'</div><div class="text-[10px] font-bold text-red-700 dark:text-red-400">異常</div></div>'
+    ].join('');
+    document.getElementById('import-preview-table').innerHTML=preview.modules.map(function(module){
+      return '<tr class="border-t border-gray-200 dark:border-gray-700"><td class="p-3 font-bold">'+escapeHTML(module.label)+'</td><td class="p-3 text-center text-green-600 font-bold">'+module.newCount+'</td><td class="p-3 text-center text-amber-600 font-bold">'+module.duplicateCount+'</td><td class="p-3 text-center text-red-600 font-bold">'+module.invalidCount+'</td></tr>';
+    }).join('')||'<tr><td colspan="4" class="p-6 text-center text-gray-400">找不到可匯入的工作表</td></tr>';
+    var wrap=document.getElementById('import-duplicate-option-wrap');
+    wrap.classList.toggle('hidden',preview.duplicateCount===0);
+    document.getElementById('import-duplicate-option-text').textContent=preview.type==='database'?'勾選後會使用 Excel 內容更新相同代號的參考資料。':'可合併資料會合併，其餘完全相同的資料將略過。';
+    document.getElementById('import-preview-confirm').disabled=preview.newCount===0&&preview.duplicateCount===0;
+    document.getElementById('import-preview-modal').classList.remove('hidden');
+    document.getElementById('import-preview-modal').classList.add('flex');
+  }
+
+  function ensureImportedTags(tags){
+    var known=new Set(state.tagSettings.categories.reduce(function(result,category){return result.concat(category.tags);},[]));
+    var missing=(tags||[]).filter(function(tag){return tag&&!known.has(tag);});
+    if(!missing.length)return;
+    var category=state.tagSettings.categories.find(function(item){return item.title==='📥 匯入標籤';});
+    if(!category){category={title:'📥 匯入標籤',theme:'blue',tags:[]};state.tagSettings.categories.push(category);}
+    missing.forEach(function(tag){if(!category.tags.includes(tag))category.tags.push(tag);state.tagSettings.meta[tag]=normalizeTagMeta(tag,'blue',{isStrategy:true});});
+    state.tagSettings.updatedAt=Date.now();
+  }
+
+  function mergeImportedTagSettings(imported,handleDuplicates){
+    if(!imported||!Array.isArray(imported.categories))return{added:0,merged:0,skipped:0};
+    var result={added:0,merged:0,skipped:0};
+    imported.categories.forEach(function(sourceCategory){
+      var targetCategory=state.tagSettings.categories.find(function(category){return category.title===sourceCategory.title;});
+      if(!targetCategory){targetCategory={title:sourceCategory.title,theme:sourceCategory.theme,tags:[]};state.tagSettings.categories.push(targetCategory);}
+      sourceCategory.tags.forEach(function(tag){
+        var currentCategory=state.tagSettings.categories.find(function(category){return category.tags.includes(tag);});
+        if(currentCategory){
+          if(!handleDuplicates){result.skipped++;return;}
+          currentCategory.tags=currentCategory.tags.filter(function(current){return current!==tag;});
+          if(!targetCategory.tags.includes(tag))targetCategory.tags.push(tag);
+          state.tagSettings.meta[tag]=normalizeTagMeta(tag,targetCategory.theme,imported.meta&&imported.meta[tag]);result.merged++;
+        }else{
+          targetCategory.tags.push(tag);state.tagSettings.meta[tag]=normalizeTagMeta(tag,targetCategory.theme,imported.meta&&imported.meta[tag]);result.added++;
+        }
+      });
+    });
+    state.tagSettings.updatedAt=Date.now();return result;
+  }
+
+  async function commitBackupImport(handleDuplicates){
+    var added=0,merged=0,skipped=0,allImportedTags=[];
+    pendingImport.modules.forEach(function(module){
+      module.entries.forEach(function(entry){
+        var item=entry.item,existing;
+        if(module.key==='journal'){
+          existing=state.journals.find(function(current){return journalKey(current)===journalKey(item);});
+          if(existing){
+            if(!handleDuplicates){skipped++;return;}
+            existing.tags=Array.from(new Set((existing.tags||[]).concat(item.tags||[])));existing.notes=mergeText(existing.notes,item.notes);existing.isFavorite=Math.max(parseInt(existing.isFavorite,10)||0,parseInt(item.isFavorite,10)||0);existing.updatedAt=Date.now();allImportedTags=allImportedTags.concat(item.tags||[]);merged++;return;
+          }
+          state.journals.push(item);allImportedTags=allImportedTags.concat(item.tags||[]);added++;
+        }else if(module.key==='revenue'){
+          existing=state.revenueRecords.find(function(current){return revenueKey(current)===revenueKey(item);});
+          if(existing){if(!handleDuplicates){skipped++;return;}existing.notes=mergeText(existing.notes,item.notes);existing.updatedAt=Date.now();merged++;return;}
+          state.revenueRecords.push(item);added++;
+        }else if(module.key==='report'){
+          existing=state.reports.find(function(current){return reportKey(current)===reportKey(item);});
+          if(existing){skipped++;return;}state.reports.push(item);added++;
+        }else if(module.key==='checklist'){
+          existing=state.checklists.find(function(current){return checklistKey(current)===checklistKey(item);});
+          if(existing){
+            if(!handleDuplicates){skipped++;return;}
+            existing.checkedItems=Array.from(new Set((existing.checkedItems||[]).concat(item.checkedItems||[])));existing.details=existing.details||{};
+            Object.keys(item.details||{}).forEach(function(key){if(key==='notes')existing.details[key]=mergeText(existing.details[key],item.details[key]);else if(!existing.details[key]&&item.details[key])existing.details[key]=item.details[key];});
+            existing.updatedAt=Date.now();merged++;return;
+          }
+          state.checklists.push(item);added++;
+        }else if(module.key==='plan'){
+          existing=state.plans.find(function(current){return planKey(current)===planKey(item);});
+          if(existing){skipped++;return;}state.plans.push(item);added++;
+        }
+        var code=item.code||item.stock,name=item.name;
+        if(code&&name){state.codeToName[code]=name;state.nameToCode[name]=code;}
+      });
+    });
+    var tagResult=mergeImportedTagSettings(pendingImport.importedTagSettings,handleDuplicates);added+=tagResult.added;merged+=tagResult.merged;skipped+=tagResult.skipped;
+    ensureImportedTags(allImportedTags);
+    saveLocalData();window.syncCustomTagSettings();
+    await Promise.allSettled([
+      putDataToCloud('journals',Object.fromEntries(state.journals.map(function(item){return[item.id,item];}))),
+      putDataToCloud('revenueRecords',Object.fromEntries(state.revenueRecords.map(function(item){return[item.id,item];}))),
+      putDataToCloud('reports',Object.fromEntries(state.reports.map(function(item){return[item.id,item];}))),
+      putDataToCloud('checklists',Object.fromEntries(state.checklists.map(function(item){return[item.id,item];}))),
+      putDataToCloud('plans',Object.fromEntries(state.plans.map(function(item){return[item.id,item];}))),
+      putDataToCloud('tagSettings',state.tagSettings)
+    ]);
+    processAndRenderJournals();renderFavorites();renderRevenueRecords();renderReports();renderChecklists();renderPlans();
+    showToast('匯入完成：新增 '+added+'、合併 '+merged+'、略過 '+skipped);
+  }
+
+  async function commitDatabaseImport(handleDuplicates){
+    var added=0,updated=0,skipped=0,module=pendingImport.modules[0];
+    (module?module.entries:[]).forEach(function(entry){
+      var item=entry.item,exists=!!state.epsData[item.code];
+      if(exists&&!handleDuplicates){skipped++;return;}
+      state.epsData[item.code]=item;state.codeToName[item.code]=item.name;state.nameToCode[item.name]=item.code;
+      if(exists)updated++;else added++;
+    });
+    saveLocalData();await patchDataToCloud('epsData',state.epsData);processAndRenderJournals();renderFavorites();
+    if(document.getElementById('module-overview')&&document.getElementById('module-overview').classList.contains('active'))renderStockOverview();
+    showToast('資料庫匯入完成：新增 '+added+'、更新 '+updated+'、略過 '+skipped);
+  }
+
+  async function confirmImport(){
+    if(!pendingImport)return;
+    var button=document.getElementById('import-preview-confirm');
+    if(button.disabled)return;
+    button.disabled=true;button.innerHTML='<i class="fa-solid fa-spinner fa-spin mr-1.5"></i>匯入中';
+    try{
+      var handle=document.getElementById('import-handle-duplicates').checked;
+      if(pendingImport.type==='database')await commitDatabaseImport(handle);else await commitBackupImport(handle);
+      closeImportPreview();
+    }catch(error){console.error(error);showToast('匯入失敗，請確認檔案格式','error');}
+    finally{button.disabled=false;button.innerHTML='<i class="fa-solid fa-check mr-1.5"></i>確認匯入';}
+  }
+
+  function closeImportPreview(){
+    pendingImport=null;
+    var modal=document.getElementById('import-preview-modal');modal.classList.add('hidden');modal.classList.remove('flex');
+  }
+
+  async function handleImportFile(input){
+    var file=input.files&&input.files[0];if(!file)return;
+    try{
+      if(typeof XLSX==='undefined')return showToast('匯入套件載入中，請稍後','error');
+      var data=await file.arrayBuffer(),workbook=XLSX.read(data);
+      var preview=input.id==='excel-upload'?parseDatabaseWorkbook(workbook):parseBackupWorkbook(workbook);
+      renderImportPreview(preview);
+    }catch(error){console.error(error);showToast('無法讀取 Excel，請確認檔案格式','error');}
+    finally{input.value='';}
+  }
+
+  document.addEventListener('change',function(event){
+    var input=event.target;
+    if(!input||!['backup-file','excel-upload'].includes(input.id))return;
+    event.preventDefault();event.stopImmediatePropagation();handleImportFile(input);
+  },true);
+
+  document.addEventListener('click',function(event){
+    var button=event.target.closest('[data-action]');
+    var actionMap={'delete-journal':'journal','delete-plan':'plan','delete-revenue':'revenue','delete-report':'report','delete-checklist':'checklist'};
+    if(button&&actionMap[button.dataset.action]){
+      event.preventDefault();event.stopImmediatePropagation();
+      var type=actionMap[button.dataset.action],id=button.dataset.id;
+      openConfirmModal('確定移至垃圾桶？之後仍可復原。',function(){return moveItemsToTrash(type,[id]);});
+      return;
+    }
+    if(event.target.closest('#btn-batch-delete-confirm')){
+      event.preventDefault();event.stopImmediatePropagation();
+      var rawType=document.getElementById('batch-delete-type').value;
+      var ids=Array.from(selectedIds[rawType]||[]);
+      document.getElementById('batch-delete-modal').classList.add('hidden');
+      moveItemsToTrash(rawType,ids);
+    }
+  },true);
+
+  function bindOptimizationEvents(){
+    document.getElementById('btn-tag-manager').addEventListener('click',function(){renderTagManager();document.getElementById('tag-manager-modal').classList.remove('hidden');document.getElementById('tag-manager-modal').classList.add('flex');});
+    document.getElementById('tag-manager-close').addEventListener('click',function(){document.getElementById('tag-manager-modal').classList.add('hidden');document.getElementById('tag-manager-modal').classList.remove('flex');});
+    document.getElementById('tag-manager-save').addEventListener('click',saveManagedTag);
+    document.getElementById('tag-manager-cancel-edit').addEventListener('click',resetTagForm);
+    document.getElementById('tag-manager-category').addEventListener('change',function(){if(document.getElementById('tag-manager-original').value)return;var category=state.tagSettings.categories[parseInt(this.value,10)||0];if(category){document.getElementById('tag-manager-theme').value=category.theme;document.getElementById('tag-manager-strategy').checked=(parseInt(this.value,10)||0)!==0;}});
+    document.getElementById('tag-manager-list').addEventListener('click',function(event){
+      var button=event.target.closest('[data-tag-action]');if(!button)return;
+      var tag=decodeURIComponent(button.dataset.tagName),action=button.dataset.tagAction;
+      if(action==='edit')editManagedTag(tag);else if(action==='delete')deleteManagedTag(tag);else if(action==='up')moveManagedTag(tag,-1);else if(action==='down')moveManagedTag(tag,1);
+    });
+    document.getElementById('btn-trash-manager').addEventListener('click',function(){window.renderTrashManager();document.getElementById('trash-manager-modal').classList.remove('hidden');document.getElementById('trash-manager-modal').classList.add('flex');});
+    document.getElementById('trash-manager-close').addEventListener('click',function(){document.getElementById('trash-manager-modal').classList.add('hidden');document.getElementById('trash-manager-modal').classList.remove('flex');});
+    document.getElementById('trash-manager-list').addEventListener('click',function(event){
+      var button=event.target.closest('[data-trash-action]');if(!button)return;
+      if(button.dataset.trashAction==='restore')restoreTrashEntry(button.dataset.trashId);else permanentlyDeleteTrashEntry(button.dataset.trashId);
+    });
+    document.getElementById('trash-empty-all').addEventListener('click',function(){
+      openConfirmModal('確定永久清空垃圾桶？此動作無法復原。',async function(){state.trash=[];saveLocalData();window.renderTrashManager();await deleteDataFromCloud('trash');showToast('垃圾桶已清空');});
+    });
+    document.getElementById('import-preview-close').addEventListener('click',closeImportPreview);
+    document.getElementById('import-preview-cancel').addEventListener('click',closeImportPreview);
+    document.getElementById('import-preview-confirm').addEventListener('click',confirmImport);
+    window.confirmBatchDelete=function(type){
+      updateBatchUI(type);
+      if(!selectedIds[type]||selectedIds[type].size===0)return showToast('請先勾選要刪除的資料','error');
+      document.getElementById('batch-delete-type').value=type;
+      document.getElementById('batch-delete-msg').textContent='確定將這 '+selectedIds[type].size+' 筆資料移至垃圾桶嗎？之後仍可復原。';
+      document.getElementById('batch-delete-modal').classList.remove('hidden');
+    };
+  }
+
+  document.addEventListener('DOMContentLoaded',function(){
+    var changed=window.ensureOptimizationState();
+    window.syncCustomTagSettings();
+    injectOptimizationUI();
+    bindOptimizationEvents();
+    renderTagManager();window.renderTrashManager();resetTagForm();
+    if(changed)saveLocalData();
+  });
 })();
 </script>
 
