@@ -4,6 +4,14 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩飆股起漲手札</title>
+<script id="admin-mode-bootstrap">
+try{
+    if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
+        document.documentElement.classList.remove('viewer-mode');
+        document.documentElement.classList.add('admin-mode');
+    }
+}catch(error){}
+</script>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
@@ -245,7 +253,10 @@ button { touch-action: manipulation; }
                         <div class="bg-blue-500/10 dark:bg-blue-500/20 p-1.5 rounded mr-2"><i class="fa-solid fa-pen-to-square"></i></div> 
                         新增條件 <span class="text-[10px] sm:text-xs text-gray-400 dark:text-gray-500 font-normal ml-2 sm:ml-3 tracking-wide group-hover:text-blue-500 transition-colors">(點擊展開/收合)</span>
                     </h2>
-                    <div class="p-1 pointer-events-none"><i class="fa-solid fa-chevron-down text-gray-400 group-hover:text-blue-500 transition-transform duration-300" id="journal-form-chevron"></i></div>
+                    <div class="flex items-center gap-1.5">
+                        <button type="button" id="journal-form-pin-btn" aria-pressed="false" aria-label="釘選新增條件" title="釘選常駐" class="w-8 h-8 rounded-lg text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition active:scale-95"><i class="fa-solid fa-thumbtack pointer-events-none"></i></button>
+                        <div class="p-1 pointer-events-none"><i class="fa-solid fa-chevron-down text-gray-400 group-hover:text-blue-500 transition-transform duration-300" id="journal-form-chevron"></i></div>
+                    </div>
                 </div>
                 <div id="journal-form-wrapper" class="hidden overflow-hidden transition-all duration-300">
                     <form id="journal-form" class="flex flex-col gap-4 pt-1" action="javascript:void(0);">
@@ -260,7 +271,10 @@ button { touch-action: manipulation; }
                         <div class="bg-gray-50 dark:bg-gray-900/40 px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700/50 flex flex-col shadow-inner">
                             <div id="toggle-tags-btn" role="button" tabindex="0" aria-expanded="false" aria-controls="form-tags-wrapper" class="flex justify-between items-center w-full cursor-pointer group">
                                 <span class="block text-xs text-gray-500 dark:text-gray-400 font-medium tracking-wide group-hover:text-blue-500 transition-colors select-none pointer-events-none">策略標籤 <span class="text-gray-400 dark:text-gray-500 font-normal ml-1">(單選，可不選)</span><span class="text-[10px] sm:text-xs text-gray-400 dark:text-gray-500 font-normal ml-2">(點擊展開/收合)</span></span>
-                                <div class="p-1 pointer-events-none"><i class="fa-solid fa-chevron-down text-gray-400 transition-transform duration-300 group-hover:text-blue-500" id="tags-chevron"></i></div>
+                                <div class="flex items-center gap-1">
+                                    <button type="button" id="strategy-tags-pin-btn" aria-pressed="false" aria-label="釘選策略標籤" title="釘選常駐" class="w-7 h-7 rounded-lg text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition active:scale-95"><i class="fa-solid fa-thumbtack pointer-events-none text-xs"></i></button>
+                                    <div class="p-1 pointer-events-none"><i class="fa-solid fa-chevron-down text-gray-400 transition-transform duration-300 group-hover:text-blue-500" id="tags-chevron"></i></div>
+                                </div>
                             </div>
                             <div id="form-tags-wrapper" class="hidden overflow-hidden transition-all duration-300 mt-2 border-t border-gray-200 dark:border-gray-700/50 pt-3">
                                 <div id="form-tags-container" class="space-y-3"></div>
@@ -274,9 +288,12 @@ button { touch-action: manipulation; }
         <div id="journal-streak-panel" class="card-panel border-t-4 border-violet-500 mt-6 mb-6 overflow-hidden">
             <div class="p-4 sm:p-5 bg-violet-50/50 dark:bg-violet-900/10 border-b border-violet-100 dark:border-violet-900/40 flex items-center justify-between gap-3">
                 <h3 class="font-bold text-violet-700 dark:text-violet-300 text-base sm:text-lg flex items-center"><span class="w-8 h-8 rounded-lg bg-violet-100 dark:bg-violet-900/40 flex items-center justify-center mr-2"><i class="fa-solid fa-repeat"></i></span>策略連續出現追蹤</h3>
-                <button type="button" id="streak-toggle-btn" aria-expanded="true" aria-controls="streak-panel-content" aria-label="收合策略連續出現追蹤" title="收合" class="shrink-0 p-2 rounded-lg group transition active:scale-95">
-                    <i id="streak-toggle-icon" class="fa-solid fa-chevron-down text-gray-400 group-hover:text-violet-500 transition-transform duration-300" style="transform:rotate(180deg)"></i>
-                </button>
+                <div class="flex items-center gap-1.5">
+                    <button type="button" id="streak-pin-btn" aria-pressed="false" aria-label="釘選策略連續出現追蹤" title="釘選常駐" class="w-8 h-8 rounded-lg text-gray-400 hover:text-violet-600 dark:hover:text-violet-300 hover:bg-violet-100 dark:hover:bg-violet-900/40 transition active:scale-95"><i class="fa-solid fa-thumbtack pointer-events-none"></i></button>
+                    <button type="button" id="streak-toggle-btn" aria-expanded="true" aria-controls="streak-panel-content" aria-label="收合策略連續出現追蹤" title="收合" class="shrink-0 p-2 rounded-lg group transition active:scale-95">
+                        <i id="streak-toggle-icon" class="fa-solid fa-chevron-down text-gray-400 group-hover:text-violet-500 transition-transform duration-300" style="transform:rotate(180deg)"></i>
+                    </button>
+                </div>
             </div>
             <div id="streak-panel-content">
                 <div class="px-4 sm:px-5 py-4 bg-violet-50/30 dark:bg-violet-900/5 border-b border-violet-100 dark:border-violet-900/40">
@@ -904,15 +921,6 @@ button { touch-action: manipulation; }
 </main>
 
 <!-- 互動彈窗 -->
-<div id="sync-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center z-[60] hidden transition-opacity duration-300">
-    <div class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl p-6 border border-gray-200 dark:border-gray-700 w-[340px] max-w-[90%] shadow-2xl mx-4 modal-enter">
-        <h3 class="font-bold mb-3 text-xl border-b border-gray-200 dark:border-gray-700 pb-3 flex items-center"><i class="fa-solid fa-cloud-arrow-up text-blue-500 mr-2 text-2xl"></i>跨裝置雲端同步</h3>
-        <p class="text-sm text-gray-600 dark:text-gray-300 mb-5 leading-relaxed bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg border border-blue-200 dark:border-blue-800/30 shadow-inner">請輸入專屬「同步碼」。在不同裝置輸入相同代碼即可同步所有選股與規劃數據。</p>
-        <div class="mb-5 relative"><input type="password" id="sync-key-input" placeholder="請輸入自訂同步碼" class="input-base font-medium tracking-wider pr-10"><button type="button" id="toggle-sync-visibility" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition"><i class="fa-solid fa-eye"></i></button></div>
-        <div class="flex gap-3"><button id="btn-save-sync" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-2.5 rounded-lg text-sm font-bold transition shadow-md active:scale-95">建立連線 / 載入</button></div>
-        <button id="btn-cancel-sync" class="w-full mt-3 bg-gray-100 dark:bg-transparent hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 py-2.5 rounded-lg text-sm transition active:scale-95">關閉</button>
-    </div>
-</div>
 <div id="config-warning-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex justify-center items-center z-[70] hidden transition-opacity duration-300">
     <div class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl p-6 border border-red-500 shadow-2xl max-w-md w-full mx-4 modal-enter">
         <h3 class="font-bold mb-3 text-red-500 dark:text-red-400 text-xl flex items-center"><i class="fa-solid fa-triangle-exclamation mr-2"></i>資料庫權限不足</h3>
@@ -1018,9 +1026,9 @@ const journalStreakMount=document.getElementById('journal-streak-mount'),journal
 if(journalStreakMount&&journalStreakPanel)journalStreakMount.replaceWith(journalStreakPanel);
 
 const DB_URL="https://stockstrategy-492a1-default-rtdb.firebaseio.com", LOCAL_STORAGE_KEY='ryan_stock_data_v1';
-const getSyncKey=()=>localStorage.getItem('ryan_sync_key')||'default_local_user';
-const getSyncPath=()=>encodeURIComponent(getSyncKey());
-const isCloudMode=()=>!!localStorage.getItem('ryan_sync_key');
+const DIRECT_SYNC_PATH='ryan_stock_strategy_direct_v1',LEGACY_SYNC_KEY=localStorage.getItem('ryan_sync_key')||'';
+const getSyncPath=()=>DIRECT_SYNC_PATH;
+const isCloudMode=()=>true;
 let cloudSyncInterval=null, state={journals:[],plans:[],revenueRecords:[],reports:[],checklists:[],trash:[],tagSettings:null,epsData:{},codeToName:{},nameToCode:{},customMarketHolidays:[],copyCompareDuplicates:false,filters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,tags:[],minScore:0,tagLogic:'OR'},favFilters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,tags:[],minScore:0,tagLogic:'OR'},revenueFilters:{month:'',code:''},reportFilters:{start:'',end:'',code:''},sortConfig:{key:'createdAt',asc:false},favSortConfig:{key:'createdAt',asc:false},planSortConfig:{key:'createdAt',asc:false},revenueSortConfig:{key:'month',asc:false},reportSortConfig:{key:'date',asc:false},checklistSortConfig:{key:'createdAt',asc:false}};
 const selectedIds={journal:new Set(),fav:new Set(),plan:new Set(),revenue:new Set(),report:new Set(),checklist:new Set()};
 
@@ -1046,14 +1054,14 @@ const THEME_MAP = {
 };
 
 const TAG_CATEGORIES = [
-    {title: "🌟 特別關注", theme: "rose", tags: ["特別追蹤", "非凡重點", "總編認同"]},
+    {title: "🌟 特別關注", theme: "rose", tags: ["特別追蹤", "非凡重點", "總編概念股"]},
     {title: "📊 基本面佳", theme: "blue", tags: ["多頭營收創高", "赤兔馬", "千里馬"]},
     {title: "🔥 動能與型態", theme: "amber", tags: ["一陽指", "金包銀", "披荊斬棘", "破繭而出", "月來越好", "季不可失", "守株待兔", "缺口", "阿婆散步", "多排破上關"]},
     {title: "💰 量價與籌碼", theme: "purple", tags: ["量價齊揚", "高成交值", "法人加持", "1日籌碼集中度", "5日籌碼集中", "20日籌碼集中"]},
     {title: "📈 技術指標", theme: "teal", tags: ["OBV突破", "MACD突破", "KD金叉"]}
 ];
 
-const STRATEGY_TAG_ALIASES={'一條根':'一陽指','跳空缺口':'缺口','1日籌碼集中':'1日籌碼集中度','小碎步':'阿婆散步','阿甘步伐':'阿婆散步'};
+const STRATEGY_TAG_ALIASES={'一條根':'一陽指','跳空缺口':'缺口','1日籌碼集中':'1日籌碼集中度','小碎步':'阿婆散步','阿甘步伐':'阿婆散步','總編認同':'總編概念股'};
 const normalizeStrategyTagName=tag=>STRATEGY_TAG_ALIASES[tag]||tag;
 
 const normalizeStrategyTags=items=>{
@@ -1224,7 +1232,7 @@ const normalizeReportDate=value=>{
 const formatNumColor=(val,isP=false)=>{if(val==null||val==='-'||val==='')return'<span class="text-gray-400 dark:text-gray-500">-</span>';const n=parseFloat(val);if(isNaN(n))return'<span class="text-gray-400 dark:text-gray-500">-</span>';return`<span class="font-bold ${n>0?'tw-red':(n<0?'tw-green':'text-gray-900 dark:text-white')}">${isP?(n*100).toFixed(2)+'%':n.toString()}</span>`;};
 const formatTargetPrice=val=>(val==null||val==='-'||val===''||isNaN(val))?'<span class="text-gray-400 dark:text-gray-500">-</span>':`<span class="font-bold text-yellow-600 dark:text-yellow-400">${escapeHTML(val)}</span>`;
 const getEpsInfo=(c,j)=>{const e=state.epsData[c]||{};return{eps2025:e.eps2025??j?.eps2025??null,eps2026:e.eps2026??j?.eps2026??null,epsGrowth:e.epsGrowth??j?.epsGrowth??null,futures:e.futures==='●'||j?.futures==='●',targetPrice:e.targetPrice??j?.targetPrice??null,broker:e.broker??j?.broker??null,reportDate:e.reportDate??j?.reportDate??null};};
-const NON_STRATEGY_COPY_TAGS=new Set(['特別追蹤','非凡重點','總編認同']);
+const NON_STRATEGY_COPY_TAGS=new Set(['特別追蹤','非凡重點','總編概念股']);
 const getScore=(t,e)=>{let s=0;if(t)s=t.filter(x=>!NON_STRATEGY_COPY_TAGS.has(x)).length;const g=parseFloat(e?.epsGrowth),e26=parseFloat(e?.eps2026);if(!isNaN(g)&&g>0&&!isNaN(e26)&&e26>0)s+=1;return s;};
 const getRevenueMonthsHtml=c=>{const r=state.revenueRecords.filter(x=>x.code===c);if(r.length===0)return'<span class="text-gray-300 dark:text-gray-600 text-xs">-</span>';r.sort((a,b)=>b.month.localeCompare(a.month));return r.map(x=>{const p=x.month.split('-'),m=parseInt(p[1],10);return`<span class="inline-block ${MONTH_BG_COLORS[(m-1)%12]} text-[10px] font-bold px-1.5 py-0.5 rounded mr-1 mb-1 border shadow-sm" title="${escapeHTML(x.month)}">${escapeHTML(p[0].substring(2)+'/'+p[1])}</span>`;}).join('');};
 const renderReportIndicator=()=>'<span title="有法人報告" aria-label="有法人報告" class="inline-flex shrink-0 w-5 h-5 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300 text-[10px]"><i class="fa-solid fa-file-lines"></i></span>';
@@ -1306,13 +1314,42 @@ const bindDatalistAutoUpdate=()=>{
     });
 };
 
-const initCollapsible=(buttonId,wrapperId,chevronId)=>{
-    const button=document.getElementById(buttonId),wrapper=document.getElementById(wrapperId),chevron=document.getElementById(chevronId);if(!button||!wrapper||!chevron)return;
+const COLLAPSIBLE_PIN_STORAGE_PREFIX='ryan_collapsible_pin_v1_';
+const collapsibleControllers={};
+const initCollapsible=(buttonId,wrapperId,chevronId,pinButtonId,pinKey,label,parentKey='')=>{
+    const button=document.getElementById(buttonId),wrapper=document.getElementById(wrapperId),chevron=document.getElementById(chevronId),pinButton=document.getElementById(pinButtonId);if(!button||!wrapper||!chevron)return;
+    const storageKey=COLLAPSIBLE_PIN_STORAGE_PREFIX+pinKey;
+    let pinned=false;
     const setExpanded=expanded=>{wrapper.classList.toggle('hidden',!expanded);button.setAttribute('aria-expanded',String(expanded));chevron.style.transform=expanded?'rotate(180deg)':'rotate(0deg)';};
-    const toggle=()=>setExpanded(wrapper.classList.contains('hidden'));
-    setExpanded(false);
-    button.addEventListener('click',toggle);
-    button.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle();}});
+    const updatePinUI=()=>{
+        if(!pinButton)return;
+        pinButton.setAttribute('aria-pressed',String(pinned));pinButton.setAttribute('aria-label',`${pinned?'取消釘選':'釘選'}${label}`);pinButton.title=pinned?'取消釘選':'釘選常駐';
+        pinButton.classList.toggle('!bg-blue-600',pinned);pinButton.classList.toggle('!text-white',pinned);pinButton.classList.toggle('shadow-sm',pinned);
+        const icon=pinButton.querySelector('i');if(icon)icon.style.transform=pinned?'rotate(-45deg)':'rotate(0deg)';
+    };
+    const controller={pinKey,parentKey,isPinned:()=>pinned,setExpanded,setPinned:null};
+    collapsibleControllers[pinKey]=controller;
+    controller.setPinned=(next,notifyUser=false)=>{
+        pinned=!!next;
+        try{localStorage.setItem(storageKey,String(pinned));}catch(error){}
+        if(pinned){
+            setExpanded(true);
+            if(parentKey&&collapsibleControllers[parentKey])collapsibleControllers[parentKey].setPinned(true,false);
+        }else{
+            Object.values(collapsibleControllers).filter(item=>item.parentKey===pinKey&&item.isPinned()).forEach(item=>item.setPinned(false,false));
+        }
+        updatePinUI();
+        if(notifyUser)showToast(pinned?`${label}已釘選常駐`:`${label}已取消釘選`);
+    };
+    const toggle=()=>{
+        if(pinned&&!wrapper.classList.contains('hidden'))return showToast(`${label}已釘選，請先取消釘選`,'error');
+        setExpanded(wrapper.classList.contains('hidden'));
+    };
+    let savedPin=false;try{savedPin=localStorage.getItem(storageKey)==='true';}catch(error){}
+    if(savedPin)controller.setPinned(true,false);else{setExpanded(false);updatePinUI();}
+    button.addEventListener('click',event=>{if(pinButton&&pinButton.contains(event.target))return;toggle();});
+    button.addEventListener('keydown',event=>{if(pinButton&&pinButton.contains(event.target))return;if(event.key==='Enter'||event.key===' '){event.preventDefault();toggle();}});
+    pinButton?.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();controller.setPinned(!pinned,true);});
 };
 
 const setupLogicBtns=(sel,fKey,cb)=>{
@@ -1380,6 +1417,23 @@ function renderFilterTags(){
 function saveLocalData(){localStorage.setItem(LOCAL_STORAGE_KEY,JSON.stringify(state));}
 const cloudCollection=v=>Array.isArray(v)?v.filter(Boolean):(v&&typeof v==='object'?Object.values(v).filter(Boolean):[]);
 const cloudSnapshot=()=>({journals:Object.fromEntries(state.journals.map(x=>[x.id,x])),plans:Object.fromEntries(state.plans.map(x=>[x.id,x])),revenueRecords:Object.fromEntries(state.revenueRecords.map(x=>[x.id,x])),reports:Object.fromEntries(state.reports.map(x=>[x.id,x])),checklists:Object.fromEntries(state.checklists.map(x=>[x.id,x])),trash:Object.fromEntries((state.trash||[]).map(x=>[x.id,x])),tagSettings:state.tagSettings||null,epsData:state.epsData||{},customMarketHolidaySettings:{dates:[...(state.customMarketHolidays||[])],updatedAt:Date.now()}});
+const hasCollectionRecords=value=>Array.isArray(value)?value.some(Boolean):!!(value&&typeof value==='object'&&Object.keys(value).length);
+const hasSyncPayload=data=>!!(data&&(hasCollectionRecords(data.journals)||hasCollectionRecords(data.plans)||hasCollectionRecords(data.revenueRecords)||hasCollectionRecords(data.reports)||hasCollectionRecords(data.checklists)||hasCollectionRecords(data.trash)||hasCollectionRecords(data.epsData)||hasCollectionRecords(data.tagSettings?.categories)||hasCollectionRecords(data.customMarketHolidaySettings?.dates)));
+const hasLocalSyncData=()=>hasSyncPayload(cloudSnapshot());
+async function migrateLegacyCloudData(){
+    if(!LEGACY_SYNC_KEY||LEGACY_SYNC_KEY===DIRECT_SYNC_PATH)return false;
+    try{
+        const targetResponse=await fetch(`${DB_URL}/data/${DIRECT_SYNC_PATH}.json`,{cache:'no-store'});
+        if(targetResponse.ok&&hasSyncPayload(await targetResponse.json()))return false;
+        const legacyPath=encodeURIComponent(LEGACY_SYNC_KEY);
+        const legacyResponse=await fetch(`${DB_URL}/data/${legacyPath}.json`,{cache:'no-store'});
+        if(!legacyResponse.ok)return false;
+        const legacyData=await legacyResponse.json();
+        if(!hasSyncPayload(legacyData))return false;
+        const migrateResponse=await fetch(`${DB_URL}/data/${DIRECT_SYNC_PATH}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(legacyData)});
+        return migrateResponse.ok;
+    }catch(error){console.warn('舊雲端資料遷移略過',error);return false;}
+}
 async function loadFromCloud(showError=true){
     if(!isCloudMode())return false;
     try{
@@ -1394,19 +1448,21 @@ async function loadFromCloud(showError=true){
             state.customMarketHolidays=d.customMarketHolidaySettings?normalizeCustomMarketHolidays(cloudCollection(d.customMarketHolidaySettings.dates)):[];
             state.codeToName={};state.nameToCode={};
             [...state.journals,...state.plans.map(p=>({code:p.stock,name:p.name})),...state.revenueRecords,...state.reports,...state.checklists,...Object.values(state.epsData)].forEach(dt=>{if(dt&&dt.code&&dt.name){state.codeToName[dt.code]=dt.name;state.nameToCode[dt.name]=dt.code;}});
-            window.ensureOptimizationState?.();window.syncCustomTagSettings?.();window.renderTrashManager?.();
+            const migratedManagedTags=window.ensureOptimizationState?.();window.syncCustomTagSettings?.();window.renderTrashManager?.();
             if(migratedStrategyTags)await putDataToCloud('journals',Object.fromEntries(state.journals.map(x=>[x.id,x])));
-            if(!d.tagSettings&&state.tagSettings)await putDataToCloud('tagSettings',state.tagSettings);
+            if((!d.tagSettings||migratedManagedTags)&&state.tagSettings)await putDataToCloud('tagSettings',state.tagSettings);
             if(d.trash===undefined&&state.trash?.length)await putDataToCloud('trash',Object.fromEntries(state.trash.map(x=>[x.id,x])));
         }else{
-            const init=await fetch(`${DB_URL}/data/${getSyncPath()}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(cloudSnapshot())});
-            if(!init.ok)throw new Error(`雲端建立失敗 (${init.status})`);
+            if(hasLocalSyncData()){
+                const init=await fetch(`${DB_URL}/data/${getSyncPath()}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(cloudSnapshot())});
+                if(!init.ok)throw new Error(`雲端建立失敗 (${init.status})`);
+            }
         }
         renderCustomMarketHolidays();processAndRenderJournals();renderFavorites();renderPlans();renderRevenueRecords();renderReports();renderChecklists();
         if(document.getElementById('module-overview')?.classList.contains('active'))renderStockOverview();
         saveLocalData();
         return true;
-    }catch(e){console.error(e);if(showError)showToast('跨裝置同步失敗，請檢查網路或同步碼','error');return false;}
+    }catch(e){console.error(e);if(showError)showToast('跨裝置同步失敗，請檢查網路連線','error');return false;}
 }
 function startCloudSync(){
     if(cloudSyncInterval)clearInterval(cloudSyncInterval);
@@ -1511,20 +1567,35 @@ const initStreakBaseDate=()=>{
     const latest=[...new Set((state.journals||[]).map(item=>item.date).filter(date=>isJournalTradingDate(date,holidays)))].sort().reverse()[0];
     input.value=latest||getToday();
 };
-const STREAK_PANEL_STORAGE_KEY='ryan_streak_panel_collapsed';
+const STREAK_PANEL_STORAGE_KEY='ryan_streak_panel_collapsed',STREAK_PANEL_PIN_KEY='ryan_streak_panel_pinned_v1';
+let streakPanelPinned=false;
+const updateStreakPinUI=()=>{
+    const pinButton=document.getElementById('streak-pin-btn');if(!pinButton)return;
+    pinButton.setAttribute('aria-pressed',String(streakPanelPinned));pinButton.setAttribute('aria-label',streakPanelPinned?'取消釘選策略連續出現追蹤':'釘選策略連續出現追蹤');pinButton.title=streakPanelPinned?'取消釘選':'釘選常駐';
+    pinButton.classList.toggle('!bg-violet-600',streakPanelPinned);pinButton.classList.toggle('!text-white',streakPanelPinned);pinButton.classList.toggle('shadow-sm',streakPanelPinned);
+    const icon=pinButton.querySelector('i');if(icon)icon.style.transform=streakPanelPinned?'rotate(-45deg)':'rotate(0deg)';
+};
 const setStreakPanelCollapsed=collapsed=>{
     const content=document.getElementById('streak-panel-content'),button=document.getElementById('streak-toggle-btn'),icon=document.getElementById('streak-toggle-icon');
     if(!content||!button||!icon)return;
+    if(streakPanelPinned&&collapsed)collapsed=false;
     content.classList.toggle('hidden',collapsed);
     button.setAttribute('aria-expanded',String(!collapsed));
     button.setAttribute('aria-label',collapsed?'展開策略連續出現追蹤':'收合策略連續出現追蹤');
     button.title=collapsed?'展開':'收合';
     icon.style.transform=collapsed?'rotate(0deg)':'rotate(180deg)';
 };
+const setStreakPanelPinned=(pinned,notifyUser=false)=>{
+    streakPanelPinned=!!pinned;
+    try{localStorage.setItem(STREAK_PANEL_PIN_KEY,String(streakPanelPinned));}catch(error){}
+    if(streakPanelPinned){setStreakPanelCollapsed(false);try{localStorage.setItem(STREAK_PANEL_STORAGE_KEY,'false');}catch(error){}}
+    updateStreakPinUI();
+    if(notifyUser)showToast(streakPanelPinned?'策略連續出現追蹤已釘選常駐':'策略連續出現追蹤已取消釘選');
+};
 const initStreakPanelToggle=()=>{
-    let collapsed=false;
-    try{collapsed=localStorage.getItem(STREAK_PANEL_STORAGE_KEY)==='true';}catch(e){}
-    setStreakPanelCollapsed(collapsed);
+    let collapsed=true,pinned=false;
+    try{const savedCollapsed=localStorage.getItem(STREAK_PANEL_STORAGE_KEY);if(savedCollapsed!==null)collapsed=savedCollapsed==='true';pinned=localStorage.getItem(STREAK_PANEL_PIN_KEY)==='true';}catch(e){}
+    if(pinned)setStreakPanelPinned(true,false);else{streakPanelPinned=false;updateStreakPinUI();setStreakPanelCollapsed(collapsed);}
 };
 const renderCustomMarketHolidays=()=>{
     const root=document.getElementById('streak-holiday-list'),clearBtn=document.getElementById('streak-clear-holidays-btn');if(!root)return;
@@ -1632,10 +1703,12 @@ document.getElementById('streak-clear-holidays-btn')?.addEventListener('click',(
 });
 document.getElementById('streak-toggle-btn')?.addEventListener('click',()=>{
     const content=document.getElementById('streak-panel-content');if(!content)return;
+    if(streakPanelPinned)return showToast('策略連續出現追蹤已釘選，請先取消釘選','error');
     const collapsed=!content.classList.contains('hidden');
     setStreakPanelCollapsed(collapsed);
     try{localStorage.setItem(STREAK_PANEL_STORAGE_KEY,String(collapsed));}catch(e){}
 });
+document.getElementById('streak-pin-btn')?.addEventListener('click',()=>setStreakPanelPinned(!streakPanelPinned,true));
 const getVisibleRowCheckboxes=t=>Array.from(document.querySelectorAll(`.row-cb[data-type="${t}"]`));
 function updateBatchUI(t){
     const b=document.getElementById(`batch-bar-${t}`),c=document.getElementById(`batch-count-${t}`);
@@ -2262,71 +2335,34 @@ document.addEventListener('DOMContentLoaded',async()=>{
     document.getElementById('theme-toggle')?.addEventListener('click',()=>{ht.classList.toggle('dark');localStorage.setItem('ryan_theme',ht.classList.contains('dark')?'dark':'light');});
     
     // --- 跨裝置同步功能綁定 ---
-    const updateSyncStatusUI = () => {
+    let syncInProgress=false;
+    const updateSyncStatusUI = status => {
         const syncBtn = document.getElementById('btn-sync-modal');
         if (!syncBtn) return;
-        if (isCloudMode()) {
-            syncBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up sm:mr-1.5 text-green-300"></i><span class="hidden sm:inline">已連線</span>';
+        if(status==='syncing'){
+            syncBtn.innerHTML='<i class="fa-solid fa-arrows-rotate fa-spin sm:mr-1.5"></i><span class="hidden sm:inline">同步中</span>';
+            syncBtn.classList.remove('bg-blue-800','border-blue-400');
+        }else if(status==='connected'){
+            syncBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up sm:mr-1.5 text-green-300"></i><span class="hidden sm:inline">已同步</span>';
             syncBtn.classList.add('bg-blue-800', 'border-blue-400');
         } else {
-            syncBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up sm:mr-1.5"></i><span class="hidden sm:inline">跨裝置同步</span>';
+            syncBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up sm:mr-1.5"></i><span class="hidden sm:inline">立即同步</span>';
             syncBtn.classList.remove('bg-blue-800', 'border-blue-400');
         }
     };
-    updateSyncStatusUI(); // 初始化時更新按鈕狀態
-
-    const syncModal = document.getElementById('sync-modal');
-    document.getElementById('btn-sync-modal')?.addEventListener('click', () => {
-        document.getElementById('sync-key-input').value = localStorage.getItem('ryan_sync_key') || '';
-        syncModal.classList.remove('hidden');
-    });
-    
-    document.getElementById('btn-cancel-sync')?.addEventListener('click', () => {
-        syncModal.classList.add('hidden');
-    });
-    
-    document.getElementById('btn-save-sync')?.addEventListener('click', async () => {
-        const val = document.getElementById('sync-key-input').value.trim();
-        if (val) {
-            if(/[.#$\[\]\/\u0000-\u001F\u007F]/.test(val)) {
-                return showToast('同步碼不可包含 . # $ [ ] / 等特殊字元','error');
-            }
-            localStorage.setItem('ryan_sync_key', val);
-            syncModal.classList.add('hidden');
-            showToast('🔄 正在同步雲端資料...');
-            updateSyncStatusUI();
+    const performDirectCloudSync=async(showSuccess=true)=>{
+        if(syncInProgress)return false;
+        const syncBtn=document.getElementById('btn-sync-modal');
+        syncInProgress=true;if(syncBtn)syncBtn.disabled=true;updateSyncStatusUI('syncing');
+        try{
+            await migrateLegacyCloudData();
             const ok=await loadFromCloud(true);
-            if(ok){startCloudSync();showToast('✅ 雲端資料載入／建立完成');}
-        } else {
-            localStorage.removeItem('ryan_sync_key');
-            stopCloudSync();
-            syncModal.classList.add('hidden');
-            updateSyncStatusUI();
-            showToast('已切換為單機模式');
-        }
-    });
-
-    // 新增：按下 Enter 鍵觸發同步按鈕
-    document.getElementById('sync-key-input')?.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            document.getElementById('btn-save-sync').click();
-        }
-    });
-
-    document.getElementById('toggle-sync-visibility')?.addEventListener('click', function() {
-        const input = document.getElementById('sync-key-input');
-        const icon = this.querySelector('i');
-        if (input.type === 'password') {
-            input.type = 'text';
-            icon.classList.remove('fa-eye');
-            icon.classList.add('fa-eye-slash');
-        } else {
-            input.type = 'password';
-            icon.classList.remove('fa-eye-slash');
-            icon.classList.add('fa-eye');
-        }
-    });
+            if(ok){startCloudSync();updateSyncStatusUI('connected');if(showSuccess)showToast('✅ 跨裝置雲端同步完成');return true;}
+            updateSyncStatusUI('error');return false;
+        }finally{syncInProgress=false;if(syncBtn)syncBtn.disabled=false;}
+    };
+    updateSyncStatusUI('ready');
+    document.getElementById('btn-sync-modal')?.addEventListener('click',()=>performDirectCloudSync(true));
     // --- 跨裝置同步功能綁定結束 ---
 
     // 初始化導航列按鈕事件 (修正"按下去沒反應"的關鍵區塊)
@@ -2357,7 +2393,8 @@ document.addEventListener('DOMContentLoaded',async()=>{
             document.getElementById('chk-btn-submit')?.click();
         }
     }));
-    initCollapsible('toggle-journal-form-btn','journal-form-wrapper','journal-form-chevron'); initCollapsible('toggle-tags-btn','form-tags-wrapper','tags-chevron');
+    initCollapsible('toggle-journal-form-btn','journal-form-wrapper','journal-form-chevron','journal-form-pin-btn','journal-form','新增條件');
+    initCollapsible('toggle-tags-btn','form-tags-wrapper','tags-chevron','strategy-tags-pin-btn','strategy-tags','策略標籤','journal-form');
     setupLogicBtns('.logic-btn', 'filters', processAndRenderJournals);
     setupLogicBtns('.logic-btn-fav', 'favFilters', renderFavorites);
     
@@ -2601,7 +2638,7 @@ setChkDirection('long');
         e.target.value = '';
     });
 
-    if(isCloudMode()){await loadFromCloud(true);startCloudSync();}else{ processAndRenderJournals(); renderFavorites(); renderPlans(); renderRevenueRecords(); renderReports(); renderChecklists(); }
+    await performDirectCloudSync(false);
 });
 </script>
 
@@ -2881,12 +2918,13 @@ const SESSION={
       state.tagSettings={version:1,categories:clone(DEFAULT_TAG_CATEGORIES),meta:meta,updatedAt:Date.now()};
       changed=true;
     }else{
-      var seen=new Set(),normalizedCategories=[];
+      var previousSettings=JSON.stringify({categories:state.tagSettings.categories,meta:state.tagSettings.meta||{},version:state.tagSettings.version});
+      var sourceMeta=state.tagSettings.meta||{},seen=new Set(),normalizedCategories=[];
       state.tagSettings.categories.forEach(function(category,index){
         var theme=VALID_THEMES.includes(category.theme)?category.theme:(DEFAULT_TAG_CATEGORIES[index]&&DEFAULT_TAG_CATEGORIES[index].theme)||'blue';
         var tags=[];
         (Array.isArray(category.tags)?category.tags:[]).forEach(function(rawTag){
-          var tag=String(rawTag||'').trim();
+          var tag=normalizeStrategyTagName(String(rawTag||'').trim());
           if(tag&&!seen.has(tag)){seen.add(tag);tags.push(tag);}
         });
         normalizedCategories.push({title:String(category.title||('分類 '+(index+1))),theme:theme,tags:tags});
@@ -2894,11 +2932,15 @@ const SESSION={
       if(!normalizedCategories.length)normalizedCategories=clone(DEFAULT_TAG_CATEGORIES);
       var nextMeta={};
       normalizedCategories.forEach(function(category){
-        category.tags.forEach(function(tag){nextMeta[tag]=normalizeTagMeta(tag,category.theme,state.tagSettings.meta&&state.tagSettings.meta[tag]);});
+        category.tags.forEach(function(tag){
+          var legacyName=Object.keys(STRATEGY_TAG_ALIASES).find(function(oldName){return STRATEGY_TAG_ALIASES[oldName]===tag&&sourceMeta[oldName];});
+          nextMeta[tag]=normalizeTagMeta(tag,category.theme,sourceMeta[tag]||sourceMeta[legacyName]);
+        });
       });
       state.tagSettings.categories=normalizedCategories;
       state.tagSettings.meta=nextMeta;
       state.tagSettings.version=1;
+      if(JSON.stringify({categories:state.tagSettings.categories,meta:state.tagSettings.meta,version:state.tagSettings.version})!==previousSettings){state.tagSettings.updatedAt=Date.now();changed=true;}
     }
     return changed;
   };
@@ -2944,7 +2986,7 @@ const SESSION={
       '<div class="grid grid-cols-1 lg:grid-cols-12 min-h-0 flex-1">',
       '<div class="lg:col-span-5 p-4 sm:p-5 border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-gray-700 bg-gray-50/70 dark:bg-gray-900/30">',
       '<input type="hidden" id="tag-manager-original">',
-      '<div class="grid grid-cols-2 gap-3"><div class="col-span-2"><label class="block text-xs font-bold text-gray-500 mb-1">標籤名稱</label><input id="tag-manager-name" maxlength="20" class="input-base" placeholder="例如：總編認同"></div>',
+      '<div class="grid grid-cols-2 gap-3"><div class="col-span-2"><label class="block text-xs font-bold text-gray-500 mb-1">標籤名稱</label><input id="tag-manager-name" maxlength="20" class="input-base" placeholder="例如：總編概念股"></div>',
       '<div><label class="block text-xs font-bold text-gray-500 mb-1">分類</label><select id="tag-manager-category" class="input-base"></select></div>',
       '<div><label class="block text-xs font-bold text-gray-500 mb-1">顏色</label><select id="tag-manager-theme" class="input-base"><option value="rose">紅色</option><option value="blue">藍色</option><option value="amber">橘色</option><option value="purple">紫色</option><option value="teal">綠色</option></select></div>',
       '<div class="col-span-2"><label class="block text-xs font-bold text-gray-500 mb-1">複製圖示（選填）</label><input id="tag-manager-icon" maxlength="12" class="input-base" placeholder="例如：🎯"></div>',
@@ -3548,13 +3590,20 @@ const SESSION={
   }
 
   function readAdminSession(){
-    try{return window.sessionStorage.getItem(ADMIN_SESSION_KEY)==='1';}catch(error){return false;}
+    try{
+      if(window.localStorage.getItem(ADMIN_SESSION_KEY)==='1')return true;
+      if(window.sessionStorage.getItem(ADMIN_SESSION_KEY)==='1'){
+        window.localStorage.setItem(ADMIN_SESSION_KEY,'1');window.sessionStorage.removeItem(ADMIN_SESSION_KEY);return true;
+      }
+      return false;
+    }catch(error){return false;}
   }
 
   function writeAdminSession(enabled){
     try{
-      if(enabled)window.sessionStorage.setItem(ADMIN_SESSION_KEY,'1');
-      else window.sessionStorage.removeItem(ADMIN_SESSION_KEY);
+      if(enabled)window.localStorage.setItem(ADMIN_SESSION_KEY,'1');
+      else window.localStorage.removeItem(ADMIN_SESSION_KEY);
+      window.sessionStorage.removeItem(ADMIN_SESSION_KEY);
     }catch(error){}
   }
 
@@ -3575,6 +3624,9 @@ const SESSION={
     document.documentElement.classList.toggle('viewer-mode',!adminMode);
     updateAdminButton();
     if(!adminMode){
+      ['tag-manager-modal','trash-manager-modal','import-preview-modal','batch-delete-modal','close-plan-modal','confirm-modal','prompt-modal'].forEach(function(id){
+        var modal=document.getElementById(id);if(modal){modal.classList.add('hidden');modal.classList.remove('flex');}
+      });
       var restrictedActive=document.querySelector('#module-plan.active, #module-favorites.active');
       if(restrictedActive){
         var journalButton=document.querySelector('[data-target="module-journal"]');
@@ -3671,6 +3723,7 @@ const SESSION={
       else if(event.key==='Escape')closeAdminLogin();
     });
     if(modal)modal.addEventListener('click',function(event){if(event.target===modal)closeAdminLogin();});
+    window.addEventListener('storage',function(event){if(event.key===ADMIN_SESSION_KEY)applyAdminMode(event.newValue==='1');});
   });
 })();
 </script>
