@@ -1016,7 +1016,7 @@ const THEME_MAP = {
 };
 
 const TAG_CATEGORIES = [
-    {title: "🌟 特別關注", theme: "rose", tags: ["特別追蹤", "非凡重點"]},
+    {title: "🌟 特別關注", theme: "rose", tags: ["特別追蹤", "非凡重點", "總編認同"]},
     {title: "📊 基本面佳", theme: "blue", tags: ["多頭營收創高", "赤兔馬", "千里馬"]},
     {title: "🔥 動能與型態", theme: "amber", tags: ["一陽指", "金包銀", "披荊斬棘", "破繭而出", "月來越好", "季不可失", "守株待兔", "缺口", "阿婆散步", "多排破上關"]},
     {title: "💰 量價與籌碼", theme: "purple", tags: ["量價齊揚", "高成交值", "法人加持", "1日籌碼集中度", "5日籌碼集中", "20日籌碼集中"]},
@@ -1194,7 +1194,7 @@ const normalizeReportDate=value=>{
 const formatNumColor=(val,isP=false)=>{if(val==null||val==='-'||val==='')return'<span class="text-gray-400 dark:text-gray-500">-</span>';const n=parseFloat(val);if(isNaN(n))return'<span class="text-gray-400 dark:text-gray-500">-</span>';return`<span class="font-bold ${n>0?'tw-red':(n<0?'tw-green':'text-gray-900 dark:text-white')}">${isP?(n*100).toFixed(2)+'%':n.toString()}</span>`;};
 const formatTargetPrice=val=>(val==null||val==='-'||val===''||isNaN(val))?'<span class="text-gray-400 dark:text-gray-500">-</span>':`<span class="font-bold text-yellow-600 dark:text-yellow-400">${escapeHTML(val)}</span>`;
 const getEpsInfo=(c,j)=>{const e=state.epsData[c]||{};return{eps2025:e.eps2025??j?.eps2025??null,eps2026:e.eps2026??j?.eps2026??null,epsGrowth:e.epsGrowth??j?.epsGrowth??null,futures:e.futures==='●'||j?.futures==='●',targetPrice:e.targetPrice??j?.targetPrice??null,broker:e.broker??j?.broker??null,reportDate:e.reportDate??j?.reportDate??null};};
-const NON_STRATEGY_COPY_TAGS=new Set(['特別追蹤','非凡重點']);
+const NON_STRATEGY_COPY_TAGS=new Set(['特別追蹤','非凡重點','總編認同']);
 const getScore=(t,e)=>{let s=0;if(t)s=t.filter(x=>!NON_STRATEGY_COPY_TAGS.has(x)).length;const g=parseFloat(e?.epsGrowth),e26=parseFloat(e?.eps2026);if(!isNaN(g)&&g>0&&!isNaN(e26)&&e26>0)s+=1;return s;};
 const getRevenueMonthsHtml=c=>{const r=state.revenueRecords.filter(x=>x.code===c);if(r.length===0)return'<span class="text-gray-300 dark:text-gray-600 text-xs">-</span>';r.sort((a,b)=>b.month.localeCompare(a.month));return r.map(x=>{const p=x.month.split('-'),m=parseInt(p[1],10);return`<span class="inline-block ${MONTH_BG_COLORS[(m-1)%12]} text-[10px] font-bold px-1.5 py-0.5 rounded mr-1 mb-1 border shadow-sm" title="${escapeHTML(x.month)}">${escapeHTML(p[0].substring(2)+'/'+p[1])}</span>`;}).join('');};
 const renderReportIndicator=()=>'<span title="有法人報告" aria-label="有法人報告" class="inline-flex shrink-0 w-5 h-5 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300 text-[10px]"><i class="fa-solid fa-file-lines"></i></span>';
