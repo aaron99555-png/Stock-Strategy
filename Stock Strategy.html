@@ -59,7 +59,8 @@ html.viewer-mode [data-remove-holiday],
 html.viewer-mode #btn-tag-manager,
 html.viewer-mode #btn-trash-manager,
 html.viewer-mode #btn-db-upload,
-html.viewer-mode #btn-import-backup { display:none !important; }
+html.viewer-mode #btn-import-backup,
+html.viewer-mode #btn-export-backup { display:none !important; }
 html.viewer-mode .row-cb,
 html.viewer-mode .select-all-cb { visibility:hidden !important; pointer-events:none !important; }
 html.viewer-mode [data-action="remove-tag"] { cursor:default !important; pointer-events:none !important; }
@@ -2377,6 +2378,7 @@ setChkDirection('long');
     document.querySelectorAll('.chk-sortable').forEach(th=>th.addEventListener('click',e=>handleTableSorting(e,'chk','checklistSortConfig',renderChecklists)));
 
     document.getElementById('btn-export-backup')?.addEventListener('click', () => {
+        if(!window.isAdminMode||!window.isAdminMode())return showToast('匯出功能僅限管理者使用','error');
         try {
             if(typeof XLSX === 'undefined') return showToast('匯出套件載入中，請稍後', 'error');
             const wb = XLSX.utils.book_new();
@@ -3635,7 +3637,7 @@ const SESSION={
   document.addEventListener('click',function(event){
     var restrictedModule=event.target.closest('[data-target="module-plan"], [data-target="module-favorites"]');
     if(restrictedModule&&!adminMode){requireAdmin(event,'此模組僅限管理者查看');return;}
-    var restrictedAction=event.target.closest('#btn-journal-submit, #btn-revenue-submit, #btn-report-submit, [data-action="add-plan"], [data-action="toggle-fav"], [data-action="remove-tag"], [data-action="edit-notes"], [data-action="delete-journal"], [data-action="edit-report"], [data-action="delete-report"], [data-action="delete-revenue"], [data-batch-delete-type], [data-tag-action="delete"], #streak-holiday-date, #streak-add-holiday-btn, #streak-clear-holidays-btn, [data-remove-holiday], #btn-tag-manager, #btn-trash-manager, #btn-db-upload, #btn-import-backup');
+    var restrictedAction=event.target.closest('#btn-journal-submit, #btn-revenue-submit, #btn-report-submit, [data-action="add-plan"], [data-action="toggle-fav"], [data-action="remove-tag"], [data-action="edit-notes"], [data-action="delete-journal"], [data-action="edit-report"], [data-action="delete-report"], [data-action="delete-revenue"], [data-batch-delete-type], [data-tag-action="delete"], #streak-holiday-date, #streak-add-holiday-btn, #streak-clear-holidays-btn, [data-remove-holiday], #btn-tag-manager, #btn-trash-manager, #btn-db-upload, #btn-import-backup, #btn-export-backup');
     if(restrictedAction&&!adminMode){requireAdmin(event,'此操作僅限管理者使用');return;}
   },true);
 
