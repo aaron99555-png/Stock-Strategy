@@ -54,7 +54,7 @@ input[type="date"]::-webkit-calendar-picker-indicator, input[type="month"]::-web
 .modal-enter { animation:modalEnter 0.3s cubic-bezier(0.16,1,0.3,1) forwards; }
 @keyframes modalEnter { from { opacity:0; transform:scale(0.95); } to { opacity:1; transform:scale(1); } }
 .table-sticky-bg { @apply bg-white dark:bg-gray-900; } .table-row-hover:hover .table-sticky-bg { @apply bg-gray-50 dark:bg-gray-800; }
-/* 選股日誌／追蹤清單：財務數值欄精簡並置中 */
+/* 策略日誌／追蹤清單：財務數值欄精簡並置中 */
 #module-journal table :is(th,td):nth-child(4), #module-journal table :is(th,td):nth-child(5),
 #module-favorites table :is(th,td):nth-child(4), #module-favorites table :is(th,td):nth-child(5) { width:76px; min-width:76px; max-width:76px; padding-left:0.375rem !important; padding-right:0.375rem !important; text-align:center !important; }
 #module-journal table :is(th,td):nth-child(6), #module-journal table :is(th,td):nth-child(8),
@@ -170,7 +170,7 @@ button { touch-action: manipulation; }
                 <span id="auth-status" class="hidden md:flex ml-1 sm:ml-2 w-7 h-7 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-full shadow-sm items-center justify-center cursor-help flex-shrink-0"><i class="fa-solid fa-spinner fa-spin text-yellow-500 text-xs"></i></span>
             </div>
             <div class="hidden lg:flex flex-1 justify-center space-x-1 sm:space-x-2 relative z-10">
-                <button class="nav-btn active-blue" data-target="module-journal" data-color="blue"><i class="fa-solid fa-book-journal-whills mr-1.5 sm:mr-2"></i>選股日誌</button>
+                <button class="nav-btn active-blue" data-target="module-journal" data-color="blue"><i class="fa-solid fa-book-journal-whills mr-1.5 sm:mr-2"></i>策略日誌</button>
                 <button class="nav-btn" data-target="module-overview" data-color="blue"><i class="fa-solid fa-magnifying-glass-chart mr-1.5 sm:mr-2"></i>個股總覽</button>
                 <button class="nav-btn" data-target="module-checklist" data-color="cyan"><i class="fa-solid fa-clipboard-check mr-1.5 sm:mr-2"></i>進場查核</button>
                 <button class="nav-btn" data-target="module-calculator" data-color="purple"><i class="fa-solid fa-calculator mr-1.5 sm:mr-2"></i>支撐壓力</button>
@@ -191,7 +191,7 @@ button { touch-action: manipulation; }
         </div>
     </div>
     <div class="lg:hidden border-t border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-800/95 px-2 py-2 flex gap-2 overflow-x-auto scrollbar-hide">
-        <button class="nav-btn-mobile active-blue" data-target="module-journal" data-color="blue">日誌</button>
+        <button class="nav-btn-mobile active-blue" data-target="module-journal" data-color="blue">策略日誌</button>
         <button class="nav-btn-mobile" data-target="module-overview" data-color="blue">總覽</button>
         <button class="nav-btn-mobile" data-target="module-checklist" data-color="cyan">查核</button>
         <button class="nav-btn-mobile" data-target="module-calculator" data-color="purple">支撐壓力</button>
@@ -204,7 +204,7 @@ button { touch-action: manipulation; }
 
 <main class="flex-grow w-full xl:w-[98%] max-w-[1920px] mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-6">
 
-    <!-- 選股日誌 -->
+    <!-- 策略日誌 -->
     <div id="module-journal" class="tab-content active">
         <div class="mb-6">
             <div class="card-panel p-4 sm:p-6 border-t-4 border-blue-500 flex flex-col gap-4">
@@ -249,7 +249,7 @@ button { touch-action: manipulation; }
             <div id="streak-panel-content">
                 <div class="px-4 sm:px-5 py-4 bg-violet-50/30 dark:bg-violet-900/5 border-b border-violet-100 dark:border-violet-900/40">
                     <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                        <p class="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 lg:max-w-xs">以基準日往前比對選股日誌實際有資料的交易日；週末及無交易資料的休市日會自動略過，不計入也不中斷。</p>
+                        <p class="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 lg:max-w-xs">以基準日往前比對策略日誌實際有資料的交易日；週末及無交易資料的休市日會自動略過，不計入也不中斷。</p>
                         <form id="streak-search-form" class="grid grid-cols-12 gap-2 w-full lg:flex-1" action="javascript:void(0);">
                             <div class="col-span-6 sm:col-span-4 lg:col-span-2"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">基準日</label><input type="date" id="streak-base-date" class="input-base text-center"></div>
                             <div class="col-span-6 sm:col-span-4 lg:col-span-2"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium"><i class="fa-solid fa-calendar-xmark mr-1 text-amber-500"></i>自訂休市日</label><div class="flex items-center gap-1.5"><input type="date" id="streak-holiday-date" aria-label="自訂休市日期" title="臨時休市可自行加入，計算時會強制略過" class="input-base flex-1 min-w-0 text-center"><button type="button" id="streak-add-holiday-btn" aria-label="加入自訂休市日" title="加入自訂休市日" class="shrink-0 w-[42px] h-[42px] rounded-lg bg-amber-500 hover:bg-amber-400 text-white text-sm font-bold transition active:scale-95"><i class="fa-solid fa-plus"></i></button></div></div>
@@ -382,7 +382,7 @@ button { touch-action: manipulation; }
         <div id="overview-welcome" class="card-panel min-h-[320px] flex flex-col items-center justify-center text-center p-8 text-gray-400 dark:text-gray-500">
             <span class="w-16 h-16 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center mb-4"><i class="fa-solid fa-chart-pie text-2xl text-blue-400"></i></span>
             <p class="font-bold text-gray-600 dark:text-gray-300">輸入股票代號或股名開始查詢</p>
-            <p class="text-xs mt-2">將整合選股日誌、營收創高、法人報告、進場查核與交易規劃。</p>
+            <p class="text-xs mt-2">將整合策略日誌、營收創高、法人報告、進場查核與交易規劃。</p>
         </div>
 
         <div id="overview-content" class="hidden space-y-4">
@@ -417,7 +417,7 @@ button { touch-action: manipulation; }
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <section class="card-panel p-4 sm:p-5"><div class="flex items-center justify-between mb-3"><h3 class="font-bold text-blue-600 dark:text-blue-400"><i class="fa-solid fa-book-journal-whills mr-2"></i>選股日誌</h3><span id="overview-journal-count" class="text-xs text-gray-400"></span></div><div id="overview-journals" class="space-y-2 max-h-[420px] overflow-y-auto pr-1"></div></section>
+                <section class="card-panel p-4 sm:p-5"><div class="flex items-center justify-between mb-3"><h3 class="font-bold text-blue-600 dark:text-blue-400"><i class="fa-solid fa-book-journal-whills mr-2"></i>策略日誌</h3><span id="overview-journal-count" class="text-xs text-gray-400"></span></div><div id="overview-journals" class="space-y-2 max-h-[420px] overflow-y-auto pr-1"></div></section>
                 <section class="card-panel p-4 sm:p-5"><div class="flex items-center justify-between mb-3"><h3 class="font-bold text-pink-600 dark:text-pink-400"><i class="fa-solid fa-money-bill-trend-up mr-2"></i>營收創高</h3><span id="overview-revenue-count" class="text-xs text-gray-400"></span></div><div id="overview-revenues" class="space-y-2 max-h-[420px] overflow-y-auto pr-1"></div></section>
                 <section class="card-panel p-4 sm:p-5"><div class="flex items-center justify-between mb-3"><h3 class="font-bold text-indigo-600 dark:text-indigo-400"><i class="fa-solid fa-file-lines mr-2"></i>法人報告</h3><span id="overview-report-count" class="text-xs text-gray-400"></span></div><div id="overview-reports" class="space-y-2 max-h-[420px] overflow-y-auto pr-1"></div></section>
                 <section class="card-panel p-4 sm:p-5"><div class="flex items-center justify-between mb-3"><h3 class="font-bold text-cyan-600 dark:text-cyan-400"><i class="fa-solid fa-clipboard-check mr-2"></i>進場查核</h3><span id="overview-checklist-count" class="text-xs text-gray-400"></span></div><div id="overview-checklists" class="space-y-2 max-h-[420px] overflow-y-auto pr-1"></div></section>
@@ -1400,13 +1400,15 @@ function loadLocalData(){
     const migratedFilterTags=normalizeFilterStrategyTags(state.filters)|normalizeFilterStrategyTags(state.favFilters);
     if(!state.revenueFilters)state.revenueFilters={month:'',code:''}; if(!state.reportFilters)state.reportFilters={start:'',end:'',code:''};
     if(state.copyCompareDuplicates===undefined)state.copyCompareDuplicates=false;
+    let migratedJournalFilter=false;
+    if(!state.journalFiltersDefaultTodayV1){const today=getToday();state.filters={...state.filters,start:today,end:today};state.journalFiltersDefaultTodayV1=true;migratedJournalFilter=true;}
     let migratedReportFilter=false;
     if(!state.reportFiltersDefaultAllV1){state.reportFilters={start:'',end:'',code:''};state.reportFiltersDefaultAllV1=true;migratedReportFilter=true;}
     if(state.filters.tagLogic===undefined)state.filters.tagLogic='OR'; if(state.favFilters.tagLogic===undefined)state.favFilters.tagLogic='OR';
     if(state.filters.revenueHigh===undefined)state.filters.revenueHigh=false; if(state.favFilters.revenueHigh===undefined)state.favFilters.revenueHigh=false;
     if(state.filters.code===undefined)state.filters.code=''; if(state.favFilters.code===undefined)state.favFilters.code='';
     if(!state.reportSortConfig)state.reportSortConfig={key:'date',asc:false}; if(!state.checklistSortConfig)state.checklistSortConfig={key:'date',asc:false};
-    if(migratedStrategyTags||migratedFilterTags||migratedReportFilter||migratedMarketHolidays)saveLocalData();
+    if(migratedStrategyTags||migratedFilterTags||migratedJournalFilter||migratedReportFilter||migratedMarketHolidays)saveLocalData();
     const applyLogicState=(lv,sel)=>{document.querySelectorAll(sel).forEach(b=>{if(b.dataset.logic===lv){b.classList.remove('text-gray-500','dark:text-gray-400','hover:text-gray-700','dark:hover:text-gray-200');b.classList.add('bg-white','dark:bg-gray-700','text-blue-600','dark:text-blue-400','shadow-sm');}else{b.classList.remove('bg-white','dark:bg-gray-700','text-blue-600','dark:text-blue-400','shadow-sm');b.classList.add('text-gray-500','dark:text-gray-400','hover:text-gray-700','dark:hover:text-gray-200');}});};
     applyLogicState(state.filters.tagLogic,'.logic-btn'); applyLogicState(state.favFilters.tagLogic,'.logic-btn-fav');
 }
@@ -1543,7 +1545,7 @@ function renderJournalStreaks(){
     const analysis=analyzeJournalStreaks(state.journals,baseInput.value,daysInput.value,excludeInput.checked);lastJournalStreakResult=analysis;
     copyBtn.disabled=analysis.results.length===0;
     if(!analysis.baseDate){
-        summary.innerHTML='<span class="text-amber-600 dark:text-amber-400"><i class="fa-solid fa-circle-info mr-1.5"></i>基準日前沒有選股日誌資料。</span>';
+        summary.innerHTML='<span class="text-amber-600 dark:text-amber-400"><i class="fa-solid fa-circle-info mr-1.5"></i>基準日前沒有策略日誌資料。</span>';
         root.innerHTML='';root.classList.add('hidden');return;
     }
     const adjusted=analysis.baseDate!==analysis.requestedBase;
@@ -1972,7 +1974,7 @@ function renderOverviewSections(data){
         const level=item.isFavorite===true?1:(parseInt(item.isFavorite)||0);
         const tags=(item.tags||[]).length?(item.tags||[]).map(tag=>`<span class="px-2 py-0.5 rounded border text-[10px] font-bold ${getTagStyle(tag,true)}">${escapeHTML(tag)}</span>`).join(''):'<span class="text-[10px] text-gray-400">無標籤</span>';
         return`<article class="rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/70 dark:bg-gray-900/30 p-3"><div class="flex flex-wrap items-center justify-between gap-2"><span class="text-xs font-bold text-blue-600 dark:text-blue-400">${escapeHTML((item.date||'').replace(/-/g,'/'))}</span>${level?`<span class="text-amber-500 text-xs">${'★'.repeat(Math.min(level,3))}</span>`:''}</div><div class="flex flex-wrap gap-1 mt-2">${tags}</div>${item.notes?`<p class="text-xs text-gray-600 dark:text-gray-300 mt-2 whitespace-pre-wrap break-words">${escapeHTML(item.notes)}</p>`:''}</article>`;
-    }).join(''):overviewEmpty('尚無選股日誌');
+    }).join(''):overviewEmpty('尚無策略日誌');
 
     setOverviewCount('overview-revenue-count',data.revenues.length);
     const revenueEl=document.getElementById('overview-revenues');
@@ -2023,7 +2025,7 @@ document.getElementById('overview-clear-btn')?.addEventListener('click',()=>{
     if(code)code.value='';if(name)name.value='';activeOverviewStock=null;
     document.getElementById('overview-content')?.classList.add('hidden');
     const welcome=document.getElementById('overview-welcome');
-    if(welcome){welcome.classList.remove('hidden');welcome.innerHTML='<span class="w-16 h-16 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center mb-4"><i class="fa-solid fa-chart-pie text-2xl text-blue-400"></i></span><p class="font-bold text-gray-600 dark:text-gray-300">輸入股票代號或股名開始查詢</p><p class="text-xs mt-2">將整合選股日誌、營收創高、法人報告、進場查核與交易規劃。</p>';}
+    if(welcome){welcome.classList.remove('hidden');welcome.innerHTML='<span class="w-16 h-16 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center mb-4"><i class="fa-solid fa-chart-pie text-2xl text-blue-400"></i></span><p class="font-bold text-gray-600 dark:text-gray-300">輸入股票代號或股名開始查詢</p><p class="text-xs mt-2">將整合策略日誌、營收創高、法人報告、進場查核與交易規劃。</p>';}
     code?.focus();
 });
 document.getElementById('overview-copy-btn')?.addEventListener('click',()=>activeOverviewStock?executeCopy(buildOverviewCopyText(activeOverviewStock)):showToast('請先查詢股票','error'));
@@ -2364,7 +2366,7 @@ setChkDirection('long');
             const wb = XLSX.utils.book_new();
             
             const wsJournals = XLSX.utils.json_to_sheet(state.journals.map(j => ({'日期':j.date,'代號':j.code,'股名':j.name,'策略標籤':j.tags?j.tags.join(', '):'','追蹤等級':j.isFavorite===true?1:(j.isFavorite||0),'備註':j.notes||''})));
-            XLSX.utils.book_append_sheet(wb, wsJournals, '選股日誌');
+            XLSX.utils.book_append_sheet(wb, wsJournals, '策略日誌');
             
             const wsRevenue = XLSX.utils.json_to_sheet(state.revenueRecords.map(r => ({'創高月份':r.month,'代號':r.code,'股名':r.name,'備註':r.notes||''})));
             XLSX.utils.book_append_sheet(wb, wsRevenue, '營收創高');
@@ -2449,8 +2451,9 @@ setChkDirection('long');
             
             let importCount = 0;
 
-            if (workbook.SheetNames.includes('選股日誌')) {
-                const ws = workbook.Sheets['選股日誌'];
+            const journalSheetName = workbook.SheetNames.includes('策略日誌') ? '策略日誌' : (workbook.SheetNames.includes('選股日誌') ? '選股日誌' : null);
+            if (journalSheetName) {
+                const ws = workbook.Sheets[journalSheetName];
                 const json = XLSX.utils.sheet_to_json(ws);
                 json.forEach(row => {
                     if(row['代號'] && row['股名'] && row['日期']) {
