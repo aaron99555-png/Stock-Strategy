@@ -90,6 +90,28 @@ input[type="date"]::-webkit-calendar-picker-indicator, input[type="month"]::-web
 #module-revenue table th:nth-child(2), #module-report table th:nth-child(2), #module-checklist table th:nth-child(2), #module-plan table th:nth-child(2) { white-space:normal !important; line-height:1.15; }
 #journal-table-body td:nth-child(3), #fav-table-body td:nth-child(3) { left:95px !important; }
 .compact-date-cell { width:55px !important; min-width:55px !important; max-width:55px !important; padding-left:0.25rem !important; padding-right:0.25rem !important; text-align:center !important; }
+/* 所有股票清單：代號在上、股名在下，保留至少四個中文字寬度 */
+#module-journal table :is(th,td):nth-child(3), #module-favorites table :is(th,td):nth-child(3),
+#module-revenue table :is(th,td):nth-child(3), #module-report table :is(th,td):nth-child(3),
+#module-checklist table :is(th,td):nth-child(3), #module-plan table :is(th,td):nth-child(3) { width:110px !important; min-width:110px !important; max-width:110px !important; padding-left:0.5rem !important; padding-right:0.5rem !important; }
+.stock-identity-cell { width:110px !important; min-width:110px !important; max-width:110px !important; overflow:hidden; white-space:normal !important; vertical-align:middle; }
+.stock-identity-code { font-size:11px; line-height:1; color:#64748b; font-weight:600; }
+.stock-identity-name { margin-top:3px; min-width:0; display:flex; align-items:center; font-size:15px; line-height:1.15; color:#1f2937; font-weight:800; letter-spacing:.025em; }
+.stock-identity-name-text { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.stock-identity-note { margin-top:3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:10px; line-height:1.15; color:#9ca3af; }
+.dark .stock-identity-code { color:#9ca3af; }
+.dark .stock-identity-name { color:#e5e7eb; }
+.dark .stock-identity-note { color:#6b7280; }
+.column-resize-handle { display:none; }
+@media (min-width:1024px) {
+  table.desktop-resizable-table thead th { position:sticky; }
+  .column-resize-handle { display:block; position:absolute; top:0; right:-4px; z-index:75; width:9px; height:100%; cursor:col-resize; touch-action:none; }
+  .column-resize-handle::after { content:''; position:absolute; top:18%; bottom:18%; left:4px; width:1px; border-radius:999px; background:#cbd5e1; opacity:.42; transition:opacity .16s ease, background-color .16s ease, width .16s ease; }
+  .column-resize-handle:hover::after, .column-resize-handle.is-resizing::after { width:2px; background:#3b82f6; opacity:1; }
+  .dark .column-resize-handle::after { background:#475569; }
+  .dark .column-resize-handle:hover::after, .dark .column-resize-handle.is-resizing::after { background:#60a5fa; }
+  body.table-column-resizing, body.table-column-resizing * { cursor:col-resize !important; user-select:none !important; }
+}
 .compact-date-value { display:inline-flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; line-height:1.05; white-space:normal; }
 .compact-date-year { font-size:10px; color:#94a3b8; font-weight:700; letter-spacing:.02em; }
 .compact-date-month-day { font-size:12px; font-weight:800; color:#475569; }
@@ -232,7 +254,7 @@ button { touch-action: manipulation; }
                             <div class="col-span-6 sm:col-span-4 lg:col-span-2"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">基準日</label><input type="date" id="streak-base-date" class="input-base text-center"></div>
                             <div class="col-span-6 sm:col-span-4 lg:col-span-2"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium"><i class="fa-solid fa-calendar-xmark mr-1 text-amber-500"></i>自訂休市日</label><div class="flex items-center gap-1.5"><input type="date" id="streak-holiday-date" aria-label="自訂休市日期" title="臨時休市可自行加入，計算時會強制略過" class="input-base flex-1 min-w-0 text-center"><button type="button" id="streak-add-holiday-btn" aria-label="加入自訂休市日" title="加入自訂休市日" class="shrink-0 w-[42px] h-[42px] rounded-lg bg-amber-500 hover:bg-amber-400 text-white text-sm font-bold transition active:scale-95"><i class="fa-solid fa-plus"></i></button></div></div>
                             <div class="col-span-6 sm:col-span-4 lg:col-span-2"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">至少連續</label><select id="streak-min-days" class="input-base text-center"><option value="2">2 個交易日</option><option value="3">3 個交易日</option><option value="4">4 個交易日</option><option value="5">5 個交易日</option><option value="6">6 個交易日</option><option value="7">7 個交易日</option><option value="8">8 個交易日</option><option value="9">9 個交易日</option><option value="10">10 個交易日</option></select></div>
-                            <div class="col-span-12 sm:col-span-4 lg:col-span-2 flex items-end"><label class="w-full h-[42px] flex items-center justify-center gap-2 cursor-pointer bg-white dark:bg-gray-800 border border-violet-200 dark:border-violet-700/70 rounded-lg px-2 text-[11px] sm:text-xs font-bold text-violet-700 dark:text-violet-300 hover:bg-violet-50 dark:hover:bg-violet-900/30 transition"><input type="checkbox" id="streak-exclude-horses" class="w-4 h-4 rounded border-violet-300 accent-violet-600"><span>排除赤兔馬／千里馬</span></label></div>
+                            <div class="col-span-12 sm:col-span-4 lg:col-span-2 flex items-end"><label class="w-full h-[42px] flex items-center justify-center gap-2 cursor-pointer bg-white dark:bg-gray-800 border border-violet-200 dark:border-violet-700/70 rounded-lg px-2 text-[11px] sm:text-xs font-bold text-violet-700 dark:text-violet-300 hover:bg-violet-50 dark:hover:bg-violet-900/30 transition"><input type="checkbox" id="streak-exclude-horses" class="w-4 h-4 rounded border-violet-300 accent-violet-600" checked><span>排除赤兔馬／千里馬</span></label></div>
                             <div class="col-span-6 sm:col-span-4 lg:col-span-2 flex items-end"><button type="submit" id="streak-query-btn" class="w-full h-[42px] bg-violet-600 hover:bg-violet-500 text-white rounded-lg font-bold text-sm transition shadow-sm active:scale-95"><i class="fa-solid fa-magnifying-glass mr-1.5"></i>開始比對</button></div>
                             <div class="col-span-6 sm:col-span-4 lg:col-span-2 flex items-end"><button type="button" id="streak-copy-btn" disabled class="w-full h-[42px] bg-violet-600 hover:bg-violet-500 text-white rounded-lg font-bold text-sm border border-violet-600 transition active:scale-95 disabled:bg-gray-100 dark:disabled:bg-gray-700 disabled:text-gray-400 disabled:border-gray-300 dark:disabled:border-gray-600 disabled:cursor-not-allowed disabled:opacity-60"><i class="fa-solid fa-copy mr-1.5"></i>複製結果</button></div>
                             <div class="col-span-12 mt-1 pt-2 border-t border-violet-100 dark:border-violet-900/40 flex flex-col sm:flex-row sm:items-center gap-2">
@@ -318,7 +340,7 @@ button { touch-action: manipulation; }
                         <tr>
                             <th class="py-3 px-2 w-[40px] text-center sticky left-0 top-0 bg-gray-50 dark:bg-gray-900 z-40"><input type="checkbox" class="select-all-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" data-type="journal"></th>
                             <th class="py-3 px-1 sm:px-2 w-[55px] text-center sticky left-[40px] top-0 bg-gray-50 dark:bg-gray-900 z-40 sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-sort="date" data-module="journal">日期 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
-                            <th class="py-3 px-2 sm:px-3 w-[95px] sticky left-[95px] top-0 bg-gray-50 dark:bg-gray-900 z-40 border-r border-gray-200 dark:border-gray-700 sortable cursor-pointer" data-sort="code" data-module="journal">代號 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+                            <th class="py-3 px-2 sm:px-3 w-[95px] sticky left-[95px] top-0 bg-gray-50 dark:bg-gray-900 z-40 border-r border-gray-200 dark:border-gray-700 sortable cursor-pointer" data-sort="code" data-module="journal">代號/股名 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
                             <th class="py-3 px-2 sm:px-3 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-sort="eps2025" data-module="journal">25 EPS</th>
                             <th class="py-3 px-2 sm:px-3 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-sort="eps2026" data-module="journal">26 EPS</th>
                             <th class="py-3 px-3 sm:px-4 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-sort="epsGrowth" data-module="journal">成長率</th>
@@ -688,7 +710,7 @@ button { touch-action: manipulation; }
                         <tr>
                             <th class="py-3 px-2 w-[40px] text-center sticky left-0 top-0 bg-gray-50 dark:bg-gray-900 z-40"><input type="checkbox" class="select-all-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" data-type="checklist"></th>
                             <th class="py-3 px-2 sm:px-3 chk-sortable cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition sticky top-0 bg-gray-50 dark:bg-gray-900 z-40 w-[100px]" data-sort="date">日期 <i class="fa-solid fa-sort-down ml-1 text-xs text-blue-500"></i></th>
-                            <th class="py-3 px-2 sm:px-3 chk-sortable cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition sticky top-0 bg-gray-50 dark:bg-gray-900 z-40 w-[120px]" data-sort="code">標的 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+                            <th class="py-3 px-2 sm:px-3 chk-sortable cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition sticky top-0 bg-gray-50 dark:bg-gray-900 z-40 w-[120px]" data-sort="code">代號/股名 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
                             <th class="py-3 px-2 sm:px-3 sticky top-0 bg-gray-50 dark:bg-gray-900 z-40 text-center">方向</th>
                             <th class="py-3 px-2 sm:px-3 sticky top-0 bg-gray-50 dark:bg-gray-900 z-40">濾網符合度</th>
                             <th class="py-3 px-2 sm:px-3 text-right sticky top-0 bg-gray-50 dark:bg-gray-900 z-40">目標價</th>
@@ -1071,9 +1093,14 @@ const setYahooStockTarget=(element,code)=>{
 };
 const decorateYahooStockTable=tableBody=>{
     tableBody?.querySelectorAll('tr > td:nth-child(3)').forEach(cell=>{
-        if(cell.hasAttribute('data-yahoo-stock-code'))return;
         const match=cell.textContent.match(/(\d{4,6}[A-Z]?)/i);
-        if(match)setYahooStockTarget(cell,match[1]);
+        if(!match)return;
+        const code=normalizeYahooStockCode(match[1]);if(!code)return;
+        if(!cell.hasAttribute('data-stock-identity-formatted')){
+            const children=Array.from(cell.children),texts=children.map(child=>child.textContent.trim()),codeIndex=texts.findIndex(text=>text.includes(code)),directName=(codeIndex>=0?texts.slice(codeIndex+1):texts).find(text=>text&&text!=='期'&&!/^\d{4,6}[A-Z]?$/i.test(text)),name=directName||state.codeToName?.[code]||'未命名',isFutures=texts.includes('期')||state.epsData?.[code]?.futures==='●',note=tableBody.id==='plan-table-body'?(children.find(child=>child.tagName==='DIV')?.textContent.trim()||''):'';
+            const futuresBadge=isFutures?'<span class="shrink-0 bg-sky-600 text-white text-[9px] px-1 rounded ml-1">期</span>':'';cell.dataset.stockIdentityFormatted='true';cell.classList.add('stock-identity-cell');cell.innerHTML=`<div class="stock-identity-code">${escapeHTML(code)}</div><div class="stock-identity-name" title="${escapeHTML(name)}"><span class="stock-identity-name-text">${escapeHTML(name)}</span>${futuresBadge}</div>${note?`<div class="stock-identity-note" title="${escapeHTML(note)}">${escapeHTML(note)}</div>`:''}`;
+        }
+        setYahooStockTarget(cell,code);
     });
 };
 ['revenue-table-body','report-table-body','checklist-table-body','plan-table-body'].forEach(id=>{
@@ -1092,6 +1119,61 @@ const decorateCompactDateTable=tableBody=>{
     decorateCompactDateTable(tableBody);
     new MutationObserver(()=>decorateCompactDateTable(tableBody)).observe(tableBody,{childList:true,subtree:true});
 });
+
+const TABLE_COLUMN_WIDTHS_STORAGE_KEY='ryan_table_column_widths_v1';
+let tableColumnWidthState={};
+try{tableColumnWidthState=JSON.parse(localStorage.getItem(TABLE_COLUMN_WIDTHS_STORAGE_KEY)||'{}')||{};}catch(error){tableColumnWidthState={};}
+const tableColumnResizeRules=new Map();
+const getTableResizeKey=table=>table.querySelector('tbody[id]')?.id||'';
+const ensureTableColumnResizeRule=(table,columnIndex)=>{
+    const key=getTableResizeKey(table),ruleKey=`${key}:${columnIndex}`;if(!key)return null;
+    if(tableColumnResizeRules.has(ruleKey))return tableColumnResizeRules.get(ruleKey);
+    let style=document.getElementById('table-column-resize-styles');if(!style){style=document.createElement('style');style.id='table-column-resize-styles';document.head.appendChild(style);}
+    const tableId=table.id||`${key}-resizable-table`;table.id=tableId;const selector=`html.desktop-table-resize-active table#${tableId}[data-table-resize-key="${key}"] tr > *:nth-child(${columnIndex+1})`;style.sheet.insertRule(`${selector}{}`,style.sheet.cssRules.length);const rule=style.sheet.cssRules[style.sheet.cssRules.length-1];tableColumnResizeRules.set(ruleKey,rule);return rule;
+};
+const updateFrozenStockOffset=(table,dateWidthOverride=null)=>{
+    const key=getTableResizeKey(table);if(key!=='journal-table-body'&&key!=='fav-table-body')return;
+    const savedDateWidth=Number(tableColumnWidthState[key]?.[1]),renderedDateWidth=table.querySelector('thead th:nth-child(2)')?.getBoundingClientRect().width||0,dateWidth=Number(dateWidthOverride)||savedDateWidth||renderedDateWidth||55,left=40+dateWidth;
+    table.querySelectorAll('thead th:nth-child(3), tbody td:nth-child(3)').forEach(cell=>cell.style.setProperty('left',`${Math.round(left)}px`,'important'));
+};
+const applyTableColumnWidth=(table,columnIndex,width)=>{
+    const rule=ensureTableColumnResizeRule(table,columnIndex);if(!rule)return;
+    const pixels=`${Math.round(width)}px`;rule.style.setProperty('width',pixels,'important');rule.style.setProperty('min-width',pixels,'important');rule.style.setProperty('max-width',pixels,'important');updateFrozenStockOffset(table,columnIndex===1?width:null);
+};
+const clearTableColumnWidth=(table,columnIndex)=>{
+    const rule=ensureTableColumnResizeRule(table,columnIndex);if(rule){rule.style.removeProperty('width');rule.style.removeProperty('min-width');rule.style.removeProperty('max-width');}
+    const key=getTableResizeKey(table);if(tableColumnWidthState[key]){delete tableColumnWidthState[key][columnIndex];if(!Object.keys(tableColumnWidthState[key]).length)delete tableColumnWidthState[key];}
+    try{localStorage.setItem(TABLE_COLUMN_WIDTHS_STORAGE_KEY,JSON.stringify(tableColumnWidthState));}catch(error){}
+    requestAnimationFrame(()=>updateFrozenStockOffset(table,columnIndex===1?55:null));
+};
+const saveTableColumnWidth=(table,columnIndex,width)=>{
+    const key=getTableResizeKey(table);if(!key)return;if(!tableColumnWidthState[key])tableColumnWidthState[key]={};tableColumnWidthState[key][columnIndex]=Math.round(width);
+    try{localStorage.setItem(TABLE_COLUMN_WIDTHS_STORAGE_KEY,JSON.stringify(tableColumnWidthState));}catch(error){}
+};
+const initDesktopTableResizing=()=>{
+    if(!window.matchMedia('(min-width:1024px)').matches)return;
+    ['journal-table-body','fav-table-body','revenue-table-body','report-table-body','checklist-table-body','plan-table-body'].forEach(bodyId=>{
+        const table=document.getElementById(bodyId)?.closest('table');if(!table||table.dataset.tableResizeInitialized==='true')return;
+        const key=getTableResizeKey(table);if(!key)return;table.id=table.id||`${key}-resizable-table`;table.dataset.tableResizeInitialized='true';table.dataset.tableResizeKey=key;table.classList.add('desktop-resizable-table');
+        Object.entries(tableColumnWidthState[key]||{}).forEach(([columnIndex,width])=>{if(Number.isFinite(Number(width)))applyTableColumnWidth(table,Number(columnIndex),Number(width));});
+        Array.from(table.querySelectorAll('thead th')).forEach((header,columnIndex)=>{
+            if(columnIndex===0)return;const handle=document.createElement('span');handle.className='column-resize-handle';handle.title='拖曳調整欄寬；雙擊恢復預設';handle.setAttribute('aria-hidden','true');header.appendChild(handle);
+            handle.addEventListener('click',event=>event.stopPropagation());
+            handle.addEventListener('dblclick',event=>{event.preventDefault();event.stopPropagation();clearTableColumnWidth(table,columnIndex);});
+            handle.addEventListener('pointerdown',event=>{
+                if(event.button!==0)return;event.preventDefault();event.stopPropagation();const startX=event.clientX,storedWidth=Number(tableColumnWidthState[key]?.[columnIndex]),measuredWidth=header.getBoundingClientRect().width||100,startWidth=storedWidth||measuredWidth,minWidth=columnIndex===1?48:columnIndex===2?88:50;let nextWidth=startWidth,animationFrame=0;
+                handle.classList.add('is-resizing');document.body.classList.add('table-column-resizing');handle.setPointerCapture?.(event.pointerId);
+                const paint=()=>{animationFrame=0;applyTableColumnWidth(table,columnIndex,nextWidth);};
+                const move=moveEvent=>{nextWidth=Math.max(minWidth,Math.min(900,startWidth+moveEvent.clientX-startX));if(!animationFrame)animationFrame=requestAnimationFrame(paint);};
+                const finish=()=>{if(animationFrame){cancelAnimationFrame(animationFrame);animationFrame=0;}applyTableColumnWidth(table,columnIndex,nextWidth);saveTableColumnWidth(table,columnIndex,nextWidth);handle.classList.remove('is-resizing');document.body.classList.remove('table-column-resizing');window.removeEventListener('pointermove',move,true);window.removeEventListener('pointerup',finish,true);window.removeEventListener('pointercancel',finish,true);};
+                window.addEventListener('pointermove',move,true);window.addEventListener('pointerup',finish,true);window.addEventListener('pointercancel',finish,true);
+            });
+        });
+        requestAnimationFrame(()=>updateFrozenStockOffset(table));
+    });
+};
+const desktopResizeMedia=window.matchMedia('(min-width:1024px)'),syncDesktopResizeMode=()=>{document.documentElement.classList.toggle('desktop-table-resize-active',desktopResizeMedia.matches);['journal-table-body','fav-table-body'].forEach(id=>{const table=document.getElementById(id)?.closest('table');if(!table)return;if(desktopResizeMedia.matches)updateFrozenStockOffset(table);else table.querySelectorAll('thead th:nth-child(3), tbody td:nth-child(3)').forEach(cell=>cell.style.removeProperty('left'));});};syncDesktopResizeMode();initDesktopTableResizing();
+if(desktopResizeMedia.addEventListener)desktopResizeMedia.addEventListener('change',event=>{syncDesktopResizeMode();if(event.matches)initDesktopTableResizing();});else desktopResizeMedia.addListener?.(event=>{syncDesktopResizeMode();if(event.matches)initDesktopTableResizing();});
 
 const getToday=()=>{const d=new Date();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;};
 const getCurrentMonth=()=>{const d=new Date();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;};
