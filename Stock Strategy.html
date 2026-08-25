@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!-- GLOBAL OPTIMIZATION: UX / mobile / accessibility / clipboard fallback -->
-<html lang="zh-TW" class="dark">
+<html lang="zh-TW" class="dark viewer-mode">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩飆股起漲手札</title>
@@ -33,6 +33,36 @@ tailwind.config={darkMode:'class',theme:{extend:{colors:{gray:{50:'#f8fafc',100:
 .nav-btn-mobile.active-indigo { @apply bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border-indigo-300 dark:border-indigo-700 shadow-sm; }
 .nav-btn-mobile.active-cyan { @apply bg-cyan-100 dark:bg-cyan-900/60 text-cyan-700 dark:text-cyan-300 border-cyan-300 dark:border-cyan-700 shadow-sm; }
 }
+</style>
+
+<style id="admin-mode-style">
+html.viewer-mode [data-target="module-plan"],
+html.viewer-mode [data-target="module-favorites"],
+html.viewer-mode #module-plan,
+html.viewer-mode #module-favorites,
+html.viewer-mode #journal-add-section,
+html.viewer-mode #revenue-form,
+html.viewer-mode #report-form,
+html.viewer-mode [data-action="add-plan"],
+html.viewer-mode [data-action="toggle-fav"],
+html.viewer-mode [data-action="edit-notes"],
+html.viewer-mode [data-action="delete-journal"],
+html.viewer-mode [data-action="edit-report"],
+html.viewer-mode [data-action="delete-report"],
+html.viewer-mode [data-action="delete-revenue"],
+html.viewer-mode [data-batch-delete-type],
+html.viewer-mode [id^="batch-bar-"],
+html.viewer-mode [data-tag-action="delete"],
+html.viewer-mode #streak-holiday-controls,
+html.viewer-mode #streak-clear-holidays-btn,
+html.viewer-mode [data-remove-holiday],
+html.viewer-mode #btn-tag-manager,
+html.viewer-mode #btn-trash-manager,
+html.viewer-mode #btn-db-upload,
+html.viewer-mode #btn-import-backup { display:none !important; }
+html.viewer-mode .row-cb,
+html.viewer-mode .select-all-cb { visibility:hidden !important; pointer-events:none !important; }
+html.viewer-mode [data-action="remove-tag"] { cursor:default !important; pointer-events:none !important; }
 </style>
 <style>
 ::-webkit-scrollbar { width:6px; height:8px; } ::-webkit-scrollbar-track { background:transparent; } ::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:4px; } .dark ::-webkit-scrollbar-thumb { background:#4b5563; }
@@ -180,6 +210,7 @@ button { touch-action: manipulation; }
                 <button class="nav-btn" data-target="module-favorites" data-color="yellow"><i class="fa-solid fa-star mr-1.5 sm:mr-2"></i>追蹤清單</button>
             </div>
             <div class="flex items-center gap-1 sm:gap-2 flex-shrink-0 relative z-10">
+                <button id="btn-admin-mode" type="button" class="h-8 sm:h-9 px-2 sm:px-2.5 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors shadow-sm flex items-center justify-center" aria-label="進入管理者模式" title="管理者模式"><i class="fa-solid fa-lock text-sm"></i><span class="hidden 2xl:inline ml-1.5 text-xs font-medium">管理者</span></button>
                 <button id="theme-toggle" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-yellow-400 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors shadow-inner"><i class="fa-solid fa-moon dark:hidden text-sm sm:text-base"></i><i class="fa-solid fa-sun hidden dark:block text-sm sm:text-base"></i></button>
                 <button id="btn-sync-modal" class="text-xs sm:text-sm bg-blue-600 hover:bg-blue-500 text-white px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm border border-transparent flex items-center font-medium active:scale-95"><i class="fa-solid fa-cloud-arrow-up sm:mr-1.5"></i><span class="hidden sm:inline">跨裝置同步</span></button>
                 <button id="btn-db-upload" onclick="document.getElementById('excel-upload').click()" class="text-xs sm:text-sm bg-purple-50 dark:bg-purple-900/40 hover:bg-purple-100 dark:hover:bg-purple-800/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-700/50 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center font-medium active:scale-95"><i class="fa-solid fa-database sm:mr-1.5"></i><span class="hidden sm:inline">資料庫</span></button>
@@ -206,7 +237,7 @@ button { touch-action: manipulation; }
 
     <!-- 策略日誌 -->
     <div id="module-journal" class="tab-content active">
-        <div class="mb-6">
+        <div id="journal-add-section" class="mb-6">
             <div class="card-panel p-4 sm:p-6 border-t-4 border-blue-500 flex flex-col gap-4">
                 <div id="toggle-journal-form-btn" role="button" tabindex="0" aria-expanded="false" aria-controls="journal-form-wrapper" class="w-full flex justify-between items-center border-b border-gray-200 dark:border-gray-700/50 pb-3 cursor-pointer group">
                     <h2 class="font-bold text-blue-600 dark:text-blue-400 flex items-center text-lg sm:text-xl relative text-left select-none pointer-events-none">
@@ -252,7 +283,7 @@ button { touch-action: manipulation; }
                         <p class="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 lg:max-w-xs">以基準日往前比對策略日誌實際有資料的交易日；週末及無交易資料的休市日會自動略過，不計入也不中斷。</p>
                         <form id="streak-search-form" class="grid grid-cols-12 gap-2 w-full lg:flex-1" action="javascript:void(0);">
                             <div class="col-span-6 sm:col-span-4 lg:col-span-2"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">基準日</label><input type="date" id="streak-base-date" class="input-base text-center"></div>
-                            <div class="col-span-6 sm:col-span-4 lg:col-span-2"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium"><i class="fa-solid fa-calendar-xmark mr-1 text-amber-500"></i>自訂休市日</label><div class="flex items-center gap-1.5"><input type="date" id="streak-holiday-date" aria-label="自訂休市日期" title="臨時休市可自行加入，計算時會強制略過" class="input-base flex-1 min-w-0 text-center"><button type="button" id="streak-add-holiday-btn" aria-label="加入自訂休市日" title="加入自訂休市日" class="shrink-0 w-[42px] h-[42px] rounded-lg bg-amber-500 hover:bg-amber-400 text-white text-sm font-bold transition active:scale-95"><i class="fa-solid fa-plus"></i></button></div></div>
+                            <div id="streak-holiday-controls" class="col-span-6 sm:col-span-4 lg:col-span-2"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium"><i class="fa-solid fa-calendar-xmark mr-1 text-amber-500"></i>自訂休市日</label><div class="flex items-center gap-1.5"><input type="date" id="streak-holiday-date" aria-label="自訂休市日期" title="臨時休市可自行加入，計算時會強制略過" class="input-base flex-1 min-w-0 text-center"><button type="button" id="streak-add-holiday-btn" aria-label="加入自訂休市日" title="加入自訂休市日" class="shrink-0 w-[42px] h-[42px] rounded-lg bg-amber-500 hover:bg-amber-400 text-white text-sm font-bold transition active:scale-95"><i class="fa-solid fa-plus"></i></button></div></div>
                             <div class="col-span-6 sm:col-span-4 lg:col-span-2"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">至少連續</label><select id="streak-min-days" class="input-base text-center"><option value="2">2 個交易日</option><option value="3">3 個交易日</option><option value="4">4 個交易日</option><option value="5">5 個交易日</option><option value="6">6 個交易日</option><option value="7">7 個交易日</option><option value="8">8 個交易日</option><option value="9">9 個交易日</option><option value="10">10 個交易日</option></select></div>
                             <div class="col-span-12 sm:col-span-4 lg:col-span-2 flex items-end"><label class="w-full h-[42px] flex items-center justify-center gap-2 cursor-pointer bg-white dark:bg-gray-800 border border-violet-200 dark:border-violet-700/70 rounded-lg px-2 text-[11px] sm:text-xs font-bold text-violet-700 dark:text-violet-300 hover:bg-violet-50 dark:hover:bg-violet-900/30 transition"><input type="checkbox" id="streak-exclude-horses" class="w-4 h-4 rounded border-violet-300 accent-violet-600" checked><span>排除赤兔馬／千里馬</span></label></div>
                             <div class="col-span-6 sm:col-span-4 lg:col-span-2 flex items-end"><button type="submit" id="streak-query-btn" class="w-full h-[42px] bg-violet-600 hover:bg-violet-500 text-white rounded-lg font-bold text-sm transition shadow-sm active:scale-95"><i class="fa-solid fa-magnifying-glass mr-1.5"></i>開始比對</button></div>
@@ -382,7 +413,7 @@ button { touch-action: manipulation; }
         <div id="overview-welcome" class="card-panel min-h-[320px] flex flex-col items-center justify-center text-center p-8 text-gray-400 dark:text-gray-500">
             <span class="w-16 h-16 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center mb-4"><i class="fa-solid fa-chart-pie text-2xl text-blue-400"></i></span>
             <p class="font-bold text-gray-600 dark:text-gray-300">輸入股票代號或股名開始查詢</p>
-            <p class="text-xs mt-2">將整合策略日誌、營收創高、法人報告、進場查核與交易規劃。</p>
+            <p class="text-xs mt-2">將整合策略日誌、營收創高與法人報告。</p>
         </div>
 
         <div id="overview-content" class="hidden space-y-4">
@@ -420,8 +451,6 @@ button { touch-action: manipulation; }
                 <section class="card-panel p-4 sm:p-5"><div class="flex items-center justify-between mb-3"><h3 class="font-bold text-blue-600 dark:text-blue-400"><i class="fa-solid fa-book-journal-whills mr-2"></i>策略日誌</h3><span id="overview-journal-count" class="text-xs text-gray-400"></span></div><div id="overview-journals" class="space-y-2 max-h-[420px] overflow-y-auto pr-1"></div></section>
                 <section class="card-panel p-4 sm:p-5"><div class="flex items-center justify-between mb-3"><h3 class="font-bold text-pink-600 dark:text-pink-400"><i class="fa-solid fa-money-bill-trend-up mr-2"></i>營收創高</h3><span id="overview-revenue-count" class="text-xs text-gray-400"></span></div><div id="overview-revenues" class="space-y-2 max-h-[420px] overflow-y-auto pr-1"></div></section>
                 <section class="card-panel p-4 sm:p-5"><div class="flex items-center justify-between mb-3"><h3 class="font-bold text-indigo-600 dark:text-indigo-400"><i class="fa-solid fa-file-lines mr-2"></i>法人報告</h3><span id="overview-report-count" class="text-xs text-gray-400"></span></div><div id="overview-reports" class="space-y-2 max-h-[420px] overflow-y-auto pr-1"></div></section>
-                <section class="card-panel p-4 sm:p-5"><div class="flex items-center justify-between mb-3"><h3 class="font-bold text-cyan-600 dark:text-cyan-400"><i class="fa-solid fa-clipboard-check mr-2"></i>進場查核</h3><span id="overview-checklist-count" class="text-xs text-gray-400"></span></div><div id="overview-checklists" class="space-y-2 max-h-[420px] overflow-y-auto pr-1"></div></section>
-                <section class="card-panel p-4 sm:p-5 lg:col-span-2"><div class="flex items-center justify-between mb-3"><h3 class="font-bold text-green-600 dark:text-green-400"><i class="fa-solid fa-chess-knight mr-2"></i>交易規劃</h3><span id="overview-plan-count" class="text-xs text-gray-400"></span></div><div id="overview-plans" class="grid grid-cols-1 lg:grid-cols-2 gap-2 max-h-[420px] overflow-y-auto pr-1"></div></section>
             </div>
         </div>
     </div>
@@ -1434,13 +1463,14 @@ const getFilteredAndSortedData=(dl,cf,cs)=>{
 
 const renderTableRows=(data,tbId,emId,isFav=false)=>{
     const tb=document.getElementById(tbId),em=document.getElementById(emId),lt=isFav?'fav':'journal',countEl=document.getElementById(`${lt}-stock-count`);
+    const canRemoveTags=Boolean(window.isAdminMode&&window.isAdminMode());
     const stockCount=new Set(data.map(item=>String(item.code||'').trim()).filter(Boolean)).size;
     if(countEl)countEl.innerHTML=`<i class="fa-solid fa-chart-simple"></i>目前顯示 ${stockCount} 檔股票`;
     if(data.length===0){tb.innerHTML='';em.classList.remove('hidden');updateBatchUI(lt);return;}
     em.classList.add('hidden'); let rh='';
     data.forEach(i=>{
         const ei=i.ei||getEpsInfo(i.code,i),sc=i.score!==undefined?i.score:getScore(i.tags,ei);
-        const th=(i.tags||[]).map(t=>`<span class="inline-block text-[11px] font-bold px-2 py-0.5 rounded-md mr-1 mb-1 border shadow-sm cursor-pointer hover:opacity-80 transition ${getTagStyle(t)}" data-action="remove-tag" data-id="${i.id}" data-tag="${escapeHTML(t)}" title="點擊移除標籤">${escapeHTML(t)} ✕</span>`).join('');
+        const th=(i.tags||[]).map(t=>`<span class="inline-block text-[11px] font-bold px-2 py-0.5 rounded-md mr-1 mb-1 border shadow-sm transition ${canRemoveTags?'cursor-pointer hover:opacity-80':'cursor-default'} ${getTagStyle(t)}"${canRemoveTags?` data-action="remove-tag" data-id="${i.id}" data-tag="${escapeHTML(t)}" title="點擊移除標籤"`:' title="策略標籤"'}>${escapeHTML(t)}${canRemoveTags?' ✕':''}</span>`).join('');
         let fl=i.isFavorite===true?1:(parseInt(i.isFavorite)||0),fc='text-gray-400 dark:text-gray-500 hover:text-yellow-500',fi='<i class="fa-solid fa-star pointer-events-none"></i>',ft='加入追蹤';
         if(fl===1){fc='text-yellow-500';ft='一星追蹤';}else if(fl===2){fc='text-orange-500';fi='<i class="fa-solid fa-star pointer-events-none"></i><span class="ml-1 text-[10px] font-bold pointer-events-none">2</span>';ft='二次追蹤';}else if(fl===3){fc='text-red-500';fi='<i class="fa-solid fa-star pointer-events-none"></i><span class="ml-1 text-[10px] font-bold pointer-events-none">3</span>';ft='三次追蹤';}
         const fd=i.date?i.date.replace(/-/g,'/'):'',rbh=getRevenueMonthsHtml(i.code),hr=state.reports.some(r=>String(r.code||'').trim()===String(i.code||'').trim()),rb=hr?renderReportIndicator():'',futuresBadge=ei.futures?'<span class="shrink-0 bg-sky-600 text-white text-[9px] px-1 rounded ml-1">期</span>':'';
@@ -1451,7 +1481,7 @@ const renderTableRows=(data,tbId,emId,isFav=false)=>{
 
 const handleJournalTableAction=async(e)=>{
     const b=e.target.closest('[data-action]');if(!b)return;const a=b.dataset.action,id=b.dataset.id;
-    if(a==='remove-tag'){const t=b.dataset.tag,j=state.journals.find(x=>x.id===id);if(j&&j.tags){j.tags=j.tags.filter(x=>x!==t);j.updatedAt=Date.now();saveLocalData();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();await putDataToCloud(`journals/${id}`,j);showToast(`已移除標籤: ${t}`);}}
+    if(a==='remove-tag'){if(!window.isAdminMode||!window.isAdminMode())return showToast('移除策略標籤僅限管理者使用','error');const t=b.dataset.tag,j=state.journals.find(x=>x.id===id);if(j&&j.tags){j.tags=j.tags.filter(x=>x!==t);j.updatedAt=Date.now();saveLocalData();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();await putDataToCloud(`journals/${id}`,j);showToast(`已移除標籤: ${t}`);}}
     else if(a==='add-plan'){const c=b.dataset.code;document.querySelector('[data-target="module-plan"]').click();document.getElementById('p-stock').value=c;if(state.codeToName[c])document.getElementById('p-name').value=state.codeToName[c];document.getElementById('p-entry').focus();showToast('已代入股號與股名');}
     else if(a==='toggle-fav'){const j=state.journals.find(x=>x.id===id);if(j){let n=((j.isFavorite===true?1:(parseInt(j.isFavorite)||0))+1)%4;j.isFavorite=n;j.updatedAt=Date.now();saveLocalData();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();await putDataToCloud(`journals/${id}`,j);showToast(['已取消追蹤','已加入一星追蹤','已升級二次追蹤','已升級三次追蹤'][n]);}}
     else if(a==='edit-notes'){const j=state.journals.find(x=>x.id===id);if(!j)return;window.openPromptModal("修改備註說明",j.notes||"",async(nn)=>{if(nn!==null){j.notes=nn.trim();j.updatedAt=Date.now();saveLocalData();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();await putDataToCloud(`journals/${id}`,j);showToast("備註修改成功");}});}
@@ -1574,6 +1604,7 @@ const buildJournalStreakCopyText=analysis=>{
     return lines.join('\n').trim();
 };
 const addCustomMarketHoliday=async()=>{
+    if(!window.isAdminMode||!window.isAdminMode())return showToast('自訂休市日僅限管理者設定','error');
     const input=document.getElementById('streak-holiday-date'),date=input?.value||'';
     if(!isValidISODate(date))return showToast('請先選擇休市日期','error');
     const [year,month,day]=date.split('-').map(Number),weekday=new Date(Date.UTC(year,month-1,day)).getUTCDay();
@@ -1589,10 +1620,12 @@ document.getElementById('streak-add-holiday-btn')?.addEventListener('click',addC
 document.getElementById('streak-holiday-date')?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addCustomMarketHoliday();}});
 document.getElementById('streak-holiday-list')?.addEventListener('click',async e=>{
     const button=e.target.closest('[data-remove-holiday]');if(!button)return;
+    if(!window.isAdminMode||!window.isAdminMode())return showToast('移除自訂休市日僅限管理者使用','error');
     const date=button.dataset.removeHoliday;state.customMarketHolidays=(state.customMarketHolidays||[]).filter(item=>item!==date);
     await persistCustomMarketHolidays();showToast(`已移除休市日 ${date.replace(/-/g,'/')}`);
 });
 document.getElementById('streak-clear-holidays-btn')?.addEventListener('click',()=>{
+    if(!window.isAdminMode||!window.isAdminMode())return showToast('清除自訂休市日僅限管理者使用','error');
     if(!(state.customMarketHolidays||[]).length)return;
     window.openConfirmModal('確定要清除全部自訂休市日嗎？',async()=>{state.customMarketHolidays=[];await persistCustomMarketHolidays();showToast('已清除全部自訂休市日');});
 });
@@ -1630,6 +1663,7 @@ document.addEventListener('change',e=>{
     }
 });
 window.confirmBatchDelete=t=>{
+    if(!window.isAdminMode||!window.isAdminMode())return showToast('批次刪除僅限管理者使用','error');
     updateBatchUI(t);
     if(!selectedIds[t]||selectedIds[t].size===0)return showToast('請先勾選要刪除的資料','error');
     document.getElementById('batch-delete-type').value=t;
@@ -1637,6 +1671,7 @@ window.confirmBatchDelete=t=>{
     document.getElementById('batch-delete-modal').classList.remove('hidden');
 };
 window.executeBatchDelete=async()=>{
+    if(!window.isAdminMode||!window.isAdminMode())return showToast('批次刪除僅限管理者使用','error');
     const confirmBtn=document.getElementById('btn-batch-delete-confirm');
     if(confirmBtn?.disabled)return;
     const t=document.getElementById('batch-delete-type').value;
@@ -1886,8 +1921,6 @@ const getOverviewCatalog=()=>{
     (state.journals||[]).forEach(item=>add(item.code,item.name));
     (state.revenueRecords||[]).forEach(item=>add(item.code,item.name));
     (state.reports||[]).forEach(item=>add(item.code,item.name));
-    (state.checklists||[]).forEach(item=>add(item.code,item.name));
-    (state.plans||[]).forEach(item=>add(item.stock,item.name));
     return Array.from(stocks.values()).sort((a,b)=>a.code.localeCompare(b.code,undefined,{numeric:true}));
 };
 
@@ -1913,13 +1946,11 @@ const collectOverviewData=stock=>{
     const journals=(state.journals||[]).filter(item=>sameCode(item.code)).sort(overviewSortByDateDesc);
     const revenues=(state.revenueRecords||[]).filter(item=>sameCode(item.code)).sort(overviewSortByDateDesc);
     const reports=(state.reports||[]).filter(item=>sameCode(item.code)).sort(overviewSortByDateDesc);
-    const checklists=(state.checklists||[]).filter(item=>sameCode(item.code)).sort(overviewSortByDateDesc);
-    const plans=(state.plans||[]).filter(item=>sameCode(item.stock)).sort(overviewSortByDateDesc);
-    const fallbackName=stock.name||journals[0]?.name||revenues[0]?.name||reports[0]?.name||checklists[0]?.name||plans[0]?.name||'';
+    const fallbackName=stock.name||journals[0]?.name||revenues[0]?.name||reports[0]?.name||'';
     const tags=[...new Set(journals.flatMap(item=>Array.isArray(item.tags)?item.tags:[]).filter(Boolean))];
     const eps=getEpsInfo(code,journals[0]||{});
     const favorite=Math.max(0,...journals.map(item=>item.isFavorite===true?1:(parseInt(item.isFavorite)||0)));
-    return{code,name:fallbackName,journals,revenues,reports,checklists,plans,tags,eps,favorite};
+    return{code,name:fallbackName,journals,revenues,reports,tags,eps,favorite};
 };
 
 const setOverviewCount=(id,count)=>{const el=document.getElementById(id);if(el)el.textContent=`${count} 筆`;};
@@ -1953,7 +1984,7 @@ function renderStockOverview(forcedCode=''){
     setYahooStockTarget(document.getElementById('overview-stock-name'),data.code);
     const favoriteEl=document.getElementById('overview-favorite');
     if(favoriteEl)favoriteEl.textContent=data.favorite?'★'.repeat(Math.min(data.favorite,3)):'';
-    const allDates=[...data.journals,...data.reports,...data.checklists,...data.plans,...data.revenues].map(overviewDateValue).filter(Boolean).sort().reverse();
+    const allDates=[...data.journals,...data.reports,...data.revenues].map(overviewDateValue).filter(Boolean).sort().reverse();
     setOverviewText('overview-latest-date',allDates.length?`最近紀錄：${allDates[0].replace(/-/g,'/')}`:'尚無日期紀錄');
     const eps25=document.getElementById('overview-eps25'),eps26=document.getElementById('overview-eps26'),growth=document.getElementById('overview-eps-growth'),target=document.getElementById('overview-target');
     if(eps25)eps25.innerHTML=formatNumColor(data.eps.eps2025);
@@ -1990,22 +2021,6 @@ function renderOverviewSections(data){
     const reportEl=document.getElementById('overview-reports');
     if(reportEl)reportEl.innerHTML=data.reports.length?data.reports.map(item=>`<article class="rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/70 dark:bg-gray-900/30 p-3"><div class="text-xs font-bold text-indigo-600 dark:text-indigo-400 mb-2">${escapeHTML((item.date||'').replace(/-/g,'/'))}</div><p class="text-xs sm:text-sm leading-relaxed text-gray-700 dark:text-gray-200 whitespace-pre-wrap break-words">${escapeHTML(item.content||'')}</p></article>`).join(''):overviewEmpty('尚無法人報告');
 
-    setOverviewCount('overview-checklist-count',data.checklists.length);
-    const checklistEl=document.getElementById('overview-checklists');
-    if(checklistEl)checklistEl.innerHTML=data.checklists.length?data.checklists.map(item=>{
-        const total=CHK_CONFIG[item.direction]?.length||1,checked=item.checkedItems?.length||0,score=Math.round(checked/total*100)||0,details=item.details||{};
-        const detailItems=[details.pressure&&`壓力 ${details.pressure}`,details.support&&`支撐 ${details.support}`,details.target&&`目標 ${details.target}`,details.cost&&`成本 ${details.cost}`].filter(Boolean);
-        const direction=item.direction==='long'?'📈 多方':'📉 空方',directionClass=item.direction==='long'?'bg-red-100 text-red-700':'bg-emerald-100 text-emerald-700',barClass=item.direction==='long'?'bg-red-500':'bg-emerald-500';
-        return`<article class="rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/70 dark:bg-gray-900/30 p-3"><div class="flex flex-wrap items-center justify-between gap-2"><span class="text-xs font-bold text-cyan-600 dark:text-cyan-400">${escapeHTML((item.date||'').replace(/-/g,'/'))}</span><span class="px-2 py-0.5 rounded text-[10px] font-bold ${directionClass}">${direction}</span></div><div class="flex items-center gap-2 mt-2"><div class="h-1.5 flex-1 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden"><div class="h-full ${barClass}" style="width:${score}%"></div></div><span class="text-[10px] font-bold text-gray-500">${checked}/${total} · ${score}%</span></div>${detailItems.length?`<p class="text-[11px] text-gray-600 dark:text-gray-300 mt-2">${escapeHTML(detailItems.join('｜'))}</p>`:''}${details.notes?`<p class="text-xs text-gray-600 dark:text-gray-300 mt-2 whitespace-pre-wrap break-words">${escapeHTML(details.notes)}</p>`:''}</article>`;
-    }).join(''):overviewEmpty('尚無進場查核');
-
-    setOverviewCount('overview-plan-count',data.plans.length);
-    const planEl=document.getElementById('overview-plans');
-    if(planEl)planEl.innerHTML=data.plans.length?data.plans.map(item=>{
-        const statusClass=item.status==='持倉中'?'bg-blue-100 text-blue-700':item.status==='已停利'?'bg-red-100 text-red-700':'bg-green-100 text-green-700';
-        const pnlClass=item.pnl>0?'tw-red':item.pnl<0?'tw-green':'';
-        return`<article class="rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/70 dark:bg-gray-900/30 p-3"><div class="flex flex-wrap items-center justify-between gap-2"><span class="text-xs font-bold text-green-600 dark:text-green-400">${escapeHTML((item.entryDate||'').replace(/-/g,'/'))}</span><span class="px-2 py-0.5 rounded text-[10px] font-bold ${statusClass}">${escapeHTML(item.status||'未設定')}</span></div><div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-3 text-xs"><span>進場 <b>${escapeHTML(item.entry??'—')}</b></span><span>目標 <b class="tw-red">${escapeHTML(item.target??'—')}</b></span><span>停損 <b class="tw-green">${escapeHTML(item.stop??'—')}</b></span><span>張數 <b>${escapeHTML(item.qty??'—')}</b></span></div>${item.status!=='持倉中'&&item.pnl!=null?`<p class="text-xs mt-2">損益 <b class="${pnlClass}">${escapeHTML(item.pnl)}</b></p>`:''}${item.note?`<p class="text-xs text-gray-600 dark:text-gray-300 mt-2 whitespace-pre-wrap break-words">${escapeHTML(item.note)}</p>`:''}</article>`;
-    }).join(''):overviewEmpty('尚無交易規劃');
 }
 
 const buildOverviewCopyText=data=>{
@@ -2017,8 +2032,6 @@ const buildOverviewCopyText=data=>{
     lines.push(`目標價：${data.eps.targetPrice??'-'}｜券商：${data.eps.broker??'-'}｜報告日期：${data.eps.reportDate??'-'}`);
     if(data.revenues.length)lines.push(`營收創高：${data.revenues.map(item=>String(item.month||'').replace(/-/g,'/')).join('、')}`);
     if(data.reports.length){lines.push(`最新法人報告 [${String(data.reports[0].date||'').replace(/-/g,'/')}]`);lines.push(data.reports[0].content||'');}
-    if(data.checklists.length){const item=data.checklists[0],total=CHK_CONFIG[item.direction]?.length||1;lines.push(`最新查核：${item.direction==='long'?'多方':'空方'} ${item.checkedItems?.length||0}/${total}${item.details?.target?`｜目標 ${item.details.target}`:''}`);}
-    if(data.plans.length){const item=data.plans[0];lines.push(`最新規劃：${item.status||'-'}｜進場 ${item.entry??'-'}｜目標 ${item.target??'-'}｜停損 ${item.stop??'-'}`);}
     return lines.join('\n');
 };
 
@@ -2028,7 +2041,7 @@ document.getElementById('overview-clear-btn')?.addEventListener('click',()=>{
     if(code)code.value='';if(name)name.value='';activeOverviewStock=null;
     document.getElementById('overview-content')?.classList.add('hidden');
     const welcome=document.getElementById('overview-welcome');
-    if(welcome){welcome.classList.remove('hidden');welcome.innerHTML='<span class="w-16 h-16 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center mb-4"><i class="fa-solid fa-chart-pie text-2xl text-blue-400"></i></span><p class="font-bold text-gray-600 dark:text-gray-300">輸入股票代號或股名開始查詢</p><p class="text-xs mt-2">將整合策略日誌、營收創高、法人報告、進場查核與交易規劃。</p>';}
+    if(welcome){welcome.classList.remove('hidden');welcome.innerHTML='<span class="w-16 h-16 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center mb-4"><i class="fa-solid fa-chart-pie text-2xl text-blue-400"></i></span><p class="font-bold text-gray-600 dark:text-gray-300">輸入股票代號或股名開始查詢</p><p class="text-xs mt-2">將整合策略日誌、營收創高與法人報告。</p>';}
     code?.focus();
 });
 document.getElementById('overview-copy-btn')?.addEventListener('click',()=>activeOverviewStock?executeCopy(buildOverviewCopyText(activeOverviewStock)):showToast('請先查詢股票','error'));
@@ -3069,6 +3082,7 @@ const SESSION={
   }
 
   function deleteManagedTag(tag){
+    if(!window.isAdminMode||!window.isAdminMode())return showToast('刪除策略標籤僅限管理者使用','error');
     openConfirmModal('確定刪除標籤「'+tag+'」？所有既有紀錄中的此標籤也會一併移除。',async function(){
       state.tagSettings.categories.forEach(function(category){category.tags=category.tags.filter(function(item){return item!==tag;});});
       delete state.tagSettings.meta[tag];
@@ -3420,6 +3434,9 @@ const SESSION={
   document.addEventListener('change',function(event){
     var input=event.target;
     if(!input||!['backup-file','excel-upload'].includes(input.id))return;
+    if(window.isAdminMode&&!window.isAdminMode()){
+      event.preventDefault();event.stopImmediatePropagation();input.value='';showToast('此匯入功能僅限管理者使用','error');return;
+    }
     event.preventDefault();event.stopImmediatePropagation();handleImportFile(input);
   },true);
 
@@ -3427,14 +3444,20 @@ const SESSION={
     var button=event.target.closest('[data-action]');
     var actionMap={'delete-journal':'journal','delete-plan':'plan','delete-revenue':'revenue','delete-report':'report','delete-checklist':'checklist'};
     if(button&&actionMap[button.dataset.action]){
-      event.preventDefault();event.stopImmediatePropagation();
       var type=actionMap[button.dataset.action],id=button.dataset.id;
+      if(['journal','revenue','report'].includes(type)&&(!window.isAdminMode||!window.isAdminMode())){
+        event.preventDefault();event.stopImmediatePropagation();showToast('刪除資料僅限管理者使用','error');return;
+      }
+      event.preventDefault();event.stopImmediatePropagation();
       openConfirmModal('確定移至垃圾桶？之後仍可復原。',function(){return moveItemsToTrash(type,[id]);});
       return;
     }
     if(event.target.closest('#btn-batch-delete-confirm')){
-      event.preventDefault();event.stopImmediatePropagation();
       var rawType=document.getElementById('batch-delete-type').value;
+      if(!window.isAdminMode||!window.isAdminMode()){
+        event.preventDefault();event.stopImmediatePropagation();showToast('批次刪除僅限管理者使用','error');return;
+      }
+      event.preventDefault();event.stopImmediatePropagation();
       var ids=Array.from(selectedIds[rawType]||[]);
       document.getElementById('batch-delete-modal').classList.add('hidden');
       moveItemsToTrash(rawType,ids);
@@ -3465,6 +3488,7 @@ const SESSION={
     document.getElementById('import-preview-cancel').addEventListener('click',closeImportPreview);
     document.getElementById('import-preview-confirm').addEventListener('click',confirmImport);
     window.confirmBatchDelete=function(type){
+      if(!window.isAdminMode||!window.isAdminMode())return showToast('批次刪除僅限管理者使用','error');
       updateBatchUI(type);
       if(!selectedIds[type]||selectedIds[type].size===0)return showToast('請先勾選要刪除的資料','error');
       document.getElementById('batch-delete-type').value=type;
@@ -3480,6 +3504,171 @@ const SESSION={
     bindOptimizationEvents();
     renderTagManager();window.renderTrashManager();resetTagForm();
     if(changed)saveLocalData();
+  });
+})();
+</script>
+
+<div id="admin-login-modal" class="hidden fixed inset-0 z-[210] bg-black/60 backdrop-blur-sm items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="admin-login-title" aria-hidden="true">
+    <div class="w-full max-w-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-2xl overflow-hidden">
+        <div class="px-5 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+            <div>
+                <h2 id="admin-login-title" class="font-bold text-lg text-gray-900 dark:text-white flex items-center"><i class="fa-solid fa-shield-halved text-blue-600 dark:text-blue-400 mr-2"></i>管理者模式</h2>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">請輸入管理者密碼以開啟受限功能</p>
+            </div>
+            <button id="admin-login-close" type="button" class="w-8 h-8 rounded-lg text-gray-400 hover:text-gray-700 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition" aria-label="關閉"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="p-5">
+            <label for="admin-password-input" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">管理者密碼</label>
+            <div class="relative">
+                <input id="admin-password-input" type="password" inputmode="numeric" maxlength="20" autocomplete="current-password" class="input-base !pr-11" placeholder="請輸入密碼">
+                <button id="admin-password-toggle" type="button" class="absolute inset-y-0 right-0 w-11 flex items-center justify-center text-gray-400 hover:text-blue-600 dark:hover:text-blue-400" aria-label="顯示密碼" title="顯示／隱藏密碼"><i class="fa-solid fa-eye"></i></button>
+            </div>
+            <p id="admin-login-error" class="hidden mt-2 text-xs text-red-600 dark:text-red-400" role="alert">密碼錯誤，請重新輸入。</p>
+            <div class="mt-5 grid grid-cols-2 gap-3">
+                <button id="admin-login-cancel" type="button" class="h-10 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 font-medium transition">取消</button>
+                <button id="admin-login-submit" type="button" class="h-10 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold shadow-sm transition active:scale-95"><i class="fa-solid fa-right-to-bracket mr-1.5"></i>登入</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script id="admin-mode-suite">
+(function(){
+  'use strict';
+  var ADMIN_SESSION_KEY='ryan_admin_session_v1';
+  var DEFAULT_ADMIN_PASSWORD='8888';
+  var adminMode=false;
+  var lastFocusedElement=null;
+
+  function notify(message,type){
+    if(typeof window.showToast==='function')window.showToast(message,type||'success');
+    else window.alert(message);
+  }
+
+  function readAdminSession(){
+    try{return window.sessionStorage.getItem(ADMIN_SESSION_KEY)==='1';}catch(error){return false;}
+  }
+
+  function writeAdminSession(enabled){
+    try{
+      if(enabled)window.sessionStorage.setItem(ADMIN_SESSION_KEY,'1');
+      else window.sessionStorage.removeItem(ADMIN_SESSION_KEY);
+    }catch(error){}
+  }
+
+  function updateAdminButton(){
+    var button=document.getElementById('btn-admin-mode');
+    if(!button)return;
+    button.classList.toggle('!bg-emerald-600',adminMode);
+    button.classList.toggle('!border-emerald-500',adminMode);
+    button.classList.toggle('!text-white',adminMode);
+    button.setAttribute('aria-label',adminMode?'退出管理者模式':'進入管理者模式');
+    button.setAttribute('title',adminMode?'管理者模式已啟用，點擊可退出':'進入管理者模式');
+    button.innerHTML=adminMode?'<i class="fa-solid fa-unlock-keyhole text-sm"></i><span class="hidden 2xl:inline ml-1.5 text-xs font-medium">管理中</span>':'<i class="fa-solid fa-lock text-sm"></i><span class="hidden 2xl:inline ml-1.5 text-xs font-medium">管理者</span>';
+  }
+
+  function applyAdminMode(enabled){
+    adminMode=Boolean(enabled);
+    document.documentElement.classList.toggle('admin-mode',adminMode);
+    document.documentElement.classList.toggle('viewer-mode',!adminMode);
+    updateAdminButton();
+    if(!adminMode){
+      var restrictedActive=document.querySelector('#module-plan.active, #module-favorites.active');
+      if(restrictedActive){
+        var journalButton=document.querySelector('[data-target="module-journal"]');
+        if(journalButton)journalButton.click();
+      }
+    }
+    if(typeof window.processAndRenderJournals==='function')window.processAndRenderJournals();
+    if(typeof window.renderFavorites==='function')window.renderFavorites();
+  }
+
+  window.isAdminMode=function(){return adminMode;};
+
+  function openAdminLogin(){
+    var modal=document.getElementById('admin-login-modal');
+    var input=document.getElementById('admin-password-input');
+    if(!modal||!input)return;
+    lastFocusedElement=document.activeElement;
+    document.getElementById('admin-login-error').classList.add('hidden');
+    input.value='';input.type='password';
+    var eye=document.querySelector('#admin-password-toggle i');
+    if(eye){eye.classList.remove('fa-eye-slash');eye.classList.add('fa-eye');}
+    modal.classList.remove('hidden');modal.classList.add('flex');modal.setAttribute('aria-hidden','false');
+    window.setTimeout(function(){input.focus();},30);
+  }
+
+  function closeAdminLogin(){
+    var modal=document.getElementById('admin-login-modal');
+    if(!modal)return;
+    modal.classList.add('hidden');modal.classList.remove('flex');modal.setAttribute('aria-hidden','true');
+    if(lastFocusedElement&&typeof lastFocusedElement.focus==='function')lastFocusedElement.focus();
+  }
+
+  function submitAdminLogin(){
+    var input=document.getElementById('admin-password-input');
+    var error=document.getElementById('admin-login-error');
+    if(!input)return;
+    if(input.value===DEFAULT_ADMIN_PASSWORD){
+      writeAdminSession(true);applyAdminMode(true);closeAdminLogin();notify('已進入管理者模式');
+      return;
+    }
+    if(error)error.classList.remove('hidden');
+    input.select();notify('管理者密碼錯誤','error');
+  }
+
+  function logoutAdmin(){
+    writeAdminSession(false);applyAdminMode(false);notify('已退出管理者模式');
+  }
+
+  function requireAdmin(event,message){
+    if(adminMode)return false;
+    if(event){event.preventDefault();event.stopImmediatePropagation();}
+    notify(message||'此功能僅限管理者使用','error');
+    return true;
+  }
+
+  document.addEventListener('submit',function(event){
+    if(['journal-form','revenue-form','report-form'].includes(event.target&&event.target.id))requireAdmin(event,'新增資料僅限管理者使用');
+  },true);
+
+  document.addEventListener('click',function(event){
+    var restrictedModule=event.target.closest('[data-target="module-plan"], [data-target="module-favorites"]');
+    if(restrictedModule&&!adminMode){requireAdmin(event,'此模組僅限管理者查看');return;}
+    var restrictedAction=event.target.closest('#btn-journal-submit, #btn-revenue-submit, #btn-report-submit, [data-action="add-plan"], [data-action="toggle-fav"], [data-action="remove-tag"], [data-action="edit-notes"], [data-action="delete-journal"], [data-action="edit-report"], [data-action="delete-report"], [data-action="delete-revenue"], [data-batch-delete-type], [data-tag-action="delete"], #streak-holiday-date, #streak-add-holiday-btn, #streak-clear-holidays-btn, [data-remove-holiday], #btn-tag-manager, #btn-trash-manager, #btn-db-upload, #btn-import-backup');
+    if(restrictedAction&&!adminMode){requireAdmin(event,'此操作僅限管理者使用');return;}
+  },true);
+
+  document.addEventListener('change',function(event){
+    if(adminMode)return;
+    var checkbox=event.target.closest('.row-cb, .select-all-cb');
+    if(checkbox){event.preventDefault();event.stopImmediatePropagation();checkbox.checked=false;notify('資料選取與刪除僅限管理者使用','error');}
+  },true);
+
+  document.addEventListener('DOMContentLoaded',function(){
+    var adminButton=document.getElementById('btn-admin-mode');
+    var modal=document.getElementById('admin-login-modal');
+    var passwordInput=document.getElementById('admin-password-input');
+    applyAdminMode(readAdminSession());
+    if(adminButton)adminButton.addEventListener('click',function(){
+      if(adminMode){if(window.confirm('確定要退出管理者模式嗎？'))logoutAdmin();}
+      else openAdminLogin();
+    });
+    document.getElementById('admin-login-submit')?.addEventListener('click',submitAdminLogin);
+    document.getElementById('admin-login-cancel')?.addEventListener('click',closeAdminLogin);
+    document.getElementById('admin-login-close')?.addEventListener('click',closeAdminLogin);
+    document.getElementById('admin-password-toggle')?.addEventListener('click',function(){
+      if(!passwordInput)return;
+      var showing=passwordInput.type==='text';passwordInput.type=showing?'password':'text';
+      var icon=this.querySelector('i');
+      if(icon){icon.classList.toggle('fa-eye',showing);icon.classList.toggle('fa-eye-slash',!showing);}
+      this.setAttribute('aria-label',showing?'顯示密碼':'隱藏密碼');passwordInput.focus();
+    });
+    if(passwordInput)passwordInput.addEventListener('keydown',function(event){
+      if(event.key==='Enter'){event.preventDefault();submitAdminLogin();}
+      else if(event.key==='Escape')closeAdminLogin();
+    });
+    if(modal)modal.addEventListener('click',function(event){if(event.target===modal)closeAdminLogin();});
   });
 })();
 </script>
