@@ -1,3 +1,38 @@
+已修正並更新至第 84 版：
+
+手機版導覽列下方固定顯示「管理者登入」。
+「日／夜模式」與管理者登入並排顯示。
+日／夜模式不需登入管理者即可切換。
+登入後，按鈕會改為「登出管理者」。
+已通過 HTML 與 JavaScript 檢查。
+
+下載完整修正版
+
+萊恩飆股起漲手札_完整修正版.html
+HTML
+手機版左上角要有萊恩飆股起漲手札 LOGO
+
+已完成並更新至第 85 版：
+
+手機版左上角顯示圖表圖示。
+顯示完整「萊恩飆股起漲手札」LOGO 文字。
+窄螢幕會自動調整寬度，避免與右側按鈕重疊。
+
+下載完整修正版
+
+萊恩飆股起漲手札_完整修正版.html
+HTML
+策略標籤只能單選 輸入完成後維持在剛剛選擇的標籤 讓我可以連續輸入
+
+已完成並更新至第 86 版：
+
+策略標籤嚴格限制單選。
+新增股票後保留剛才選擇的標籤。
+只清空代號、股名及備註，方便連續輸入。
+重新展開標籤區塊時，選擇仍會保留。
+
+下載完整修正版
+
 <!DOCTYPE html>
 <!-- GLOBAL OPTIMIZATION: UX / mobile / accessibility / clipboard fallback -->
 <html lang="zh-TW" class="dark viewer-mode">
@@ -248,8 +283,8 @@ button { touch-action: manipulation; }
   #toast-container > * { min-width:0 !important; width:100%; }
 }
 @media (max-width: 480px) {
-  .header-brand { max-width:42px !important; }
-  .header-brand .cool-title { display:none !important; }
+  .header-brand { flex:1 1 auto !important; min-width:0 !important; max-width:calc(100% - 134px) !important; }
+  .header-brand .cool-title { display:block !important; min-width:0; font-size:13px !important; letter-spacing:.02em !important; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 }
 
 /* Respect reduced-motion preference */
@@ -1457,8 +1492,21 @@ const setupLogicBtns=(sel,fKey,cb)=>{
     document.querySelectorAll(sel).forEach(btn=>{btn.addEventListener('click',e=>{const lg=e.target.dataset.logic;state[fKey].tagLogic=lg;document.querySelectorAll(sel).forEach(b=>{b.classList.remove('bg-white','dark:bg-gray-700','text-blue-600','dark:text-blue-400','shadow-sm');b.classList.add('text-gray-500','dark:text-gray-400','hover:text-gray-700','dark:hover:text-gray-200');});e.target.classList.remove('text-gray-500','dark:text-gray-400','hover:text-gray-700','dark:hover:text-gray-200');e.target.classList.add('bg-white','dark:bg-gray-700','text-blue-600','dark:text-blue-400','shadow-sm');cb();saveLocalData();});});
 };
 
+const JOURNAL_FORM_TAG_KEY='ryan_journal_form_tag_v1';
+let rememberedJournalFormTag='';
+try{rememberedJournalFormTag=localStorage.getItem(JOURNAL_FORM_TAG_KEY)||'';}catch(error){}
+const rememberJournalFormTag=tag=>{
+    rememberedJournalFormTag=String(tag||'');
+    try{
+        if(rememberedJournalFormTag)localStorage.setItem(JOURNAL_FORM_TAG_KEY,rememberedJournalFormTag);
+        else localStorage.removeItem(JOURNAL_FORM_TAG_KEY);
+    }catch(error){}
+};
+
 function renderDynamicTags(){
     const fc=document.getElementById('form-tags-container');
+    const currentFormTag=fc?.querySelector('.tag-input:checked')?.value||rememberedJournalFormTag;
+    if(currentFormTag)rememberJournalFormTag(currentFormTag);
     if(fc)fc.innerHTML=TAG_CATEGORIES.map(c=>`<div><div class="text-xs font-bold text-gray-500 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 pb-1 mb-2">${c.title}</div><div class="flex flex-wrap gap-2">${c.tags.map(t=>{const theme=window.getManagedTagTheme?.(t,c.theme)||c.theme;return`<label class="cursor-pointer"><input type="checkbox" value="${escapeHTML(t)}" class="hidden tag-input" data-theme="${theme}"><div class="px-3 py-1.5 rounded-lg text-xs font-bold border transition active:scale-95 ${THEME_MAP[theme].inactive}">${escapeHTML(t)}</div></label>`;}).join('')}</div></div>`).join('');
     
     document.querySelectorAll('#filter-tags-container, #filter-tags-container-fav').forEach(container=>{
@@ -1472,12 +1520,19 @@ function renderDynamicTags(){
         if(box.checked){btn.classList.remove(...inactiveClasses);btn.classList.add(...activeClasses,'shadow-md');}
         else{btn.classList.remove(...activeClasses,'shadow-md');btn.classList.add(...inactiveClasses);}
     };
-    document.querySelectorAll('.tag-input').forEach(cb=>{
+    const journalTagInputs=Array.from(document.querySelectorAll('.tag-input'));
+    if(rememberedJournalFormTag&&!journalTagInputs.some(cb=>cb.value===rememberedJournalFormTag))rememberJournalFormTag('');
+    journalTagInputs.forEach(cb=>{
+        cb.checked=Boolean(rememberedJournalFormTag&&cb.value===rememberedJournalFormTag);
+        updateTagInputVisual(cb);
         cb.addEventListener('change',function(){
             if(this.checked){
-                document.querySelectorAll('.tag-input').forEach(other=>{
+                journalTagInputs.forEach(other=>{
                     if(other!==this&&other.checked){other.checked=false;updateTagInputVisual(other);}
                 });
+                rememberJournalFormTag(this.value);
+            }else if(!journalTagInputs.some(other=>other.checked)){
+                rememberJournalFormTag('');
             }
             updateTagInputVisual(this);
         });
@@ -1933,7 +1988,9 @@ document.getElementById('journal-form')?.addEventListener('submit', async e => {
     const nt = document.getElementById('j-notes').value.trim();
     if (!c || !n || !d) return showToast('請填寫完整資訊', 'error');
 
-    const tags = Array.from(document.querySelectorAll('.tag-input:checked')).map(cb => cb.value).slice(-1);
+    const selectedTag = document.querySelector('.tag-input:checked')?.value || '';
+    const tags = selectedTag ? [selectedTag] : [];
+    rememberJournalFormTag(selectedTag);
     
     state.codeToName[c] = n;
     state.nameToCode[n] = c;
@@ -4052,3 +4109,5 @@ const SESSION={
 
 </body>
 </html>
+萊恩飆股起漲手札_完整修正版.html
+HTML
