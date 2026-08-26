@@ -2570,13 +2570,29 @@ function renderOverviewSections(data){
 
 const buildOverviewCopyText=data=>{
     const epsGrowth=data.eps.epsGrowth!=null&&!isNaN(parseFloat(data.eps.epsGrowth))?`${(parseFloat(data.eps.epsGrowth)*100).toFixed(2)}%`:'-';
-    const lines=[`【個股總覽】${data.code} ${data.name}`];
+    const referenceDate=String(data.eps.reportDate??'-').replace(/-/g,'/');
+    const lines=['【個股總覽】',`${data.code} ${data.name}`];
     if(data.favorite)lines.push(`追蹤：${'★'.repeat(Math.min(data.favorite,3))}`);
-    lines.push(`策略：${data.tags.length?data.tags.join('、'):'-'}`);
-    lines.push(`25 EPS：${data.eps.eps2025??'-'}｜預26 EPS：${data.eps.eps2026??'-'}｜成長率：${epsGrowth}`);
-    lines.push(`目標價：${data.eps.targetPrice??'-'}｜券商：${data.eps.broker??'-'}｜報告日期：${data.eps.reportDate??'-'}`);
-    if(data.revenues.length)lines.push(`營收創高：${data.revenues.map(item=>String(item.month||'').replace(/-/g,'/')).join('、')}`);
-    if(data.reports.length){lines.push(`最新法人報告 [${String(data.reports[0].date||'').replace(/-/g,'/')}]`);lines.push(data.reports[0].content||'');}
+    lines.push('',
+        '【EPS 預估】',
+        `25 EPS：${data.eps.eps2025??'-'}`,
+        `預26 EPS：${data.eps.eps2026??'-'}`,
+        `成長率：${epsGrowth}`,
+        '',
+        '【目標價資訊】',
+        `目標價：${data.eps.targetPrice??'-'}`,
+        `券商：${data.eps.broker??'-'}`,
+        `報告日期：${referenceDate}`
+    );
+    const latestReport=data.reports?.[0];
+    if(latestReport){
+        const latestDate=resolveReportRecordDate(latestReport),latestContent=String(latestReport.content||'').trim()||'—';
+        lines.push('',
+            '【最新法人報告】',
+            `日期：${latestDate?latestDate.replace(/-/g,'/'):'未填寫'}`,
+            latestContent
+        );
+    }
     return lines.join('\n');
 };
 
@@ -3149,6 +3165,33 @@ setChkDirection('long');
     'module-plan':[3,4,5,6]
   };
 
+  const mobileDarkPaint=(element,background,color,border)=>{
+    if(!element)return;
+    element.dataset.mobileDarkPaint='true';
+    element.style.setProperty('background-color',background,'important');
+    element.style.setProperty('background-image','none','important');
+    if(color)element.style.setProperty('color',color,'important');
+    if(border)element.style.setProperty('border-color',border,'important');
+  };
+  const clearMobileDarkPaint=element=>{
+    if(!element||element.dataset.mobileDarkPaint!=='true')return;
+    delete element.dataset.mobileDarkPaint;
+    ['background-color','background-image','color','border-color'].forEach(property=>element.style.removeProperty(property));
+  };
+  function syncMobileTableTheme(){
+    const isMobile=window.matchMedia('(max-width:640px)').matches,isDark=document.documentElement.classList.contains('dark');
+    document.querySelectorAll('table.mobile-card-table').forEach(table=>{
+      const wrapper=table.closest('.mobile-card-scroll'),allPainted=[wrapper,table,...table.querySelectorAll('thead,thead tr,thead th,tbody,tbody tr,tbody td')].filter(Boolean);
+      if(!isMobile||!isDark){allPainted.forEach(clearMobileDarkPaint);return;}
+      mobileDarkPaint(wrapper,'#020617','#f8fafc','#475569');
+      mobileDarkPaint(table,'#0f172a','#f8fafc','#475569');
+      table.querySelectorAll('thead,thead tr,thead th').forEach(element=>mobileDarkPaint(element,'#0b1220','#f1f5f9','#475569'));
+      mobileDarkPaint(table.tBodies[0],'#111827','#f8fafc','#475569');
+      table.querySelectorAll('tbody tr,tbody td').forEach(element=>mobileDarkPaint(element,'#111827','#f8fafc','#475569'));
+    });
+  }
+  window.syncMobileTableTheme=syncMobileTableTheme;
+
   function updateMobileSelectButton(type){
     const button=document.querySelector(`[data-mobile-select-all="${type}"]`),selectAll=document.querySelector(`.select-all-cb[data-type="${type}"]`);
     if(!button||!selectAll)return;
@@ -3180,6 +3223,7 @@ setChkDirection('long');
     document.documentElement.classList.toggle('mobile-view-card',nextMode==='card');
     try{window.localStorage.setItem(MOBILE_VIEW_KEY,nextMode);}catch(error){}
     updateMobileViewControls();
+    syncMobileTableTheme();
   }
   window.setMobileViewMode=setMobileViewMode;
 
@@ -3211,6 +3255,7 @@ setChkDirection('long');
     });
     ensureMobileSelectBar(table);
     const type=table.querySelector('.select-all-cb[data-type]')?.dataset.type;if(type)updateMobileSelectButton(type);
+    syncMobileTableTheme();
   }
 
   function initMobileCardTables(){
@@ -3375,6 +3420,7 @@ setChkDirection('long');
     ensureMobileActionBars();
     initMobileCardTables();
     updateMobileViewControls();
+    syncMobileTableTheme();
     updateMobileShellNavigation();
     updateMobileFilterIndicators();
     document.getElementById('btn-global-search')?.addEventListener('click',()=>setGlobalSearchOpen(true));
@@ -3423,8 +3469,8 @@ setChkDirection('long');
       else if(event.key==='Escape'&&!document.getElementById('global-search-modal')?.classList.contains('hidden'))setGlobalSearchOpen(false);
     });
     window.addEventListener('storage',event=>{if(event.key==='ryan_admin_session_v1'&&!document.getElementById('global-search-modal')?.classList.contains('hidden'))renderGlobalSearch();});
-    window.addEventListener('resize',()=>{if(window.innerWidth>=640){closeMobileActionSheet();setMobileMoreOpen(false);}updateMobileFab();});
-    new MutationObserver(()=>{updateMobileShellNavigation();}).observe(document.documentElement,{attributes:true,attributeFilter:['class']});
+    window.addEventListener('resize',()=>{if(window.innerWidth>=640){closeMobileActionSheet();setMobileMoreOpen(false);}updateMobileFab();syncMobileTableTheme();});
+    new MutationObserver(()=>{updateMobileShellNavigation();syncMobileTableTheme();}).observe(document.documentElement,{attributes:true,attributeFilter:['class']});
   });
 })();
 </script>
