@@ -245,6 +245,9 @@ button { touch-action: manipulation; }
   #mobile-action-sheet-body .filter-toolbar > .filter-score { grid-column:span 2; justify-content:center; text-align:center; }
   #mobile-action-sheet-body .filter-toolbar > div.relative { grid-column:span 4; display:grid !important; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.55rem !important; }
   #mobile-action-sheet-body .filter-toolbar > div.relative > button { width:100% !important; justify-content:center !important; }
+  #mobile-action-sheet-body .filter-toolbar > div.relative:has(> #filter-tag-panel:not(.hidden)),
+  #mobile-action-sheet-body .filter-toolbar > div.relative:has(> #filter-tag-panel-fav:not(.hidden)) { grid-column:1/-1; }
+  #mobile-action-sheet-body :is(#filter-tag-panel,#filter-tag-panel-fav) { position:static !important; grid-column:1/-1; left:auto !important; top:auto !important; width:100% !important; max-height:min(44vh,380px) !important; margin-top:0 !important; overflow-y:auto !important; overscroll-behavior:contain; box-shadow:none !important; }
   #mobile-action-sheet-body .filter-toolbar > :is(#filter-tags-display,#filter-tags-display-fav) { grid-column:1/-1; }
   .mobile-app-action-btn { position:relative; }
   .mobile-app-action-btn.has-active-filter { border-color:#f59e0b !important; background:#fffbeb !important; color:#b45309 !important; box-shadow:0 0 0 2px rgba(245,158,11,.13); }
@@ -261,6 +264,13 @@ button { touch-action: manipulation; }
   table.mobile-card-table tbody { display:grid; gap:0.55rem; width:100%; }
   table.mobile-card-table tbody tr { position:relative; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0.45rem 0.6rem; width:100%; padding:0.65rem; border:1px solid #e2e8f0 !important; border-radius:0.75rem; background:#fff !important; box-shadow:0 1px 6px rgba(15,23,42,.06); }
   .dark table.mobile-card-table tbody tr { border-color:#374151 !important; background:#111827 !important; box-shadow:0 2px 10px rgba(0,0,0,.22); }
+  html.dark.mobile-view-card .mobile-card-scroll { background:#0f172a !important; }
+  html.dark.mobile-view-card table.mobile-card-table tbody tr { border-color:#475569 !important; background:#111827 !important; box-shadow:0 2px 12px rgba(0,0,0,.34); }
+  html.dark table.mobile-card-table tbody td { color:#e5e7eb !important; }
+  html.dark table.mobile-card-table tbody td::before { color:#94a3b8 !important; }
+  html.dark table.mobile-card-table tbody td :is(.text-gray-900,.text-gray-800,.text-gray-700) { color:#f3f4f6 !important; }
+  html.dark table.mobile-card-table tbody td :is(.text-gray-600,.text-gray-500) { color:#d1d5db !important; }
+  html.dark table.mobile-card-table tbody td .text-gray-400 { color:#9ca3af !important; }
   table.mobile-card-table tbody td { position:static !important; left:auto !important; top:auto !important; z-index:auto !important; display:flex !important; flex-direction:column; align-items:flex-start; justify-content:flex-start; min-width:0 !important; width:auto !important; max-width:none !important; padding:0 !important; border:0 !important; background:transparent !important; white-space:normal !important; text-align:left !important; overflow-wrap:anywhere; }
   :is(#module-journal,#module-favorites,#module-revenue,#module-report,#module-checklist,#module-plan) table.mobile-card-table tbody td { position:static !important; left:auto !important; width:auto !important; min-width:0 !important; max-width:none !important; padding:0 !important; text-align:left !important; }
   table.mobile-card-table tbody td::before { content:attr(data-mobile-label); display:block; margin-bottom:0.15rem; color:#94a3b8; font-size:10px; line-height:1.1; font-weight:800; letter-spacing:.04em; }
@@ -288,6 +298,8 @@ button { touch-action: manipulation; }
   html.mobile-view-list table.mobile-card-table tbody td,
   html.mobile-view-list :is(#module-journal,#module-favorites,#module-revenue,#module-report,#module-checklist,#module-plan) table.mobile-card-table tbody td { position:static !important; display:table-cell !important; min-width:initial !important; width:initial !important; max-width:initial !important; padding:0.75rem !important; border-bottom:1px solid #e5e7eb !important; background:#fff !important; white-space:nowrap !important; text-align:inherit !important; vertical-align:middle !important; overflow-wrap:normal; }
   html.dark.mobile-view-list table.mobile-card-table tbody td { border-bottom-color:#374151 !important; background:#111827 !important; }
+  html.dark.mobile-view-list table.mobile-card-table thead th { border-color:#374151 !important; background:#0f172a !important; color:#cbd5e1 !important; }
+  html.dark.mobile-view-list :is(#module-journal,#module-favorites) table.mobile-card-table tbody td:nth-child(-n+3) { background:#111827 !important; }
   html.mobile-view-list table.mobile-card-table tbody tr:hover td { background:#f8fafc !important; }
   html.dark.mobile-view-list table.mobile-card-table tbody tr:hover td { background:#1f2937 !important; }
   html.mobile-view-list table.mobile-card-table tbody td::before { display:none !important; }
@@ -493,6 +505,7 @@ button { touch-action: manipulation; }
                         <div id="filter-tag-panel" class="absolute left-0 top-full mt-1.5 w-[280px] sm:w-[320px] bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl shadow-2xl hidden z-50 p-3 max-h-[60vh] overflow-y-auto modal-enter">
                             <div class="mb-3 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between"><span class="text-xs font-bold text-gray-700 dark:text-gray-300">篩選邏輯</span><div class="flex items-center bg-gray-100 dark:bg-gray-900 p-1 rounded-lg"><button type="button" id="btn-logic-or" class="logic-btn px-2 py-1 text-[10px] sm:text-xs rounded font-medium transition-colors bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm" data-logic="OR">符合任一 (OR)</button><button type="button" id="btn-logic-and" class="logic-btn px-2 py-1 text-[10px] sm:text-xs rounded font-medium transition-colors text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" data-logic="AND">完全符合 (AND)</button></div></div>
                             <div id="filter-tags-container"></div>
+                            <div class="sm:hidden sticky bottom-0 pt-3 mt-2 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"><button type="button" data-close-filter-tags class="w-full min-h-[42px] rounded-lg bg-blue-600 text-white text-sm font-black shadow-sm">完成標籤挑選</button></div>
                         </div>
                     </div>
                     <div id="filter-tags-display" class="flex flex-wrap gap-1.5 w-full md:w-auto mt-2 lg:mt-0"></div>
@@ -1007,6 +1020,7 @@ button { touch-action: manipulation; }
                                 </div>
                             </div>
                             <div id="filter-tags-container-fav"></div>
+                            <div class="sm:hidden sticky bottom-0 pt-3 mt-2 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"><button type="button" data-close-filter-tags class="w-full min-h-[42px] rounded-lg bg-blue-600 text-white text-sm font-black shadow-sm">完成標籤挑選</button></div>
                         </div>
                     </div>
                     <div id="filter-tags-display-fav" class="flex flex-wrap gap-1.5 w-full md:w-auto mt-2 lg:mt-0"></div>
@@ -3196,6 +3210,8 @@ setChkDirection('long');
     document.addEventListener('click',event=>{
       if(mobileToolsMenu&&!mobileToolsMenu.classList.contains('hidden')&&!mobileToolsMenu.contains(event.target)&&event.target!==mobileToolsButton){mobileToolsMenu.classList.add('hidden');mobileToolsButton?.setAttribute('aria-expanded','false');}
       if(event.target.closest('#btn-clear-filters,#btn-clear-filters-fav,#btn-clear-revenue-filters,#btn-clear-rep-filters,.logic-btn,.logic-btn-fav'))setTimeout(updateMobileFilterIndicators);
+      const closeFilterTags=event.target.closest('[data-close-filter-tags]');
+      if(closeFilterTags){closeFilterTags.closest('#filter-tag-panel,#filter-tag-panel-fav')?.classList.add('hidden');updateMobileFilterIndicators();return;}
       if(event.target.closest('[data-mobile-more-close]')){setMobileMoreOpen(false);return;}
       const moreTarget=event.target.closest('[data-mobile-more-target]');
       if(moreTarget){setMobileMoreOpen(false);document.querySelector(`.nav-btn-mobile[data-target="${moreTarget.dataset.mobileMoreTarget}"]`)?.click();setTimeout(updateMobileShellNavigation);return;}
