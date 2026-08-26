@@ -122,8 +122,8 @@ input[type="date"]::-webkit-calendar-picker-indicator, input[type="month"]::-web
 .copy-stock-count { flex:0 0 auto; }
 .dark .copy-section { background:rgba(30,58,138,0.10); }
 .dark .copy-toolbar { background:rgba(30,58,138,0.18); border-color:rgba(59,130,246,0.38) !important; }
-.report-summary-col { width:86vw; min-width:86vw; max-width:86vw; }
-.report-summary-cell { white-space:pre-wrap !important; overflow-wrap:anywhere; word-break:break-word; }
+.report-summary-col { width:86vw; min-width:0; max-width:86vw; }
+.report-summary-cell { white-space:pre-wrap !important; overflow-wrap:anywhere !important; word-break:break-word !important; line-break:auto; }
 .report-reader-header { padding-top:max(0.75rem,env(safe-area-inset-top)); }
 .report-reader-footer { padding-bottom:max(0.75rem,env(safe-area-inset-bottom)); }
 #report-reader-content-wrap { touch-action:pan-y; overscroll-behavior:contain; }
@@ -168,7 +168,7 @@ input[type="date"]::-webkit-calendar-picker-indicator, input[type="month"]::-web
 .dark .compact-date-year { color:#64748b; }
 .dark .compact-date-month-day { color:#cbd5e1; }
 @media (min-width:640px) {
-  .report-summary-col { width:auto; min-width:520px; max-width:none; }
+  #module-report .report-summary-col { width:clamp(320px,55vw,760px); min-width:320px; max-width:clamp(320px,55vw,760px); white-space:pre-wrap !important; overflow-wrap:anywhere !important; word-break:break-word !important; }
 }
 </style>
 
@@ -281,6 +281,8 @@ button { touch-action: manipulation; }
   .mobile-app-action-btn.has-active-filter { border-color:#f59e0b !important; background:#fffbeb !important; color:#b45309 !important; box-shadow:0 0 0 2px rgba(245,158,11,.13); }
   .mobile-app-action-btn.has-active-filter::after { content:'●'; position:absolute; top:3px; right:7px; color:#f59e0b; font-size:9px; line-height:1; }
   .dark .mobile-app-action-btn.has-active-filter { border-color:#d97706 !important; background:rgba(120,53,15,.35) !important; color:#fcd34d !important; }
+  #module-report .mobile-table-view-bar { justify-content:flex-start !important; flex-wrap:nowrap; overflow-x:auto; overscroll-behavior-x:contain; }
+  #module-report .mobile-table-view-bar .mobile-inline-action-btn { flex:0 0 auto; min-height:36px; padding:.35rem .5rem; font-size:11px; white-space:nowrap; }
   #mobile-action-sheet-body .copy-section { margin:0 !important; }
   #mobile-fab { bottom:calc(70px + env(safe-area-inset-bottom)); }
   #calc-form .calc-price-field { min-width:0; }
@@ -321,7 +323,8 @@ button { touch-action: manipulation; }
   .dark :is(#module-journal,#module-favorites,#module-revenue,#module-report,#module-checklist,#module-plan) table.mobile-card-table tbody td:last-child { border-top-color:#374151 !important; }
   table.mobile-card-table tbody td:last-child::before { align-self:flex-start; }
   table.mobile-card-table tbody td button { min-width:40px; min-height:40px; align-items:center; justify-content:center; }
-  table.mobile-card-table .report-summary-col { width:auto !important; min-width:0 !important; max-width:none !important; }
+  table.mobile-card-table .report-summary-col { width:auto !important; min-width:0 !important; max-width:100% !important; white-space:pre-wrap !important; overflow-wrap:anywhere !important; word-break:break-word !important; }
+  html.mobile-view-card #module-report table.mobile-card-table .report-summary-col { grid-column:1/-1 !important; width:100% !important; min-width:0 !important; max-width:100% !important; }
   html.mobile-view-list .mobile-card-scroll { max-height:65vh !important; overflow-x:auto !important; overflow-y:auto !important; padding:0 !important; background:transparent !important; }
   html.dark.mobile-view-list .mobile-card-scroll { background:#0f172a !important; }
   html.mobile-view-list table.mobile-card-table { display:table !important; min-width:720px !important; width:100% !important; white-space:nowrap !important; }
@@ -351,7 +354,8 @@ button { touch-action: manipulation; }
   html.mobile-view-list table.mobile-card-table tbody td:last-child { grid-column:auto !important; }
   html.mobile-view-list table.mobile-card-table tbody td[data-mobile-detail="true"] { display:table-cell !important; }
   html.mobile-view-list .mobile-card-expand { display:none !important; }
-  html.mobile-view-list table.mobile-card-table .report-summary-col { width:auto !important; min-width:520px !important; max-width:none !important; white-space:normal !important; }
+  html.mobile-view-list #module-report table.mobile-card-table { table-layout:fixed !important; width:calc(100vw + 221px) !important; min-width:calc(100vw + 221px) !important; max-width:none !important; }
+  html.mobile-view-list #module-report table.mobile-card-table .report-summary-col { width:calc(100vw - 32px) !important; min-width:calc(100vw - 32px) !important; max-width:calc(100vw - 32px) !important; white-space:pre-wrap !important; overflow-wrap:anywhere !important; word-break:break-word !important; }
   /* 手機表格主題：淺色／深色同步切換全部背景與文字 */
   html body main .tab-content .card-panel:has(> .mobile-card-scroll) { background-color:var(--mobile-table-panel) !important; color:var(--mobile-table-text) !important; transition:background-color .2s ease,color .2s ease; }
   html body main .tab-content .mobile-card-scroll,
@@ -3232,9 +3236,10 @@ setChkDirection('long');
     if(!selectAll||!wrapper||document.querySelector(`[data-mobile-select-all="${selectAll.dataset.type}"]`))return;
     const countSource=document.getElementById(`${selectAll.dataset.type}-stock-count`),initialCount=countSource?.dataset.stockCount||countSource?.textContent.match(/\d+/)?.[0]||'0';
     const countMarkup=countSource?`<span data-mobile-stock-count="${escapeHTML(selectAll.dataset.type)}" class="inline-flex min-h-[36px] shrink-0 items-center gap-1 rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/35 px-2 text-[10px] font-black text-blue-600 dark:text-blue-300 whitespace-nowrap"><i class="fa-solid fa-chart-simple"></i>顯示 ${escapeHTML(initialCount)} 檔</span>`:'';
+    const reportActionMarkup=selectAll.dataset.type==='report'?'<button type="button" class="mobile-app-action-btn mobile-inline-action-btn" data-mobile-action-module="module-report" data-mobile-action-key="tools"><i class="fa-solid fa-sliders mr-1"></i>篩選與閱讀</button>':'';
     const bar=document.createElement('div');
     bar.className='mobile-table-view-bar sm:hidden flex items-center justify-between gap-1.5 px-2.5 py-2 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800';
-    bar.innerHTML=`<div class="flex min-w-0 items-center gap-1"><span class="text-[10px] font-bold text-gray-400">檢視</span><div class="inline-flex rounded-lg bg-gray-100 dark:bg-gray-900 p-0.5" role="group" aria-label="清單顯示模式"><button type="button" data-mobile-view-mode="card" aria-pressed="false" class="min-h-[36px] rounded-md border px-1.5 text-[11px] font-bold transition"><i class="fa-solid fa-table-cells-large mr-1"></i>卡片</button><button type="button" data-mobile-view-mode="list" aria-pressed="false" class="min-h-[36px] rounded-md border px-1.5 text-[11px] font-bold transition"><i class="fa-solid fa-list mr-1"></i>清單</button></div></div><button type="button" data-mobile-select-all="${escapeHTML(selectAll.dataset.type)}" aria-pressed="false" class="min-h-[36px] shrink-0 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 px-2 text-[10px] font-bold text-gray-600 dark:text-gray-200"></button>${countMarkup}`;
+    bar.innerHTML=`<div class="flex min-w-0 items-center gap-1"><span class="text-[10px] font-bold text-gray-400">檢視</span><div class="inline-flex rounded-lg bg-gray-100 dark:bg-gray-900 p-0.5" role="group" aria-label="清單顯示模式"><button type="button" data-mobile-view-mode="card" aria-pressed="false" class="min-h-[36px] rounded-md border px-1.5 text-[11px] font-bold transition"><i class="fa-solid fa-table-cells-large mr-1"></i>卡片</button><button type="button" data-mobile-view-mode="list" aria-pressed="false" class="min-h-[36px] rounded-md border px-1.5 text-[11px] font-bold transition"><i class="fa-solid fa-list mr-1"></i>清單</button></div></div>${reportActionMarkup}<button type="button" data-mobile-select-all="${escapeHTML(selectAll.dataset.type)}" aria-pressed="false" class="min-h-[36px] shrink-0 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 px-2 text-[10px] font-bold text-gray-600 dark:text-gray-200"></button>${countMarkup}`;
     wrapper.before(bar);updateMobileSelectButton(selectAll.dataset.type);updateMobileViewControls();
   }
 
@@ -3374,6 +3379,7 @@ setChkDirection('long');
   }
   function ensureMobileActionBars(){
     Object.entries(mobileActionConfig).forEach(([moduleId,items])=>{
+      if(moduleId==='module-report')return;
       const module=document.getElementById(moduleId);if(!module||module.querySelector(`[data-mobile-app-actions="${moduleId}"]`))return;
       const firstPanel=module.querySelector(items[0].selector);if(!firstPanel)return;
       const bar=document.createElement('div');bar.className='mobile-app-actions sm:hidden';bar.dataset.mobileAppActions=moduleId;
