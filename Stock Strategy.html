@@ -12,6 +12,12 @@ try{
     }
 }catch(error){}
 </script>
+<script id="mobile-view-bootstrap">
+try{
+    var savedMobileView=window.localStorage.getItem('ryan_mobile_view_mode_v1');
+    document.documentElement.classList.add(savedMobileView==='list'?'mobile-view-list':'mobile-view-card');
+}catch(error){document.documentElement.classList.add('mobile-view-card');}
+</script>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
@@ -69,8 +75,7 @@ html.viewer-mode #btn-trash-manager,
 html.viewer-mode #btn-db-upload,
 html.viewer-mode #btn-import-backup,
 html.viewer-mode #btn-export-backup,
-html.viewer-mode #btn-mobile-tools,
-html.viewer-mode #mobile-tools-menu,
+html.viewer-mode [data-admin-mobile-tool],
 html.viewer-mode [data-mobile-select-all] { display:none !important; }
 html.viewer-mode .row-cb,
 html.viewer-mode .select-all-cb { visibility:hidden !important; pointer-events:none !important; }
@@ -190,31 +195,58 @@ button { touch-action: manipulation; }
   .mobile-module-nav { position:fixed; left:0; right:0; bottom:0; z-index:80; padding:0.45rem 0.5rem max(0.45rem,env(safe-area-inset-bottom)); border-top:1px solid #e5e7eb; border-bottom:0 !important; box-shadow:0 -6px 18px rgba(15,23,42,.12); overscroll-behavior-x:contain; scroll-snap-type:x proximity; }
   .dark .mobile-module-nav { border-top-color:#374151; box-shadow:0 -6px 18px rgba(0,0,0,.32); }
   .mobile-module-nav .nav-btn-mobile { min-height:44px; padding:0.55rem 0.85rem; scroll-snap-align:center; }
-  .mobile-card-scroll { max-height:none !important; overflow-x:hidden !important; overflow-y:visible !important; padding:0.65rem; background:rgba(241,245,249,.72); }
+  .mobile-card-scroll { max-height:none !important; overflow-x:hidden !important; overflow-y:visible !important; padding:0.5rem; background:rgba(241,245,249,.72); }
   .dark .mobile-card-scroll { background:rgba(15,23,42,.45); }
   table.mobile-card-table { display:block; min-width:0 !important; width:100% !important; white-space:normal !important; }
   table.mobile-card-table thead { display:none !important; }
-  table.mobile-card-table tbody { display:grid; gap:0.75rem; width:100%; }
-  table.mobile-card-table tbody tr { position:relative; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0.6rem 0.8rem; width:100%; padding:0.85rem; border:1px solid #e2e8f0 !important; border-radius:0.9rem; background:#fff !important; box-shadow:0 2px 8px rgba(15,23,42,.06); opacity:1 !important; }
+  table.mobile-card-table tbody { display:grid; gap:0.55rem; width:100%; }
+  table.mobile-card-table tbody tr { position:relative; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0.45rem 0.6rem; width:100%; padding:0.65rem; border:1px solid #e2e8f0 !important; border-radius:0.75rem; background:#fff !important; box-shadow:0 1px 6px rgba(15,23,42,.06); }
   .dark table.mobile-card-table tbody tr { border-color:#374151 !important; background:#111827 !important; box-shadow:0 2px 10px rgba(0,0,0,.22); }
   table.mobile-card-table tbody td { position:static !important; left:auto !important; top:auto !important; z-index:auto !important; display:flex !important; flex-direction:column; align-items:flex-start; justify-content:flex-start; min-width:0 !important; width:auto !important; max-width:none !important; padding:0 !important; border:0 !important; background:transparent !important; white-space:normal !important; text-align:left !important; overflow-wrap:anywhere; }
   :is(#module-journal,#module-favorites,#module-revenue,#module-report,#module-checklist,#module-plan) table.mobile-card-table tbody td { position:static !important; left:auto !important; width:auto !important; min-width:0 !important; max-width:none !important; padding:0 !important; text-align:left !important; }
-  table.mobile-card-table tbody td::before { content:attr(data-mobile-label); display:block; margin-bottom:0.22rem; color:#94a3b8; font-size:10px; line-height:1.1; font-weight:800; letter-spacing:.04em; }
-  table.mobile-card-table tbody td:first-child { position:absolute !important; top:0.75rem !important; right:0.75rem !important; width:40px !important; min-height:40px; align-items:center; justify-content:center; }
+  table.mobile-card-table tbody td::before { content:attr(data-mobile-label); display:block; margin-bottom:0.15rem; color:#94a3b8; font-size:10px; line-height:1.1; font-weight:800; letter-spacing:.04em; }
+  table.mobile-card-table tbody td:first-child { position:absolute !important; top:0.55rem !important; right:0.55rem !important; width:40px !important; min-height:40px; align-items:center; justify-content:center; }
   :is(#module-journal,#module-favorites,#module-revenue,#module-report,#module-checklist,#module-plan) table.mobile-card-table tbody td:first-child { position:absolute !important; left:auto !important; width:40px !important; min-width:40px !important; max-width:40px !important; padding:0 !important; }
   table.mobile-card-table tbody td:first-child::before { display:none; }
   table.mobile-card-table tbody td:nth-child(2) { padding-right:2.5rem !important; }
   :is(#module-journal,#module-favorites,#module-revenue,#module-report,#module-checklist,#module-plan) table.mobile-card-table tbody td:nth-child(2) { padding-right:2.5rem !important; }
   table.mobile-card-table tbody td[data-mobile-wide="true"] { grid-column:1/-1; }
-  table.mobile-card-table tbody td:last-child { grid-column:1/-1; padding-top:0.65rem !important; border-top:1px solid #e5e7eb !important; align-items:flex-end; }
-  :is(#module-journal,#module-favorites,#module-revenue,#module-report,#module-checklist,#module-plan) table.mobile-card-table tbody td:last-child { padding-top:0.65rem !important; border-top:1px solid #e5e7eb !important; }
+  table.mobile-card-table tbody td:last-child { grid-column:1/-1; padding-top:0.45rem !important; border-top:1px solid #e5e7eb !important; align-items:flex-end; }
+  :is(#module-journal,#module-favorites,#module-revenue,#module-report,#module-checklist,#module-plan) table.mobile-card-table tbody td:last-child { padding-top:0.45rem !important; border-top:1px solid #e5e7eb !important; }
   .dark table.mobile-card-table tbody td:last-child { border-top-color:#374151 !important; }
   .dark :is(#module-journal,#module-favorites,#module-revenue,#module-report,#module-checklist,#module-plan) table.mobile-card-table tbody td:last-child { border-top-color:#374151 !important; }
   table.mobile-card-table tbody td:last-child::before { align-self:flex-start; }
-  table.mobile-card-table tbody td button { min-width:42px; min-height:42px; align-items:center; justify-content:center; }
+  table.mobile-card-table tbody td button { min-width:40px; min-height:40px; align-items:center; justify-content:center; }
   table.mobile-card-table .report-summary-col { width:auto !important; min-width:0 !important; max-width:none !important; }
+  html.mobile-view-list .mobile-card-scroll { max-height:65vh !important; overflow-x:auto !important; overflow-y:auto !important; padding:0 !important; background:transparent !important; }
+  html.mobile-view-list table.mobile-card-table { display:table !important; min-width:720px !important; width:100% !important; white-space:nowrap !important; }
+  html.mobile-view-list table.mobile-card-table thead { display:table-header-group !important; }
+  html.mobile-view-list table.mobile-card-table tbody { display:table-row-group !important; width:auto !important; }
+  html.mobile-view-list table.mobile-card-table tbody tr { position:static !important; display:table-row !important; width:auto !important; padding:0 !important; border:0 !important; border-radius:0 !important; background:inherit !important; box-shadow:none !important; }
+  html.mobile-view-list table.mobile-card-table tbody td,
+  html.mobile-view-list :is(#module-journal,#module-favorites,#module-revenue,#module-report,#module-checklist,#module-plan) table.mobile-card-table tbody td { position:static !important; display:table-cell !important; min-width:initial !important; width:initial !important; max-width:initial !important; padding:0.75rem !important; border-bottom:1px solid #e5e7eb !important; background:#fff !important; white-space:nowrap !important; text-align:inherit !important; vertical-align:middle !important; overflow-wrap:normal; }
+  html.dark.mobile-view-list table.mobile-card-table tbody td { border-bottom-color:#374151 !important; background:#111827 !important; }
+  html.mobile-view-list table.mobile-card-table tbody tr:hover td { background:#f8fafc !important; }
+  html.dark.mobile-view-list table.mobile-card-table tbody tr:hover td { background:#1f2937 !important; }
+  html.mobile-view-list table.mobile-card-table tbody td::before { display:none !important; }
+  html.mobile-view-list table.mobile-card-table tbody td:first-child,
+  html.mobile-view-list :is(#module-journal,#module-favorites,#module-revenue,#module-report,#module-checklist,#module-plan) table.mobile-card-table tbody td:first-child { position:static !important; width:40px !important; min-width:40px !important; max-width:40px !important; min-height:0 !important; padding:0.75rem 0.5rem !important; }
+  html.mobile-view-list table.mobile-card-table tbody td:nth-child(2),
+  html.mobile-view-list :is(#module-journal,#module-favorites,#module-revenue,#module-report,#module-checklist,#module-plan) table.mobile-card-table tbody td:nth-child(2) { width:55px !important; min-width:55px !important; max-width:55px !important; padding:0.75rem 0.25rem !important; }
+  html.mobile-view-list table.mobile-card-table tbody td:nth-child(3),
+  html.mobile-view-list :is(#module-journal,#module-favorites,#module-revenue,#module-report,#module-checklist,#module-plan) table.mobile-card-table tbody td:nth-child(3) { width:110px !important; min-width:110px !important; max-width:110px !important; padding:0.75rem 0.5rem !important; }
+  html.mobile-view-list :is(#module-journal,#module-favorites) table.mobile-card-table tbody td:nth-child(1) { position:sticky !important; left:0 !important; z-index:20 !important; }
+  html.mobile-view-list :is(#module-journal,#module-favorites) table.mobile-card-table tbody td:nth-child(2) { position:sticky !important; left:40px !important; z-index:20 !important; }
+  html.mobile-view-list :is(#module-journal,#module-favorites) table.mobile-card-table tbody td:nth-child(3) { position:sticky !important; left:95px !important; z-index:20 !important; border-right:1px solid #e5e7eb !important; }
+  html.mobile-view-list table.mobile-card-table tbody td[data-mobile-wide="true"],
+  html.mobile-view-list table.mobile-card-table tbody td:last-child { grid-column:auto !important; }
+  html.mobile-view-list table.mobile-card-table .report-summary-col { width:auto !important; min-width:520px !important; max-width:none !important; white-space:normal !important; }
   #toast-container { left:0.75rem; right:0.75rem; bottom:calc(76px + env(safe-area-inset-bottom)); align-items:stretch; }
   #toast-container > * { min-width:0 !important; width:100%; }
+}
+@media (max-width: 480px) {
+  .header-brand { max-width:42px !important; }
+  .header-brand .cool-title { display:none !important; }
 }
 
 /* Respect reduced-motion preference */
@@ -279,9 +311,11 @@ button { touch-action: manipulation; }
     </div>
 </nav>
 <div id="mobile-tools-menu" class="hidden sm:hidden fixed right-2 top-[62px] z-[90] w-[210px] rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-2 shadow-2xl">
-    <button type="button" data-mobile-tool-target="btn-db-upload" class="w-full min-h-[44px] rounded-lg px-3 text-left text-sm font-bold text-purple-600 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/30"><i class="fa-solid fa-database w-6"></i>資料庫 Excel</button>
-    <button type="button" data-mobile-tool-target="btn-import-backup" class="w-full min-h-[44px] rounded-lg px-3 text-left text-sm font-bold text-gray-600 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fa-solid fa-upload w-6"></i>匯入備份</button>
-    <button type="button" data-mobile-tool-target="btn-export-backup" class="w-full min-h-[44px] rounded-lg px-3 text-left text-sm font-bold text-gray-600 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fa-solid fa-download w-6"></i>匯出備份</button>
+    <button type="button" data-mobile-tool-target="btn-admin-mode" class="w-full min-h-[44px] rounded-lg px-3 text-left text-sm font-bold text-blue-600 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/30"><i class="fa-solid fa-lock w-6" data-mobile-admin-icon></i><span data-mobile-admin-label>管理者登入</span></button>
+    <div data-admin-mobile-tool class="my-1 border-t border-gray-200 dark:border-gray-700"></div>
+    <button type="button" data-admin-mobile-tool data-mobile-tool-target="btn-db-upload" class="w-full min-h-[44px] rounded-lg px-3 text-left text-sm font-bold text-purple-600 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/30"><i class="fa-solid fa-database w-6"></i>資料庫 Excel</button>
+    <button type="button" data-admin-mobile-tool data-mobile-tool-target="btn-import-backup" class="w-full min-h-[44px] rounded-lg px-3 text-left text-sm font-bold text-gray-600 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fa-solid fa-upload w-6"></i>匯入備份</button>
+    <button type="button" data-admin-mobile-tool data-mobile-tool-target="btn-export-backup" class="w-full min-h-[44px] rounded-lg px-3 text-left text-sm font-bold text-gray-600 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fa-solid fa-download w-6"></i>匯出備份</button>
 </div>
 
 <main class="flex-grow w-full xl:w-[98%] max-w-[1920px] mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-6">
@@ -1035,7 +1069,7 @@ button { touch-action: manipulation; }
     </div>
 </div>
 <div id="report-reader-modal" class="fixed inset-0 z-[180] hidden bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-white" role="dialog" aria-modal="true" aria-label="法人報告全螢幕閱讀" style="height:100vh;height:100dvh;">
-    <div class="h-full flex flex-col">
+    <div class="relative h-full flex flex-col">
         <header class="report-reader-header shrink-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur border-b border-gray-200 dark:border-gray-700 px-3 sm:px-6 pb-3 sm:pb-4 shadow-md">
             <div class="max-w-7xl mx-auto">
                 <div class="flex items-center justify-between gap-3 mb-3">
@@ -1058,17 +1092,19 @@ button { touch-action: manipulation; }
         </header>
         <div id="report-reader-content-wrap" class="flex-1 min-h-0 overflow-y-auto px-3 py-4 sm:px-8 sm:py-7 lg:px-14">
             <article class="max-w-5xl mx-auto bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-lg p-5 sm:p-8 lg:p-10 min-h-full">
-                <div class="flex items-center gap-2 text-sm sm:text-base font-black text-indigo-700 dark:text-indigo-300 mb-4 pb-3 border-b border-gray-200 dark:border-gray-700"><span class="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-900/50 inline-flex items-center justify-center"><i class="fa-solid fa-align-left"></i></span>報告摘要</div>
+                <div class="flex items-center justify-between gap-2 mb-4 pb-3 border-b border-gray-200 dark:border-gray-700">
+                    <div class="min-w-0 flex items-center gap-2 text-sm sm:text-base font-black text-indigo-700 dark:text-indigo-300"><span class="w-8 h-8 shrink-0 rounded-lg bg-indigo-100 dark:bg-indigo-900/50 inline-flex items-center justify-center"><i class="fa-solid fa-align-left"></i></span><span class="truncate">報告摘要</span></div>
+                    <div class="shrink-0 flex items-center justify-center gap-1 sm:gap-2" aria-label="報告文字大小">
+                        <button type="button" id="report-reader-font-down" class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-xs sm:text-sm font-black disabled:opacity-35" aria-label="縮小報告文字">A−</button>
+                        <span id="report-reader-font-label" class="min-w-[42px] sm:min-w-[52px] text-center text-[10px] sm:text-[11px] font-bold text-gray-400">標準</span>
+                        <button type="button" id="report-reader-font-up" class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-xs sm:text-sm font-black disabled:opacity-35" aria-label="放大報告文字">A＋</button>
+                    </div>
+                </div>
                 <div id="report-reader-content" class="whitespace-pre-wrap break-words text-base sm:text-lg lg:text-xl leading-8 sm:leading-9 lg:leading-10 font-normal tracking-wide text-gray-800 dark:text-gray-100"></div>
             </article>
         </div>
-        <footer class="report-reader-footer shrink-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur border-t border-gray-200 dark:border-gray-700 px-3 sm:px-6 pt-3 shadow-[0_-4px_12px_rgba(0,0,0,0.06)]">
-            <div class="max-w-5xl mx-auto grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4 items-center">
-                <button type="button" id="report-reader-prev-btn" class="h-12 sm:h-14 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-gray-700 dark:text-gray-200 hover:text-indigo-700 dark:hover:text-indigo-300 font-bold transition active:scale-95 disabled:opacity-35 disabled:cursor-not-allowed disabled:active:scale-100"><i class="fa-solid fa-chevron-left mr-2"></i>上一檔</button>
-                <div class="col-span-2 order-first sm:col-span-1 sm:order-none flex items-center justify-center gap-2"><button type="button" id="report-reader-font-down" class="w-11 h-10 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 font-black disabled:opacity-35" aria-label="縮小報告文字">A−</button><span id="report-reader-font-label" class="min-w-[52px] text-center text-[11px] font-bold text-gray-400">標準</span><button type="button" id="report-reader-font-up" class="w-11 h-10 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 font-black disabled:opacity-35" aria-label="放大報告文字">A＋</button></div>
-                <button type="button" id="report-reader-next-btn" class="h-12 sm:h-14 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold shadow-md transition active:scale-95 disabled:opacity-35 disabled:cursor-not-allowed disabled:active:scale-100">下一檔<i class="fa-solid fa-chevron-right ml-2"></i></button>
-            </div>
-        </footer>
+        <button type="button" id="report-reader-prev-btn" title="上一檔" aria-label="上一檔法人報告" class="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-10 h-20 sm:w-12 sm:h-24 rounded-r-2xl border border-l-0 border-gray-300/60 dark:border-gray-600/60 bg-white/70 dark:bg-gray-800/70 text-gray-700 dark:text-gray-200 opacity-25 hover:opacity-80 focus:opacity-90 active:opacity-100 backdrop-blur-sm shadow-md transition-opacity disabled:opacity-0 disabled:pointer-events-none"><i class="fa-solid fa-chevron-left"></i></button>
+        <button type="button" id="report-reader-next-btn" title="下一檔" aria-label="下一檔法人報告" class="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-10 h-20 sm:w-12 sm:h-24 rounded-l-2xl border border-r-0 border-gray-300/60 dark:border-gray-600/60 bg-white/70 dark:bg-gray-800/70 text-indigo-700 dark:text-indigo-300 opacity-25 hover:opacity-80 focus:opacity-90 active:opacity-100 backdrop-blur-sm shadow-md transition-opacity disabled:opacity-0 disabled:pointer-events-none"><i class="fa-solid fa-chevron-right"></i></button>
     </div>
 </div>
 <div id="toast-container" class="fixed bottom-5 right-5 z-[200] flex flex-col-reverse gap-3 pointer-events-none"></div>
@@ -2753,6 +2789,7 @@ setChkDirection('long');
 <script id="responsive-module-optimization">
 (function(){
   'use strict';
+  const MOBILE_VIEW_KEY='ryan_mobile_view_mode_v1';
   const mobileWideColumns={
     'module-journal':[9,10],
     'module-favorites':[9],
@@ -2766,17 +2803,43 @@ setChkDirection('long');
     const button=document.querySelector(`[data-mobile-select-all="${type}"]`),selectAll=document.querySelector(`.select-all-cb[data-type="${type}"]`);
     if(!button||!selectAll)return;
     const allSelected=selectAll.checked&&!selectAll.indeterminate;
-    button.innerHTML=allSelected?'<i class="fa-solid fa-square-minus mr-1.5"></i>取消全選':'<i class="fa-solid fa-check-double mr-1.5"></i>全選目前清單';
+    button.innerHTML=allSelected?'<i class="fa-solid fa-square-minus mr-1.5"></i>取消全選':'<i class="fa-solid fa-check-double mr-1.5"></i>全選';
     button.setAttribute('aria-pressed',String(allSelected));
   }
+
+  function updateMobileViewControls(){
+    const mode=document.documentElement.classList.contains('mobile-view-list')?'list':'card';
+    document.querySelectorAll('[data-mobile-view-mode]').forEach(button=>{
+      const active=button.dataset.mobileViewMode===mode;
+      button.setAttribute('aria-pressed',String(active));
+      button.classList.toggle('bg-blue-600',active);
+      button.classList.toggle('text-white',active);
+      button.classList.toggle('border-blue-600',active);
+      button.classList.toggle('bg-white',!active);
+      button.classList.toggle('dark:bg-gray-800',!active);
+      button.classList.toggle('text-gray-500',!active);
+      button.classList.toggle('dark:text-gray-300',!active);
+      button.classList.toggle('border-gray-200',!active);
+      button.classList.toggle('dark:border-gray-600',!active);
+    });
+  }
+
+  function setMobileViewMode(mode){
+    const nextMode=mode==='list'?'list':'card';
+    document.documentElement.classList.toggle('mobile-view-list',nextMode==='list');
+    document.documentElement.classList.toggle('mobile-view-card',nextMode==='card');
+    try{window.localStorage.setItem(MOBILE_VIEW_KEY,nextMode);}catch(error){}
+    updateMobileViewControls();
+  }
+  window.setMobileViewMode=setMobileViewMode;
 
   function ensureMobileSelectBar(table){
     const selectAll=table.querySelector('.select-all-cb[data-type]'),wrapper=table.closest('.mobile-card-scroll');
     if(!selectAll||!wrapper||document.querySelector(`[data-mobile-select-all="${selectAll.dataset.type}"]`))return;
     const bar=document.createElement('div');
-    bar.className='sm:hidden flex items-center justify-between gap-3 px-3 py-2 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800';
-    bar.innerHTML=`<span class="text-[11px] font-bold text-gray-400"><i class="fa-solid fa-mobile-screen-button mr-1.5"></i>卡片清單</span><button type="button" data-mobile-select-all="${escapeHTML(selectAll.dataset.type)}" aria-pressed="false" class="min-h-[40px] rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 px-3 text-xs font-bold text-gray-600 dark:text-gray-200"></button>`;
-    wrapper.before(bar);updateMobileSelectButton(selectAll.dataset.type);
+    bar.className='sm:hidden flex items-center justify-between gap-2 px-2.5 py-2 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800';
+    bar.innerHTML=`<div class="flex items-center gap-1.5"><span class="text-[10px] font-bold text-gray-400 mr-0.5">檢視</span><div class="inline-flex rounded-lg bg-gray-100 dark:bg-gray-900 p-0.5" role="group" aria-label="清單顯示模式"><button type="button" data-mobile-view-mode="card" aria-pressed="false" class="min-h-[36px] rounded-md border px-2 text-[11px] font-bold transition"><i class="fa-solid fa-table-cells-large mr-1"></i>卡片</button><button type="button" data-mobile-view-mode="list" aria-pressed="false" class="min-h-[36px] rounded-md border px-2 text-[11px] font-bold transition"><i class="fa-solid fa-list mr-1"></i>清單</button></div></div><button type="button" data-mobile-select-all="${escapeHTML(selectAll.dataset.type)}" aria-pressed="false" class="min-h-[40px] rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 px-2.5 text-[11px] font-bold text-gray-600 dark:text-gray-200"></button>`;
+    wrapper.before(bar);updateMobileSelectButton(selectAll.dataset.type);updateMobileViewControls();
   }
 
   function decorateMobileCardTable(table){
@@ -2857,6 +2920,7 @@ setChkDirection('long');
 
   document.addEventListener('DOMContentLoaded',()=>{
     initMobileCardTables();
+    updateMobileViewControls();
     document.getElementById('btn-global-search')?.addEventListener('click',()=>setGlobalSearchOpen(true));
     const mobileToolsButton=document.getElementById('btn-mobile-tools'),mobileToolsMenu=document.getElementById('mobile-tools-menu');
     mobileToolsButton?.addEventListener('click',event=>{event.stopPropagation();const opening=mobileToolsMenu?.classList.contains('hidden');mobileToolsMenu?.classList.toggle('hidden',!opening);mobileToolsButton.setAttribute('aria-expanded',String(!!opening));});
@@ -2870,6 +2934,8 @@ setChkDirection('long');
       if(mobileToolsMenu&&!mobileToolsMenu.classList.contains('hidden')&&!mobileToolsMenu.contains(event.target)&&event.target!==mobileToolsButton){mobileToolsMenu.classList.add('hidden');mobileToolsButton?.setAttribute('aria-expanded','false');}
       const selectButton=event.target.closest('[data-mobile-select-all]');
       if(selectButton){const selectAll=document.querySelector(`.select-all-cb[data-type="${selectButton.dataset.mobileSelectAll}"]`);if(selectAll){selectAll.checked=!(selectAll.checked&&!selectAll.indeterminate);selectAll.dispatchEvent(new Event('change',{bubbles:true}));setTimeout(()=>updateMobileSelectButton(selectButton.dataset.mobileSelectAll));}return;}
+      const viewButton=event.target.closest('[data-mobile-view-mode]');
+      if(viewButton){setMobileViewMode(viewButton.dataset.mobileViewMode);return;}
       const jumpButton=event.target.closest('[data-overview-jump]');if(jumpButton)jumpFromOverview(jumpButton.dataset.overviewJump);
       const navButton=event.target.closest('.nav-btn-mobile');if(navButton)setTimeout(()=>navButton.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'}));
     });
@@ -3858,7 +3924,11 @@ const SESSION={
     button.classList.toggle('!text-white',adminMode);
     button.setAttribute('aria-label',adminMode?'退出管理者模式':'進入管理者模式');
     button.setAttribute('title',adminMode?'管理者模式已啟用，點擊可退出':'進入管理者模式');
-    button.innerHTML=adminMode?'<i class="fa-solid fa-unlock-keyhole text-sm"></i><span class="hidden 2xl:inline ml-1.5 text-xs font-medium">管理中</span>':'<i class="fa-solid fa-lock text-sm"></i><span class="hidden 2xl:inline ml-1.5 text-xs font-medium">管理者</span>';
+    button.innerHTML=adminMode?'<i class="fa-solid fa-unlock-keyhole text-sm"></i><span class="inline sm:hidden ml-1.5 text-[11px] font-bold">管理中</span><span class="hidden 2xl:inline ml-1.5 text-xs font-medium">管理中</span>':'<i class="fa-solid fa-lock text-sm"></i><span class="inline sm:hidden ml-1.5 text-[11px] font-bold">登入</span><span class="hidden 2xl:inline ml-1.5 text-xs font-medium">管理者</span>';
+    var mobileLabel=document.querySelector('[data-mobile-admin-label]');
+    var mobileIcon=document.querySelector('[data-mobile-admin-icon]');
+    if(mobileLabel)mobileLabel.textContent=adminMode?'登出管理者模式':'管理者登入';
+    if(mobileIcon)mobileIcon.className=(adminMode?'fa-solid fa-unlock-keyhole':'fa-solid fa-lock')+' w-6';
   }
 
   function applyAdminMode(enabled){
