@@ -189,6 +189,28 @@ button { touch-action: manipulation; }
   table { min-width: 720px; }
 }
 @media (max-width: 640px) {
+  html {
+    --mobile-table-panel:#ffffff;
+    --mobile-table-shell:#f1f5f9;
+    --mobile-table-header:#e2e8f0;
+    --mobile-table-row:#ffffff;
+    --mobile-table-hover:#f8fafc;
+    --mobile-table-text:#1f2937;
+    --mobile-table-muted:#475569;
+    --mobile-table-label:#64748b;
+    --mobile-table-border:#cbd5e1;
+  }
+  html.dark {
+    --mobile-table-panel:#0f172a;
+    --mobile-table-shell:#0f172a;
+    --mobile-table-header:#0f172a;
+    --mobile-table-row:#111827;
+    --mobile-table-hover:#1f2937;
+    --mobile-table-text:#f8fafc;
+    --mobile-table-muted:#cbd5e1;
+    --mobile-table-label:#94a3b8;
+    --mobile-table-border:#334155;
+  }
   body { font-size: 14px; padding-bottom:calc(76px + env(safe-area-inset-bottom)); }
   body.mobile-sheet-open { overflow:hidden; }
   button, .btn { min-height: 40px; }
@@ -235,25 +257,26 @@ button { touch-action: manipulation; }
   .mobile-app-action-btn { flex:1 0 auto; min-height:40px; border:1px solid #dbeafe; border-radius:.7rem; background:#eff6ff; color:#2563eb; font-size:12px; font-weight:900; }
   .dark .mobile-app-action-btn { border-color:#1e3a8a; background:rgba(30,58,138,.28); color:#93c5fd; }
   .copy-stock-count { display:none !important; }
-  :is(#module-journal,#module-favorites) .mobile-toolbar-host { display:none !important; }
-  :is(#module-journal,#module-favorites) .mobile-table-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); width:100%; overflow:visible; border-top:1px solid #e5e7eb; background:#f8fafc; }
-  .dark :is(#module-journal,#module-favorites) .mobile-table-actions { border-top-color:#374151; background:#111827; }
-  :is(#module-journal,#module-favorites) .mobile-table-actions .mobile-app-action-btn { width:100%; min-width:0; }
-  :is(#module-journal,#module-favorites) :is(.filter-toolbar,.copy-section):not(.mobile-sheet-panel),
   [data-mobile-toolbar]:not(.mobile-sheet-panel) { display:none !important; }
   .mobile-sheet-panel { padding:.25rem !important; border:0 !important; background:transparent !important; box-shadow:none !important; }
-  #mobile-action-sheet-body .filter-toolbar { display:grid !important; grid-template-columns:repeat(6,minmax(0,1fr)); align-items:stretch !important; gap:.55rem !important; }
-  #mobile-action-sheet-body .filter-toolbar > * { max-width:none !important; width:100% !important; min-width:0 !important; margin:0 !important; }
-  #mobile-action-sheet-body .filter-toolbar > :nth-child(1),
-  #mobile-action-sheet-body .filter-toolbar > :nth-child(2) { grid-column:span 3; }
-  #mobile-action-sheet-body .filter-toolbar > :is(label:nth-child(3),label:nth-child(4),label:nth-child(5)),
-  #mobile-action-sheet-body .filter-toolbar > .filter-score { grid-column:span 2; justify-content:center; text-align:center; }
-  #mobile-action-sheet-body .filter-toolbar > div.relative { grid-column:span 4; display:grid !important; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.55rem !important; }
-  #mobile-action-sheet-body .filter-toolbar > div.relative > button { width:100% !important; justify-content:center !important; }
-  #mobile-action-sheet-body .filter-toolbar > div.relative:has(> #filter-tag-panel:not(.hidden)),
-  #mobile-action-sheet-body .filter-toolbar > div.relative:has(> #filter-tag-panel-fav:not(.hidden)) { grid-column:1/-1; }
-  #mobile-action-sheet-body :is(#filter-tag-panel,#filter-tag-panel-fav) { position:static !important; grid-column:1/-1; left:auto !important; top:auto !important; width:100% !important; max-height:min(44vh,380px) !important; margin-top:0 !important; overflow-y:auto !important; overscroll-behavior:contain; box-shadow:none !important; }
-  #mobile-action-sheet-body .filter-toolbar > :is(#filter-tags-display,#filter-tags-display-fav) { grid-column:1/-1; }
+  :is(#mobile-action-sheet-body,#module-journal,#module-favorites) .filter-toolbar { display:grid !important; grid-template-columns:repeat(6,minmax(0,1fr)); align-items:stretch !important; gap:.55rem !important; }
+  :is(#mobile-action-sheet-body,#module-journal,#module-favorites) .filter-toolbar > * { max-width:none !important; width:100% !important; min-width:0 !important; margin:0 !important; }
+  :is(#mobile-action-sheet-body,#module-journal,#module-favorites) .filter-toolbar > :nth-child(1),
+  :is(#mobile-action-sheet-body,#module-journal,#module-favorites) .filter-toolbar > :nth-child(2) { grid-column:span 3; }
+  :is(#mobile-action-sheet-body,#module-journal,#module-favorites) .filter-toolbar > :is(label:nth-child(3),label:nth-child(4),label:nth-child(5)),
+  :is(#mobile-action-sheet-body,#module-journal,#module-favorites) .filter-toolbar > .filter-score { grid-column:span 2; justify-content:center; text-align:center; }
+  :is(#mobile-action-sheet-body,#module-journal,#module-favorites) .filter-toolbar > div.relative { grid-column:span 4; display:grid !important; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.55rem !important; }
+  :is(#mobile-action-sheet-body,#module-journal,#module-favorites) .filter-toolbar > div.relative > button { width:100% !important; justify-content:center !important; }
+  :is(#mobile-action-sheet-body,#module-journal,#module-favorites) .filter-toolbar > div.relative:has(> #filter-tag-panel:not(.hidden)),
+  :is(#mobile-action-sheet-body,#module-journal,#module-favorites) .filter-toolbar > div.relative:has(> #filter-tag-panel-fav:not(.hidden)) { grid-column:1/-1; }
+  :is(#mobile-action-sheet-body,#module-journal,#module-favorites) :is(#filter-tag-panel,#filter-tag-panel-fav) { position:static !important; grid-column:1/-1; left:auto !important; top:auto !important; width:100% !important; max-height:min(44vh,380px) !important; margin-top:0 !important; overflow-y:auto !important; overscroll-behavior:contain; box-shadow:none !important; }
+  :is(#mobile-action-sheet-body,#module-journal,#module-favorites) .filter-toolbar > :is(#filter-tags-display,#filter-tags-display-fav) { grid-column:1/-1; }
+  :is(#module-journal,#module-favorites) .filter-toolbar.has-active-filter { padding:.55rem; border:1px solid #f59e0b; border-radius:.75rem; background:#fffbeb; box-shadow:0 0 0 2px rgba(245,158,11,.10); }
+  .dark :is(#module-journal,#module-favorites) .filter-toolbar.has-active-filter { border-color:#d97706; background:rgba(120,53,15,.24); box-shadow:0 0 0 2px rgba(217,119,6,.10); }
+  :is(#module-journal,#module-favorites) .copy-section { display:block !important; padding:.7rem !important; }
+  :is(#module-journal,#module-favorites) .copy-section-row { display:block !important; }
+  :is(#module-journal,#module-favorites) .copy-toolbar { display:flex !important; flex-wrap:wrap !important; gap:.45rem !important; width:100% !important; overflow:visible !important; }
+  :is(#module-journal,#module-favorites) .copy-toolbar > span:first-child { width:100%; margin:0 0 .1rem !important; }
   .mobile-app-action-btn { position:relative; }
   .mobile-app-action-btn.has-active-filter { border-color:#f59e0b !important; background:#fffbeb !important; color:#b45309 !important; box-shadow:0 0 0 2px rgba(245,158,11,.13); }
   .mobile-app-action-btn.has-active-filter::after { content:'●'; position:absolute; top:3px; right:7px; color:#f59e0b; font-size:9px; line-height:1; }
@@ -262,7 +285,7 @@ button { touch-action: manipulation; }
   #mobile-fab { bottom:calc(70px + env(safe-area-inset-bottom)); }
   #calc-form .calc-price-field { min-width:0; }
   #calc-form .calc-actions > button { min-width:0; padding-left:.35rem !important; padding-right:.35rem !important; line-height:1.2; }
-  .mobile-card-scroll { max-height:none !important; overflow-x:hidden !important; overflow-y:visible !important; padding:0.5rem; background:rgba(241,245,249,.72); }
+  .mobile-card-scroll { max-height:none !important; overflow-x:hidden !important; overflow-y:visible !important; padding:.45rem .35rem .45rem .15rem; background:rgba(241,245,249,.72); }
   html.dark .mobile-card-scroll { background:#0f172a !important; }
   table.mobile-card-table { display:block; min-width:0 !important; width:100% !important; white-space:normal !important; }
   table.mobile-card-table thead { display:none !important; }
@@ -329,6 +352,35 @@ button { touch-action: manipulation; }
   html.mobile-view-list table.mobile-card-table tbody td[data-mobile-detail="true"] { display:table-cell !important; }
   html.mobile-view-list .mobile-card-expand { display:none !important; }
   html.mobile-view-list table.mobile-card-table .report-summary-col { width:auto !important; min-width:520px !important; max-width:none !important; white-space:normal !important; }
+  /* 手機表格主題：淺色／深色同步切換全部背景與文字 */
+  html body main .tab-content .card-panel:has(> .mobile-card-scroll) { background-color:var(--mobile-table-panel) !important; color:var(--mobile-table-text) !important; transition:background-color .2s ease,color .2s ease; }
+  html body main .tab-content .mobile-card-scroll,
+  html body main .tab-content table.mobile-card-table,
+  html body main .tab-content table.mobile-card-table tbody { background-color:var(--mobile-table-shell) !important; background-image:none !important; color:var(--mobile-table-text) !important; transition:background-color .2s ease,color .2s ease; }
+  html body main .tab-content table.mobile-card-table thead,
+  html body main .tab-content table.mobile-card-table thead tr,
+  html body main .tab-content table.mobile-card-table thead th { background-color:var(--mobile-table-header) !important; background-image:none !important; border-color:var(--mobile-table-border) !important; color:var(--mobile-table-muted) !important; }
+  html body main .tab-content table.mobile-card-table tbody tr,
+  html body main .tab-content table.mobile-card-table tbody td,
+  html body main .tab-content table.mobile-card-table tbody td.table-sticky-bg { background-color:var(--mobile-table-row) !important; background-image:none !important; border-color:var(--mobile-table-border) !important; color:var(--mobile-table-text) !important; }
+  html.mobile-view-list body main .tab-content table.mobile-card-table tbody tr:hover td { background-color:var(--mobile-table-hover) !important; }
+  html body main .tab-content table.mobile-card-table tbody td::before { color:var(--mobile-table-label) !important; }
+  html body main .tab-content table.mobile-card-table tbody td:is(.text-gray-900,.text-gray-800,.text-gray-700),
+  html body main .tab-content table.mobile-card-table tbody td :is(.text-gray-900,.text-gray-800,.text-gray-700) { color:var(--mobile-table-text) !important; }
+  html body main .tab-content table.mobile-card-table tbody td:is(.text-gray-600,.text-gray-500,.text-gray-400),
+  html body main .tab-content table.mobile-card-table tbody td :is(.text-gray-600,.text-gray-500,.text-gray-400) { color:var(--mobile-table-muted) !important; }
+  html body main .tab-content table.mobile-card-table :is(.stock-identity-code,.stock-identity-note,.compact-date-year) { color:var(--mobile-table-muted) !important; }
+  html body main .tab-content table.mobile-card-table :is(.stock-identity-name,.compact-date-month-day) { color:var(--mobile-table-text) !important; }
+  html body main .tab-content .mobile-card-scroll > [id$="-empty"] { background-color:var(--mobile-table-row) !important; color:var(--mobile-table-muted) !important; }
+  html body main .tab-content .mobile-table-view-bar { background-color:var(--mobile-table-panel) !important; border-color:var(--mobile-table-border) !important; color:var(--mobile-table-text) !important; }
+  html body main :is(#module-journal,#module-favorites) .card-panel > div:has(> .filter-toolbar),
+  html body main :is(#module-journal,#module-favorites) .copy-section { background-color:var(--mobile-table-shell) !important; border-color:var(--mobile-table-border) !important; }
+  /* 一般使用者不保留不可操作的勾選空欄，日期與代號欄同步向左校正 */
+  html.viewer-mode body main .tab-content table.mobile-card-table thead th:first-child,
+  html.viewer-mode body main .tab-content table.mobile-card-table tbody td:first-child { display:none !important; }
+  html.viewer-mode.mobile-view-card body main .tab-content table.mobile-card-table tbody td:nth-child(2) { padding-right:0 !important; }
+  html.viewer-mode.mobile-view-list body main :is(#module-journal,#module-favorites) table.mobile-card-table :is(th,td):nth-child(2) { left:0 !important; }
+  html.viewer-mode.mobile-view-list body main :is(#module-journal,#module-favorites) table.mobile-card-table :is(th,td):nth-child(3) { left:55px !important; }
   #toast-container { left:0.75rem; right:0.75rem; bottom:calc(76px + env(safe-area-inset-bottom)); align-items:stretch; }
   #toast-container > * { min-width:0 !important; width:100%; }
 }
@@ -3015,7 +3067,7 @@ setChkDirection('long');
     const countSource=document.getElementById(`${selectAll.dataset.type}-stock-count`),initialCount=countSource?.dataset.stockCount||countSource?.textContent.match(/\d+/)?.[0]||'0';
     const countMarkup=countSource?`<span data-mobile-stock-count="${escapeHTML(selectAll.dataset.type)}" class="inline-flex min-h-[36px] shrink-0 items-center gap-1 rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/35 px-2 text-[10px] font-black text-blue-600 dark:text-blue-300 whitespace-nowrap"><i class="fa-solid fa-chart-simple"></i>顯示 ${escapeHTML(initialCount)} 檔</span>`:'';
     const bar=document.createElement('div');
-    bar.className='sm:hidden flex items-center justify-between gap-1.5 px-2.5 py-2 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800';
+    bar.className='mobile-table-view-bar sm:hidden flex items-center justify-between gap-1.5 px-2.5 py-2 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800';
     bar.innerHTML=`<div class="flex min-w-0 items-center gap-1"><span class="text-[10px] font-bold text-gray-400">檢視</span><div class="inline-flex rounded-lg bg-gray-100 dark:bg-gray-900 p-0.5" role="group" aria-label="清單顯示模式"><button type="button" data-mobile-view-mode="card" aria-pressed="false" class="min-h-[36px] rounded-md border px-1.5 text-[11px] font-bold transition"><i class="fa-solid fa-table-cells-large mr-1"></i>卡片</button><button type="button" data-mobile-view-mode="list" aria-pressed="false" class="min-h-[36px] rounded-md border px-1.5 text-[11px] font-bold transition"><i class="fa-solid fa-list mr-1"></i>清單</button></div></div><button type="button" data-mobile-select-all="${escapeHTML(selectAll.dataset.type)}" aria-pressed="false" class="min-h-[36px] shrink-0 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 px-2 text-[10px] font-bold text-gray-600 dark:text-gray-200"></button>${countMarkup}`;
     wrapper.before(bar);updateMobileSelectButton(selectAll.dataset.type);updateMobileViewControls();
   }
@@ -3111,14 +3163,6 @@ setChkDirection('long');
     'module-plan':{label:'新增規劃',focusId:'p-stock',scrollSelector:'#plan-form',admin:true}
   };
   const mobileActionConfig={
-    'module-journal':[
-      {key:'filter',label:'篩選',icon:'fa-filter',selector:'.filter-toolbar'},
-      {key:'copy',label:'複製',icon:'fa-copy',selector:'.copy-section'}
-    ],
-    'module-favorites':[
-      {key:'filter',label:'篩選',icon:'fa-filter',selector:'.filter-toolbar'},
-      {key:'copy',label:'複製',icon:'fa-copy',selector:'.copy-section'}
-    ],
     'module-revenue':[{key:'tools',label:'篩選與複製',icon:'fa-sliders',selector:'[data-mobile-toolbar="revenue"]'}],
     'module-report':[{key:'tools',label:'篩選與閱讀',icon:'fa-sliders',selector:'[data-mobile-toolbar="report"]'}]
   };
@@ -3167,11 +3211,7 @@ setChkDirection('long');
       const firstPanel=module.querySelector(items[0].selector);if(!firstPanel)return;
       const bar=document.createElement('div');bar.className='mobile-app-actions sm:hidden';bar.dataset.mobileAppActions=moduleId;
       bar.innerHTML=items.map(item=>`<button type="button" class="mobile-app-action-btn" data-mobile-action-module="${moduleId}" data-mobile-action-key="${item.key}"><i class="fa-solid ${item.icon} mr-1.5"></i>${item.label}</button>`).join('');
-      if(moduleId==='module-journal'||moduleId==='module-favorites'){
-        firstPanel.parentElement?.classList.add('mobile-toolbar-host');bar.classList.add('mobile-table-actions');
-        const tableWrapper=module.querySelector('.mobile-card-scroll');
-        if(tableWrapper)tableWrapper.parentNode.insertBefore(bar,tableWrapper);else firstPanel.parentNode.insertBefore(bar,firstPanel);
-      }else firstPanel.parentNode.insertBefore(bar,firstPanel);
+      firstPanel.parentNode.insertBefore(bar,firstPanel);
     });
   }
   function hasActiveMobileFilter(moduleId){
@@ -3186,6 +3226,10 @@ setChkDirection('long');
     return false;
   }
   function updateMobileFilterIndicators(){
+    ['module-journal','module-favorites'].forEach(moduleId=>{
+      const toolbar=document.querySelector(`#${moduleId} .filter-toolbar`);if(!toolbar)return;
+      const active=hasActiveMobileFilter(moduleId);toolbar.classList.toggle('has-active-filter',active);toolbar.title=active?'目前有套用篩選條件':'目前為預設篩選條件';
+    });
     Object.keys(mobileActionConfig).forEach(moduleId=>{
       const button=document.querySelector(`[data-mobile-action-module="${moduleId}"][data-mobile-action-key="${moduleId==='module-journal'||moduleId==='module-favorites'?'filter':'tools'}"]`);if(!button)return;
       const active=hasActiveMobileFilter(moduleId);button.classList.toggle('has-active-filter',active);button.setAttribute('data-filter-active',String(active));button.title=active?'目前有套用篩選條件':'目前為預設篩選條件';
