@@ -248,8 +248,8 @@ button { touch-action: manipulation; }
   #toast-container > * { min-width:0 !important; width:100%; }
 }
 @media (max-width: 480px) {
-  .header-brand { max-width:42px !important; }
-  .header-brand .cool-title { display:none !important; }
+  .header-brand { flex:1 1 auto !important; min-width:0 !important; max-width:calc(100% - 134px) !important; }
+  .header-brand .cool-title { display:block !important; min-width:0; font-size:13px !important; letter-spacing:.02em !important; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 }
 
 /* Respect reduced-motion preference */
@@ -276,7 +276,6 @@ button { touch-action: manipulation; }
             <div class="header-brand flex items-center gap-1.5 sm:gap-3 flex-shrink-0 relative z-10 max-w-[65%] sm:max-w-none overflow-hidden">
                 <div class="bg-blue-600/10 dark:bg-blue-600/20 p-1.5 sm:p-2 rounded-lg flex-shrink-0"><i class="fa-solid fa-chart-line text-blue-600 dark:text-blue-500 text-sm sm:text-xl"></i></div>
                 <span class="cool-title font-bold text-[15px] sm:text-xl md:text-2xl tracking-wider truncate">萊恩飆股起漲手札</span>
-                <span id="auth-status" class="hidden md:flex ml-1 sm:ml-2 w-7 h-7 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-full shadow-sm items-center justify-center cursor-help flex-shrink-0"><i class="fa-solid fa-spinner fa-spin text-yellow-500 text-xs"></i></span>
             </div>
             <div class="hidden lg:flex flex-1 justify-center space-x-1 sm:space-x-2 relative z-10">
                 <button class="nav-btn active-blue" data-target="module-journal" data-color="blue"><i class="fa-solid fa-book-journal-whills mr-1.5 sm:mr-2"></i>策略日誌</button>
@@ -413,7 +412,7 @@ button { touch-action: manipulation; }
                     </div>
                     <div class="flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 h-[38px] sm:h-auto box-border">
                         <i class="fa-solid fa-search text-gray-400 text-[10px] sm:text-xs ml-1 sm:ml-2"></i>
-                        <input type="text" id="filter-code" class="filter-code bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-1 w-[130px] sm:w-[170px] h-full box-border m-0" placeholder="代號／股名／備註">
+                        <input type="text" id="filter-code" class="filter-code bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-1 w-[130px] sm:w-[170px] h-full box-border m-0" placeholder="代號／股名／備註" autocomplete="off" spellcheck="false">
                     </div>
                     <label class="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white dark:bg-gray-900/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-700/50 transition hover:bg-gray-50 dark:hover:bg-gray-800">
                         <input type="checkbox" id="filter-futures" class="filter-futures rounded border-gray-300 dark:border-gray-600 text-sky-500 focus:ring-sky-500 w-3.5 h-3.5 sm:w-4 sm:h-4">
@@ -696,7 +695,7 @@ button { touch-action: manipulation; }
                     </div>
                     <div class="flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 h-[38px] sm:h-auto box-border">
                         <i class="fa-solid fa-search text-gray-400 text-[10px] sm:text-xs ml-1 sm:ml-2"></i>
-                        <input type="text" id="filter-revenue-code" class="bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-1 w-[130px] sm:w-[170px] h-full box-border m-0" placeholder="代號／股名／備註">
+                        <input type="text" id="filter-revenue-code" class="bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-1 w-[130px] sm:w-[170px] h-full box-border m-0" placeholder="代號／股名／備註" autocomplete="off" spellcheck="false">
                     </div>
                 </div>
                 <div class="flex items-center justify-end gap-1.5 sm:gap-2 w-full lg:w-auto border-t lg:border-t-0 border-gray-200 dark:border-gray-700 pt-3 lg:pt-0">
@@ -753,7 +752,7 @@ button { touch-action: manipulation; }
                     </div>
                     <div class="flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 h-[38px] sm:h-auto box-border">
                         <i class="fa-solid fa-search text-gray-400 text-[10px] sm:text-xs ml-1 sm:ml-2"></i>
-                        <input type="text" id="filter-rep-code" class="bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-1 w-[130px] sm:w-[180px] h-full box-border m-0" placeholder="代號／股名／報告內容">
+                        <input type="text" id="filter-rep-code" class="bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-1 w-[130px] sm:w-[180px] h-full box-border m-0" placeholder="代號／股名／報告內容" autocomplete="off" spellcheck="false">
                     </div>
                 </div>
                 <div class="flex items-center justify-end gap-1.5 sm:gap-2 w-full lg:w-auto border-t lg:border-t-0 border-gray-200 dark:border-gray-700 pt-3 lg:pt-0">
@@ -921,7 +920,7 @@ button { touch-action: manipulation; }
                     </div>
                     <div class="flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 h-[38px] sm:h-auto box-border">
                         <i class="fa-solid fa-search text-gray-400 text-[10px] sm:text-xs ml-1 sm:ml-2"></i>
-                        <input type="text" id="filter-code-fav" class="filter-code bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-1 w-[130px] sm:w-[170px] h-full box-border m-0" placeholder="代號／股名／備註">
+                        <input type="text" id="filter-code-fav" class="filter-code bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-1 w-[130px] sm:w-[170px] h-full box-border m-0" placeholder="代號／股名／備註" autocomplete="off" spellcheck="false">
                     </div>
                     <label class="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white dark:bg-gray-900/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-700/50 transition hover:bg-gray-50 dark:hover:bg-gray-800">
                         <input type="checkbox" id="filter-futures-fav" class="filter-futures rounded border-gray-300 dark:border-gray-600 text-sky-500 focus:ring-sky-500 w-3.5 h-3.5 sm:w-4 sm:h-4">
@@ -1457,8 +1456,21 @@ const setupLogicBtns=(sel,fKey,cb)=>{
     document.querySelectorAll(sel).forEach(btn=>{btn.addEventListener('click',e=>{const lg=e.target.dataset.logic;state[fKey].tagLogic=lg;document.querySelectorAll(sel).forEach(b=>{b.classList.remove('bg-white','dark:bg-gray-700','text-blue-600','dark:text-blue-400','shadow-sm');b.classList.add('text-gray-500','dark:text-gray-400','hover:text-gray-700','dark:hover:text-gray-200');});e.target.classList.remove('text-gray-500','dark:text-gray-400','hover:text-gray-700','dark:hover:text-gray-200');e.target.classList.add('bg-white','dark:bg-gray-700','text-blue-600','dark:text-blue-400','shadow-sm');cb();saveLocalData();});});
 };
 
+const JOURNAL_FORM_TAG_KEY='ryan_journal_form_tag_v1';
+let rememberedJournalFormTag='';
+try{rememberedJournalFormTag=localStorage.getItem(JOURNAL_FORM_TAG_KEY)||'';}catch(error){}
+const rememberJournalFormTag=tag=>{
+    rememberedJournalFormTag=String(tag||'');
+    try{
+        if(rememberedJournalFormTag)localStorage.setItem(JOURNAL_FORM_TAG_KEY,rememberedJournalFormTag);
+        else localStorage.removeItem(JOURNAL_FORM_TAG_KEY);
+    }catch(error){}
+};
+
 function renderDynamicTags(){
     const fc=document.getElementById('form-tags-container');
+    const currentFormTag=fc?.querySelector('.tag-input:checked')?.value||rememberedJournalFormTag;
+    if(currentFormTag)rememberJournalFormTag(currentFormTag);
     if(fc)fc.innerHTML=TAG_CATEGORIES.map(c=>`<div><div class="text-xs font-bold text-gray-500 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 pb-1 mb-2">${c.title}</div><div class="flex flex-wrap gap-2">${c.tags.map(t=>{const theme=window.getManagedTagTheme?.(t,c.theme)||c.theme;return`<label class="cursor-pointer"><input type="checkbox" value="${escapeHTML(t)}" class="hidden tag-input" data-theme="${theme}"><div class="px-3 py-1.5 rounded-lg text-xs font-bold border transition active:scale-95 ${THEME_MAP[theme].inactive}">${escapeHTML(t)}</div></label>`;}).join('')}</div></div>`).join('');
     
     document.querySelectorAll('#filter-tags-container, #filter-tags-container-fav').forEach(container=>{
@@ -1472,12 +1484,19 @@ function renderDynamicTags(){
         if(box.checked){btn.classList.remove(...inactiveClasses);btn.classList.add(...activeClasses,'shadow-md');}
         else{btn.classList.remove(...activeClasses,'shadow-md');btn.classList.add(...inactiveClasses);}
     };
-    document.querySelectorAll('.tag-input').forEach(cb=>{
+    const journalTagInputs=Array.from(document.querySelectorAll('.tag-input'));
+    if(rememberedJournalFormTag&&!journalTagInputs.some(cb=>cb.value===rememberedJournalFormTag))rememberJournalFormTag('');
+    journalTagInputs.forEach(cb=>{
+        cb.checked=Boolean(rememberedJournalFormTag&&cb.value===rememberedJournalFormTag);
+        updateTagInputVisual(cb);
         cb.addEventListener('change',function(){
             if(this.checked){
-                document.querySelectorAll('.tag-input').forEach(other=>{
+                journalTagInputs.forEach(other=>{
                     if(other!==this&&other.checked){other.checked=false;updateTagInputVisual(other);}
                 });
+                rememberJournalFormTag(this.value);
+            }else if(!journalTagInputs.some(other=>other.checked)){
+                rememberJournalFormTag('');
             }
             updateTagInputVisual(this);
         });
@@ -1635,6 +1654,22 @@ function loadLocalData(){
     if(migratedStrategyTags||migratedFilterTags||migratedJournalFilter||migratedReportFilter||migratedMarketHolidays)saveLocalData();
     const applyLogicState=(lv,sel)=>{document.querySelectorAll(sel).forEach(b=>{if(b.dataset.logic===lv){b.classList.remove('text-gray-500','dark:text-gray-400','hover:text-gray-700','dark:hover:text-gray-200');b.classList.add('bg-white','dark:bg-gray-700','text-blue-600','dark:text-blue-400','shadow-sm');}else{b.classList.remove('bg-white','dark:bg-gray-700','text-blue-600','dark:text-blue-400','shadow-sm');b.classList.add('text-gray-500','dark:text-gray-400','hover:text-gray-700','dark:hover:text-gray-200');}});};
     applyLogicState(state.filters.tagLogic,'.logic-btn'); applyLogicState(state.favFilters.tagLogic,'.logic-btn-fav');
+}
+
+function clearTransientSearchFields(){
+    state.filters={...state.filters,code:''};
+    state.favFilters={...state.favFilters,code:''};
+    state.revenueFilters={...state.revenueFilters,code:''};
+    state.reportFilters={...state.reportFilters,code:''};
+    [
+        'filter-code','filter-code-fav','filter-revenue-code','filter-rep-code','global-search-input',
+        'j-code','j-name','overview-code','overview-name','r-code','r-name','rep-code','rep-name',
+        'p-stock','p-name','chk-code','chk-name'
+    ].forEach(id=>{
+        const input=document.getElementById(id);
+        if(input){input.value='';input.setAttribute('value','');}
+    });
+    saveLocalData();
 }
 
 const getFilteredAndSortedData=(dl,cf,cs)=>{
@@ -1933,7 +1968,9 @@ document.getElementById('journal-form')?.addEventListener('submit', async e => {
     const nt = document.getElementById('j-notes').value.trim();
     if (!c || !n || !d) return showToast('請填寫完整資訊', 'error');
 
-    const tags = Array.from(document.querySelectorAll('.tag-input:checked')).map(cb => cb.value).slice(-1);
+    const selectedTag = document.querySelector('.tag-input:checked')?.value || '';
+    const tags = selectedTag ? [selectedTag] : [];
+    rememberJournalFormTag(selectedTag);
     
     state.codeToName[c] = n;
     state.nameToCode[n] = c;
@@ -2527,7 +2564,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
         });
     });
 
-    loadLocalData(); initStreakBaseDate(); initStreakPanelToggle(); renderCustomMarketHolidays(); syncDuplicateCompareToggles(); renderDynamicTags(); bindDatalistAutoUpdate();
+    loadLocalData(); clearTransientSearchFields(); initStreakBaseDate(); initStreakPanelToggle(); renderCustomMarketHolidays(); syncDuplicateCompareToggles(); renderDynamicTags(); bindDatalistAutoUpdate();
     bindAutoFill('j-code','j-name',c=>updatePreview(c,'j-preview','blue')); bindAutoFill('overview-code','overview-name',c=>{if(c)renderStockOverview(c);}); bindAutoFill('c-code','c-name'); bindAutoFill('r-code','r-name'); bindAutoFill('rep-code','rep-name'); bindAutoFill('p-stock','p-name'); bindAutoFill('modal-plan-stock','modal-plan-name'); 
     bindAutoFill('chk-code','chk-name',c=>{
         updatePreview(c,'chk-preview','cyan');
@@ -2553,6 +2590,11 @@ document.addEventListener('DOMContentLoaded',async()=>{
     if(!state.filters.start&&!state.filters.end){state.filters.start=tD;state.filters.end=tD;}
     document.getElementById('filter-start').value=state.filters.start||''; document.getElementById('filter-end').value=state.filters.end||''; document.getElementById('filter-start-fav').value=state.favFilters.start||''; document.getElementById('filter-end-fav').value=state.favFilters.end||''; document.getElementById('r-month').value=getCurrentMonth(); document.getElementById('rep-date').value=tD; document.getElementById('p-date').value=tD; document.getElementById('chk-date').value=tD; document.getElementById('filter-rep-start').value=state.reportFilters.start||''; document.getElementById('filter-rep-end').value=state.reportFilters.end||''; document.getElementById('filter-rep-code').value=state.reportFilters.code||''; document.getElementById('j-date').value=tD;
     document.querySelectorAll('.filter-futures').forEach(el=>el.checked=!!state.filters.futuresOnly); document.querySelectorAll('.filter-exclude-negative-growth').forEach(el=>el.checked=!!state.filters.excludeNegativeGrowth); document.querySelectorAll('.filter-revenue-high').forEach(el=>el.checked=!!state.filters.revenueHigh); document.querySelectorAll('.filter-score').forEach(el=>el.value=String(state.filters.minScore||0)); document.querySelectorAll('.filter-tag-cb').forEach(cb=>cb.checked=state.filters.tags.includes(cb.value)); renderFilterTags();
+
+    window.addEventListener('pageshow',()=>requestAnimationFrame(()=>{
+        clearTransientSearchFields();
+        processAndRenderJournals();renderFavorites();renderRevenueRecords();renderReports();
+    }));
 
 setChkDirection('long');
 
