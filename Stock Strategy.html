@@ -52,6 +52,8 @@ tailwind.config={darkMode:'class',theme:{extend:{colors:{gray:{50:'#f8fafc',100:
 <style id="admin-mode-style">
 html.viewer-mode [data-target="module-plan"],
 html.viewer-mode [data-target="module-favorites"],
+html.viewer-mode [data-mobile-more-target="module-plan"],
+html.viewer-mode [data-mobile-more-target="module-favorites"],
 html.viewer-mode #module-plan,
 html.viewer-mode #module-favorites,
 html.viewer-mode #journal-add-section,
@@ -187,7 +189,8 @@ button { touch-action: manipulation; }
   table { min-width: 720px; }
 }
 @media (max-width: 640px) {
-  body { font-size: 14px; padding-bottom:calc(66px + env(safe-area-inset-bottom)); }
+  body { font-size: 14px; padding-bottom:calc(76px + env(safe-area-inset-bottom)); }
+  body.mobile-sheet-open { overflow:hidden; }
   button, .btn { min-height: 40px; }
   .header-brand { max-width:32% !important; }
   .header-actions { gap:0.2rem !important; }
@@ -195,10 +198,28 @@ button { touch-action: manipulation; }
   .header-actions #theme-toggle { display:flex !important; }
   .header-actions :is(#btn-global-search,#theme-toggle,#btn-mobile-tools) { width:40px !important; height:40px !important; }
   .header-actions :is(#btn-admin-mode,#btn-sync-modal) { min-width:40px; min-height:40px; }
-  #mobile-tools-menu { top:112px !important; }
-  .mobile-module-nav { position:fixed; left:0; right:0; bottom:0; z-index:80; padding:0.45rem 0.5rem max(0.45rem,env(safe-area-inset-bottom)); border-top:1px solid #e5e7eb; border-bottom:0 !important; box-shadow:0 -6px 18px rgba(15,23,42,.12); overscroll-behavior-x:contain; scroll-snap-type:x proximity; }
+  #mobile-tools-menu { top:62px !important; }
+  .mobile-module-nav { position:fixed; left:0; right:0; bottom:0; z-index:80; display:grid !important; grid-template-columns:repeat(5,minmax(0,1fr)); gap:.2rem !important; padding:0.3rem 0.4rem max(0.3rem,env(safe-area-inset-bottom)); border-top:1px solid #e5e7eb; border-bottom:0 !important; box-shadow:0 -6px 18px rgba(15,23,42,.12); overflow:visible !important; }
   .dark .mobile-module-nav { border-top-color:#374151; box-shadow:0 -6px 18px rgba(0,0,0,.32); }
-  .mobile-module-nav .nav-btn-mobile { min-height:44px; padding:0.55rem 0.85rem; scroll-snap-align:center; }
+  .mobile-module-nav .nav-btn-mobile,
+  .mobile-module-nav .mobile-more-nav-btn { display:flex !important; min-width:0 !important; min-height:52px !important; padding:.35rem .15rem !important; border:1px solid transparent; border-radius:.7rem; flex-direction:column; align-items:center; justify-content:center; gap:.18rem; color:#64748b; background:transparent; font-size:10px; line-height:1.05; font-weight:800; transition:background-color .16s ease,color .16s ease,transform .16s ease; }
+  .dark .mobile-module-nav .mobile-more-nav-btn { color:#94a3b8; }
+  .mobile-module-nav :is(.nav-btn-mobile,.mobile-more-nav-btn) i { margin:0 !important; font-size:17px; line-height:1; }
+  .mobile-module-nav :is(.nav-btn-mobile,.mobile-more-nav-btn):active { transform:scale(.94); }
+  .mobile-module-nav .mobile-more-nav-btn.is-active { color:#2563eb; background:#dbeafe; border-color:#bfdbfe; }
+  .dark .mobile-module-nav .mobile-more-nav-btn.is-active { color:#93c5fd; background:rgba(30,64,175,.45); border-color:#1e40af; }
+  .mobile-module-nav .nav-btn-mobile:is([data-target="module-checklist"],[data-target="module-revenue"],[data-target="module-plan"],[data-target="module-favorites"]) { display:none !important; }
+  .mobile-app-actions { display:flex; align-items:center; gap:.5rem; padding:.55rem .65rem; border-bottom:1px solid #e5e7eb; background:rgba(248,250,252,.92); overflow-x:auto; }
+  .dark .mobile-app-actions { border-bottom-color:#374151; background:rgba(17,24,39,.9); }
+  .mobile-app-action-btn { flex:1 0 auto; min-height:40px; border:1px solid #dbeafe; border-radius:.7rem; background:#eff6ff; color:#2563eb; font-size:12px; font-weight:900; }
+  .dark .mobile-app-action-btn { border-color:#1e3a8a; background:rgba(30,58,138,.28); color:#93c5fd; }
+  :is(#module-journal,#module-favorites) :is(.filter-toolbar,.copy-section):not(.mobile-sheet-panel),
+  [data-mobile-toolbar]:not(.mobile-sheet-panel) { display:none !important; }
+  .mobile-sheet-panel { padding:.25rem !important; border:0 !important; background:transparent !important; box-shadow:none !important; }
+  #mobile-action-sheet-body .filter-toolbar { display:flex !important; flex-direction:column !important; align-items:stretch !important; gap:.75rem !important; }
+  #mobile-action-sheet-body .filter-toolbar > * { max-width:none !important; width:100% !important; }
+  #mobile-action-sheet-body .copy-section { margin:0 !important; }
+  #mobile-fab { bottom:calc(70px + env(safe-area-inset-bottom)); }
   .mobile-card-scroll { max-height:none !important; overflow-x:hidden !important; overflow-y:visible !important; padding:0.5rem; background:rgba(241,245,249,.72); }
   .dark .mobile-card-scroll { background:rgba(15,23,42,.45); }
   table.mobile-card-table { display:block; min-width:0 !important; width:100% !important; white-space:normal !important; }
@@ -215,6 +236,9 @@ button { touch-action: manipulation; }
   table.mobile-card-table tbody td:nth-child(2) { padding-right:2.5rem !important; }
   :is(#module-journal,#module-favorites,#module-revenue,#module-report,#module-checklist,#module-plan) table.mobile-card-table tbody td:nth-child(2) { padding-right:2.5rem !important; }
   table.mobile-card-table tbody td[data-mobile-wide="true"] { grid-column:1/-1; }
+  html.mobile-view-card table.mobile-card-table tbody tr:not(.mobile-card-expanded) td[data-mobile-detail="true"] { display:none !important; }
+  .mobile-card-expand { min-height:34px !important; min-width:auto !important; padding:.35rem .7rem; border:1px solid #dbeafe; border-radius:.55rem; background:#eff6ff; color:#2563eb; font-size:11px; font-weight:900; }
+  .dark .mobile-card-expand { border-color:#1e3a8a; background:rgba(30,58,138,.28); color:#93c5fd; }
   table.mobile-card-table tbody td:last-child { grid-column:1/-1; padding-top:0.45rem !important; border-top:1px solid #e5e7eb !important; align-items:flex-end; }
   :is(#module-journal,#module-favorites,#module-revenue,#module-report,#module-checklist,#module-plan) table.mobile-card-table tbody td:last-child { padding-top:0.45rem !important; border-top:1px solid #e5e7eb !important; }
   .dark table.mobile-card-table tbody td:last-child { border-top-color:#374151 !important; }
@@ -244,6 +268,8 @@ button { touch-action: manipulation; }
   html.mobile-view-list :is(#module-journal,#module-favorites) table.mobile-card-table tbody td:nth-child(3) { position:sticky !important; left:95px !important; z-index:20 !important; border-right:1px solid #e5e7eb !important; }
   html.mobile-view-list table.mobile-card-table tbody td[data-mobile-wide="true"],
   html.mobile-view-list table.mobile-card-table tbody td:last-child { grid-column:auto !important; }
+  html.mobile-view-list table.mobile-card-table tbody td[data-mobile-detail="true"] { display:table-cell !important; }
+  html.mobile-view-list .mobile-card-expand { display:none !important; }
   html.mobile-view-list table.mobile-card-table .report-summary-col { width:auto !important; min-width:520px !important; max-width:none !important; white-space:normal !important; }
   #toast-container { left:0.75rem; right:0.75rem; bottom:calc(76px + env(safe-area-inset-bottom)); align-items:stretch; }
   #toast-container > * { min-width:0 !important; width:100%; }
@@ -302,15 +328,13 @@ button { touch-action: manipulation; }
             </div>
         </div>
     </div>
-    <div id="mobile-quick-settings" class="sm:hidden border-t border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-800/95 px-2 py-1.5" aria-label="手機管理者設定">
-        <button type="button" id="btn-mobile-admin-entry" class="w-full min-h-[40px] rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs font-black inline-flex items-center justify-center gap-2 shadow-sm active:scale-95" aria-label="進入管理者模式"><i class="fa-solid fa-lock" data-mobile-admin-icon></i><span data-mobile-admin-label>管理者登入</span></button>
-    </div>
-    <div class="mobile-module-nav lg:hidden border-t border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-800/95 px-2 py-2 flex gap-2 overflow-x-auto scrollbar-hide" aria-label="手機模組導覽">
-        <button class="nav-btn-mobile active-blue" data-target="module-journal" data-color="blue">策略日誌</button>
-        <button class="nav-btn-mobile" data-target="module-overview" data-color="blue">總覽</button>
+    <div class="mobile-module-nav lg:hidden border-t border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-800/95" aria-label="手機模組導覽">
+        <button class="nav-btn-mobile active-blue" data-target="module-journal" data-color="blue" aria-label="策略日誌"><i class="fa-solid fa-book-journal-whills"></i><span>日誌</span></button>
+        <button class="nav-btn-mobile" data-target="module-overview" data-color="blue" aria-label="個股總覽"><i class="fa-solid fa-magnifying-glass-chart"></i><span>總覽</span></button>
+        <button class="nav-btn-mobile" data-target="module-calculator" data-color="purple" aria-label="支撐壓力"><i class="fa-solid fa-calculator"></i><span>支撐</span></button>
+        <button class="nav-btn-mobile" data-target="module-report" data-color="indigo" aria-label="法人報告"><i class="fa-solid fa-file-lines"></i><span>報告</span></button>
+        <button type="button" id="mobile-more-nav-btn" class="mobile-more-nav-btn sm:hidden" aria-label="開啟更多功能" aria-expanded="false"><i class="fa-solid fa-table-cells-large"></i><span>更多</span></button>
         <button class="nav-btn-mobile" data-target="module-checklist" data-color="cyan">查核</button>
-        <button class="nav-btn-mobile" data-target="module-calculator" data-color="purple">支撐壓力</button>
-        <button class="nav-btn-mobile" data-target="module-report" data-color="indigo">報告</button>
         <button class="nav-btn-mobile" data-target="module-revenue" data-color="pink">營收</button>
         <button class="nav-btn-mobile" data-target="module-plan" data-color="green">規劃</button>
         <button class="nav-btn-mobile" data-target="module-favorites" data-color="yellow">追蹤</button>
@@ -687,7 +711,7 @@ button { touch-action: manipulation; }
                     <div class="col-span-3 md:col-span-1"><button type="submit" id="btn-revenue-submit" class="w-full h-[42px] bg-pink-600 hover:bg-pink-500 text-white text-base sm:text-sm font-bold rounded-lg transition shadow-md active:scale-95">加入</button></div>
                 </form>
             </div>
-            <div class="p-4 border-b border-gray-200 dark:border-gray-700/50 bg-gray-50/80 dark:bg-gray-800/80 flex flex-col lg:flex-row items-start lg:items-center gap-4 w-full justify-between">
+            <div data-mobile-toolbar="revenue" class="p-4 border-b border-gray-200 dark:border-gray-700/50 bg-gray-50/80 dark:bg-gray-800/80 flex flex-col lg:flex-row items-start lg:items-center gap-4 w-full justify-between">
                 <div class="flex flex-wrap items-center gap-2 sm:gap-3 w-full lg:w-auto">
                     <div class="flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 max-w-[150px] sm:max-w-none h-[38px] sm:h-auto box-border">
                         <span class="text-xs text-gray-500 dark:text-gray-400 px-1 sm:px-2 hidden sm:inline"><i class="fa-solid fa-filter mr-1"></i>月份</span>
@@ -742,7 +766,7 @@ button { touch-action: manipulation; }
                     <div class="col-span-3 md:col-span-1"><button type="submit" id="btn-report-submit" class="w-full h-[42px] bg-indigo-600 hover:bg-indigo-500 text-white text-base sm:text-sm font-bold rounded-lg transition shadow-md active:scale-95">加入</button></div>
                 </form>
             </div>
-            <div class="p-4 border-b border-gray-200 dark:border-gray-700/50 bg-gray-50/80 dark:bg-gray-800/80 flex flex-col lg:flex-row items-start lg:items-center gap-4 w-full justify-between">
+            <div data-mobile-toolbar="report" class="p-4 border-b border-gray-200 dark:border-gray-700/50 bg-gray-50/80 dark:bg-gray-800/80 flex flex-col lg:flex-row items-start lg:items-center gap-4 w-full justify-between">
                 <div class="flex flex-wrap items-center gap-2 sm:gap-3 w-full lg:w-auto">
                     <div class="flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 max-w-[180px] sm:max-w-none h-[38px] sm:h-auto box-border">
                         <span class="text-xs text-gray-500 dark:text-gray-400 px-1 sm:px-2 hidden sm:inline"><i class="fa-solid fa-filter mr-1"></i>區間</span>
@@ -1113,6 +1137,37 @@ button { touch-action: manipulation; }
         <button type="button" id="report-reader-next-btn" title="下一檔" aria-label="下一檔法人報告" class="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-10 h-20 sm:w-12 sm:h-24 rounded-l-2xl border border-r-0 border-gray-300/60 dark:border-gray-600/60 bg-white/70 dark:bg-gray-800/70 text-indigo-700 dark:text-indigo-300 opacity-25 hover:opacity-80 focus:opacity-90 active:opacity-100 backdrop-blur-sm shadow-md transition-opacity disabled:opacity-0 disabled:pointer-events-none"><i class="fa-solid fa-chevron-right"></i></button>
     </div>
 </div>
+<div id="mobile-more-sheet" class="hidden sm:hidden fixed inset-0 z-[160]" role="dialog" aria-modal="true" aria-labelledby="mobile-more-title" aria-hidden="true">
+    <button type="button" data-mobile-more-close class="absolute inset-0 w-full h-full bg-slate-950/45 backdrop-blur-[1px]" aria-label="關閉更多功能"></button>
+    <section class="absolute inset-x-0 bottom-0 max-h-[82vh] overflow-y-auto rounded-t-[1.4rem] border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 pt-2 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-2xl">
+        <div class="mx-auto mb-2 h-1 w-11 rounded-full bg-gray-300 dark:bg-gray-600"></div>
+        <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-3">
+            <div><h2 id="mobile-more-title" class="font-black text-gray-900 dark:text-white">更多功能</h2><p class="mt-0.5 text-[11px] text-gray-400">切換其他模組與管理設定</p></div>
+            <button type="button" data-mobile-more-close class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-300" aria-label="關閉"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="grid grid-cols-2 gap-2.5 py-4">
+            <button type="button" data-mobile-more-target="module-checklist" class="min-h-[70px] rounded-xl border border-cyan-200 dark:border-cyan-900 bg-cyan-50 dark:bg-cyan-950/35 px-3 text-left text-cyan-700 dark:text-cyan-300"><i class="fa-solid fa-clipboard-check mr-2"></i><span class="font-black">進場查核</span></button>
+            <button type="button" data-mobile-more-target="module-revenue" class="min-h-[70px] rounded-xl border border-pink-200 dark:border-pink-900 bg-pink-50 dark:bg-pink-950/35 px-3 text-left text-pink-700 dark:text-pink-300"><i class="fa-solid fa-money-bill-trend-up mr-2"></i><span class="font-black">營收創高</span></button>
+            <button type="button" data-mobile-more-target="module-plan" class="min-h-[70px] rounded-xl border border-emerald-200 dark:border-emerald-900 bg-emerald-50 dark:bg-emerald-950/35 px-3 text-left text-emerald-700 dark:text-emerald-300"><i class="fa-solid fa-chess-knight mr-2"></i><span class="font-black">交易規劃</span></button>
+            <button type="button" data-mobile-more-target="module-favorites" class="min-h-[70px] rounded-xl border border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950/35 px-3 text-left text-amber-700 dark:text-amber-300"><i class="fa-solid fa-star mr-2"></i><span class="font-black">追蹤清單</span></button>
+        </div>
+        <div class="border-t border-gray-100 dark:border-gray-800 pt-3">
+            <button type="button" id="btn-mobile-admin-entry" class="w-full min-h-[48px] rounded-xl border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-sm font-black inline-flex items-center justify-center gap-2 shadow-sm active:scale-95" aria-label="進入管理者模式"><i class="fa-solid fa-lock" data-mobile-admin-icon></i><span data-mobile-admin-label>管理者登入</span></button>
+        </div>
+    </section>
+</div>
+<div id="mobile-action-sheet" class="hidden sm:hidden fixed inset-0 z-[170]" role="dialog" aria-modal="true" aria-labelledby="mobile-action-sheet-title" aria-hidden="true">
+    <button type="button" data-mobile-action-close class="absolute inset-0 w-full h-full bg-slate-950/45 backdrop-blur-[1px]" aria-label="關閉操作面板"></button>
+    <section class="absolute inset-x-0 bottom-0 max-h-[85vh] flex flex-col rounded-t-[1.4rem] border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-2xl">
+        <div class="mx-auto mt-2 h-1 w-11 flex-none rounded-full bg-gray-300 dark:bg-gray-600"></div>
+        <div class="flex flex-none items-center justify-between border-b border-gray-100 dark:border-gray-800 px-4 py-3">
+            <h2 id="mobile-action-sheet-title" class="font-black text-gray-900 dark:text-white">操作</h2>
+            <button type="button" data-mobile-action-close class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-300" aria-label="關閉"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div id="mobile-action-sheet-body" class="min-h-0 flex-1 overflow-y-auto px-3 py-3 pb-[max(1rem,env(safe-area-inset-bottom))]"></div>
+    </section>
+</div>
+<button type="button" id="mobile-fab" class="hidden sm:hidden fixed right-4 z-[75] min-h-[48px] rounded-full bg-blue-600 hover:bg-blue-500 text-white px-4 shadow-[0_8px_24px_rgba(37,99,235,.36)] inline-flex items-center justify-center gap-2 font-black active:scale-95" aria-label="新增資料"><i class="fa-solid fa-plus"></i><span id="mobile-fab-label">新增</span></button>
 <div id="toast-container" class="fixed bottom-5 right-5 z-[200] flex flex-col-reverse gap-3 pointer-events-none"></div>
 <datalist id="stock-names-list"></datalist>
 
@@ -2847,6 +2902,14 @@ setChkDirection('long');
     'module-checklist':[4],
     'module-plan':[]
   };
+  const mobileDetailColumns={
+    'module-journal':[3,4,5,6,7,8,10],
+    'module-favorites':[3,4,5,6,7,8],
+    'module-revenue':[3,4,5,6,7],
+    'module-report':[],
+    'module-checklist':[4,5],
+    'module-plan':[3,4,5,6]
+  };
 
   function updateMobileSelectButton(type){
     const button=document.querySelector(`[data-mobile-select-all="${type}"]`),selectAll=document.querySelector(`.select-all-cb[data-type="${type}"]`);
@@ -2892,13 +2955,19 @@ setChkDirection('long');
   }
 
   function decorateMobileCardTable(table){
-    const moduleId=table.closest('.tab-content')?.id||'',wideColumns=mobileWideColumns[moduleId]||[];
+    const moduleId=table.closest('.tab-content')?.id||'',wideColumns=mobileWideColumns[moduleId]||[],detailColumns=mobileDetailColumns[moduleId]||[];
     const labels=Array.from(table.querySelectorAll('thead th')).map((th,index)=>index===0?'選取':th.textContent.replace(/\s+/g,' ').trim());
     table.querySelectorAll('tbody tr').forEach(row=>{
       Array.from(row.children).forEach((cell,index)=>{
         cell.dataset.mobileLabel=labels[index]||'';
         if(wideColumns.includes(index))cell.dataset.mobileWide='true';else delete cell.dataset.mobileWide;
+        if(detailColumns.includes(index))cell.dataset.mobileDetail='true';else delete cell.dataset.mobileDetail;
       });
+      const actionCell=row.lastElementChild;
+      let expandButton=actionCell?.querySelector('[data-mobile-card-expand]');
+      if(detailColumns.length&&actionCell&&!expandButton){
+        actionCell.insertAdjacentHTML('afterbegin','<button type="button" data-mobile-card-expand class="mobile-card-expand mr-auto" aria-expanded="false"><i class="fa-solid fa-chevron-down mr-1"></i>詳情</button>');
+      }else if(!detailColumns.length&&expandButton){expandButton.remove();}
     });
     ensureMobileSelectBar(table);
     const type=table.querySelector('.select-all-cb[data-type]')?.dataset.type;if(type)updateMobileSelectButton(type);
@@ -2967,11 +3036,96 @@ setChkDirection('long');
     saveLocalData();document.querySelector(`.nav-btn[data-target="${target}"]`)?.click();window.scrollTo({top:0,behavior:'smooth'});
   }
 
+  const mobileMoreModules=new Set(['module-checklist','module-revenue','module-plan','module-favorites']);
+  const mobileFabConfig={
+    'module-journal':{label:'新增條件',focusId:'j-code',scrollSelector:'#journal-add-section',admin:true},
+    'module-checklist':{label:'新增查核',focusId:'chk-code',scrollSelector:'#module-checklist .card-panel:first-child'},
+    'module-report':{label:'新增報告',focusId:'rep-code',scrollSelector:'#report-form',admin:true},
+    'module-revenue':{label:'新增營收',focusId:'r-code',scrollSelector:'#revenue-form',admin:true},
+    'module-plan':{label:'新增規劃',focusId:'p-stock',scrollSelector:'#plan-form',admin:true}
+  };
+  const mobileActionConfig={
+    'module-journal':[
+      {key:'filter',label:'篩選',icon:'fa-filter',selector:'.filter-toolbar'},
+      {key:'copy',label:'複製',icon:'fa-copy',selector:'.copy-section'}
+    ],
+    'module-favorites':[
+      {key:'filter',label:'篩選',icon:'fa-filter',selector:'.filter-toolbar'},
+      {key:'copy',label:'複製',icon:'fa-copy',selector:'.copy-section'}
+    ],
+    'module-revenue':[{key:'tools',label:'篩選與複製',icon:'fa-sliders',selector:'[data-mobile-toolbar="revenue"]'}],
+    'module-report':[{key:'tools',label:'篩選與閱讀',icon:'fa-sliders',selector:'[data-mobile-toolbar="report"]'}]
+  };
+  let mobileActionState=null;
+
+  const getActiveModuleId=()=>document.querySelector('.tab-content.active')?.id||'module-journal';
+  function updateMobileBodyLock(){
+    const moreOpen=!document.getElementById('mobile-more-sheet')?.classList.contains('hidden');
+    const actionOpen=!document.getElementById('mobile-action-sheet')?.classList.contains('hidden');
+    document.body.classList.toggle('mobile-sheet-open',moreOpen||actionOpen);
+  }
+  function setMobileMoreOpen(open){
+    const sheet=document.getElementById('mobile-more-sheet'),button=document.getElementById('mobile-more-nav-btn');if(!sheet||!button)return;
+    if(open)closeMobileActionSheet();
+    sheet.classList.toggle('hidden',!open);sheet.setAttribute('aria-hidden',String(!open));button.setAttribute('aria-expanded',String(open));button.classList.toggle('is-active',open||mobileMoreModules.has(getActiveModuleId()));
+    updateMobileBodyLock();
+  }
+  function updateMobileShellNavigation(){
+    const activeId=getActiveModuleId(),moreButton=document.getElementById('mobile-more-nav-btn');
+    moreButton?.classList.toggle('is-active',mobileMoreModules.has(activeId));
+    document.querySelectorAll('[data-mobile-more-target]').forEach(button=>button.setAttribute('aria-current',button.dataset.mobileMoreTarget===activeId?'page':'false'));
+    updateMobileFab();
+  }
+  function updateMobileFab(){
+    const fab=document.getElementById('mobile-fab'),label=document.getElementById('mobile-fab-label');if(!fab)return;
+    const config=mobileFabConfig[getActiveModuleId()],blocked=config?.admin&&!window.isAdminMode?.();
+    const show=window.matchMedia('(max-width: 639px)').matches&&config&&!blocked;
+    fab.classList.toggle('hidden',!show);
+    if(config&&label){label.textContent=config.label;fab.setAttribute('aria-label',config.label);}
+  }
+  function activateMobileFab(){
+    const moduleId=getActiveModuleId(),config=mobileFabConfig[moduleId];if(!config)return;
+    if(config.admin&&!window.isAdminMode?.())return showToast('請先登入管理者模式','error');
+    if(moduleId==='module-journal'){
+      const wrapper=document.getElementById('journal-form-wrapper');
+      if(wrapper?.classList.contains('hidden'))document.getElementById('toggle-journal-form-btn')?.click();
+    }
+    const target=document.querySelector(config.scrollSelector)||document.getElementById(config.focusId);
+    target?.scrollIntoView({behavior:'smooth',block:'start'});
+    setTimeout(()=>document.getElementById(config.focusId)?.focus(),360);
+  }
+  function ensureMobileActionBars(){
+    Object.entries(mobileActionConfig).forEach(([moduleId,items])=>{
+      const module=document.getElementById(moduleId);if(!module||module.querySelector(`[data-mobile-app-actions="${moduleId}"]`))return;
+      const firstPanel=module.querySelector(items[0].selector);if(!firstPanel)return;
+      const bar=document.createElement('div');bar.className='mobile-app-actions sm:hidden';bar.dataset.mobileAppActions=moduleId;
+      bar.innerHTML=items.map(item=>`<button type="button" class="mobile-app-action-btn" data-mobile-action-module="${moduleId}" data-mobile-action-key="${item.key}"><i class="fa-solid ${item.icon} mr-1.5"></i>${item.label}</button>`).join('');
+      firstPanel.parentNode.insertBefore(bar,firstPanel);
+    });
+  }
+  function openMobileActionSheet(moduleId,key){
+    const item=mobileActionConfig[moduleId]?.find(entry=>entry.key===key),module=document.getElementById(moduleId),sheet=document.getElementById('mobile-action-sheet'),body=document.getElementById('mobile-action-sheet-body'),title=document.getElementById('mobile-action-sheet-title');
+    if(!item||!module||!sheet||!body||!title)return;
+    closeMobileActionSheet();setMobileMoreOpen(false);
+    const panel=module.querySelector(item.selector);if(!panel)return;
+    const placeholder=document.createComment(`mobile-action-${moduleId}-${key}`);panel.parentNode.insertBefore(placeholder,panel);body.appendChild(panel);panel.classList.add('mobile-sheet-panel');
+    mobileActionState={panel,placeholder};title.textContent=item.label;sheet.classList.remove('hidden');sheet.setAttribute('aria-hidden','false');updateMobileBodyLock();
+  }
+  function closeMobileActionSheet(){
+    const sheet=document.getElementById('mobile-action-sheet');
+    if(mobileActionState){const {panel,placeholder}=mobileActionState;if(placeholder.parentNode){placeholder.parentNode.insertBefore(panel,placeholder);placeholder.remove();}panel.classList.remove('mobile-sheet-panel');mobileActionState=null;}
+    sheet?.classList.add('hidden');sheet?.setAttribute('aria-hidden','true');updateMobileBodyLock();
+  }
+
   document.addEventListener('DOMContentLoaded',()=>{
+    ensureMobileActionBars();
     initMobileCardTables();
     updateMobileViewControls();
+    updateMobileShellNavigation();
     document.getElementById('btn-global-search')?.addEventListener('click',()=>setGlobalSearchOpen(true));
-    document.getElementById('btn-mobile-admin-entry')?.addEventListener('click',()=>document.getElementById('btn-admin-mode')?.click());
+    document.getElementById('btn-mobile-admin-entry')?.addEventListener('click',()=>{setMobileMoreOpen(false);document.getElementById('btn-admin-mode')?.click();});
+    document.getElementById('mobile-more-nav-btn')?.addEventListener('click',()=>setMobileMoreOpen(document.getElementById('mobile-more-sheet')?.classList.contains('hidden')));
+    document.getElementById('mobile-fab')?.addEventListener('click',activateMobileFab);
     const mobileToolsButton=document.getElementById('btn-mobile-tools'),mobileToolsMenu=document.getElementById('mobile-tools-menu');
     mobileToolsButton?.addEventListener('click',event=>{event.stopPropagation();const opening=mobileToolsMenu?.classList.contains('hidden');mobileToolsMenu?.classList.toggle('hidden',!opening);mobileToolsButton.setAttribute('aria-expanded',String(!!opening));});
     mobileToolsMenu?.addEventListener('click',event=>{const button=event.target.closest('[data-mobile-tool-target]');if(!button)return;document.getElementById(button.dataset.mobileToolTarget)?.click();mobileToolsMenu.classList.add('hidden');mobileToolsButton?.setAttribute('aria-expanded','false');});
@@ -2982,21 +3136,34 @@ setChkDirection('long');
     document.getElementById('global-search-modal')?.addEventListener('click',event=>{if(event.target.id==='global-search-modal')setGlobalSearchOpen(false);});
     document.addEventListener('click',event=>{
       if(mobileToolsMenu&&!mobileToolsMenu.classList.contains('hidden')&&!mobileToolsMenu.contains(event.target)&&event.target!==mobileToolsButton){mobileToolsMenu.classList.add('hidden');mobileToolsButton?.setAttribute('aria-expanded','false');}
+      if(event.target.closest('[data-mobile-more-close]')){setMobileMoreOpen(false);return;}
+      const moreTarget=event.target.closest('[data-mobile-more-target]');
+      if(moreTarget){setMobileMoreOpen(false);document.querySelector(`.nav-btn-mobile[data-target="${moreTarget.dataset.mobileMoreTarget}"]`)?.click();setTimeout(updateMobileShellNavigation);return;}
+      if(event.target.closest('[data-mobile-action-close]')){closeMobileActionSheet();return;}
+      const actionButton=event.target.closest('[data-mobile-action-module][data-mobile-action-key]');
+      if(actionButton){openMobileActionSheet(actionButton.dataset.mobileActionModule,actionButton.dataset.mobileActionKey);return;}
+      const cardExpand=event.target.closest('[data-mobile-card-expand]');
+      if(cardExpand){const row=cardExpand.closest('tr'),expanded=row?.classList.toggle('mobile-card-expanded');cardExpand.setAttribute('aria-expanded',String(!!expanded));cardExpand.innerHTML=expanded?'<i class="fa-solid fa-chevron-up mr-1"></i>收合':'<i class="fa-solid fa-chevron-down mr-1"></i>詳情';return;}
       const selectButton=event.target.closest('[data-mobile-select-all]');
       if(selectButton){const selectAll=document.querySelector(`.select-all-cb[data-type="${selectButton.dataset.mobileSelectAll}"]`);if(selectAll){selectAll.checked=!(selectAll.checked&&!selectAll.indeterminate);selectAll.dispatchEvent(new Event('change',{bubbles:true}));setTimeout(()=>updateMobileSelectButton(selectButton.dataset.mobileSelectAll));}return;}
       const viewButton=event.target.closest('[data-mobile-view-mode]');
       if(viewButton){setMobileViewMode(viewButton.dataset.mobileViewMode);return;}
       const jumpButton=event.target.closest('[data-overview-jump]');if(jumpButton)jumpFromOverview(jumpButton.dataset.overviewJump);
-      const navButton=event.target.closest('.nav-btn-mobile');if(navButton)setTimeout(()=>navButton.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'}));
+      const navButton=event.target.closest('.nav-btn-mobile');if(navButton){closeMobileActionSheet();setMobileMoreOpen(false);setTimeout(updateMobileShellNavigation);}
+      if(mobileActionState&&event.target.closest('#mobile-action-sheet-body [id^="btn-copy"],#mobile-action-sheet-body #btn-open-report-reader'))setTimeout(closeMobileActionSheet,80);
     });
     document.addEventListener('change',event=>{const type=event.target?.dataset?.type;if(type&&(event.target.classList.contains('row-cb')||event.target.classList.contains('select-all-cb')))setTimeout(()=>updateMobileSelectButton(type));});
     document.addEventListener('keydown',event=>{
       const editing=event.target.closest?.('input,textarea,select,[contenteditable="true"]');
       if((event.ctrlKey||event.metaKey)&&event.key.toLocaleLowerCase()==='k'){event.preventDefault();setGlobalSearchOpen(true);}
       else if(event.key==='/'&&!editing){event.preventDefault();setGlobalSearchOpen(true);}
+      else if(event.key==='Escape'&&!document.getElementById('mobile-action-sheet')?.classList.contains('hidden'))closeMobileActionSheet();
+      else if(event.key==='Escape'&&!document.getElementById('mobile-more-sheet')?.classList.contains('hidden'))setMobileMoreOpen(false);
       else if(event.key==='Escape'&&!document.getElementById('global-search-modal')?.classList.contains('hidden'))setGlobalSearchOpen(false);
     });
     window.addEventListener('storage',event=>{if(event.key==='ryan_admin_session_v1'&&!document.getElementById('global-search-modal')?.classList.contains('hidden'))renderGlobalSearch();});
+    window.addEventListener('resize',()=>{if(window.innerWidth>=640){closeMobileActionSheet();setMobileMoreOpen(false);}updateMobileFab();});
+    new MutationObserver(()=>{updateMobileShellNavigation();}).observe(document.documentElement,{attributes:true,attributeFilter:['class']});
   });
 })();
 </script>
