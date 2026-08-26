@@ -404,6 +404,53 @@ button { touch-action: manipulation; }
   .header-brand .cool-title { display:block !important; min-width:0; font-size:13px !important; letter-spacing:.02em !important; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 }
 
+/* 全模組深色表格：表頭、凍結欄、股名、EPS、策略與右側欄位使用一致不透明底色 */
+html.dark body main :is(#module-journal,#module-favorites,#module-revenue,#module-report,#module-checklist,#module-plan) .mobile-card-scroll {
+  background:#020617 !important;
+  color:#f8fafc !important;
+  scrollbar-color:#475569 #0f172a;
+}
+html.dark body main :is(#module-journal,#module-favorites,#module-revenue,#module-report,#module-checklist,#module-plan) table.mobile-card-table {
+  background:#0f172a !important;
+  color:#f8fafc !important;
+}
+html.dark body main :is(#module-journal,#module-favorites,#module-revenue,#module-report,#module-checklist,#module-plan) table.mobile-card-table :is(thead,thead tr,thead th) {
+  background:#0b1220 !important;
+  background-image:none !important;
+  color:#f1f5f9 !important;
+  border-color:#475569 !important;
+}
+html.dark body main :is(#module-journal,#module-favorites,#module-revenue,#module-report,#module-checklist,#module-plan) table.mobile-card-table tbody,
+html.dark body main :is(#module-journal,#module-favorites,#module-revenue,#module-report,#module-checklist,#module-plan) table.mobile-card-table tbody tr,
+html.dark body main :is(#module-journal,#module-favorites,#module-revenue,#module-report,#module-checklist,#module-plan) table.mobile-card-table tbody td,
+html.dark body main :is(#module-journal,#module-favorites,#module-revenue,#module-report,#module-checklist,#module-plan) table.mobile-card-table tbody td.table-sticky-bg {
+  background:#111827 !important;
+  background-image:none !important;
+  color:#f8fafc !important;
+  border-color:#475569 !important;
+}
+html.dark body main :is(#module-journal,#module-favorites,#module-revenue,#module-report,#module-checklist,#module-plan) table.mobile-card-table tbody tr:hover td,
+html.dark body main :is(#module-journal,#module-favorites,#module-revenue,#module-report,#module-checklist,#module-plan) table.mobile-card-table tbody tr:hover td.table-sticky-bg {
+  background:#1e293b !important;
+  color:#ffffff !important;
+}
+html.dark body main :is(#module-journal,#module-favorites,#module-revenue,#module-report,#module-checklist,#module-plan) table.mobile-card-table tbody td:is(.text-gray-900,.text-gray-800,.text-gray-700),
+html.dark body main :is(#module-journal,#module-favorites,#module-revenue,#module-report,#module-checklist,#module-plan) table.mobile-card-table tbody td :is(.text-gray-900,.text-gray-800,.text-gray-700,.stock-identity-name,.compact-date-month-day) {
+  color:#f8fafc !important;
+}
+html.dark body main :is(#module-journal,#module-favorites,#module-revenue,#module-report,#module-checklist,#module-plan) table.mobile-card-table tbody td:is(.text-gray-600,.text-gray-500,.text-gray-400),
+html.dark body main :is(#module-journal,#module-favorites,#module-revenue,#module-report,#module-checklist,#module-plan) table.mobile-card-table tbody td :is(.text-gray-600,.text-gray-500,.text-gray-400,.stock-identity-code,.stock-identity-note,.compact-date-year) {
+  color:#cbd5e1 !important;
+}
+html.dark body main :is(#module-journal,#module-favorites,#module-revenue,#module-report,#module-checklist,#module-plan) table.mobile-card-table thead th i {
+  color:#93c5fd !important;
+  opacity:1 !important;
+}
+html.dark body main :is(#module-journal,#module-favorites,#module-revenue,#module-report,#module-checklist,#module-plan) .mobile-card-scroll > [id$="-empty"] {
+  background:#111827 !important;
+  color:#cbd5e1 !important;
+}
+
 /* Respect reduced-motion preference */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -518,10 +565,10 @@ button { touch-action: manipulation; }
 
         <div id="journal-streak-panel" class="card-panel border-t-4 border-violet-500 mt-6 mb-6 overflow-hidden">
             <div class="p-4 sm:p-5 bg-violet-50/50 dark:bg-violet-900/10 border-b border-violet-100 dark:border-violet-900/40 flex items-center justify-between gap-3">
-                <h3 class="font-bold text-violet-700 dark:text-violet-300 text-base sm:text-lg flex items-center"><span class="w-8 h-8 rounded-lg bg-violet-100 dark:bg-violet-900/40 flex items-center justify-center mr-2"><i class="fa-solid fa-repeat"></i></span>策略連續出現追蹤</h3>
+                <h3 class="font-bold text-violet-700 dark:text-violet-300 text-base sm:text-lg flex items-center"><span class="w-8 h-8 rounded-lg bg-violet-100 dark:bg-violet-900/40 flex items-center justify-center mr-2"><i class="fa-solid fa-tower-broadcast"></i></span>策略訊號雷達</h3>
                 <div class="flex items-center gap-1.5">
-                    <button type="button" id="streak-pin-btn" aria-pressed="false" aria-label="釘選策略連續出現追蹤" title="釘選常駐" class="w-8 h-8 rounded-lg text-gray-400 hover:text-violet-600 dark:hover:text-violet-300 hover:bg-violet-100 dark:hover:bg-violet-900/40 transition active:scale-95"><i class="fa-solid fa-thumbtack pointer-events-none"></i></button>
-                    <button type="button" id="streak-toggle-btn" aria-expanded="true" aria-controls="streak-panel-content" aria-label="收合策略連續出現追蹤" title="收合" class="shrink-0 p-2 rounded-lg group transition active:scale-95">
+                    <button type="button" id="streak-pin-btn" aria-pressed="false" aria-label="釘選策略訊號雷達" title="釘選常駐" class="w-8 h-8 rounded-lg text-gray-400 hover:text-violet-600 dark:hover:text-violet-300 hover:bg-violet-100 dark:hover:bg-violet-900/40 transition active:scale-95"><i class="fa-solid fa-thumbtack pointer-events-none"></i></button>
+                    <button type="button" id="streak-toggle-btn" aria-expanded="true" aria-controls="streak-panel-content" aria-label="收合策略訊號雷達" title="收合" class="shrink-0 p-2 rounded-lg group transition active:scale-95">
                         <i id="streak-toggle-icon" class="fa-solid fa-chevron-down text-gray-400 group-hover:text-violet-500 transition-transform duration-300" style="transform:rotate(180deg)"></i>
                     </button>
                 </div>
@@ -529,14 +576,14 @@ button { touch-action: manipulation; }
             <div id="streak-panel-content">
                 <div class="px-4 sm:px-5 py-4 bg-violet-50/30 dark:bg-violet-900/5 border-b border-violet-100 dark:border-violet-900/40">
                     <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                        <p class="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 lg:max-w-xs">以基準日往前比對策略日誌實際有資料的交易日；週末及無交易資料的休市日會自動略過，不計入也不中斷。</p>
+                        <p id="streak-mode-description" class="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 lg:max-w-xs">連續模式會找出最近 N 個有效交易日每天都有訊號的股票；週末及休市日不計入。</p>
                         <form id="streak-search-form" class="grid grid-cols-12 gap-2 w-full lg:flex-1" action="javascript:void(0);">
                             <div class="col-span-6 sm:col-span-4 lg:col-span-2"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">基準日</label><input type="date" id="streak-base-date" class="input-base text-center"></div>
                             <div id="streak-holiday-controls" class="col-span-6 sm:col-span-4 lg:col-span-2"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium"><i class="fa-solid fa-calendar-xmark mr-1 text-amber-500"></i>自訂休市日</label><div class="flex items-center gap-1.5"><input type="date" id="streak-holiday-date" aria-label="自訂休市日期" title="臨時休市可自行加入，計算時會強制略過" class="input-base flex-1 min-w-0 text-center"><button type="button" id="streak-add-holiday-btn" aria-label="加入自訂休市日" title="加入自訂休市日" class="shrink-0 w-[42px] h-[42px] rounded-lg bg-amber-500 hover:bg-amber-400 text-white text-sm font-bold transition active:scale-95"><i class="fa-solid fa-plus"></i></button></div></div>
-                            <div class="col-span-6 sm:col-span-4 lg:col-span-2"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">至少連續</label><select id="streak-min-days" class="input-base text-center"><option value="2">2 個交易日</option><option value="3">3 個交易日</option><option value="4">4 個交易日</option><option value="5">5 個交易日</option><option value="6">6 個交易日</option><option value="7">7 個交易日</option><option value="8">8 個交易日</option><option value="9">9 個交易日</option><option value="10">10 個交易日</option></select></div>
+                            <div class="col-span-6 sm:col-span-4 lg:col-span-2"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">判定方式</label><select id="streak-mode" class="input-base text-center"><option value="consecutive">N 日連續出現</option><option value="window">N 日內重複出現</option></select></div>
+                            <div class="col-span-6 sm:col-span-4 lg:col-span-2"><label id="streak-day-count-label" class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">連續交易日數</label><input type="number" id="streak-min-days" min="2" max="60" step="1" inputmode="numeric" value="2" class="input-base text-center" aria-describedby="streak-mode-description"></div>
                             <div class="col-span-12 sm:col-span-4 lg:col-span-2 flex items-end"><label class="w-full h-[42px] flex items-center justify-center gap-2 cursor-pointer bg-white dark:bg-gray-800 border border-violet-200 dark:border-violet-700/70 rounded-lg px-2 text-[11px] sm:text-xs font-bold text-violet-700 dark:text-violet-300 hover:bg-violet-50 dark:hover:bg-violet-900/30 transition"><input type="checkbox" id="streak-exclude-horses" class="w-4 h-4 rounded border-violet-300 accent-violet-600" checked><span>排除赤兔馬／千里馬</span></label></div>
-                            <div class="col-span-6 sm:col-span-4 lg:col-span-2 flex items-end"><button type="submit" id="streak-query-btn" class="w-full h-[42px] bg-violet-600 hover:bg-violet-500 text-white rounded-lg font-bold text-sm transition shadow-sm active:scale-95"><i class="fa-solid fa-magnifying-glass mr-1.5"></i>開始比對</button></div>
-                            <div class="col-span-6 sm:col-span-4 lg:col-span-2 flex items-end"><button type="button" id="streak-copy-btn" disabled class="w-full h-[42px] bg-violet-600 hover:bg-violet-500 text-white rounded-lg font-bold text-sm border border-violet-600 transition active:scale-95 disabled:bg-gray-100 dark:disabled:bg-gray-700 disabled:text-gray-400 disabled:border-gray-300 dark:disabled:border-gray-600 disabled:cursor-not-allowed disabled:opacity-60"><i class="fa-solid fa-copy mr-1.5"></i>複製結果</button></div>
+                            <div class="col-span-12 sm:col-span-8 lg:col-span-2 flex items-end gap-2"><button type="submit" id="streak-query-btn" class="flex-1 min-w-0 h-[42px] bg-violet-600 hover:bg-violet-500 text-white rounded-lg font-bold text-xs sm:text-sm transition shadow-sm active:scale-95"><i class="fa-solid fa-magnifying-glass mr-1"></i>比對</button><button type="button" id="streak-copy-btn" disabled class="flex-1 min-w-0 h-[42px] bg-violet-600 hover:bg-violet-500 text-white rounded-lg font-bold text-xs sm:text-sm border border-violet-600 transition active:scale-95 disabled:bg-gray-100 dark:disabled:bg-gray-700 disabled:text-gray-400 disabled:border-gray-300 dark:disabled:border-gray-600 disabled:cursor-not-allowed disabled:opacity-60"><i class="fa-solid fa-copy mr-1"></i>複製</button></div>
                             <div class="col-span-12 mt-1 pt-2 border-t border-violet-100 dark:border-violet-900/40 flex flex-col sm:flex-row sm:items-center gap-2">
                                 <span class="shrink-0 text-[10px] sm:text-xs font-bold text-gray-500 dark:text-gray-400">已設定休市日</span>
                                 <div id="streak-holiday-list" class="flex flex-1 flex-wrap gap-2" aria-live="polite"><span class="text-[11px] text-gray-400">尚未設定自訂休市日</span></div>
@@ -545,7 +592,7 @@ button { touch-action: manipulation; }
                         </form>
                     </div>
                 </div>
-                <div id="streak-summary" class="px-4 sm:px-5 py-3 text-xs sm:text-sm text-gray-500 dark:text-gray-400">請選擇基準日與連續天數後開始比對。</div>
+                <div id="streak-summary" class="px-4 sm:px-5 py-3 text-xs sm:text-sm text-gray-500 dark:text-gray-400">請選擇判定方式、基準日與 N 日後開始比對。</div>
                 <div id="streak-results" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 px-4 sm:px-5 pb-5 max-h-[640px] lg:max-h-[75vh] overflow-y-auto"></div>
             </div>
         </div>
@@ -1957,7 +2004,7 @@ const STREAK_PANEL_STORAGE_KEY='ryan_streak_panel_collapsed',STREAK_PANEL_PIN_KE
 let streakPanelPinned=false;
 const updateStreakPinUI=()=>{
     const pinButton=document.getElementById('streak-pin-btn');if(!pinButton)return;
-    pinButton.setAttribute('aria-pressed',String(streakPanelPinned));pinButton.setAttribute('aria-label',streakPanelPinned?'取消釘選策略連續出現追蹤':'釘選策略連續出現追蹤');pinButton.title=streakPanelPinned?'取消釘選':'釘選常駐';
+    pinButton.setAttribute('aria-pressed',String(streakPanelPinned));pinButton.setAttribute('aria-label',streakPanelPinned?'取消釘選策略訊號雷達':'釘選策略訊號雷達');pinButton.title=streakPanelPinned?'取消釘選':'釘選常駐';
     pinButton.classList.toggle('!bg-violet-600',streakPanelPinned);pinButton.classList.toggle('!text-white',streakPanelPinned);pinButton.classList.toggle('shadow-sm',streakPanelPinned);
     const icon=pinButton.querySelector('i');if(icon)icon.style.transform=streakPanelPinned?'rotate(-45deg)':'rotate(0deg)';
 };
@@ -1967,7 +2014,7 @@ const setStreakPanelCollapsed=collapsed=>{
     if(streakPanelPinned&&collapsed)collapsed=false;
     content.classList.toggle('hidden',collapsed);
     button.setAttribute('aria-expanded',String(!collapsed));
-    button.setAttribute('aria-label',collapsed?'展開策略連續出現追蹤':'收合策略連續出現追蹤');
+    button.setAttribute('aria-label',collapsed?'展開策略訊號雷達':'收合策略訊號雷達');
     button.title=collapsed?'展開':'收合';
     icon.style.transform=collapsed?'rotate(0deg)':'rotate(180deg)';
 };
@@ -1976,7 +2023,7 @@ const setStreakPanelPinned=(pinned,notifyUser=false)=>{
     try{localStorage.setItem(STREAK_PANEL_PIN_KEY,String(streakPanelPinned));}catch(error){}
     if(streakPanelPinned){setStreakPanelCollapsed(false);try{localStorage.setItem(STREAK_PANEL_STORAGE_KEY,'false');}catch(error){}}
     updateStreakPinUI();
-    if(notifyUser)showToast(streakPanelPinned?'策略連續出現追蹤已釘選常駐':'策略連續出現追蹤已取消釘選');
+    if(notifyUser)showToast(streakPanelPinned?'策略訊號雷達已釘選常駐':'策略訊號雷達已取消釘選');
 };
 const initStreakPanelToggle=()=>{
     let collapsed=true,pinned=false;
@@ -1995,11 +2042,21 @@ const persistCustomMarketHolidays=async()=>{
     return putDataToCloud('customMarketHolidaySettings',{dates:[...state.customMarketHolidays],updatedAt:Date.now()});
 };
 
-const analyzeJournalStreaks=(journals,requestedBase,minDays,excludeHorses=false)=>{
-    const wantedBase=requestedBase||getToday(),minimum=Math.max(2,Math.min(10,parseInt(minDays)||2)),excludeHorseTags=!!excludeHorses,customHolidays=new Set(normalizeCustomMarketHolidays(state.customMarketHolidays));
+const normalizeStreakMode=mode=>mode==='window'?'window':'consecutive';
+const updateStreakModeUI=()=>{
+    const modeInput=document.getElementById('streak-mode'),daysLabel=document.getElementById('streak-day-count-label'),description=document.getElementById('streak-mode-description'),daysInput=document.getElementById('streak-min-days');
+    if(!modeInput||!daysLabel||!description||!daysInput)return;
+    const mode=normalizeStreakMode(modeInput.value),isWindow=mode==='window';
+    daysLabel.textContent=isWindow?'觀察交易日數':'連續交易日數';
+    description.textContent=isWindow?'重複模式會統計最近 N 個有效交易日，列出出現至少 2 次的股票與各日策略；週末及休市日不計入。':'連續模式會找出最近 N 個有效交易日每天都有訊號的股票；週末及休市日不計入。';
+    daysInput.setAttribute('aria-label',isWindow?'觀察交易日數':'連續交易日數');
+};
+
+const analyzeJournalStreaks=(journals,requestedBase,minDays,excludeHorses=false,mode='consecutive')=>{
+    const wantedBase=requestedBase||getToday(),minimum=Math.max(2,Math.min(60,parseInt(minDays)||2)),analysisMode=normalizeStreakMode(mode),excludeHorseTags=!!excludeHorses,customHolidays=new Set(normalizeCustomMarketHolidays(state.customMarketHolidays));
     const eligible=(journals||[]).filter(item=>item&&item.date&&item.date<=wantedBase&&isJournalTradingDate(item.date,customHolidays)&&String(item.code||'').trim());
     const dates=[...new Set(eligible.map(item=>item.date))].sort().reverse();
-    if(!dates.length)return{requestedBase:wantedBase,baseDate:null,minDays:minimum,excludeHorses:excludeHorseTags,customHolidays:[...customHolidays],availableDays:0,results:[]};
+    if(!dates.length)return{requestedBase:wantedBase,baseDate:null,minDays:minimum,mode:analysisMode,excludeHorses:excludeHorseTags,customHolidays:[...customHolidays],availableDays:0,windowDays:0,results:[]};
     const baseDate=dates[0],byDate=new Map();
     [...eligible].sort((a,b)=>(a.createdAt||0)-(b.createdAt||0)).forEach(item=>{
         const code=String(item.code||'').trim();
@@ -2010,19 +2067,31 @@ const analyzeJournalStreaks=(journals,requestedBase,minDays,excludeHorses=false)
         dateMap.set(code,entry);
     });
     const results=[];
-    (byDate.get(baseDate)||new Map()).forEach((baseEntry,code)=>{
-        const days=[];
-        for(const date of dates){
-            const entry=byDate.get(date)?.get(code);if(!entry)break;
-            days.push({date,tags:[...entry.tags]});
-        }
-        if(days.length<minimum)return;
-        if(excludeHorseTags&&days.some(day=>day.tags.some(tag=>tag==='赤兔馬'||tag==='千里馬')))return;
-        const commonTags=days.length?days[0].tags.filter(tag=>days.every(day=>day.tags.includes(tag))):[];
-        results.push({code,name:baseEntry.name||state.codeToName[code]||'',streak:days.length,commonTags,days});
-    });
-    results.sort((a,b)=>b.streak-a.streak||a.code.localeCompare(b.code,undefined,{numeric:true}));
-    return{requestedBase:wantedBase,baseDate,minDays:minimum,excludeHorses:excludeHorseTags,customHolidays:[...customHolidays],availableDays:dates.length,results};
+    if(analysisMode==='window'){
+        const windowDates=dates.slice(0,minimum),candidateCodes=new Set();
+        windowDates.forEach(date=>(byDate.get(date)||new Map()).forEach((entry,code)=>candidateCodes.add(code)));
+        candidateCodes.forEach(code=>{
+            const days=windowDates.map(date=>{const entry=byDate.get(date)?.get(code);return entry?{date,tags:[...entry.tags]}:null;}).filter(Boolean);
+            if(days.length<2)return;
+            if(excludeHorseTags&&days.some(day=>day.tags.some(tag=>tag==='赤兔馬'||tag==='千里馬')))return;
+            const latestEntry=byDate.get(days[0].date)?.get(code),commonTags=days[0].tags.filter(tag=>days.every(day=>day.tags.includes(tag)));
+            results.push({code,name:latestEntry?.name||state.codeToName[code]||'',streak:days.length,occurrences:days.length,commonTags,days});
+        });
+    }else{
+        (byDate.get(baseDate)||new Map()).forEach((baseEntry,code)=>{
+            const days=[];
+            for(const date of dates){
+                const entry=byDate.get(date)?.get(code);if(!entry)break;
+                days.push({date,tags:[...entry.tags]});
+            }
+            if(days.length<minimum)return;
+            if(excludeHorseTags&&days.some(day=>day.tags.some(tag=>tag==='赤兔馬'||tag==='千里馬')))return;
+            const commonTags=days.length?days[0].tags.filter(tag=>days.every(day=>day.tags.includes(tag))):[];
+            results.push({code,name:baseEntry.name||state.codeToName[code]||'',streak:days.length,occurrences:days.length,commonTags,days});
+        });
+    }
+    results.sort((a,b)=>b.occurrences-a.occurrences||a.code.localeCompare(b.code,undefined,{numeric:true}));
+    return{requestedBase:wantedBase,baseDate,minDays:minimum,mode:analysisMode,excludeHorses:excludeHorseTags,customHolidays:[...customHolidays],availableDays:dates.length,windowDays:Math.min(minimum,dates.length),results};
 };
 
 const renderStreakTag=tag=>`<span class="inline-flex px-2 py-0.5 rounded-md border text-[10px] font-bold ${getTagStyle(tag,true)}">${escapeHTML(tag)}</span>`;
@@ -2031,30 +2100,34 @@ const renderStreakStockInfoIcons=code=>{
     return`${hasReport?renderReportIndicator():''}${hasRevenueHigh?'<span title="有營收創高紀錄" aria-label="有營收創高紀錄" class="inline-flex shrink-0 w-5 h-5 items-center justify-center rounded-full bg-pink-100 dark:bg-pink-900/50 text-pink-600 dark:text-pink-300 text-[10px]"><i class="fa-solid fa-chart-line"></i></span>':''}`;
 };
 function renderJournalStreaks(){
-    const baseInput=document.getElementById('streak-base-date'),daysInput=document.getElementById('streak-min-days'),excludeInput=document.getElementById('streak-exclude-horses'),summary=document.getElementById('streak-summary'),root=document.getElementById('streak-results'),copyBtn=document.getElementById('streak-copy-btn');
-    if(!baseInput||!daysInput||!excludeInput||!summary||!root||!copyBtn)return;
-    const analysis=analyzeJournalStreaks(state.journals,baseInput.value,daysInput.value,excludeInput.checked);lastJournalStreakResult=analysis;
+    const baseInput=document.getElementById('streak-base-date'),modeInput=document.getElementById('streak-mode'),daysInput=document.getElementById('streak-min-days'),excludeInput=document.getElementById('streak-exclude-horses'),summary=document.getElementById('streak-summary'),root=document.getElementById('streak-results'),copyBtn=document.getElementById('streak-copy-btn');
+    if(!baseInput||!modeInput||!daysInput||!excludeInput||!summary||!root||!copyBtn)return;
+    const dayCount=Math.max(2,Math.min(60,parseInt(daysInput.value)||2));daysInput.value=String(dayCount);
+    const analysis=analyzeJournalStreaks(state.journals,baseInput.value,dayCount,excludeInput.checked,modeInput.value);lastJournalStreakResult=analysis;
     copyBtn.disabled=analysis.results.length===0;
     if(!analysis.baseDate){
         summary.innerHTML='<span class="text-amber-600 dark:text-amber-400"><i class="fa-solid fa-circle-info mr-1.5"></i>基準日前沒有策略日誌資料。</span>';
         root.innerHTML='';root.classList.add('hidden');return;
     }
     const adjusted=analysis.baseDate!==analysis.requestedBase;
-    summary.innerHTML=`<span class="font-bold text-violet-700 dark:text-violet-300">找到 ${analysis.results.length} 檔</span>｜實際基準日 ${escapeHTML(analysis.baseDate.replace(/-/g,'/'))}｜至少連續 ${analysis.minDays} 個交易日｜週末、休市日不計${analysis.customHolidays.length?`｜自訂休市 ${analysis.customHolidays.length} 日`:''}${analysis.excludeHorses?'｜已排除赤兔馬、千里馬':''}${adjusted?`<span class="ml-2 text-amber-600 dark:text-amber-400">（${escapeHTML(analysis.requestedBase.replace(/-/g,'/'))} 無資料，已往前取最近紀錄日）</span>`:''}`;
+    const modeSummary=analysis.mode==='window'?`最近 ${analysis.minDays} 個交易日內重複出現至少 2 次${analysis.windowDays<analysis.minDays?`（目前有 ${analysis.windowDays} 日資料）`:''}`:`至少連續 ${analysis.minDays} 個交易日`;
+    summary.innerHTML=`<span class="font-bold text-violet-700 dark:text-violet-300">找到 ${analysis.results.length} 檔</span>｜實際基準日 ${escapeHTML(analysis.baseDate.replace(/-/g,'/'))}｜${modeSummary}｜週末、休市日不計${analysis.customHolidays.length?`｜自訂休市 ${analysis.customHolidays.length} 日`:''}${analysis.excludeHorses?'｜已排除赤兔馬、千里馬':''}${adjusted?`<span class="ml-2 text-amber-600 dark:text-amber-400">（${escapeHTML(analysis.requestedBase.replace(/-/g,'/'))} 無資料，已往前取最近紀錄日）</span>`:''}`;
     if(!analysis.results.length){root.innerHTML='';root.classList.add('hidden');return;}
     root.classList.remove('hidden');
     root.innerHTML=analysis.results.map(item=>{
         const common=item.commonTags.length?item.commonTags.map(renderStreakTag).join(''):'<span class="text-[10px] text-gray-400">每日策略不同</span>';
         const infoIcons=renderStreakStockInfoIcons(item.code);
         const daily=item.days.map(day=>`<div class="flex items-start gap-2 py-1.5 border-t border-gray-100 dark:border-gray-700/60 first:border-t-0"><span class="w-[78px] shrink-0 text-[11px] font-bold text-gray-500 dark:text-gray-400 tabular-nums">${escapeHTML(day.date.replace(/-/g,'/'))}</span><div class="flex flex-wrap gap-1">${day.tags.length?day.tags.map(renderStreakTag).join(''):'<span class="text-[10px] text-gray-400">無策略標籤</span>'}</div></div>`).join('');
-        return`<article class="rounded-xl border border-violet-200 dark:border-violet-800/60 bg-white dark:bg-gray-900/35 p-3 sm:p-4 shadow-sm"><div class="flex items-start justify-between gap-3"><div class="min-w-0 flex flex-wrap items-center gap-1 rounded-lg px-1 -mx-1"${getYahooStockAttributes(item.code)}><span class="font-black text-violet-700 dark:text-violet-300 mr-1">${escapeHTML(item.code)}</span><span class="font-bold text-gray-800 dark:text-gray-100">${escapeHTML(item.name||'未命名')}</span>${infoIcons}</div><span class="shrink-0 rounded-full bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 px-2.5 py-1 text-[10px] font-black">連續 ${item.streak} 日</span></div><div class="flex flex-wrap items-center gap-1 mt-3 mb-2"><span class="text-[10px] text-gray-500 dark:text-gray-400 mr-1">共同策略</span>${common}</div><div>${daily}</div></article>`;
+        const resultBadge=analysis.mode==='window'?`${analysis.minDays} 日內 ${item.occurrences} 次`:`連續 ${item.streak} 日`;
+        return`<article class="rounded-xl border border-violet-200 dark:border-violet-800/60 bg-white dark:bg-gray-900/35 p-3 sm:p-4 shadow-sm"><div class="flex items-start justify-between gap-3"><div class="min-w-0 flex flex-wrap items-center gap-1 rounded-lg px-1 -mx-1"${getYahooStockAttributes(item.code)}><span class="font-black text-violet-700 dark:text-violet-300 mr-1">${escapeHTML(item.code)}</span><span class="font-bold text-gray-800 dark:text-gray-100">${escapeHTML(item.name||'未命名')}</span>${infoIcons}</div><span class="shrink-0 rounded-full bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 px-2.5 py-1 text-[10px] font-black">${resultBadge}</span></div><div class="flex flex-wrap items-center gap-1 mt-3 mb-2"><span class="text-[10px] text-gray-500 dark:text-gray-400 mr-1">共同策略</span>${common}</div><div>${daily}</div></article>`;
     }).join('');
 }
 
 const buildJournalStreakCopyText=analysis=>{
-    const lines=[`【策略連續出現追蹤】`,`基準日：${analysis.baseDate||analysis.requestedBase}｜至少連續 ${analysis.minDays} 個交易日｜週末、休市日不計${analysis.customHolidays.length?`｜自訂休市 ${analysis.customHolidays.length} 日`:''}${analysis.excludeHorses?'｜排除赤兔馬、千里馬':''}`,`共 ${analysis.results.length} 檔`,''];
+    const modeText=analysis.mode==='window'?`${analysis.minDays} 日內重複出現至少 2 次`:`至少連續 ${analysis.minDays} 個交易日`;
+    const lines=[`【策略訊號雷達】`,`基準日：${analysis.baseDate||analysis.requestedBase}｜${modeText}｜週末、休市日不計${analysis.customHolidays.length?`｜自訂休市 ${analysis.customHolidays.length} 日`:''}${analysis.excludeHorses?'｜排除赤兔馬、千里馬':''}`,`共 ${analysis.results.length} 檔`,''];
     analysis.results.forEach(item=>{
-        lines.push(`${item.code} ${item.name}｜連續 ${item.streak} 日`);
+        lines.push(`${item.code} ${item.name}｜${analysis.mode==='window'?`${analysis.minDays} 日內出現 ${item.occurrences} 次`:`連續 ${item.streak} 日`}`);
         if(item.commonTags.length)lines.push(`共同策略：${item.commonTags.join('、')}`);
         item.days.forEach(day=>lines.push(`- ${day.date.replace(/-/g,'/')}：${day.tags.length?day.tags.join('、'):'無策略標籤'}`));
         lines.push('');
@@ -2073,6 +2146,7 @@ const addCustomMarketHoliday=async()=>{
 };
 
 document.getElementById('streak-search-form')?.addEventListener('submit',e=>{e.preventDefault();renderJournalStreaks();});
+document.getElementById('streak-mode')?.addEventListener('change',()=>{updateStreakModeUI();lastJournalStreakResult=null;const summary=document.getElementById('streak-summary'),root=document.getElementById('streak-results'),copyBtn=document.getElementById('streak-copy-btn');if(summary)summary.textContent='請設定 N 日後開始比對。';if(root){root.innerHTML='';root.classList.add('hidden');}if(copyBtn)copyBtn.disabled=true;});
 document.getElementById('streak-copy-btn')?.addEventListener('click',()=>{if(!lastJournalStreakResult?.results.length)return showToast('目前沒有可複製的結果','error');executeCopy(buildJournalStreakCopyText(lastJournalStreakResult)+copyFootnote);});
 document.getElementById('streak-add-holiday-btn')?.addEventListener('click',addCustomMarketHoliday);
 document.getElementById('streak-holiday-date')?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addCustomMarketHoliday();}});
@@ -2089,7 +2163,7 @@ document.getElementById('streak-clear-holidays-btn')?.addEventListener('click',(
 });
 document.getElementById('streak-toggle-btn')?.addEventListener('click',()=>{
     const content=document.getElementById('streak-panel-content');if(!content)return;
-    if(streakPanelPinned)return showToast('策略連續出現追蹤已釘選，請先取消釘選','error');
+    if(streakPanelPinned)return showToast('策略訊號雷達已釘選，請先取消釘選','error');
     const collapsed=!content.classList.contains('hidden');
     setStreakPanelCollapsed(collapsed);
     try{localStorage.setItem(STREAK_PANEL_STORAGE_KEY,String(collapsed));}catch(e){}
@@ -2781,7 +2855,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
         });
     });
 
-    loadLocalData(); clearTransientSearchFields(); initStreakBaseDate(); initStreakPanelToggle(); renderCustomMarketHolidays(); syncDuplicateCompareToggles(); renderDynamicTags(); bindDatalistAutoUpdate();
+    loadLocalData(); clearTransientSearchFields(); initStreakBaseDate(); updateStreakModeUI(); initStreakPanelToggle(); renderCustomMarketHolidays(); syncDuplicateCompareToggles(); renderDynamicTags(); bindDatalistAutoUpdate();
     bindAutoFill('j-code','j-name',c=>updatePreview(c,'j-preview','blue')); bindAutoFill('overview-code','overview-name',c=>{if(c)renderStockOverview(c);}); bindAutoFill('c-code','c-name'); bindAutoFill('r-code','r-name'); bindAutoFill('rep-code','rep-name'); bindAutoFill('p-stock','p-name'); bindAutoFill('modal-plan-stock','modal-plan-name'); 
     bindAutoFill('chk-code','chk-name',c=>{
         updatePreview(c,'chk-preview','cyan');
