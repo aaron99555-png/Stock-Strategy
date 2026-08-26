@@ -21,7 +21,6 @@ try{
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
 tailwind.config={darkMode:'class',theme:{extend:{colors:{gray:{50:'#f8fafc',100:'#f1f5f9',200:'#e2e8f0',300:'#cbd5e1',400:'#94a3b8',500:'#64748b',600:'#475569',700:'#334155',800:'#1e293b',900:'#0f172a'}}}}};
 </script>
@@ -1360,12 +1359,48 @@ if(journalStreakMount&&journalStreakPanel)journalStreakMount.replaceWith(journal
 const DB_URL="https://stockstrategy-492a1-default-rtdb.firebaseio.com", LOCAL_STORAGE_KEY='ryan_stock_data_v1';
 const DIRECT_SYNC_PATH='ryan_stock_strategy_direct_v1',LEGACY_SYNC_KEY=localStorage.getItem('ryan_sync_key')||'';
 const PENDING_CLOUD_WRITES_KEY='ryan_pending_cloud_writes_v1',LAST_CLOUD_SYNC_KEY='ryan_last_cloud_sync_v1';
+const ADMIN_SESSION_STORAGE_KEY='ryan_admin_session_v1';
+const XLSX_CDN_URL='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
 const getSyncPath=()=>DIRECT_SYNC_PATH;
 const isCloudMode=()=>true;
 let cloudSyncInterval=null, state={journals:[],plans:[],revenueRecords:[],reports:[],checklists:[],trash:[],tagSettings:null,epsData:{},codeToName:{},nameToCode:{},customMarketHolidays:[],copyCompareDuplicates:false,filters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,tags:[],minScore:0,tagLogic:'OR'},favFilters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,tags:[],minScore:0,tagLogic:'OR'},revenueFilters:{month:'',code:''},reportFilters:{start:'',end:'',code:''},sortConfig:{key:'createdAt',asc:false},favSortConfig:{key:'createdAt',asc:false},planSortConfig:{key:'createdAt',asc:false},revenueSortConfig:{key:'month',asc:false},reportSortConfig:{key:'date',asc:false},checklistSortConfig:{key:'createdAt',asc:false}};
 const selectedIds={journal:new Set(),fav:new Set(),plan:new Set(),revenue:new Set(),report:new Set(),checklist:new Set()};
 
 const escapeHTML=str=>(!str&&str!==0)?'':String(str).replace(/[&<>'"]/g,tag=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[tag]||tag));
+const normalizeStockCodeValue=value=>{
+    let code=String(value??'').trim().toUpperCase().replace(/\.0+$/,'');
+    if(/^\d{1,3}$/.test(code))code=code.padStart(4,'0');
+    return code;
+};
+const isValidStockCode=value=>/^\d{4,6}[A-Z]?$/.test(String(value||''));
+const isSafeImportedLabel=(value,maxLength=30)=>{const text=String(value||'').trim();return Boolean(text&&text.length<=maxLength&&!/[<>"'`\u0000-\u001F\u007F]/.test(text));};
+const hasStoredAdminAccess=()=>{
+    try{return localStorage.getItem(ADMIN_SESSION_STORAGE_KEY)==='1'||(typeof window.isAdminMode==='function'&&window.isAdminMode());}
+    catch(error){return typeof window.isAdminMode==='function'&&window.isAdminMode();}
+};
+const sanitizeJournalForViewer=item=>{const sanitized={...(item||{})};delete sanitized.isFavorite;return sanitized;};
+const rebuildStockLookup=()=>{
+    state.codeToName={};state.nameToCode={};
+    const planItems=hasStoredAdminAccess()?(state.plans||[]).map(plan=>({code:plan.stock,name:plan.name})):[];
+    [...(state.journals||[]),...planItems,...(state.revenueRecords||[]),...(state.reports||[]),...(state.checklists||[]),...Object.values(state.epsData||{})].forEach(item=>{
+        if(item&&item.code&&item.name){state.codeToName[item.code]=item.name;state.nameToCode[item.name]=item.code;}
+    });
+};
+const stripAdminState=()=>{
+    state.journals=(state.journals||[]).map(sanitizeJournalForViewer);state.plans=[];state.trash=[];
+    selectedIds.fav.clear();selectedIds.plan.clear();rebuildStockLookup();
+};
+let xlsxLoadPromise=null;
+const ensureXLSXLoaded=()=>{
+    if(typeof window.XLSX!=='undefined')return Promise.resolve(window.XLSX);
+    if(xlsxLoadPromise)return xlsxLoadPromise;
+    xlsxLoadPromise=new Promise((resolve,reject)=>{
+        const script=document.createElement('script');script.src=XLSX_CDN_URL;script.async=true;script.dataset.lazyXlsx='true';
+        script.onload=()=>{if(window.XLSX)resolve(window.XLSX);else{xlsxLoadPromise=null;script.remove();reject(new Error('Excel 套件初始化失敗'));}};script.onerror=()=>{xlsxLoadPromise=null;script.remove();reject(new Error('Excel 套件載入失敗'));};document.head.appendChild(script);
+    });
+    return xlsxLoadPromise;
+};
+window.ensureXLSXLoaded=ensureXLSXLoaded;
 const debounce=(func,wait)=>{let timeout;return function(...args){const later=()=>{clearTimeout(timeout);func(...args);};clearTimeout(timeout);timeout=setTimeout(later,wait);};};
 let confirmCallback=null, promptCallback=null;
 window.openConfirmModal=(msg,cb)=>{document.getElementById('confirm-modal-msg').textContent=msg;confirmCallback=cb;document.getElementById('confirm-modal').classList.remove('hidden');};
@@ -1604,10 +1639,11 @@ const renderReportIndicator=()=>'<span title="有法人報告" aria-label="有�
 const updatePreview=(c,tId='j-preview',col='blue')=>{
     const p=document.getElementById(tId);if(!c||!state.epsData[c]){if(p)p.classList.add('hidden');return;}
     const d=state.epsData[c],sn=state.codeToName[c]||d.name||'';
-    if(p){p.classList.remove('hidden');p.innerHTML=`<span class="text-${col}-600 dark:text-${col}-400 font-bold flex items-center flex-shrink-0"><i class="fa-solid fa-link mr-1.5"></i>參考資料 <span class="ml-2 px-2 py-0.5 bg-${col}-100 dark:bg-${col}-900/60 text-${col}-800 dark:text-${col}-200 rounded-md text-xs tracking-wider border border-${col}-200 dark:border-${col}-700/50 shadow-sm">${escapeHTML(c)} ${escapeHTML(sn)}</span><button type="button" onclick="window.copyPreviewData('${c}')" class="ml-3 text-[11px] bg-${col}-600 hover:bg-${col}-500 text-white px-2 py-1 rounded shadow-sm transition active:scale-95 flex items-center"><i class="fa-solid fa-copy mr-1"></i>複製</button></span><div class="flex flex-wrap items-center gap-3 text-xs sm:text-sm ml-2 text-gray-700 dark:text-gray-300"><span><span class="text-gray-400 text-[10px] sm:text-xs mr-1">25 EPS:</span>${formatNumColor(d.eps2025)}</span><span><span class="text-gray-400 text-[10px] sm:text-xs mr-1">預26 EPS:</span>${formatNumColor(d.eps2026)}</span><span><span class="text-gray-400 text-[10px] sm:text-xs mr-1">EPS成長率:</span>${d.epsGrowth!=null?formatNumColor(d.epsGrowth,true):'-'}</span><span><span class="text-gray-400 text-[10px] sm:text-xs mr-1">法人最高目標價:</span>${d.targetPrice?`<span class="text-yellow-600 dark:text-yellow-400 font-bold">${escapeHTML(d.targetPrice)}</span>`:'-'}</span><span><span class="text-gray-400 text-[10px] sm:text-xs mr-1">券商:</span>${d.broker?`<span class="text-purple-600 dark:text-purple-400 font-bold">${escapeHTML(d.broker)}</span>`:'-'}</span><span><span class="text-gray-400 text-[10px] sm:text-xs mr-1">報告日期:</span>${d.reportDate?`<span class="text-cyan-600 dark:text-cyan-400 font-bold">${escapeHTML(d.reportDate)}</span>`:'-'}</span>${d.futures==='●'?'<span class="bg-sky-600 text-white text-[10px] px-1.5 py-0.5 rounded ml-1">期</span>':''}</div>`;}
+    if(p){p.classList.remove('hidden');p.innerHTML=`<span class="text-${col}-600 dark:text-${col}-400 font-bold flex items-center flex-shrink-0"><i class="fa-solid fa-link mr-1.5"></i>參考資料 <span class="ml-2 px-2 py-0.5 bg-${col}-100 dark:bg-${col}-900/60 text-${col}-800 dark:text-${col}-200 rounded-md text-xs tracking-wider border border-${col}-200 dark:border-${col}-700/50 shadow-sm">${escapeHTML(c)} ${escapeHTML(sn)}</span><button type="button" data-copy-preview-code="${escapeHTML(c)}" class="ml-3 text-[11px] bg-${col}-600 hover:bg-${col}-500 text-white px-2 py-1 rounded shadow-sm transition active:scale-95 flex items-center"><i class="fa-solid fa-copy mr-1"></i>複製</button></span><div class="flex flex-wrap items-center gap-3 text-xs sm:text-sm ml-2 text-gray-700 dark:text-gray-300"><span><span class="text-gray-400 text-[10px] sm:text-xs mr-1">25 EPS:</span>${formatNumColor(d.eps2025)}</span><span><span class="text-gray-400 text-[10px] sm:text-xs mr-1">預26 EPS:</span>${formatNumColor(d.eps2026)}</span><span><span class="text-gray-400 text-[10px] sm:text-xs mr-1">EPS成長率:</span>${d.epsGrowth!=null?formatNumColor(d.epsGrowth,true):'-'}</span><span><span class="text-gray-400 text-[10px] sm:text-xs mr-1">法人最高目標價:</span>${d.targetPrice?`<span class="text-yellow-600 dark:text-yellow-400 font-bold">${escapeHTML(d.targetPrice)}</span>`:'-'}</span><span><span class="text-gray-400 text-[10px] sm:text-xs mr-1">券商:</span>${d.broker?`<span class="text-purple-600 dark:text-purple-400 font-bold">${escapeHTML(d.broker)}</span>`:'-'}</span><span><span class="text-gray-400 text-[10px] sm:text-xs mr-1">報告日期:</span>${d.reportDate?`<span class="text-cyan-600 dark:text-cyan-400 font-bold">${escapeHTML(d.reportDate)}</span>`:'-'}</span>${d.futures==='●'?'<span class="bg-sky-600 text-white text-[10px] px-1.5 py-0.5 rounded ml-1">期</span>':''}</div>`;}
 };
 
 window.copyPreviewData=c=>{const d=state.epsData[c];if(!d)return;const sn=state.codeToName[c]||d.name||'';let t=`【${c} ${sn}】參考資料\n25 EPS: ${d.eps2025??'-'}\n預26 EPS: ${d.eps2026??'-'}\nEPS成長率: ${d.epsGrowth!=null?(d.epsGrowth*100).toFixed(2)+'%':'-'}\n法人最高目標價: ${d.targetPrice??'-'}\n券商: ${d.broker??'-'}\n報告日期: ${d.reportDate??'-'}\n`;if(d.futures==='●')t+=`*含股期`;executeCopy(t.trim());};
+document.addEventListener('click',event=>{const button=event.target.closest('[data-copy-preview-code]');if(button)window.copyPreviewData(button.dataset.copyPreviewCode);});
 
 const bindAutoFill=(cId,nId,cb=null)=>{
     const codeInput=document.getElementById(cId),nameInput=document.getElementById(nId);
@@ -1735,11 +1771,11 @@ function renderDynamicTags(){
     const fc=document.getElementById('form-tags-container');
     const currentFormTag=fc?.querySelector('.tag-input:checked')?.value||rememberedJournalFormTag;
     if(currentFormTag)rememberJournalFormTag(currentFormTag);
-    if(fc)fc.innerHTML=TAG_CATEGORIES.map(c=>`<div><div class="text-xs font-bold text-gray-500 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 pb-1 mb-2">${c.title}</div><div class="flex flex-wrap gap-2">${c.tags.map(t=>{const theme=window.getManagedTagTheme?.(t,c.theme)||c.theme;return`<label class="cursor-pointer"><input type="checkbox" value="${escapeHTML(t)}" class="hidden tag-input" data-theme="${theme}"><div class="px-3 py-1.5 rounded-lg text-xs font-bold border transition active:scale-95 ${THEME_MAP[theme].inactive}">${escapeHTML(t)}</div></label>`;}).join('')}</div></div>`).join('');
+    if(fc)fc.innerHTML=TAG_CATEGORIES.map(c=>`<div><div class="text-xs font-bold text-gray-500 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 pb-1 mb-2">${escapeHTML(c.title)}</div><div class="flex flex-wrap gap-2">${c.tags.map(t=>{const theme=window.getManagedTagTheme?.(t,c.theme)||c.theme;return`<label class="cursor-pointer"><input type="checkbox" value="${escapeHTML(t)}" class="hidden tag-input" data-theme="${theme}"><div class="px-3 py-1.5 rounded-lg text-xs font-bold border transition active:scale-95 ${THEME_MAP[theme].inactive}">${escapeHTML(t)}</div></label>`;}).join('')}</div></div>`).join('');
     
     document.querySelectorAll('#filter-tags-container, #filter-tags-container-fav').forEach(container=>{
         if(!container)return;
-        container.innerHTML=TAG_CATEGORIES.map(cat=>`<div class="text-[10px] font-bold text-gray-400 border-b border-gray-300 dark:border-gray-700 pb-1 mb-1.5 mt-2 first:mt-0">${cat.title}</div><div class="grid grid-cols-2 gap-1 mb-1">${cat.tags.map(t=>`<label class="flex items-center gap-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700/50 p-1.5 rounded transition"><input type="checkbox" value="${escapeHTML(t)}" class="filter-tag-cb w-3.5 h-3.5 cursor-pointer"><span class="text-xs font-medium text-gray-700 dark:text-gray-300">${escapeHTML(t)}</span></label>`).join('')}</div>`).join('');
+        container.innerHTML=TAG_CATEGORIES.map(cat=>`<div class="text-[10px] font-bold text-gray-400 border-b border-gray-300 dark:border-gray-700 pb-1 mb-1.5 mt-2 first:mt-0">${escapeHTML(cat.title)}</div><div class="grid grid-cols-2 gap-1 mb-1">${cat.tags.map(t=>`<label class="flex items-center gap-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700/50 p-1.5 rounded transition"><input type="checkbox" value="${escapeHTML(t)}" class="filter-tag-cb w-3.5 h-3.5 cursor-pointer"><span class="text-xs font-medium text-gray-700 dark:text-gray-300">${escapeHTML(t)}</span></label>`).join('')}</div>`).join('');
     });
     
     const updateTagInputVisual=box=>{
@@ -1776,7 +1812,7 @@ function renderDynamicTags(){
                 state.filters.tags=state.filters.tags.filter(t=>t!==v);
                 state.favFilters.tags=state.favFilters.tags.filter(t=>t!==v);
             }
-            document.querySelectorAll(`.filter-tag-cb[value="${v}"]`).forEach(c=>c.checked=isC);
+            document.querySelectorAll('.filter-tag-cb').forEach(c=>{if(c.value===v)c.checked=isC;});
             renderFilterTags();processAndRenderJournals();renderFavorites();saveLocalData();
         });
     });
@@ -1785,20 +1821,26 @@ function renderDynamicTags(){
 window.removeFilterTag=tag=>{
     state.filters.tags=state.filters.tags.filter(t=>t!==tag);
     state.favFilters.tags=state.favFilters.tags.filter(t=>t!==tag);
-    document.querySelectorAll(`.filter-tag-cb[value="${tag}"]`).forEach(cb=>cb.checked=false);
+    document.querySelectorAll('.filter-tag-cb').forEach(cb=>{if(cb.value===tag)cb.checked=false;});
     renderFilterTags();processAndRenderJournals();renderFavorites();saveLocalData();
 };
 
 function renderFilterTags(){
     const d1=document.getElementById('filter-tags-display'),d2=document.getElementById('filter-tags-display-fav');
-    const h=state.filters.tags.map(t=>`<span class="${getTagStyle(t, true)} text-xs px-2 py-1 rounded-lg flex items-center cursor-pointer hover:opacity-80 transition shadow-sm" onclick="removeFilterTag('${t}')">${t} <i class="fa-solid fa-xmark ml-1.5 opacity-70"></i></span>`).join('');
+    const h=state.filters.tags.map(t=>`<button type="button" data-filter-remove-tag="${escapeHTML(encodeURIComponent(t))}" class="${getTagStyle(t, true)} text-xs px-2 py-1 rounded-lg flex items-center cursor-pointer hover:opacity-80 transition shadow-sm">${escapeHTML(t)} <i class="fa-solid fa-xmark ml-1.5 opacity-70"></i></button>`).join('');
     if(d1)d1.innerHTML=h;
     if(d2)d2.innerHTML=h;
 }
+document.addEventListener('click',event=>{const button=event.target.closest('[data-filter-remove-tag]');if(button)window.removeFilterTag(decodeURIComponent(button.dataset.filterRemoveTag));});
 
 ['', '-fav'].forEach(s=>{const b=document.getElementById('filter-tag-btn'+s),p=document.getElementById('filter-tag-panel'+s);if(b&&p){b.addEventListener('click',e=>{e.stopPropagation();p.classList.toggle('hidden');});document.addEventListener('click',e=>{if(!p.contains(e.target)&&e.target!==b)p.classList.add('hidden');});}});
 
-function saveLocalData(){localStorage.setItem(LOCAL_STORAGE_KEY,JSON.stringify(state));}
+let lastLocalSaveErrorAt=0;
+const getPersistableState=()=>hasStoredAdminAccess()?state:{...state,journals:(state.journals||[]).map(sanitizeJournalForViewer),plans:[],trash:[]};
+function saveLocalData(){
+    try{localStorage.setItem(LOCAL_STORAGE_KEY,JSON.stringify(getPersistableState()));return true;}
+    catch(error){console.error('本機資料儲存失敗',error);if(Date.now()-lastLocalSaveErrorAt>15000){lastLocalSaveErrorAt=Date.now();showToast('本機儲存空間不足，請先匯出備份或清理瀏覽器空間','error');}return false;}
+}
 const readPendingCloudWrites=()=>{try{const value=JSON.parse(localStorage.getItem(PENDING_CLOUD_WRITES_KEY)||'[]');return Array.isArray(value)?value.filter(item=>item&&item.id&&item.path&&item.method):[];}catch(error){return[];}};
 const savePendingCloudWrites=items=>{try{localStorage.setItem(PENDING_CLOUD_WRITES_KEY,JSON.stringify(items));return true;}catch(error){console.error('待同步資料儲存失敗',error);return false;}};
 const queueCloudWrite=(path,options={})=>{
@@ -1831,12 +1873,34 @@ async function flushPendingCloudWrites(showError=false){
     }catch(error){console.error(error);window.updateCloudHealthUI?.('pending');if(showError)showToast('仍有資料等待同步，請稍後再試','error');return false;}
 }
 const cloudCollection=v=>Array.isArray(v)?v.filter(Boolean):(v&&typeof v==='object'?Object.values(v).filter(Boolean):[]);
-const cloudSnapshot=()=>({journals:Object.fromEntries(state.journals.map(x=>[x.id,x])),plans:Object.fromEntries(state.plans.map(x=>[x.id,x])),revenueRecords:Object.fromEntries(state.revenueRecords.map(x=>[x.id,x])),reports:Object.fromEntries(state.reports.map(x=>[x.id,x])),checklists:Object.fromEntries(state.checklists.map(x=>[x.id,x])),trash:Object.fromEntries((state.trash||[]).map(x=>[x.id,x])),tagSettings:state.tagSettings||null,epsData:state.epsData||{},customMarketHolidaySettings:{dates:[...(state.customMarketHolidays||[])],updatedAt:Date.now()}});
+const cloudSnapshot=()=>({journals:Object.fromEntries(state.journals.map(x=>[x.id,x])),publicJournals:Object.fromEntries(state.journals.map(x=>[x.id,sanitizeJournalForViewer(x)])),plans:Object.fromEntries(state.plans.map(x=>[x.id,x])),revenueRecords:Object.fromEntries(state.revenueRecords.map(x=>[x.id,x])),reports:Object.fromEntries(state.reports.map(x=>[x.id,x])),checklists:Object.fromEntries(state.checklists.map(x=>[x.id,x])),trash:Object.fromEntries((state.trash||[]).map(x=>[x.id,x])),tagSettings:state.tagSettings||null,epsData:state.epsData||{},customMarketHolidaySettings:{dates:[...(state.customMarketHolidays||[])],updatedAt:Date.now()}});
+const sanitizeCloudJournalPayload=value=>{
+    if(Array.isArray(value))return value.map(item=>item?sanitizeJournalForViewer(item):item);
+    if(value&&typeof value==='object')return Object.fromEntries(Object.entries(value).map(([id,item])=>[id,item?sanitizeJournalForViewer(item):item]));
+    return value;
+};
+const PUBLIC_CLOUD_PATHS={journals:'publicJournals',revenueRecords:'revenueRecords',reports:'reports',checklists:'checklists',tagSettings:'tagSettings',epsData:'epsData',customMarketHolidaySettings:'customMarketHolidaySettings'};
+const fetchCloudJSON=async path=>{
+    const response=await fetch(`${DB_URL}/data/${getSyncPath()}/${path}.json`,{cache:'no-store'});
+    if(!response.ok){const error=new Error(`雲端讀取失敗 (${response.status})`);error.status=response.status;throw error;}
+    return response.json();
+};
+const fetchCloudPayload=async adminAccess=>{
+    if(adminAccess){
+        const response=await fetch(`${DB_URL}/data/${getSyncPath()}.json`,{cache:'no-store'});
+        if(!response.ok){const error=new Error(`雲端讀取失敗 (${response.status})`);error.status=response.status;throw error;}
+        return response.json();
+    }
+    const entries=await Promise.all(Object.entries(PUBLIC_CLOUD_PATHS).map(async([key,path])=>[key,await fetchCloudJSON(path)]));
+    const payload=Object.fromEntries(entries);
+    if(payload.journals==null)payload.journals=sanitizeCloudJournalPayload(await fetchCloudJSON('journals'));
+    return payload;
+};
 const hasCollectionRecords=value=>Array.isArray(value)?value.some(Boolean):!!(value&&typeof value==='object'&&Object.keys(value).length);
 const hasSyncPayload=data=>!!(data&&(hasCollectionRecords(data.journals)||hasCollectionRecords(data.plans)||hasCollectionRecords(data.revenueRecords)||hasCollectionRecords(data.reports)||hasCollectionRecords(data.checklists)||hasCollectionRecords(data.trash)||hasCollectionRecords(data.epsData)||hasCollectionRecords(data.tagSettings?.categories)||hasCollectionRecords(data.customMarketHolidaySettings?.dates)));
 const hasLocalSyncData=()=>hasSyncPayload(cloudSnapshot());
 async function migrateLegacyCloudData(){
-    if(!LEGACY_SYNC_KEY||LEGACY_SYNC_KEY===DIRECT_SYNC_PATH)return false;
+    if(!hasStoredAdminAccess()||!LEGACY_SYNC_KEY||LEGACY_SYNC_KEY===DIRECT_SYNC_PATH)return false;
     try{
         const targetResponse=await fetch(`${DB_URL}/data/${DIRECT_SYNC_PATH}.json`,{cache:'no-store'});
         if(targetResponse.ok&&hasSyncPayload(await targetResponse.json()))return false;
@@ -1849,42 +1913,57 @@ async function migrateLegacyCloudData(){
         return migrateResponse.ok;
     }catch(error){console.warn('舊雲端資料遷移略過',error);return false;}
 }
-async function loadFromCloud(showError=true){
+let lastAppliedCloudSignature='',cloudLoadPromise=null,activeCloudLoadAdminAccess=null;
+async function performCloudLoad(showError,forceApply,adminAccess){
     if(!isCloudMode())return false;
     try{
-        if(!(await flushPendingCloudWrites(false))){if(showError)showToast('尚有本機資料等待同步，已停止雲端覆蓋','error');return false;}
-        const r=await fetch(`${DB_URL}/data/${getSyncPath()}.json`,{cache:'no-store'});
-        if(r.status===401){document.getElementById('config-warning-modal').classList.remove('hidden');return false;}
-        if(!r.ok)throw new Error(`雲端讀取失敗 (${r.status})`);
-        const d=await r.json();
-        if(d){
-            state.journals=cloudCollection(d.journals);
+        if(adminAccess&&!(await flushPendingCloudWrites(false))){if(showError)showToast('尚有本機資料等待同步，已停止雲端覆蓋','error');return false;}
+        const d=await fetchCloudPayload(adminAccess),signature=`${adminAccess?'admin':'viewer'}|${JSON.stringify(d??null)}`;
+        if(!forceApply&&signature===lastAppliedCloudSignature){markCloudSyncSuccess();return true;}
+        const hasRemoteData=adminAccess?d!=null:Object.values(d||{}).some(value=>value!=null);
+        if(hasRemoteData){
+            state.journals=cloudCollection(d.journals).map(item=>adminAccess?item:sanitizeJournalForViewer(item));
             const migratedStrategyTags=normalizeStrategyTags(state.journals);
-            state.plans=cloudCollection(d.plans);state.revenueRecords=cloudCollection(d.revenueRecords);const normalizedCloudReports=normalizeReportRecords(cloudCollection(d.reports));state.reports=normalizedCloudReports.records;state.checklists=cloudCollection(d.checklists);if(d.trash!==undefined)state.trash=cloudCollection(d.trash);if(d.tagSettings)state.tagSettings=d.tagSettings;state.epsData=d.epsData||{};
+            state.plans=adminAccess?cloudCollection(d.plans):[];state.revenueRecords=cloudCollection(d.revenueRecords);const normalizedCloudReports=normalizeReportRecords(cloudCollection(d.reports));state.reports=normalizedCloudReports.records;state.checklists=cloudCollection(d.checklists);state.trash=adminAccess?cloudCollection(d.trash):[];if(d.tagSettings)state.tagSettings=d.tagSettings;state.epsData=d.epsData||{};
             state.customMarketHolidays=d.customMarketHolidaySettings?normalizeCustomMarketHolidays(cloudCollection(d.customMarketHolidaySettings.dates)):[];
-            state.codeToName={};state.nameToCode={};
-            [...state.journals,...state.plans.map(p=>({code:p.stock,name:p.name})),...state.revenueRecords,...state.reports,...state.checklists,...Object.values(state.epsData)].forEach(dt=>{if(dt&&dt.code&&dt.name){state.codeToName[dt.code]=dt.name;state.nameToCode[dt.name]=dt.code;}});
+            rebuildStockLookup();
             const migratedManagedTags=window.ensureOptimizationState?.();window.syncCustomTagSettings?.();window.renderTrashManager?.();
-            if(migratedStrategyTags)await putDataToCloud('journals',Object.fromEntries(state.journals.map(x=>[x.id,x])));
-            if(normalizedCloudReports.changed)await putDataToCloud('reports',Object.fromEntries(state.reports.map(x=>[x.id,x])));
-            if((!d.tagSettings||migratedManagedTags)&&state.tagSettings)await putDataToCloud('tagSettings',state.tagSettings);
-            if(d.trash===undefined&&state.trash?.length)await putDataToCloud('trash',Object.fromEntries(state.trash.map(x=>[x.id,x])));
+            if(adminAccess){
+                if(migratedStrategyTags)await putDataToCloud('journals',Object.fromEntries(state.journals.map(x=>[x.id,x])));
+                else if(d.publicJournals===undefined&&state.journals.length)await putDataToCloud('publicJournals',Object.fromEntries(state.journals.map(x=>[x.id,sanitizeJournalForViewer(x)])));
+                if(normalizedCloudReports.changed)await putDataToCloud('reports',Object.fromEntries(state.reports.map(x=>[x.id,x])));
+                if((!d.tagSettings||migratedManagedTags)&&state.tagSettings)await putDataToCloud('tagSettings',state.tagSettings);
+                if(d.trash===undefined&&state.trash?.length)await putDataToCloud('trash',Object.fromEntries(state.trash.map(x=>[x.id,x])));
+            }
         }else{
-            if(hasLocalSyncData()){
+            if(adminAccess&&hasLocalSyncData()){
                 const init=await fetch(`${DB_URL}/data/${getSyncPath()}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(cloudSnapshot())});
                 if(!init.ok)throw new Error(`雲端建立失敗 (${init.status})`);
             }
         }
+        if(!adminAccess)stripAdminState();
+        lastAppliedCloudSignature=signature;
         renderCustomMarketHolidays();processAndRenderJournals();renderFavorites();renderPlans();renderRevenueRecords();renderReports();renderChecklists();
         if(document.getElementById('module-overview')?.classList.contains('active'))renderStockOverview();
         saveLocalData();
         markCloudSyncSuccess();
         return true;
-    }catch(e){console.error(e);if(showError)showToast('跨裝置同步失敗，請檢查網路連線','error');return false;}
+    }catch(e){console.error(e);if(e.status===401)document.getElementById('config-warning-modal')?.classList.remove('hidden');else if(showError)showToast('跨裝置同步失敗，請檢查網路連線','error');return false;}
+}
+function loadFromCloud(showError=true,forceApply=false){
+    const requestedAdminAccess=hasStoredAdminAccess();
+    if(cloudLoadPromise){
+        if(requestedAdminAccess===activeCloudLoadAdminAccess&&!forceApply)return cloudLoadPromise;
+        return cloudLoadPromise.then(()=>loadFromCloud(showError,forceApply));
+    }
+    activeCloudLoadAdminAccess=requestedAdminAccess;
+    cloudLoadPromise=performCloudLoad(showError,forceApply,requestedAdminAccess).finally(()=>{cloudLoadPromise=null;activeCloudLoadAdminAccess=null;});
+    return cloudLoadPromise;
 }
 function startCloudSync(){
     if(cloudSyncInterval)clearInterval(cloudSyncInterval);
-    cloudSyncInterval=isCloudMode()?setInterval(()=>{if(document.visibilityState==='visible')loadFromCloud(false);},30000):null;
+    const intervalMs=hasStoredAdminAccess()?30000:60000;
+    cloudSyncInterval=isCloudMode()?setInterval(()=>{if(document.visibilityState==='visible')loadFromCloud(false);},intervalMs):null;
 }
 function stopCloudSync(){if(cloudSyncInterval){clearInterval(cloudSyncInterval);cloudSyncInterval=null;}}
 async function cloudWrite(p,options){
@@ -1893,13 +1972,32 @@ async function cloudWrite(p,options){
     try{const r=await fetch(`${DB_URL}/data/${getSyncPath()}/${p}.json`,options);if(!r.ok)throw new Error(`雲端寫入失敗 (${r.status})`);markCloudSyncSuccess();return true;}
     catch(e){console.error(e);queueCloudWrite(p,options);showToast('本機已儲存，恢復連線後會自動同步','error');return false;}
 }
-async function putDataToCloud(p,py){return cloudWrite(p,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(py)});}
-async function patchDataToCloud(p,py){return cloudWrite(p,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(py)});}
-async function deleteDataFromCloud(p){return cloudWrite(p,{method:'DELETE'});}
+const getPublicJournalWrite=(path,payload)=>{
+    if(path!=='journals'&&!path.startsWith('journals/'))return null;
+    return{path:path.replace(/^journals/,'publicJournals'),payload:sanitizeCloudJournalPayload(payload)};
+};
+async function putDataToCloud(p,py){
+    const primary=await cloudWrite(p,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(py)}),mirror=getPublicJournalWrite(p,py);
+    if(!mirror)return primary;
+    const mirrored=await cloudWrite(mirror.path,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(mirror.payload)});return primary&&mirrored;
+}
+async function patchDataToCloud(p,py){
+    const primary=await cloudWrite(p,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(py)}),mirror=getPublicJournalWrite(p,py);
+    if(!mirror)return primary;
+    const mirrored=await cloudWrite(mirror.path,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(mirror.payload)});return primary&&mirrored;
+}
+async function deleteDataFromCloud(p){
+    const primary=await cloudWrite(p,{method:'DELETE'}),mirror=getPublicJournalWrite(p,null);
+    if(!mirror)return primary;
+    const mirrored=await cloudWrite(mirror.path,{method:'DELETE'});return primary&&mirrored;
+}
+window.reloadAdminPrivateData=async()=>{const result=await loadFromCloud(true,true);startCloudSync();return result;};
+window.clearAdminPrivateData=()=>{stripAdminState();saveLocalData();renderFavorites();renderPlans();window.renderTrashManager?.();startCloudSync();};
 
 function loadLocalData(){
     const sd=localStorage.getItem(LOCAL_STORAGE_KEY);
     if(sd){try{state={...state,...JSON.parse(sd)};}catch(e){}}else{const ts={"2330":"台積電","2317":"鴻海","2454":"聯發科","2382":"廣達","2603":"長榮"};Object.entries(ts).forEach(([c,n])=>{state.codeToName[c]=n;state.nameToCode[n]=c;});}
+    if(!Array.isArray(state.journals))state.journals=[];if(!Array.isArray(state.plans))state.plans=[];if(!state.epsData||typeof state.epsData!=='object'||Array.isArray(state.epsData))state.epsData={};
     const migratedStrategyTags=normalizeStrategyTags(state.journals);
     if(!state.revenueRecords)state.revenueRecords=[]; if(!state.reports)state.reports=[]; if(!state.checklists)state.checklists=[]; if(!Array.isArray(state.trash))state.trash=[];
     const normalizedLocalReports=normalizeReportRecords(state.reports);state.reports=normalizedLocalReports.records;
@@ -1917,7 +2015,9 @@ function loadLocalData(){
     if(state.filters.revenueHigh===undefined)state.filters.revenueHigh=false; if(state.favFilters.revenueHigh===undefined)state.favFilters.revenueHigh=false;
     if(state.filters.code===undefined)state.filters.code=''; if(state.favFilters.code===undefined)state.favFilters.code='';
     if(!state.reportSortConfig)state.reportSortConfig={key:'date',asc:false}; if(!state.checklistSortConfig)state.checklistSortConfig={key:'date',asc:false};
-    if(migratedStrategyTags||migratedFilterTags||migratedJournalFilter||migratedReportFilter||migratedMarketHolidays||normalizedLocalReports.changed)saveLocalData();
+    const removedAdminLocalData=!hasStoredAdminAccess()&&((state.plans||[]).length||(state.trash||[]).length||(state.journals||[]).some(item=>Object.prototype.hasOwnProperty.call(item||{},'isFavorite')));
+    if(!hasStoredAdminAccess())stripAdminState();
+    if(migratedStrategyTags||migratedFilterTags||migratedJournalFilter||migratedReportFilter||migratedMarketHolidays||normalizedLocalReports.changed||removedAdminLocalData)saveLocalData();
     const applyLogicState=(lv,sel)=>{document.querySelectorAll(sel).forEach(b=>{if(b.dataset.logic===lv){b.classList.remove('text-gray-500','dark:text-gray-400','hover:text-gray-700','dark:hover:text-gray-200');b.classList.add('bg-white','dark:bg-gray-700','text-blue-600','dark:text-blue-400','shadow-sm');}else{b.classList.remove('bg-white','dark:bg-gray-700','text-blue-600','dark:text-blue-400','shadow-sm');b.classList.add('text-gray-500','dark:text-gray-400','hover:text-gray-700','dark:hover:text-gray-200');}});};
     applyLogicState(state.filters.tagLogic,'.logic-btn'); applyLogicState(state.favFilters.tagLogic,'.logic-btn-fav');
 }
@@ -2200,41 +2300,7 @@ document.addEventListener('change',e=>{
         updateBatchUI(t);
     }
 });
-window.confirmBatchDelete=t=>{
-    if(!window.isAdminMode||!window.isAdminMode())return showToast('批次刪除僅限管理者使用','error');
-    updateBatchUI(t);
-    if(!selectedIds[t]||selectedIds[t].size===0)return showToast('請先勾選要刪除的資料','error');
-    document.getElementById('batch-delete-type').value=t;
-    document.getElementById('batch-delete-msg').textContent=`確定要刪除這 ${selectedIds[t].size} 筆資料嗎？`;
-    document.getElementById('batch-delete-modal').classList.remove('hidden');
-};
-window.executeBatchDelete=async()=>{
-    if(!window.isAdminMode||!window.isAdminMode())return showToast('批次刪除僅限管理者使用','error');
-    const confirmBtn=document.getElementById('btn-batch-delete-confirm');
-    if(confirmBtn?.disabled)return;
-    const t=document.getElementById('batch-delete-type').value;
-    updateBatchUI(t);
-    const ids=Array.from(selectedIds[t]||[],id=>String(id));
-    if(ids.length===0){document.getElementById('batch-delete-modal').classList.add('hidden');return showToast('沒有可刪除的資料','error');}
-    const idSet=new Set(ids),keep=item=>!idSet.has(String(item.id));
-    let cloudFolder='';
-    if(confirmBtn)confirmBtn.disabled=true;
-    try{
-        if(t==='journal'||t==='fav'){state.journals=state.journals.filter(keep);cloudFolder='journals';selectedIds.journal.clear();selectedIds.fav.clear();processAndRenderJournals();renderFavorites();}
-        else if(t==='plan'){state.plans=state.plans.filter(keep);cloudFolder='plans';selectedIds.plan.clear();renderPlans();}
-        else if(t==='revenue'){state.revenueRecords=state.revenueRecords.filter(keep);cloudFolder='revenueRecords';selectedIds.revenue.clear();renderRevenueRecords();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();}
-        else if(t==='report'){state.reports=state.reports.filter(keep);cloudFolder='reports';selectedIds.report.clear();renderReports();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();}
-        else if(t==='checklist'){state.checklists=state.checklists.filter(keep);cloudFolder='checklists';selectedIds.checklist.clear();renderChecklists();}
-        else throw new Error('不支援的清單類型');
-        saveLocalData();
-        document.getElementById('batch-delete-modal').classList.add('hidden');
-        await Promise.allSettled(ids.map(id=>deleteDataFromCloud(`${cloudFolder}/${id}`)));
-        showToast(`已刪除 ${ids.length} 筆資料`);
-    }catch(err){console.error(err);showToast('批次刪除失敗，請重試','error');}
-    finally{if(confirmBtn)confirmBtn.disabled=false;}
-};
 document.addEventListener('click',e=>{const b=e.target.closest('[data-batch-delete-type]');if(b){e.preventDefault();window.confirmBatchDelete(b.dataset.batchDeleteType);}});
-document.getElementById('btn-batch-delete-confirm')?.addEventListener('click',window.executeBatchDelete);
 document.getElementById('btn-batch-delete-cancel')?.addEventListener('click',()=>document.getElementById('batch-delete-modal').classList.add('hidden'));
 
 const filterFields=[{key:'start',cls:'filter-start',type:'value'},{key:'end',cls:'filter-end',type:'value'},{key:'code',cls:'filter-code',type:'value'},{key:'futuresOnly',cls:'filter-futures',type:'checked'},{key:'excludeNegativeGrowth',cls:'filter-exclude-negative-growth',type:'checked'},{key:'revenueHigh',cls:'filter-revenue-high',type:'checked'},{key:'minScore',cls:'filter-score',type:'value',isInt:true}];
@@ -2920,10 +2986,10 @@ setChkDirection('long');
     document.querySelectorAll('.report-sortable').forEach(th=>th.addEventListener('click',e=>handleTableSorting(e,'report','reportSortConfig',renderReports)));
     document.querySelectorAll('.chk-sortable').forEach(th=>th.addEventListener('click',e=>handleTableSorting(e,'chk','checklistSortConfig',renderChecklists)));
 
-    document.getElementById('btn-export-backup')?.addEventListener('click', () => {
+    document.getElementById('btn-export-backup')?.addEventListener('click', async () => {
         if(!window.isAdminMode||!window.isAdminMode())return showToast('匯出功能僅限管理者使用','error');
         try {
-            if(typeof XLSX === 'undefined') return showToast('匯出套件載入中，請稍後', 'error');
+            await ensureXLSXLoaded();
             const wb = XLSX.utils.book_new();
             
             const wsJournals = XLSX.utils.json_to_sheet(state.journals.map(j => ({'日期':j.date,'代號':j.code,'股名':j.name,'策略標籤':j.tags?j.tags.join(', '):'','追蹤等級':j.isFavorite===true?1:(j.isFavorite||0),'備註':j.notes||''})));
@@ -2951,197 +3017,6 @@ setChkDirection('long');
             console.error(e);
             showToast('匯出失敗，請稍後再試', 'error');
         }
-    });
-
-    // 處理資料庫上傳 (excel-upload)
-    document.getElementById('excel-upload')?.addEventListener('change', async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        
-        try {
-            if (typeof XLSX === 'undefined') return showToast('匯入套件載入中，請稍後', 'error');
-            const data = await file.arrayBuffer();
-            const workbook = XLSX.read(data);
-            const firstSheetName = workbook.SheetNames[0];
-            const worksheet = workbook.Sheets[firstSheetName];
-            const json = XLSX.utils.sheet_to_json(worksheet, { defval: null });
-            
-            let count = 0;
-            json.forEach(row => {
-                const code = row['代號'] || row['股票代號'] || row['Code'] || row['stock_id'];
-                const name = row['股名'] || row['股票名稱'] || row['Name'] || row['stock_name'];
-                if (code && name) {
-                    const cStr = String(code).trim();
-                    const nStr = String(name).trim();
-                    state.codeToName[cStr] = nStr;
-                    state.nameToCode[nStr] = cStr;
-                    
-                    state.epsData[cStr] = {
-                        code: cStr,
-                        name: nStr,
-                        eps2025: row['25 EPS'] ?? row['2025 EPS'] ?? row['25EPS'] ?? row['2025EPS'] ?? row['2025'] ?? row['今年EPS'] ?? row['本年EPS'] ?? null,
-                        eps2026: row['26 EPS'] ?? row['預26 EPS'] ?? row['2026 EPS'] ?? row['26EPS'] ?? row['2026EPS'] ?? row['預估26EPS'] ?? row['預估2026EPS'] ?? row['2026'] ?? row['明年EPS'] ?? null,
-                        epsGrowth: row['EPS成長率'] ?? row['成長率'] ?? row['預估成長率'] ?? row['YoY'] ?? row['YOY'] ?? null,
-                        targetPrice: row['最高目標價'] ?? row['目標價'] ?? row['Target Price'] ?? row['TP'] ?? null,
-                        broker: row['券商'] ?? row['發布券商'] ?? row['Broker'] ?? null,
-                        reportDate: normalizeReportDate(row['報告日期'] ?? row['報告日'] ?? row['Report Date'] ?? row['report_date'] ?? Object.values(row)[8] ?? null),
-                        futures: row['股期'] === '●' || row['股期'] === '是' || row['股期'] === 'Y' || row['期貨'] === '●' ? '●' : null
-                    };
-                    count++;
-                }
-            });
-            
-            saveLocalData();
-            if (isCloudMode()) await patchDataToCloud('epsData', state.epsData);
-            processAndRenderJournals();
-            if (document.getElementById('module-favorites').classList.contains('active')) renderFavorites();
-            
-            showToast(`成功匯入 ${count} 筆資料庫紀錄`);
-        } catch (err) {
-            console.error(err);
-            showToast('資料庫匯入失敗，請確認格式', 'error');
-        }
-        e.target.value = ''; // 清除 input 狀態允許重複選取相同檔案
-    });
-
-    // 處理手札備份匯入 (backup-file)
-    document.getElementById('backup-file')?.addEventListener('change', async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        
-        try {
-            if (typeof XLSX === 'undefined') return showToast('匯入套件載入中，請稍後', 'error');
-            const data = await file.arrayBuffer();
-            const workbook = XLSX.read(data);
-            
-            let importCount = 0;
-
-            const journalSheetName = workbook.SheetNames.includes('策略日誌') ? '策略日誌' : (workbook.SheetNames.includes('選股日誌') ? '選股日誌' : null);
-            if (journalSheetName) {
-                const ws = workbook.Sheets[journalSheetName];
-                const json = XLSX.utils.sheet_to_json(ws);
-                json.forEach(row => {
-                    if(row['代號'] && row['股名'] && row['日期']) {
-                        const id = generateId();
-                        const c = String(row['代號']).trim();
-                        const n = String(row['股名']).trim();
-                        state.codeToName[c] = n;
-                        state.nameToCode[n] = c;
-                        const tagsStr = row['策略標籤'];
-                        const tags = tagsStr ? [...new Set(tagsStr.split(',').map(t => normalizeStrategyTagName(t.trim())).filter(Boolean))] : [];
-                        const isFavVal = row['追蹤等級'] ? parseInt(row['追蹤等級']) : (row['已追蹤'] === '是' ? 1 : 0);
-                        state.journals.push({
-                            id, date: row['日期'], code: c, name: n, notes: row['備註'] || '',
-                            tags: tags, isFavorite: isFavVal, createdAt: Date.now(), updatedAt: Date.now()
-                        });
-                        importCount++;
-                    }
-                });
-            }
-            
-            if (workbook.SheetNames.includes('營收創高')) {
-                const ws = workbook.Sheets['營收創高'];
-                const json = XLSX.utils.sheet_to_json(ws);
-                json.forEach(row => {
-                    if(row['代號'] && row['創高月份']) {
-                        const c = String(row['代號']).trim();
-                        const n = String(row['股名']).trim();
-                        const m = row['創高月份'];
-                        const id = `${c}_${m}`;
-                        if(!state.revenueRecords.find(x => x.id === id)) {
-                            state.revenueRecords.push({
-                                id, month: m, code: c, name: n, notes: row['備註'] || '',
-                                createdAt: Date.now(), updatedAt: Date.now()
-                            });
-                            importCount++;
-                        }
-                    }
-                });
-            }
-            
-            if (workbook.SheetNames.includes('法人報告')) {
-                 const ws = workbook.Sheets['法人報告'];
-                 const json = XLSX.utils.sheet_to_json(ws);
-                 json.forEach(row => {
-                     if(row['代號'] && row['報告日期']) {
-                         const c = String(row['代號']).trim();
-                         const n = String(row['股名']).trim();
-                         const id = `${c}_${Date.now()}_${Math.random().toString(36).substr(2,5)}`;
-                         state.reports.push({
-                             id, date: normalizeReportDate(row['報告日期'])||'', code: c, name: n, content: row['摘要內容'] || '',
-                             createdAt: Date.now(), updatedAt: Date.now()
-                         });
-                         importCount++;
-                     }
-                 });
-            }
-            
-            if (workbook.SheetNames.includes('進場查核')) {
-                 const ws = workbook.Sheets['進場查核'];
-                 const json = XLSX.utils.sheet_to_json(ws);
-                 json.forEach(row => {
-                     if(row['代號'] && row['查核日期']) {
-                         const c = String(row['代號']).trim();
-                         const n = String(row['股名']).trim();
-                         const dir = row['方向'] === '空方' ? 'short' : 'long';
-                         const checkedItemsStr = row['符合條件'];
-                         const checkedItems = checkedItemsStr ? checkedItemsStr.split(',').map(t => t.trim()).filter(Boolean) : [];
-                         state.checklists.push({
-                             id: generateId(), date: row['查核日期'], code: c, name: n, direction: dir, checkedItems: checkedItems,
-                             details: {
-                                 pressure: row['壓力'] || '', support: row['支撐'] || '', target: row['目標價'] || '',
-                                 chipsInst: row['法人籌碼'] || '', chipsConc: row['集中度'] || '', cost: row['主力成本'] || '',
-                                 pe: row['本益比'] || '', profit: row['獲利狀況'] || '', notes: row['備註'] || ''
-                             },
-                             createdAt: Date.now(), updatedAt: Date.now()
-                         });
-                         importCount++;
-                     }
-                 });
-            }
-            
-            if (workbook.SheetNames.includes('交易規劃')) {
-                 const ws = workbook.Sheets['交易規劃'];
-                 const json = XLSX.utils.sheet_to_json(ws);
-                 json.forEach(row => {
-                     if(row['代號'] && row['進場日期']) {
-                         const c = String(row['代號']).trim();
-                         const n = String(row['股名']).trim();
-                         state.plans.push({
-                             id: generateId(), entryDate: row['進場日期'], status: row['狀態'] || '持倉中', stock: c, name: n,
-                             qty: Math.max(0.01, Math.round((parseFloat(row['部位(張)']) || 1) * 100) / 100), entry: parseFloat(row['進場價']) || 0,
-                             stop: parseFloat(row['停損防守']) || 0, target: parseFloat(row['停利目標']) || null,
-                             exitPrice: row['實際出場'] ? parseFloat(row['實際出場']) : null, pnl: row['實現損益'] ? parseFloat(row['實現損益']) : 0,
-                             note: row['權證/備註'] || '',
-                             createdAt: Date.now(), updatedAt: Date.now()
-                         });
-                         importCount++;
-                     }
-                 });
-            }
-            
-            saveLocalData();
-            if (isCloudMode()) {
-                await putDataToCloud('journals', Object.fromEntries(state.journals.map(x => [x.id, x])));
-                await putDataToCloud('revenueRecords', Object.fromEntries(state.revenueRecords.map(x => [x.id, x])));
-                await putDataToCloud('reports', Object.fromEntries(state.reports.map(x => [x.id, x])));
-                await putDataToCloud('checklists', Object.fromEntries(state.checklists.map(x => [x.id, x])));
-                await putDataToCloud('plans', Object.fromEntries(state.plans.map(x => [x.id, x])));
-            }
-            
-            processAndRenderJournals();
-            renderFavorites();
-            renderRevenueRecords();
-            renderReports();
-            renderChecklists();
-            renderPlans();
-            
-            showToast(`成功匯入 ${importCount} 筆手札備份紀錄`);
-        } catch (err) {
-            console.error(err);
-            showToast('備份匯入失敗，請確認格式', 'error');
-        }
-        e.target.value = '';
     });
 
     await performDirectCloudSync(false);
@@ -4101,44 +3976,46 @@ const SESSION={
     var modules=[],journalSheet=workbook.SheetNames.includes('策略日誌')?'策略日誌':(workbook.SheetNames.includes('選股日誌')?'選股日誌':null);
     if(journalSheet){
       modules.push(classifyModule('journal','策略日誌',XLSX.utils.sheet_to_json(workbook.Sheets[journalSheet]),function(row){
-        var code=String(row['代號']||'').trim(),name=String(row['股名']||'').trim(),date=normalizeImportDate(row['日期']);
-        if(!code||!name||!date)return null;
-        var tags=String(row['策略標籤']||'').split(/[,，、]/).map(function(tag){return normalizeStrategyTagName(tag.trim());}).filter(Boolean);
-        return{id:generateId(),date:date,code:code,name:name,notes:String(row['備註']||'').trim(),tags:Array.from(new Set(tags)),isFavorite:row['追蹤等級']?parseInt(row['追蹤等級'],10):(row['已追蹤']==='是'?1:0),createdAt:Date.now(),updatedAt:Date.now()};
+        var code=normalizeStockCodeValue(row['代號']),name=String(row['股名']||'').trim(),date=normalizeImportDate(row['日期']);
+        if(!isValidStockCode(code)||!name||!date)return null;
+        var tags=String(row['策略標籤']||'').split(/[,，、]/).map(function(tag){return normalizeStrategyTagName(tag.trim());}).filter(function(tag){return isSafeImportedLabel(tag,20);});
+        var favorite=Math.min(3,Math.max(0,row['追蹤等級']?parseInt(row['追蹤等級'],10)||0:(row['已追蹤']==='是'?1:0)));
+        return{id:generateId(),date:date,code:code,name:name,notes:String(row['備註']||'').trim(),tags:Array.from(new Set(tags)),isFavorite:favorite,createdAt:Date.now(),updatedAt:Date.now()};
       },state.journals,journalKey));
     }
     if(workbook.SheetNames.includes('營收創高')){
       modules.push(classifyModule('revenue','營收創高',XLSX.utils.sheet_to_json(workbook.Sheets['營收創高']),function(row){
-        var code=String(row['代號']||'').trim(),name=String(row['股名']||'').trim(),month=normalizeImportMonth(row['創高月份']);
-        if(!code||!name||!month)return null;
+        var code=normalizeStockCodeValue(row['代號']),name=String(row['股名']||'').trim(),month=normalizeImportMonth(row['創高月份']);
+        if(!isValidStockCode(code)||!name||!month)return null;
         return{id:code+'_'+month,month:month,code:code,name:name,notes:String(row['備註']||'').trim(),createdAt:Date.now(),updatedAt:Date.now()};
       },state.revenueRecords,revenueKey));
     }
     if(workbook.SheetNames.includes('法人報告')){
       modules.push(classifyModule('report','法人報告',XLSX.utils.sheet_to_json(workbook.Sheets['法人報告']),function(row){
-        var code=String(row['代號']||'').trim(),name=String(row['股名']||'').trim(),date=normalizeImportDate(row['報告日期']),content=String(row['摘要內容']||'').trim();
-        if(!code||!name||!date||!content)return null;
+        var code=normalizeStockCodeValue(row['代號']),name=String(row['股名']||'').trim(),date=normalizeImportDate(row['報告日期']),content=String(row['摘要內容']||'').trim();
+        if(!isValidStockCode(code)||!name||!date||!content)return null;
         return{id:code+'_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),date:date,code:code,name:name,content:content,createdAt:Date.now(),updatedAt:Date.now()};
       },state.reports,reportKey));
     }
     if(workbook.SheetNames.includes('進場查核')){
       modules.push(classifyModule('checklist','進場查核',XLSX.utils.sheet_to_json(workbook.Sheets['進場查核']),function(row){
-        var code=String(row['代號']||'').trim(),name=String(row['股名']||'').trim(),date=normalizeImportDate(row['查核日期']);
-        if(!code||!name||!date)return null;
+        var code=normalizeStockCodeValue(row['代號']),name=String(row['股名']||'').trim(),date=normalizeImportDate(row['查核日期']);
+        if(!isValidStockCode(code)||!name||!date)return null;
         return{id:generateId(),date:date,code:code,name:name,direction:row['方向']==='空方'?'short':'long',checkedItems:String(row['符合條件']||'').split(/[,，]/).map(function(item){return item.trim();}).filter(Boolean),details:{pressure:row['壓力']||'',support:row['支撐']||'',target:row['目標價']||'',chipsInst:row['法人籌碼']||'',chipsConc:row['集中度']||'',cost:row['主力成本']||'',pe:row['本益比']||'',profit:row['獲利狀況']||'',notes:row['備註']||''},createdAt:Date.now(),updatedAt:Date.now()};
       },state.checklists,checklistKey));
     }
     if(workbook.SheetNames.includes('交易規劃')){
       modules.push(classifyModule('plan','交易規劃',XLSX.utils.sheet_to_json(workbook.Sheets['交易規劃']),function(row){
-        var code=String(row['代號']||'').trim(),name=String(row['股名']||'').trim(),date=normalizeImportDate(row['進場日期']);
-        if(!code||!name||!date)return null;
-        return{id:generateId(),entryDate:date,status:row['狀態']||'持倉中',stock:code,name:name,qty:Math.max(0.01,Math.round((parseFloat(row['部位(張)'])||1)*100)/100),entry:parseFloat(row['進場價'])||0,stop:parseFloat(row['停損防守'])||0,target:row['停利目標']?parseFloat(row['停利目標']):null,exitPrice:row['實際出場']?parseFloat(row['實際出場']):null,pnl:row['實現損益']?parseFloat(row['實現損益']):0,note:row['權證/備註']||'',createdAt:Date.now(),updatedAt:Date.now()};
+        var code=normalizeStockCodeValue(row['代號']),name=String(row['股名']||'').trim(),date=normalizeImportDate(row['進場日期']);
+        if(!isValidStockCode(code)||!name||!date)return null;
+        var status=['持倉中','已停利','已停損'].includes(String(row['狀態']||'').trim())?String(row['狀態']).trim():'持倉中';
+        return{id:generateId(),entryDate:date,status:status,stock:code,name:name,qty:Math.max(0.01,Math.round((parseFloat(row['部位(張)'])||1)*100)/100),entry:parseFloat(row['進場價'])||0,stop:parseFloat(row['停損防守'])||0,target:row['停利目標']?parseFloat(row['停利目標']):null,exitPrice:row['實際出場']?parseFloat(row['實際出場']):null,pnl:row['實現損益']?parseFloat(row['實現損益']):0,note:row['權證/備註']||'',createdAt:Date.now(),updatedAt:Date.now()};
       },state.plans,planKey));
     }
     var importedTagSettings=null;
     if(workbook.SheetNames.includes('標籤設定')){
       var tagRows=XLSX.utils.sheet_to_json(workbook.Sheets['標籤設定']),validRows=[],invalidTagRows=0;
-      tagRows.forEach(function(row){var tag=String(row['標籤']||'').trim(),title=String(row['分類']||'').trim();if(!tag||!title){invalidTagRows++;return;}validRows.push(row);});
+      tagRows.forEach(function(row){var tag=String(row['標籤']||'').trim(),title=String(row['分類']||'').trim();if(!isSafeImportedLabel(tag,20)||!isSafeImportedLabel(title,30)){invalidTagRows++;return;}validRows.push(row);});
       validRows.sort(function(a,b){return(parseInt(a['分類順序'],10)||999)-(parseInt(b['分類順序'],10)||999)||(parseInt(a['標籤順序'],10)||999)-(parseInt(b['標籤順序'],10)||999);});
       var categories=[],categoryMap=new Map(),meta={};
       validRows.forEach(function(row){
@@ -4158,12 +4035,12 @@ const SESSION={
   function parseDatabaseWorkbook(workbook){
     var sheet=workbook.Sheets[workbook.SheetNames[0]],rows=XLSX.utils.sheet_to_json(sheet,{defval:null}),existing=Object.keys(state.epsData||{}),modules=[];
     modules.push(classifyModule('database','參考資料庫',rows,function(row){
-      var code=row['代號']||row['股票代號']||row['Code']||row['stock_id'];
+      var code=row['代號']??row['股票代號']??row['Code']??row['stock_id'];
       var name=row['股名']||row['股票名稱']||row['Name']||row['stock_name'];
-      if(!code||!name)return null;
-      var c=String(code).trim(),n=String(name).trim();
+      var c=normalizeStockCodeValue(code),n=String(name||'').trim();
+      if(!isValidStockCode(c)||!n)return null;
       return{code:c,name:n,eps2025:row['25 EPS']??row['2025 EPS']??row['25EPS']??row['2025EPS']??row['2025']??row['今年EPS']??row['本年EPS']??null,eps2026:row['26 EPS']??row['預26 EPS']??row['2026 EPS']??row['26EPS']??row['2026EPS']??row['預估26EPS']??row['預估2026EPS']??row['2026']??row['明年EPS']??null,epsGrowth:row['EPS成長率']??row['成長率']??row['預估成長率']??row['YoY']??row['YOY']??null,targetPrice:row['最高目標價']??row['目標價']??row['Target Price']??row['TP']??null,broker:row['券商']??row['發布券商']??row['Broker']??null,reportDate:normalizeReportDate(row['報告日期']??row['報告日']??row['Report Date']??row['report_date']??Object.values(row)[8]??null),futures:row['股期']==='●'||row['股期']==='是'||row['股期']==='Y'||row['期貨']==='●'?'●':null};
-    },existing.map(function(code){return{code:code};}),function(item){return String(item.code||'');}));
+    },existing.map(function(code){return{code:normalizeStockCodeValue(code)};}),function(item){return String(item.code||'');}));
     return buildImportPreview('database','資料庫匯入預覽',modules);
   }
 
@@ -4306,11 +4183,13 @@ const SESSION={
   async function handleImportFile(input){
     var file=input.files&&input.files[0];if(!file)return;
     try{
-      if(typeof XLSX==='undefined')return showToast('匯入套件載入中，請稍後','error');
+      if(file.size>20*1024*1024)throw new Error('Excel 檔案超過 20MB 上限');
+      if(!/\.(xlsx|xls)$/i.test(file.name||''))throw new Error('不支援的 Excel 檔案格式');
+      await ensureXLSXLoaded();
       var data=await file.arrayBuffer(),workbook=XLSX.read(data);
       var preview=input.id==='excel-upload'?parseDatabaseWorkbook(workbook):parseBackupWorkbook(workbook);
       renderImportPreview(preview);
-    }catch(error){console.error(error);showToast('無法讀取 Excel，請確認檔案格式','error');}
+    }catch(error){console.error(error);const message=/Excel|套件|格式/.test(error?.message||'')?error.message:'無法讀取 Excel，請確認檔案格式';showToast(message,'error');}
     finally{input.value='';}
   }
 
@@ -4475,6 +4354,7 @@ const SESSION={
         var journalButton=document.querySelector('[data-target="module-journal"]');
         if(journalButton)journalButton.click();
       }
+      if(typeof window.clearAdminPrivateData==='function')window.clearAdminPrivateData();
     }
     if(typeof window.processAndRenderJournals==='function')window.processAndRenderJournals();
     if(typeof window.renderFavorites==='function')window.renderFavorites();
@@ -4507,7 +4387,9 @@ const SESSION={
     var error=document.getElementById('admin-login-error');
     if(!input)return;
     if(input.value===DEFAULT_ADMIN_PASSWORD){
-      writeAdminSession(true);applyAdminMode(true);closeAdminLogin();notify('已進入管理者模式');
+      writeAdminSession(true);applyAdminMode(true);closeAdminLogin();
+      if(typeof window.reloadAdminPrivateData==='function')window.reloadAdminPrivateData();
+      notify('已進入管理者模式，正在載入完整資料');
       return;
     }
     if(error)error.classList.remove('hidden');
@@ -4566,7 +4448,7 @@ const SESSION={
       else if(event.key==='Escape')closeAdminLogin();
     });
     if(modal)modal.addEventListener('click',function(event){if(event.target===modal)closeAdminLogin();});
-    window.addEventListener('storage',function(event){if(event.key===ADMIN_SESSION_KEY)applyAdminMode(event.newValue==='1');});
+    window.addEventListener('storage',function(event){if(event.key===ADMIN_SESSION_KEY){var enabled=event.newValue==='1';applyAdminMode(enabled);if(enabled&&typeof window.reloadAdminPrivateData==='function')window.reloadAdminPrivateData();}});
   });
 })();
 </script>
