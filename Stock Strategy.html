@@ -68,7 +68,10 @@ html.viewer-mode #btn-tag-manager,
 html.viewer-mode #btn-trash-manager,
 html.viewer-mode #btn-db-upload,
 html.viewer-mode #btn-import-backup,
-html.viewer-mode #btn-export-backup { display:none !important; }
+html.viewer-mode #btn-export-backup,
+html.viewer-mode #btn-mobile-tools,
+html.viewer-mode #mobile-tools-menu,
+html.viewer-mode [data-mobile-select-all] { display:none !important; }
 html.viewer-mode .row-cb,
 html.viewer-mode .select-all-cb { visibility:hidden !important; pointer-events:none !important; }
 html.viewer-mode [data-action="remove-tag"] { cursor:default !important; pointer-events:none !important; }
@@ -178,8 +181,40 @@ button { touch-action: manipulation; }
   table { min-width: 720px; }
 }
 @media (max-width: 640px) {
-  body { font-size: 14px; }
+  body { font-size: 14px; padding-bottom:calc(66px + env(safe-area-inset-bottom)); }
   button, .btn { min-height: 40px; }
+  .header-brand { max-width:32% !important; }
+  .header-actions { gap:0.2rem !important; }
+  .header-actions :is(#btn-global-search,#theme-toggle,#btn-mobile-tools) { width:40px !important; height:40px !important; }
+  .header-actions :is(#btn-admin-mode,#btn-sync-modal) { min-width:40px; min-height:40px; }
+  .mobile-module-nav { position:fixed; left:0; right:0; bottom:0; z-index:80; padding:0.45rem 0.5rem max(0.45rem,env(safe-area-inset-bottom)); border-top:1px solid #e5e7eb; border-bottom:0 !important; box-shadow:0 -6px 18px rgba(15,23,42,.12); overscroll-behavior-x:contain; scroll-snap-type:x proximity; }
+  .dark .mobile-module-nav { border-top-color:#374151; box-shadow:0 -6px 18px rgba(0,0,0,.32); }
+  .mobile-module-nav .nav-btn-mobile { min-height:44px; padding:0.55rem 0.85rem; scroll-snap-align:center; }
+  .mobile-card-scroll { max-height:none !important; overflow-x:hidden !important; overflow-y:visible !important; padding:0.65rem; background:rgba(241,245,249,.72); }
+  .dark .mobile-card-scroll { background:rgba(15,23,42,.45); }
+  table.mobile-card-table { display:block; min-width:0 !important; width:100% !important; white-space:normal !important; }
+  table.mobile-card-table thead { display:none !important; }
+  table.mobile-card-table tbody { display:grid; gap:0.75rem; width:100%; }
+  table.mobile-card-table tbody tr { position:relative; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0.6rem 0.8rem; width:100%; padding:0.85rem; border:1px solid #e2e8f0 !important; border-radius:0.9rem; background:#fff !important; box-shadow:0 2px 8px rgba(15,23,42,.06); opacity:1 !important; }
+  .dark table.mobile-card-table tbody tr { border-color:#374151 !important; background:#111827 !important; box-shadow:0 2px 10px rgba(0,0,0,.22); }
+  table.mobile-card-table tbody td { position:static !important; left:auto !important; top:auto !important; z-index:auto !important; display:flex !important; flex-direction:column; align-items:flex-start; justify-content:flex-start; min-width:0 !important; width:auto !important; max-width:none !important; padding:0 !important; border:0 !important; background:transparent !important; white-space:normal !important; text-align:left !important; overflow-wrap:anywhere; }
+  :is(#module-journal,#module-favorites,#module-revenue,#module-report,#module-checklist,#module-plan) table.mobile-card-table tbody td { position:static !important; left:auto !important; width:auto !important; min-width:0 !important; max-width:none !important; padding:0 !important; text-align:left !important; }
+  table.mobile-card-table tbody td::before { content:attr(data-mobile-label); display:block; margin-bottom:0.22rem; color:#94a3b8; font-size:10px; line-height:1.1; font-weight:800; letter-spacing:.04em; }
+  table.mobile-card-table tbody td:first-child { position:absolute !important; top:0.75rem !important; right:0.75rem !important; width:40px !important; min-height:40px; align-items:center; justify-content:center; }
+  :is(#module-journal,#module-favorites,#module-revenue,#module-report,#module-checklist,#module-plan) table.mobile-card-table tbody td:first-child { position:absolute !important; left:auto !important; width:40px !important; min-width:40px !important; max-width:40px !important; padding:0 !important; }
+  table.mobile-card-table tbody td:first-child::before { display:none; }
+  table.mobile-card-table tbody td:nth-child(2) { padding-right:2.5rem !important; }
+  :is(#module-journal,#module-favorites,#module-revenue,#module-report,#module-checklist,#module-plan) table.mobile-card-table tbody td:nth-child(2) { padding-right:2.5rem !important; }
+  table.mobile-card-table tbody td[data-mobile-wide="true"] { grid-column:1/-1; }
+  table.mobile-card-table tbody td:last-child { grid-column:1/-1; padding-top:0.65rem !important; border-top:1px solid #e5e7eb !important; align-items:flex-end; }
+  :is(#module-journal,#module-favorites,#module-revenue,#module-report,#module-checklist,#module-plan) table.mobile-card-table tbody td:last-child { padding-top:0.65rem !important; border-top:1px solid #e5e7eb !important; }
+  .dark table.mobile-card-table tbody td:last-child { border-top-color:#374151 !important; }
+  .dark :is(#module-journal,#module-favorites,#module-revenue,#module-report,#module-checklist,#module-plan) table.mobile-card-table tbody td:last-child { border-top-color:#374151 !important; }
+  table.mobile-card-table tbody td:last-child::before { align-self:flex-start; }
+  table.mobile-card-table tbody td button { min-width:42px; min-height:42px; align-items:center; justify-content:center; }
+  table.mobile-card-table .report-summary-col { width:auto !important; min-width:0 !important; max-width:none !important; }
+  #toast-container { left:0.75rem; right:0.75rem; bottom:calc(76px + env(safe-area-inset-bottom)); align-items:stretch; }
+  #toast-container > * { min-width:0 !important; width:100%; }
 }
 
 /* Respect reduced-motion preference */
@@ -203,7 +238,7 @@ button { touch-action: manipulation; }
 <nav class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-50 transition-colors duration-300">
     <div class="w-full xl:w-[98%] max-w-[1920px] mx-auto px-2 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16 relative">
-            <div class="flex items-center gap-1.5 sm:gap-3 flex-shrink-0 relative z-10 max-w-[65%] sm:max-w-none overflow-hidden">
+            <div class="header-brand flex items-center gap-1.5 sm:gap-3 flex-shrink-0 relative z-10 max-w-[65%] sm:max-w-none overflow-hidden">
                 <div class="bg-blue-600/10 dark:bg-blue-600/20 p-1.5 sm:p-2 rounded-lg flex-shrink-0"><i class="fa-solid fa-chart-line text-blue-600 dark:text-blue-500 text-sm sm:text-xl"></i></div>
                 <span class="cool-title font-bold text-[15px] sm:text-xl md:text-2xl tracking-wider truncate">萊恩飆股起漲手札</span>
                 <span id="auth-status" class="hidden md:flex ml-1 sm:ml-2 w-7 h-7 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-full shadow-sm items-center justify-center cursor-help flex-shrink-0"><i class="fa-solid fa-spinner fa-spin text-yellow-500 text-xs"></i></span>
@@ -218,19 +253,21 @@ button { touch-action: manipulation; }
                 <button class="nav-btn" data-target="module-plan" data-color="green"><i class="fa-solid fa-chess-knight mr-1.5 sm:mr-2"></i>交易規劃</button>
                 <button class="nav-btn" data-target="module-favorites" data-color="yellow"><i class="fa-solid fa-star mr-1.5 sm:mr-2"></i>追蹤清單</button>
             </div>
-            <div class="flex items-center gap-1 sm:gap-2 flex-shrink-0 relative z-10">
+            <div class="header-actions flex items-center gap-1 sm:gap-2 flex-shrink-0 relative z-10">
+                <button id="btn-global-search" type="button" class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/60 transition shadow-sm flex items-center justify-center" aria-label="全站快速查股" title="全站快速查股（Ctrl／⌘＋K）"><i class="fa-solid fa-magnifying-glass"></i></button>
                 <button id="btn-admin-mode" type="button" class="h-8 sm:h-9 px-2 sm:px-2.5 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors shadow-sm flex items-center justify-center" aria-label="進入管理者模式" title="管理者模式"><i class="fa-solid fa-lock text-sm"></i><span class="hidden 2xl:inline ml-1.5 text-xs font-medium">管理者</span></button>
                 <button id="theme-toggle" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-yellow-400 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors shadow-inner"><i class="fa-solid fa-moon dark:hidden text-sm sm:text-base"></i><i class="fa-solid fa-sun hidden dark:block text-sm sm:text-base"></i></button>
-                <button id="btn-sync-modal" class="text-xs sm:text-sm bg-blue-600 hover:bg-blue-500 text-white px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm border border-transparent flex items-center font-medium active:scale-95"><i class="fa-solid fa-cloud-arrow-up sm:mr-1.5"></i><span class="hidden sm:inline">跨裝置同步</span></button>
-                <button id="btn-db-upload" onclick="document.getElementById('excel-upload').click()" class="text-xs sm:text-sm bg-purple-50 dark:bg-purple-900/40 hover:bg-purple-100 dark:hover:bg-purple-800/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-700/50 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center font-medium active:scale-95"><i class="fa-solid fa-database sm:mr-1.5"></i><span class="hidden sm:inline">資料庫</span></button>
+                <div class="relative shrink-0"><button id="btn-sync-modal" class="text-xs sm:text-sm bg-blue-600 hover:bg-blue-500 text-white px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm border border-transparent flex items-center font-medium active:scale-95"><i class="fa-solid fa-cloud-arrow-up sm:mr-1.5"></i><span class="hidden sm:inline">跨裝置同步</span></button><span id="sync-health-status" class="pointer-events-none absolute -right-0.5 -top-0.5 w-2.5 h-2.5 rounded-full bg-gray-400 ring-2 ring-white dark:ring-gray-800 transition-colors" role="status" aria-label="雲端尚未同步" title="雲端尚未同步"></span></div>
+                <button id="btn-db-upload" onclick="document.getElementById('excel-upload').click()" class="hidden sm:flex text-xs sm:text-sm bg-purple-50 dark:bg-purple-900/40 hover:bg-purple-100 dark:hover:bg-purple-800/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-700/50 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm items-center font-medium active:scale-95"><i class="fa-solid fa-database sm:mr-1.5"></i><span class="hidden sm:inline">資料庫</span></button>
                 <input type="file" id="excel-upload" accept=".xlsx, .xls" class="hidden">
-                <button id="btn-import-backup" onclick="document.getElementById('backup-file').click()" class="text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center active:scale-95"><i class="fa-solid fa-upload sm:mr-1.5"></i><span class="hidden sm:inline">匯入</span></button>
-                <button id="btn-export-backup" class="text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center active:scale-95"><i class="fa-solid fa-download sm:mr-1.5"></i><span class="hidden sm:inline">匯出</span></button>
+                <button id="btn-import-backup" onclick="document.getElementById('backup-file').click()" class="hidden sm:flex text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm items-center active:scale-95"><i class="fa-solid fa-upload sm:mr-1.5"></i><span class="hidden sm:inline">匯入</span></button>
+                <button id="btn-export-backup" class="hidden sm:flex text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm items-center active:scale-95"><i class="fa-solid fa-download sm:mr-1.5"></i><span class="hidden sm:inline">匯出</span></button>
+                <button id="btn-mobile-tools" type="button" class="sm:hidden w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-200 flex items-center justify-center" aria-label="開啟資料工具" aria-expanded="false"><i class="fa-solid fa-ellipsis"></i></button>
                 <input type="file" id="backup-file" accept=".xlsx" class="hidden">
             </div>
         </div>
     </div>
-    <div class="lg:hidden border-t border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-800/95 px-2 py-2 flex gap-2 overflow-x-auto scrollbar-hide">
+    <div class="mobile-module-nav lg:hidden border-t border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-800/95 px-2 py-2 flex gap-2 overflow-x-auto scrollbar-hide" aria-label="手機模組導覽">
         <button class="nav-btn-mobile active-blue" data-target="module-journal" data-color="blue">策略日誌</button>
         <button class="nav-btn-mobile" data-target="module-overview" data-color="blue">總覽</button>
         <button class="nav-btn-mobile" data-target="module-checklist" data-color="cyan">查核</button>
@@ -241,6 +278,11 @@ button { touch-action: manipulation; }
         <button class="nav-btn-mobile" data-target="module-favorites" data-color="yellow">追蹤</button>
     </div>
 </nav>
+<div id="mobile-tools-menu" class="hidden sm:hidden fixed right-2 top-[62px] z-[90] w-[210px] rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-2 shadow-2xl">
+    <button type="button" data-mobile-tool-target="btn-db-upload" class="w-full min-h-[44px] rounded-lg px-3 text-left text-sm font-bold text-purple-600 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/30"><i class="fa-solid fa-database w-6"></i>資料庫 Excel</button>
+    <button type="button" data-mobile-tool-target="btn-import-backup" class="w-full min-h-[44px] rounded-lg px-3 text-left text-sm font-bold text-gray-600 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fa-solid fa-upload w-6"></i>匯入備份</button>
+    <button type="button" data-mobile-tool-target="btn-export-backup" class="w-full min-h-[44px] rounded-lg px-3 text-left text-sm font-bold text-gray-600 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fa-solid fa-download w-6"></i>匯出備份</button>
+</div>
 
 <main class="flex-grow w-full xl:w-[98%] max-w-[1920px] mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-6">
 
@@ -330,7 +372,7 @@ button { touch-action: manipulation; }
                     </div>
                     <div class="flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 h-[38px] sm:h-auto box-border">
                         <i class="fa-solid fa-search text-gray-400 text-[10px] sm:text-xs ml-1 sm:ml-2"></i>
-                        <input type="text" id="filter-code" class="filter-code bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-1 w-[110px] sm:w-[130px] h-full box-border m-0" placeholder="代號/股名">
+                        <input type="text" id="filter-code" class="filter-code bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-1 w-[130px] sm:w-[170px] h-full box-border m-0" placeholder="代號／股名／備註">
                     </div>
                     <label class="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white dark:bg-gray-900/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-700/50 transition hover:bg-gray-50 dark:hover:bg-gray-800">
                         <input type="checkbox" id="filter-futures" class="filter-futures rounded border-gray-300 dark:border-gray-600 text-sky-500 focus:ring-sky-500 w-3.5 h-3.5 sm:w-4 sm:h-4">
@@ -383,8 +425,8 @@ button { touch-action: manipulation; }
                 <span class="text-xs sm:text-sm text-red-600 dark:text-red-400 font-medium"><i class="fa-solid fa-check-double mr-1.5"></i>已選擇 <span id="batch-count-journal" class="font-bold">0</span> 筆資料</span>
                 <button type="button" data-batch-delete-type="journal" class="bg-red-600 hover:bg-red-500 text-white text-xs sm:text-sm font-medium px-3 sm:px-4 py-1.5 rounded-lg transition shadow-sm active:scale-95">批次刪除</button>
             </div>
-            <div class="overflow-x-auto overflow-y-auto max-h-[65vh] 2xl:max-h-[70vh] flex-grow relative rounded-b-xl w-full">
-                <table class="min-w-full text-left text-sm whitespace-nowrap table-auto w-full">
+            <div class="mobile-card-scroll overflow-x-auto overflow-y-auto max-h-[65vh] 2xl:max-h-[70vh] flex-grow relative rounded-b-xl w-full">
+                <table class="mobile-card-table min-w-full text-left text-sm whitespace-nowrap table-auto w-full">
                     <thead class="bg-gray-50/95 dark:bg-gray-900/95 backdrop-blur-md text-gray-500 dark:text-gray-400 sticky top-0 z-30 shadow-sm font-medium border-b border-gray-200 dark:border-gray-700">
                         <tr>
                             <th class="py-3 px-2 w-[40px] text-center sticky left-0 top-0 bg-gray-50 dark:bg-gray-900 z-40"><input type="checkbox" class="select-all-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" data-type="journal"></th>
@@ -466,9 +508,9 @@ button { touch-action: manipulation; }
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <section class="card-panel p-4 sm:p-5"><div class="flex items-center justify-between mb-3"><h3 class="font-bold text-blue-600 dark:text-blue-400"><i class="fa-solid fa-book-journal-whills mr-2"></i>策略日誌</h3><span id="overview-journal-count" class="text-xs text-gray-400"></span></div><div id="overview-journals" class="space-y-2 max-h-[420px] overflow-y-auto pr-1"></div></section>
-                <section class="card-panel p-4 sm:p-5"><div class="flex items-center justify-between mb-3"><h3 class="font-bold text-pink-600 dark:text-pink-400"><i class="fa-solid fa-money-bill-trend-up mr-2"></i>營收創高</h3><span id="overview-revenue-count" class="text-xs text-gray-400"></span></div><div id="overview-revenues" class="space-y-2 max-h-[420px] overflow-y-auto pr-1"></div></section>
-                <section class="card-panel p-4 sm:p-5"><div class="flex items-center justify-between mb-3"><h3 class="font-bold text-indigo-600 dark:text-indigo-400"><i class="fa-solid fa-file-lines mr-2"></i>法人報告</h3><span id="overview-report-count" class="text-xs text-gray-400"></span></div><div id="overview-reports" class="space-y-2 max-h-[420px] overflow-y-auto pr-1"></div></section>
+                <section class="card-panel p-4 sm:p-5"><div class="flex items-center justify-between gap-2 mb-3"><h3 class="font-bold text-blue-600 dark:text-blue-400"><i class="fa-solid fa-book-journal-whills mr-2"></i>策略日誌</h3><div class="flex items-center gap-2"><span id="overview-journal-count" class="text-xs text-gray-400"></span><button type="button" data-overview-jump="module-journal" class="h-8 px-2.5 rounded-lg bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 text-[11px] font-bold text-blue-600 dark:text-blue-300 hover:bg-blue-100 transition">查看</button></div></div><div id="overview-journals" class="space-y-2 max-h-[420px] overflow-y-auto pr-1"></div></section>
+                <section class="card-panel p-4 sm:p-5"><div class="flex items-center justify-between gap-2 mb-3"><h3 class="font-bold text-pink-600 dark:text-pink-400"><i class="fa-solid fa-money-bill-trend-up mr-2"></i>營收創高</h3><div class="flex items-center gap-2"><span id="overview-revenue-count" class="text-xs text-gray-400"></span><button type="button" data-overview-jump="module-revenue" class="h-8 px-2.5 rounded-lg bg-pink-50 dark:bg-pink-900/30 border border-pink-200 dark:border-pink-800 text-[11px] font-bold text-pink-600 dark:text-pink-300 hover:bg-pink-100 transition">查看</button></div></div><div id="overview-revenues" class="space-y-2 max-h-[420px] overflow-y-auto pr-1"></div></section>
+                <section class="card-panel p-4 sm:p-5"><div class="flex items-center justify-between gap-2 mb-3"><h3 class="font-bold text-indigo-600 dark:text-indigo-400"><i class="fa-solid fa-file-lines mr-2"></i>法人報告</h3><div class="flex items-center gap-2"><span id="overview-report-count" class="text-xs text-gray-400"></span><button type="button" data-overview-jump="module-report" class="h-8 px-2.5 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-800 text-[11px] font-bold text-indigo-600 dark:text-indigo-300 hover:bg-indigo-100 transition">查看</button></div></div><div id="overview-reports" class="space-y-2 max-h-[420px] overflow-y-auto pr-1"></div></section>
             </div>
         </div>
     </div>
@@ -505,6 +547,7 @@ button { touch-action: manipulation; }
                 <div id="cross-session-note" class="col-span-2 md:col-span-5 text-[11px] text-gray-500 dark:text-gray-400 mt-1">
                     計算邏輯：點選日盤＝使用夜盤數據計算日盤支撐壓力；點選夜盤＝使用日盤數據計算夜盤支撐壓力。
                 </div>
+                <div id="calc-input-warning" class="hidden col-span-2 md:col-span-5 rounded-lg border px-3 py-2 text-xs font-bold" role="alert"></div>
                 <div class="col-span-2 md:col-span-5 flex flex-wrap gap-4 items-center mt-2 mb-1 border-t border-gray-200 dark:border-gray-700/50 pt-4">
                     <span class="text-xs text-gray-500 dark:text-gray-400 font-medium"><i class="fa-solid fa-list-check mr-1"></i>複製選項:</span>
                     <label class="flex items-center gap-1.5 cursor-pointer hover:opacity-80 transition-opacity"><input type="checkbox" id="copy-opt-cdp" checked class="rounded border-gray-300 dark:border-gray-600 text-purple-600 focus:ring-purple-500 w-3.5 h-3.5 accent-purple-600 cursor-pointer"><span class="text-xs text-gray-700 dark:text-gray-300 font-medium">CDP</span></label>
@@ -612,7 +655,7 @@ button { touch-action: manipulation; }
                     </div>
                     <div class="flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 h-[38px] sm:h-auto box-border">
                         <i class="fa-solid fa-search text-gray-400 text-[10px] sm:text-xs ml-1 sm:ml-2"></i>
-                        <input type="text" id="filter-revenue-code" class="bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-1 w-[110px] sm:w-[130px] h-full box-border m-0" placeholder="代號/股名">
+                        <input type="text" id="filter-revenue-code" class="bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-1 w-[130px] sm:w-[170px] h-full box-border m-0" placeholder="代號／股名／備註">
                     </div>
                 </div>
                 <div class="flex items-center justify-end gap-1.5 sm:gap-2 w-full lg:w-auto border-t lg:border-t-0 border-gray-200 dark:border-gray-700 pt-3 lg:pt-0">
@@ -624,8 +667,8 @@ button { touch-action: manipulation; }
                 <span class="text-xs sm:text-sm text-red-600 dark:text-red-400 font-medium"><i class="fa-solid fa-check-double mr-1.5"></i>已選擇 <span id="batch-count-revenue" class="font-bold">0</span> 筆資料</span>
                 <button type="button" data-batch-delete-type="revenue" class="bg-red-600 hover:bg-red-500 text-white text-xs sm:text-sm font-medium px-3 sm:px-4 py-1.5 rounded-lg transition shadow-sm active:scale-95">批次刪除</button>
             </div>
-            <div class="overflow-x-auto overflow-y-auto max-h-[65vh] 2xl:max-h-[70vh] rounded-b-xl w-full flex-grow relative">
-                <table class="min-w-full text-left text-sm whitespace-nowrap table-auto w-full">
+            <div class="mobile-card-scroll overflow-x-auto overflow-y-auto max-h-[65vh] 2xl:max-h-[70vh] rounded-b-xl w-full flex-grow relative">
+                <table class="mobile-card-table min-w-full text-left text-sm whitespace-nowrap table-auto w-full">
                     <thead class="bg-gray-50/95 dark:bg-gray-900/95 backdrop-blur-md text-gray-500 dark:text-gray-400 sticky top-0 z-30 shadow-sm font-medium border-b border-gray-200 dark:border-gray-700">
                         <tr>
                             <th class="py-3 px-2 sm:px-3 w-8 text-center sticky top-0 bg-gray-50 dark:bg-gray-900 z-40"><input type="checkbox" class="select-all-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" data-type="revenue"></th>
@@ -669,7 +712,7 @@ button { touch-action: manipulation; }
                     </div>
                     <div class="flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 h-[38px] sm:h-auto box-border">
                         <i class="fa-solid fa-search text-gray-400 text-[10px] sm:text-xs ml-1 sm:ml-2"></i>
-                        <input type="text" id="filter-rep-code" class="bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-1 w-[110px] sm:w-[130px] h-full box-border m-0" placeholder="代號/股名">
+                        <input type="text" id="filter-rep-code" class="bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-1 w-[130px] sm:w-[180px] h-full box-border m-0" placeholder="代號／股名／報告內容">
                     </div>
                 </div>
                 <div class="flex items-center justify-end gap-1.5 sm:gap-2 w-full lg:w-auto border-t lg:border-t-0 border-gray-200 dark:border-gray-700 pt-3 lg:pt-0">
@@ -682,8 +725,8 @@ button { touch-action: manipulation; }
                 <span class="text-xs sm:text-sm text-red-600 dark:text-red-400 font-medium"><i class="fa-solid fa-check-double mr-1.5"></i>已選擇 <span id="batch-count-report" class="font-bold">0</span> 筆資料</span>
                 <button type="button" data-batch-delete-type="report" class="bg-red-600 hover:bg-red-500 text-white text-xs sm:text-sm font-medium px-3 sm:px-4 py-1.5 rounded-lg transition shadow-sm active:scale-95">批次刪除</button>
             </div>
-            <div class="overflow-x-auto overflow-y-auto max-h-[65vh] 2xl:max-h-[70vh] rounded-b-xl w-full flex-grow relative">
-                <table class="min-w-full text-left text-sm whitespace-nowrap table-auto w-full">
+            <div class="mobile-card-scroll overflow-x-auto overflow-y-auto max-h-[65vh] 2xl:max-h-[70vh] rounded-b-xl w-full flex-grow relative">
+                <table class="mobile-card-table min-w-full text-left text-sm whitespace-nowrap table-auto w-full">
                     <thead class="bg-gray-50/95 dark:bg-gray-900/95 backdrop-blur-md text-gray-500 dark:text-gray-400 sticky top-0 z-30 shadow-sm font-medium border-b border-gray-200 dark:border-gray-700">
                         <tr>
                             <th class="py-3 px-2 sm:px-3 w-8 text-center sticky top-0 bg-gray-50 dark:bg-gray-900 z-40"><input type="checkbox" class="select-all-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" data-type="report"></th>
@@ -751,8 +794,8 @@ button { touch-action: manipulation; }
                 <span class="text-xs sm:text-sm text-red-600 dark:text-red-400 font-medium"><i class="fa-solid fa-check-double mr-1.5"></i>已選擇 <span id="batch-count-checklist" class="font-bold">0</span> 筆資料</span>
                 <button type="button" data-batch-delete-type="checklist" class="bg-red-600 hover:bg-red-500 text-white text-xs sm:text-sm font-medium px-3 sm:px-4 py-1.5 rounded-lg transition shadow-sm active:scale-95">批次刪除</button>
             </div>
-            <div class="overflow-x-auto overflow-y-auto max-h-[65vh] rounded-b-xl w-full flex-grow relative">
-                <table class="min-w-full text-left text-sm whitespace-nowrap table-auto w-full">
+            <div class="mobile-card-scroll overflow-x-auto overflow-y-auto max-h-[65vh] rounded-b-xl w-full flex-grow relative">
+                <table class="mobile-card-table min-w-full text-left text-sm whitespace-nowrap table-auto w-full">
                     <thead class="bg-gray-50/95 dark:bg-gray-900/95 backdrop-blur-md text-gray-500 dark:text-gray-400 sticky top-0 z-30 shadow-sm font-medium border-b border-gray-200 dark:border-gray-700">
                         <tr>
                             <th class="py-3 px-2 w-[40px] text-center sticky left-0 top-0 bg-gray-50 dark:bg-gray-900 z-40"><input type="checkbox" class="select-all-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" data-type="checklist"></th>
@@ -792,14 +835,15 @@ button { touch-action: manipulation; }
                     <div class="col-span-4 md:col-span-1"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">停利價</label><input type="number" step="0.01" id="p-target" class="input-base tw-red font-bold !px-1 sm:!px-3 text-[13px] sm:text-sm text-center sm:text-left" enterkeyhint="next"></div>
                     <div class="col-span-8 md:col-span-1 lg:col-span-1"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">權證/備註</label><input type="text" id="p-note" placeholder="可選填..." class="input-base text-xs sm:text-sm" autocomplete="off" enterkeyhint="send"></div>
                     <div class="col-span-12 md:col-span-1 lg:col-span-1"><button type="submit" id="btn-plan-submit" class="w-full h-[42px] bg-green-600 hover:bg-green-500 text-white text-base sm:text-sm font-bold rounded-lg transition shadow-md active:scale-95">加入</button></div>
+                    <div id="plan-risk-preview" class="col-span-12 rounded-xl border border-green-200 dark:border-green-800/70 bg-green-50/70 dark:bg-green-900/15 px-3 py-2.5 text-xs text-gray-500 dark:text-gray-300"><i class="fa-solid fa-scale-balanced mr-1.5 text-green-600 dark:text-green-400"></i>輸入進場價、停損與停利後，自動計算風險報酬。</div>
                 </form>
             </div>
             <div id="batch-bar-plan" class="hidden bg-red-50 dark:bg-red-900/20 border-b border-gray-200 dark:border-gray-700/50 p-2 sm:p-3 justify-between items-center transition-all">
                 <span class="text-xs sm:text-sm text-red-600 dark:text-red-400 font-medium"><i class="fa-solid fa-check-double mr-1.5"></i>已選擇 <span id="batch-count-plan" class="font-bold">0</span> 筆資料</span>
                 <button type="button" data-batch-delete-type="plan" class="bg-red-600 hover:bg-red-500 text-white text-xs sm:text-sm font-medium px-3 sm:px-4 py-1.5 rounded-lg transition shadow-sm active:scale-95">批次刪除</button>
             </div>
-            <div class="overflow-x-auto overflow-y-auto max-h-[65vh] rounded-b-xl w-full">
-                <table class="min-w-full text-left text-sm whitespace-nowrap table-auto w-full">
+            <div class="mobile-card-scroll overflow-x-auto overflow-y-auto max-h-[65vh] rounded-b-xl w-full">
+                <table class="mobile-card-table min-w-full text-left text-sm whitespace-nowrap table-auto w-full">
                     <thead class="bg-gray-50/95 dark:bg-gray-900/95 backdrop-blur-md text-gray-500 dark:text-gray-400 sticky top-0 z-30 shadow-sm font-medium border-b border-gray-200 dark:border-gray-700">
                         <tr>
                             <th class="py-3 px-2 sm:px-3 w-8 text-center sticky top-0 bg-gray-50 dark:bg-gray-900 z-40"><input type="checkbox" class="select-all-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" data-type="plan"></th>
@@ -836,7 +880,7 @@ button { touch-action: manipulation; }
                     </div>
                     <div class="flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 h-[38px] sm:h-auto box-border">
                         <i class="fa-solid fa-search text-gray-400 text-[10px] sm:text-xs ml-1 sm:ml-2"></i>
-                        <input type="text" id="filter-code-fav" class="filter-code bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-1 w-[110px] sm:w-[130px] h-full box-border m-0" placeholder="代號/股名">
+                        <input type="text" id="filter-code-fav" class="filter-code bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-1 w-[130px] sm:w-[170px] h-full box-border m-0" placeholder="代號／股名／備註">
                     </div>
                     <label class="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white dark:bg-gray-900/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-700/50 transition hover:bg-gray-50 dark:hover:bg-gray-800">
                         <input type="checkbox" id="filter-futures-fav" class="filter-futures rounded border-gray-300 dark:border-gray-600 text-sky-500 focus:ring-sky-500 w-3.5 h-3.5 sm:w-4 sm:h-4">
@@ -895,8 +939,8 @@ button { touch-action: manipulation; }
                 <span class="text-xs sm:text-sm text-red-600 dark:text-red-400 font-medium"><i class="fa-solid fa-check-double mr-1.5"></i>已選擇 <span id="batch-count-fav" class="font-bold">0</span> 筆資料</span>
                 <button type="button" data-batch-delete-type="fav" class="bg-red-600 hover:bg-red-500 text-white text-xs sm:text-sm font-medium px-3 sm:px-4 py-1.5 rounded-lg transition shadow-sm active:scale-95">批次刪除</button>
             </div>
-            <div class="overflow-x-auto overflow-y-auto max-h-[65vh] 2xl:max-h-[70vh] flex-grow relative rounded-b-xl w-full">
-                <table class="min-w-full text-left text-sm whitespace-nowrap table-auto w-full">
+            <div class="mobile-card-scroll overflow-x-auto overflow-y-auto max-h-[65vh] 2xl:max-h-[70vh] flex-grow relative rounded-b-xl w-full">
+                <table class="mobile-card-table min-w-full text-left text-sm whitespace-nowrap table-auto w-full">
                     <thead class="bg-gray-50/95 dark:bg-gray-900/95 backdrop-blur-md text-gray-500 dark:text-gray-400 sticky top-0 z-30 shadow-sm font-medium border-b border-gray-200 dark:border-gray-700">
                         <tr>
                             <th class="py-3 px-2 w-[40px] text-center sticky left-0 top-0 bg-gray-50 dark:bg-gray-900 z-40"><input type="checkbox" class="select-all-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" data-type="fav"></th>
@@ -921,6 +965,19 @@ button { touch-action: manipulation; }
 </main>
 
 <!-- 互動彈窗 -->
+<div id="global-search-modal" class="fixed inset-0 z-[190] hidden items-start sm:items-center justify-center bg-black/65 backdrop-blur-sm p-2 sm:p-4" role="dialog" aria-modal="true" aria-labelledby="global-search-title" aria-hidden="true">
+    <div class="modal-enter w-full max-w-2xl mt-[8vh] sm:mt-0 overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-2xl">
+        <div class="flex items-center justify-between gap-3 border-b border-gray-200 dark:border-gray-700 px-4 py-3 sm:px-5 sm:py-4">
+            <div><h2 id="global-search-title" class="font-black text-blue-600 dark:text-blue-300"><i class="fa-solid fa-magnifying-glass-chart mr-2"></i>全站快速查股</h2><p class="mt-1 text-[11px] text-gray-400">輸入代號或股名，整合查看各模組紀錄</p></div>
+            <button type="button" id="global-search-close" class="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-500 hover:text-red-500 transition" aria-label="關閉快速查股"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="p-3 sm:p-5">
+            <label class="relative block"><i class="fa-solid fa-search absolute left-4 top-1/2 -translate-y-1/2 text-blue-500"></i><input type="search" id="global-search-input" class="input-base !h-12 !pl-11 !pr-12 text-base" placeholder="例如：2330 或 台積電" autocomplete="off" spellcheck="false" enterkeyhint="search"><span class="hidden sm:inline absolute right-3 top-1/2 -translate-y-1/2 rounded border border-gray-300 dark:border-gray-600 px-1.5 py-0.5 text-[10px] text-gray-400">ESC</span></label>
+            <div id="global-search-summary" class="mt-3 text-xs text-gray-400" aria-live="polite">輸入代號或股名開始查詢</div>
+            <div id="global-search-results" class="mt-3 grid max-h-[58vh] gap-2 overflow-y-auto overscroll-contain pr-1"></div>
+        </div>
+    </div>
+</div>
 <div id="config-warning-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex justify-center items-center z-[70] hidden transition-opacity duration-300">
     <div class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl p-6 border border-red-500 shadow-2xl max-w-md w-full mx-4 modal-enter">
         <h3 class="font-bold mb-3 text-red-500 dark:text-red-400 text-xl flex items-center"><i class="fa-solid fa-triangle-exclamation mr-2"></i>資料庫權限不足</h3>
@@ -1008,7 +1065,7 @@ button { touch-action: manipulation; }
         <footer class="report-reader-footer shrink-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur border-t border-gray-200 dark:border-gray-700 px-3 sm:px-6 pt-3 shadow-[0_-4px_12px_rgba(0,0,0,0.06)]">
             <div class="max-w-5xl mx-auto grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4 items-center">
                 <button type="button" id="report-reader-prev-btn" class="h-12 sm:h-14 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-gray-700 dark:text-gray-200 hover:text-indigo-700 dark:hover:text-indigo-300 font-bold transition active:scale-95 disabled:opacity-35 disabled:cursor-not-allowed disabled:active:scale-100"><i class="fa-solid fa-chevron-left mr-2"></i>上一檔</button>
-                <div class="hidden sm:block text-center text-xs text-gray-400 dark:text-gray-500"><i class="fa-solid fa-keyboard mr-1.5"></i>方向鍵或左右滑動切換</div>
+                <div class="col-span-2 order-first sm:col-span-1 sm:order-none flex items-center justify-center gap-2"><button type="button" id="report-reader-font-down" class="w-11 h-10 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 font-black disabled:opacity-35" aria-label="縮小報告文字">A−</button><span id="report-reader-font-label" class="min-w-[52px] text-center text-[11px] font-bold text-gray-400">標準</span><button type="button" id="report-reader-font-up" class="w-11 h-10 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 font-black disabled:opacity-35" aria-label="放大報告文字">A＋</button></div>
                 <button type="button" id="report-reader-next-btn" class="h-12 sm:h-14 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold shadow-md transition active:scale-95 disabled:opacity-35 disabled:cursor-not-allowed disabled:active:scale-100">下一檔<i class="fa-solid fa-chevron-right ml-2"></i></button>
             </div>
         </footer>
@@ -1027,6 +1084,7 @@ if(journalStreakMount&&journalStreakPanel)journalStreakMount.replaceWith(journal
 
 const DB_URL="https://stockstrategy-492a1-default-rtdb.firebaseio.com", LOCAL_STORAGE_KEY='ryan_stock_data_v1';
 const DIRECT_SYNC_PATH='ryan_stock_strategy_direct_v1',LEGACY_SYNC_KEY=localStorage.getItem('ryan_sync_key')||'';
+const PENDING_CLOUD_WRITES_KEY='ryan_pending_cloud_writes_v1',LAST_CLOUD_SYNC_KEY='ryan_last_cloud_sync_v1';
 const getSyncPath=()=>DIRECT_SYNC_PATH;
 const isCloudMode=()=>true;
 let cloudSyncInterval=null, state={journals:[],plans:[],revenueRecords:[],reports:[],checklists:[],trash:[],tagSettings:null,epsData:{},codeToName:{},nameToCode:{},customMarketHolidays:[],copyCompareDuplicates:false,filters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,tags:[],minScore:0,tagLogic:'OR'},favFilters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,tags:[],minScore:0,tagLogic:'OR'},revenueFilters:{month:'',code:''},reportFilters:{start:'',end:'',code:''},sortConfig:{key:'createdAt',asc:false},favSortConfig:{key:'createdAt',asc:false},planSortConfig:{key:'createdAt',asc:false},revenueSortConfig:{key:'month',asc:false},reportSortConfig:{key:'date',asc:false},checklistSortConfig:{key:'createdAt',asc:false}};
@@ -1415,6 +1473,37 @@ function renderFilterTags(){
 ['', '-fav'].forEach(s=>{const b=document.getElementById('filter-tag-btn'+s),p=document.getElementById('filter-tag-panel'+s);if(b&&p){b.addEventListener('click',e=>{e.stopPropagation();p.classList.toggle('hidden');});document.addEventListener('click',e=>{if(!p.contains(e.target)&&e.target!==b)p.classList.add('hidden');});}});
 
 function saveLocalData(){localStorage.setItem(LOCAL_STORAGE_KEY,JSON.stringify(state));}
+const readPendingCloudWrites=()=>{try{const value=JSON.parse(localStorage.getItem(PENDING_CLOUD_WRITES_KEY)||'[]');return Array.isArray(value)?value.filter(item=>item&&item.id&&item.path&&item.method):[];}catch(error){return[];}};
+const savePendingCloudWrites=items=>{try{localStorage.setItem(PENDING_CLOUD_WRITES_KEY,JSON.stringify(items));return true;}catch(error){console.error('待同步資料儲存失敗',error);return false;}};
+const queueCloudWrite=(path,options={})=>{
+    const method=String(options.method||'PUT').toUpperCase(),record={id:`${Date.now()}_${Math.random().toString(36).slice(2,8)}`,path,method,body:options.body??null,queuedAt:Date.now()};
+    const queue=readPendingCloudWrites().filter(item=>item.path!==path);queue.push(record);savePendingCloudWrites(queue);window.updateCloudHealthUI?.('pending');return queue.length;
+};
+window.updateCloudHealthUI=status=>{
+    const indicator=document.getElementById('sync-health-status'),button=document.getElementById('btn-sync-modal');if(!indicator)return;
+    const pending=readPendingCloudWrites().length,lastSync=Number(localStorage.getItem(LAST_CLOUD_SYNC_KEY)||0),offline=navigator.onLine===false;
+    let color='bg-gray-400',message='雲端尚未同步';
+    if(status==='syncing'){color='bg-blue-400';message='雲端同步中';}
+    else if(status==='error'){color='bg-red-500';message=pending?`${pending} 筆資料等待同步`:'雲端同步失敗';}
+    else if(offline){color='bg-red-500';message=pending?`目前離線，${pending} 筆資料等待同步`:'目前離線';}
+    else if(pending){color='bg-amber-400';message=`${pending} 筆資料等待同步`;}
+    else if(lastSync){color='bg-emerald-500';message=`上次同步：${new Date(lastSync).toLocaleString('zh-TW',{hour12:false})}`;}
+    indicator.classList.remove('bg-gray-400','bg-blue-400','bg-red-500','bg-amber-400','bg-emerald-500','animate-pulse');indicator.classList.add(color);if(status==='syncing')indicator.classList.add('animate-pulse');
+    indicator.title=message;indicator.setAttribute('aria-label',message);indicator.dataset.status=offline?'offline':(pending?'pending':(lastSync?'synced':'ready'));if(button)button.title=message;
+};
+const markCloudSyncSuccess=()=>{try{localStorage.setItem(LAST_CLOUD_SYNC_KEY,String(Date.now()));}catch(error){}window.updateCloudHealthUI?.('connected');};
+async function flushPendingCloudWrites(showError=false){
+    const queue=readPendingCloudWrites();if(!queue.length){window.updateCloudHealthUI?.();return true;}if(navigator.onLine===false){window.updateCloudHealthUI?.('offline');return false;}
+    window.updateCloudHealthUI?.('syncing');
+    try{
+        for(const item of queue.sort((a,b)=>(a.queuedAt||0)-(b.queuedAt||0))){
+            const options={method:item.method};if(item.body!==null){options.headers={'Content-Type':'application/json'};options.body=item.body;}
+            const response=await fetch(`${DB_URL}/data/${getSyncPath()}/${item.path}.json`,options);if(!response.ok)throw new Error(`待同步資料寫入失敗 (${response.status})`);
+            savePendingCloudWrites(readPendingCloudWrites().filter(current=>current.id!==item.id));
+        }
+        markCloudSyncSuccess();return true;
+    }catch(error){console.error(error);window.updateCloudHealthUI?.('pending');if(showError)showToast('仍有資料等待同步，請稍後再試','error');return false;}
+}
 const cloudCollection=v=>Array.isArray(v)?v.filter(Boolean):(v&&typeof v==='object'?Object.values(v).filter(Boolean):[]);
 const cloudSnapshot=()=>({journals:Object.fromEntries(state.journals.map(x=>[x.id,x])),plans:Object.fromEntries(state.plans.map(x=>[x.id,x])),revenueRecords:Object.fromEntries(state.revenueRecords.map(x=>[x.id,x])),reports:Object.fromEntries(state.reports.map(x=>[x.id,x])),checklists:Object.fromEntries(state.checklists.map(x=>[x.id,x])),trash:Object.fromEntries((state.trash||[]).map(x=>[x.id,x])),tagSettings:state.tagSettings||null,epsData:state.epsData||{},customMarketHolidaySettings:{dates:[...(state.customMarketHolidays||[])],updatedAt:Date.now()}});
 const hasCollectionRecords=value=>Array.isArray(value)?value.some(Boolean):!!(value&&typeof value==='object'&&Object.keys(value).length);
@@ -1437,6 +1526,7 @@ async function migrateLegacyCloudData(){
 async function loadFromCloud(showError=true){
     if(!isCloudMode())return false;
     try{
+        if(!(await flushPendingCloudWrites(false))){if(showError)showToast('尚有本機資料等待同步，已停止雲端覆蓋','error');return false;}
         const r=await fetch(`${DB_URL}/data/${getSyncPath()}.json`,{cache:'no-store'});
         if(r.status===401){document.getElementById('config-warning-modal').classList.remove('hidden');return false;}
         if(!r.ok)throw new Error(`雲端讀取失敗 (${r.status})`);
@@ -1461,6 +1551,7 @@ async function loadFromCloud(showError=true){
         renderCustomMarketHolidays();processAndRenderJournals();renderFavorites();renderPlans();renderRevenueRecords();renderReports();renderChecklists();
         if(document.getElementById('module-overview')?.classList.contains('active'))renderStockOverview();
         saveLocalData();
+        markCloudSyncSuccess();
         return true;
     }catch(e){console.error(e);if(showError)showToast('跨裝置同步失敗，請檢查網路連線','error');return false;}
 }
@@ -1471,8 +1562,9 @@ function startCloudSync(){
 function stopCloudSync(){if(cloudSyncInterval){clearInterval(cloudSyncInterval);cloudSyncInterval=null;}}
 async function cloudWrite(p,options){
     if(!isCloudMode())return true;
-    try{const r=await fetch(`${DB_URL}/data/${getSyncPath()}/${p}.json`,options);if(!r.ok)throw new Error(`雲端寫入失敗 (${r.status})`);return true;}
-    catch(e){console.error(e);showToast('本機已儲存，但雲端同步失敗','error');return false;}
+    if(navigator.onLine===false){queueCloudWrite(p,options);showToast('目前離線，資料已保留並等待同步','error');return false;}
+    try{const r=await fetch(`${DB_URL}/data/${getSyncPath()}/${p}.json`,options);if(!r.ok)throw new Error(`雲端寫入失敗 (${r.status})`);markCloudSyncSuccess();return true;}
+    catch(e){console.error(e);queueCloudWrite(p,options);showToast('本機已儲存，恢復連線後會自動同步','error');return false;}
 }
 async function putDataToCloud(p,py){return cloudWrite(p,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(py)});}
 async function patchDataToCloud(p,py){return cloudWrite(p,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(py)});}
@@ -1507,7 +1599,7 @@ const getFilteredAndSortedData=(dl,cf,cs)=>{
     let ed=dl.map(j=>{const ei=getEpsInfo(j.code,j);const score=getScore(j.tags,ei);return{...j,ei,score};});
     let fd=ed.filter(j=>{
         if(start&&j.date<start)return false; if(end&&j.date>end)return false;
-        if(code){const mc=j.code&&j.code.includes(code),mn=j.name&&j.name.includes(code);if(!mc&&!mn)return false;}
+        if(code){const query=String(code).toLocaleLowerCase(),matched=[j.code,j.name,j.notes,...(j.tags||[])].some(value=>String(value||'').toLocaleLowerCase().includes(query));if(!matched)return false;}
         if(futuresOnly&&!j.ei.futures)return false; if(excludeNegativeGrowth&&j.ei.epsGrowth!==null&&j.ei.epsGrowth<0)return false;
         if(revenueHigh&&!state.revenueRecords.some(r=>r.code===j.code))return false;
         if(minScore>0&&j.score<minScore)return false;
@@ -1853,10 +1945,13 @@ document.getElementById('journal-form')?.addEventListener('submit', async e => {
 
 document.getElementById('revenue-form')?.addEventListener('submit',async e=>{e.preventDefault();const m=document.getElementById('r-month').value,c=document.getElementById('r-code').value.trim(),n=document.getElementById('r-name').value.trim(),nt=document.getElementById('r-notes').value.trim();if(!m||!c||!n)return;const dId=`${c}_${m}`,eIdx=state.revenueRecords.findIndex(r=>r.id===dId);let mn=nt;if(eIdx!==-1){const o=state.revenueRecords[eIdx].notes||'';if(nt&&o&&o!==nt&&!o.includes(nt))mn=o+'；'+nt;else if(!nt)mn=o;}const p={id:dId,month:m,code:c,name:n,notes:mn,createdAt:eIdx!==-1?state.revenueRecords[eIdx].createdAt:Date.now(),updatedAt:Date.now()};if(eIdx!==-1)state.revenueRecords[eIdx]=p;else state.revenueRecords.push(p);saveLocalData();renderRevenueRecords();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();await putDataToCloud(`revenueRecords/${dId}`,p);showToast('營收創高已建立');e.target.reset();document.getElementById('r-month').value=m;setTimeout(()=>document.getElementById('r-code').focus(),15);});
 document.getElementById('revenue-table-body')?.addEventListener('click',async e=>{const b=e.target.closest('[data-action]');if(!b)return;const a=b.dataset.action,id=b.dataset.id;if(a==='edit-notes'){const r=state.revenueRecords.find(x=>x.id===id);if(!r)return;window.openPromptModal("修改備註說明",r.notes||"",async nn=>{if(nn!==null){r.notes=nn.trim();r.updatedAt=Date.now();saveLocalData();renderRevenueRecords();await putDataToCloud(`revenueRecords/${id}`,r);showToast("修改成功");}});}else if(a==='delete-revenue'){window.openConfirmModal('確定刪除？',async()=>{state.revenueRecords=state.revenueRecords.filter(x=>x.id!==id);saveLocalData();renderRevenueRecords();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();await deleteDataFromCloud(`revenueRecords/${id}`);showToast('已刪除');});}});
-function renderRevenueRecords(){const tb=document.getElementById('revenue-table-body'),em=document.getElementById('revenue-empty');if(!tb||!em)return;let fr=state.revenueRecords;if(state.revenueFilters){if(state.revenueFilters.month)fr=fr.filter(r=>r.month===state.revenueFilters.month);if(state.revenueFilters.code)fr=fr.filter(r=>(r.code&&r.code.includes(state.revenueFilters.code))||(r.name&&r.name.includes(state.revenueFilters.code)));}if(fr.length===0){tb.innerHTML='';em.classList.remove('hidden');updateBatchUI('revenue');return;}em.classList.add('hidden');const sr=[...fr].sort((a,b)=>{let vA,vB;switch(state.revenueSortConfig.key){case'month':vA=a.month;vB=b.month;break;case'code':vA=a.code;vB=b.code;break;case'eps2025':vA=getEpsInfo(a.code,{}).eps2025??-9999;vB=getEpsInfo(b.code,{}).eps2025??-9999;break;case'eps2026':vA=getEpsInfo(a.code,{}).eps2026??-9999;vB=getEpsInfo(b.code,{}).eps2026??-9999;break;case'epsGrowth':vA=getEpsInfo(a.code,{}).epsGrowth??-9999;vB=getEpsInfo(b.code,{}).epsGrowth??-9999;break;case'targetPrice':vA=getEpsInfo(a.code,{}).targetPrice??-9999;vB=getEpsInfo(b.code,{}).targetPrice??-9999;break;default:vA=a.createdAt||0;vB=b.createdAt||0;break;}if(vA===vB)return(b.createdAt||0)-(a.createdAt||0);return state.revenueSortConfig.asc?(vA>vB?1:-1):(vA>vB?-1:1);});let rh='';sr.forEach(r=>{const p=r.month.split('-'),dm=`${p[0]}/${p[1]}`,tc=MONTH_TEXT_COLORS[(parseInt(p[1],10)-1)%12],ei=getEpsInfo(r.code,{});rh+=`<tr class="table-row-hover border-b border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-sm"><td class="table-sticky-bg py-3 px-2 sm:px-3 text-center sticky left-0 z-20"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${r.id}" data-type="revenue" ${selectedIds['revenue'].has(r.id)?'checked':''}></td><td class="py-3 px-3 sm:px-4 font-bold ${tc}">${escapeHTML(dm)}</td><td class="py-3 px-3 sm:px-4"><span class="font-medium mr-2">${escapeHTML(r.code)}</span><span class="text-gray-600 dark:text-gray-300">${escapeHTML(r.name)}</span></td><td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2025)}</td><td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2026)}</td><td class="py-3 px-3 sm:px-4 text-right">${formatNumColor(ei.epsGrowth,true)}</td><td class="py-3 px-3 sm:px-4 text-right">${formatTargetPrice(ei.targetPrice)}</td><td class="py-3 px-3 sm:px-4 text-gray-600 dark:text-gray-300 w-full">${escapeHTML(r.notes||'')}</td><td class="py-3 px-3 sm:px-4 text-center whitespace-nowrap"><button class="mr-1 text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" data-action="edit-notes" data-id="${r.id}"><i class="fa-solid fa-comment-dots pointer-events-none"></i></button><button class="text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" data-action="delete-revenue" data-id="${r.id}"><i class="fa-solid fa-trash pointer-events-none"></i></button></td></tr>`;});tb.innerHTML=rh;updateBatchUI('revenue');}
+function renderRevenueRecords(){const tb=document.getElementById('revenue-table-body'),em=document.getElementById('revenue-empty');if(!tb||!em)return;let fr=state.revenueRecords;if(state.revenueFilters){if(state.revenueFilters.month)fr=fr.filter(r=>r.month===state.revenueFilters.month);if(state.revenueFilters.code){const query=state.revenueFilters.code.toLocaleLowerCase();fr=fr.filter(r=>[r.code,r.name,r.notes].some(value=>String(value||'').toLocaleLowerCase().includes(query)));}}if(fr.length===0){tb.innerHTML='';em.classList.remove('hidden');updateBatchUI('revenue');return;}em.classList.add('hidden');const sr=[...fr].sort((a,b)=>{let vA,vB;switch(state.revenueSortConfig.key){case'month':vA=a.month;vB=b.month;break;case'code':vA=a.code;vB=b.code;break;case'eps2025':vA=getEpsInfo(a.code,{}).eps2025??-9999;vB=getEpsInfo(b.code,{}).eps2025??-9999;break;case'eps2026':vA=getEpsInfo(a.code,{}).eps2026??-9999;vB=getEpsInfo(b.code,{}).eps2026??-9999;break;case'epsGrowth':vA=getEpsInfo(a.code,{}).epsGrowth??-9999;vB=getEpsInfo(b.code,{}).epsGrowth??-9999;break;case'targetPrice':vA=getEpsInfo(a.code,{}).targetPrice??-9999;vB=getEpsInfo(b.code,{}).targetPrice??-9999;break;default:vA=a.createdAt||0;vB=b.createdAt||0;break;}if(vA===vB)return(b.createdAt||0)-(a.createdAt||0);return state.revenueSortConfig.asc?(vA>vB?1:-1):(vA>vB?-1:1);});let rh='';sr.forEach(r=>{const p=r.month.split('-'),dm=`${p[0]}/${p[1]}`,tc=MONTH_TEXT_COLORS[(parseInt(p[1],10)-1)%12],ei=getEpsInfo(r.code,{});rh+=`<tr class="table-row-hover border-b border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-sm"><td class="table-sticky-bg py-3 px-2 sm:px-3 text-center sticky left-0 z-20"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${r.id}" data-type="revenue" ${selectedIds['revenue'].has(r.id)?'checked':''}></td><td class="py-3 px-3 sm:px-4 font-bold ${tc}">${escapeHTML(dm)}</td><td class="py-3 px-3 sm:px-4"><span class="font-medium mr-2">${escapeHTML(r.code)}</span><span class="text-gray-600 dark:text-gray-300">${escapeHTML(r.name)}</span></td><td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2025)}</td><td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2026)}</td><td class="py-3 px-3 sm:px-4 text-right">${formatNumColor(ei.epsGrowth,true)}</td><td class="py-3 px-3 sm:px-4 text-right">${formatTargetPrice(ei.targetPrice)}</td><td class="py-3 px-3 sm:px-4 text-gray-600 dark:text-gray-300 w-full">${escapeHTML(r.notes||'')}</td><td class="py-3 px-3 sm:px-4 text-center whitespace-nowrap"><button class="mr-1 text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" data-action="edit-notes" data-id="${r.id}"><i class="fa-solid fa-comment-dots pointer-events-none"></i></button><button class="text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" data-action="delete-revenue" data-id="${r.id}"><i class="fa-solid fa-trash pointer-events-none"></i></button></td></tr>`;});tb.innerHTML=rh;updateBatchUI('revenue');}
 
-const pE=document.getElementById('p-entry'),pS=document.getElementById('p-stop');pE?.addEventListener('input',e=>{const v=parseFloat(e.target.value);if(!isNaN(v)&&pS)pS.value=(v*0.95).toFixed(2);});
-document.getElementById('plan-form')?.addEventListener('submit',async e=>{e.preventDefault();const id=generateId(),d=document.getElementById('p-date').value,s=document.getElementById('p-stock').value.trim(),n=document.getElementById('p-name').value.trim(),q=Math.max(0.01,Math.round((parseFloat(document.getElementById('p-qty').value)||1)*100)/100),p={id,entryDate:d,stock:s,name:n,qty:q,entry:parseFloat(pE.value),stop:parseFloat(pS.value),target:parseFloat(document.getElementById('p-target').value)||null,note:document.getElementById('p-note').value.trim(),status:'持倉中',pnl:0,createdAt:Date.now(),updatedAt:Date.now()};state.plans.push(p);saveLocalData();renderPlans();await putDataToCloud(`plans/${id}`,p);showToast('建立成功');e.target.reset();document.getElementById('p-date').value=d;setTimeout(()=>document.getElementById('p-stock').focus(),15);});
+const pE=document.getElementById('p-entry'),pS=document.getElementById('p-stop');
+const updatePlanRiskPreview=()=>{const root=document.getElementById('plan-risk-preview'),entry=parseFloat(document.getElementById('p-entry')?.value),stop=parseFloat(document.getElementById('p-stop')?.value),target=parseFloat(document.getElementById('p-target')?.value),qty=Math.max(0.01,parseFloat(document.getElementById('p-qty')?.value)||1);if(!root)return;if(!Number.isFinite(entry)||!Number.isFinite(stop)){root.className='col-span-12 rounded-xl border border-green-200 dark:border-green-800/70 bg-green-50/70 dark:bg-green-900/15 px-3 py-2.5 text-xs text-gray-500 dark:text-gray-300';root.innerHTML='<i class="fa-solid fa-scale-balanced mr-1.5 text-green-600 dark:text-green-400"></i>輸入進場價、停損與停利後，自動計算風險報酬。';return;}const risk=entry-stop;if(risk<=0){root.className='col-span-12 rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20 px-3 py-2.5 text-xs font-bold text-amber-600 dark:text-amber-300';root.innerHTML='<i class="fa-solid fa-triangle-exclamation mr-1.5"></i>停損價需低於進場價。';return;}const shares=qty*1000,maxLoss=risk*shares,reward=Number.isFinite(target)?target-entry:NaN,ratio=Number.isFinite(reward)&&reward>0?reward/risk:NaN;root.className='col-span-12 rounded-xl border border-green-200 dark:border-green-800/70 bg-green-50/70 dark:bg-green-900/15 px-3 py-2.5 text-xs text-gray-600 dark:text-gray-200';root.innerHTML=`<div class="flex flex-wrap gap-x-5 gap-y-1"><span><b class="text-green-700 dark:text-green-300">預估最大風險</b> $${Math.round(maxLoss).toLocaleString('zh-TW')}</span><span><b class="text-blue-700 dark:text-blue-300">風險幅度</b> ${((risk/entry)*100).toFixed(2)}%</span><span><b class="text-red-600 dark:text-red-300">風險報酬比</b> ${Number.isFinite(ratio)?`1：${ratio.toFixed(2)}`:'請輸入有效停利價'}</span></div>`;};
+pE?.addEventListener('input',e=>{const v=parseFloat(e.target.value);if(!isNaN(v)&&pS)pS.value=(v*0.95).toFixed(2);updatePlanRiskPreview();});
+['p-stop','p-target','p-qty'].forEach(id=>document.getElementById(id)?.addEventListener('input',updatePlanRiskPreview));
+document.getElementById('plan-form')?.addEventListener('submit',async e=>{e.preventDefault();const id=generateId(),d=document.getElementById('p-date').value,s=document.getElementById('p-stock').value.trim(),n=document.getElementById('p-name').value.trim(),q=Math.max(0.01,Math.round((parseFloat(document.getElementById('p-qty').value)||1)*100)/100),p={id,entryDate:d,stock:s,name:n,qty:q,entry:parseFloat(pE.value),stop:parseFloat(pS.value),target:parseFloat(document.getElementById('p-target').value)||null,note:document.getElementById('p-note').value.trim(),status:'持倉中',pnl:0,createdAt:Date.now(),updatedAt:Date.now()};state.plans.push(p);saveLocalData();renderPlans();await putDataToCloud(`plans/${id}`,p);showToast('建立成功');e.target.reset();updatePlanRiskPreview();document.getElementById('p-date').value=d;setTimeout(()=>document.getElementById('p-stock').focus(),15);});
 
 window.openCloseModal=(id,def,mode='close')=>{
     const m=document.getElementById('close-plan-modal'),ti=document.getElementById('close-plan-modal-title'),ef=document.getElementById('edit-plan-fields'),cf=document.getElementById('close-plan-fields'),ea=document.getElementById('edit-plan-actions');
@@ -1876,7 +1971,7 @@ const getReportReaderItems=()=>{
     if(state.reportFilters){
         if(state.reportFilters.start)reports=reports.filter(report=>report.date>=state.reportFilters.start);
         if(state.reportFilters.end)reports=reports.filter(report=>report.date<=state.reportFilters.end);
-        if(state.reportFilters.code){const query=state.reportFilters.code;reports=reports.filter(report=>(report.code&&report.code.includes(query))||(report.name&&report.name.includes(query)));}
+        if(state.reportFilters.code){const query=state.reportFilters.code.toLocaleLowerCase();reports=reports.filter(report=>[report.code,report.name,report.content].some(value=>String(value||'').toLocaleLowerCase().includes(query)));}
     }
     return[...reports].sort((a,b)=>{
         let valueA,valueB;
@@ -1936,6 +2031,11 @@ document.getElementById('report-reader-prev-btn')?.addEventListener('click',()=>
 document.getElementById('report-reader-next-btn')?.addEventListener('click',()=>moveReportReader(1));
 document.getElementById('report-reader-close-btn')?.addEventListener('click',closeReportReader);
 document.getElementById('report-reader-copy-btn')?.addEventListener('click',()=>{const report=reportReaderItems[reportReaderIndex];if(report)executeCopy(`[${report.date||''}] ${report.code} / ${report.name}\n${report.content||''}`);});
+const REPORT_READER_FONT_KEY='ryan_report_reader_font_v1',reportReaderFontSizes=[15,17,19,21,23];let reportReaderFontIndex=Math.max(0,Math.min(reportReaderFontSizes.length-1,parseInt(localStorage.getItem(REPORT_READER_FONT_KEY)||'1')));
+const applyReportReaderFont=()=>{const content=document.getElementById('report-reader-content'),label=document.getElementById('report-reader-font-label'),down=document.getElementById('report-reader-font-down'),up=document.getElementById('report-reader-font-up');if(content){content.style.fontSize=`${reportReaderFontSizes[reportReaderFontIndex]}px`;content.style.lineHeight=reportReaderFontIndex>=3?'2':'1.9';}if(label)label.textContent=['較小','標準','舒適','大字','特大'][reportReaderFontIndex];if(down)down.disabled=reportReaderFontIndex===0;if(up)up.disabled=reportReaderFontIndex===reportReaderFontSizes.length-1;};
+const changeReportReaderFont=step=>{reportReaderFontIndex=Math.max(0,Math.min(reportReaderFontSizes.length-1,reportReaderFontIndex+step));localStorage.setItem(REPORT_READER_FONT_KEY,String(reportReaderFontIndex));applyReportReaderFont();};
+document.getElementById('report-reader-font-down')?.addEventListener('click',()=>changeReportReaderFont(-1));
+document.getElementById('report-reader-font-up')?.addEventListener('click',()=>changeReportReaderFont(1));applyReportReaderFont();
 document.getElementById('report-reader-content-wrap')?.addEventListener('touchstart',e=>{const touch=e.changedTouches[0];reportReaderTouchStart=touch?{x:touch.clientX,y:touch.clientY}:null;},{passive:true});
 document.getElementById('report-reader-content-wrap')?.addEventListener('touchend',e=>{if(!reportReaderTouchStart)return;const touch=e.changedTouches[0];if(!touch)return;const dx=touch.clientX-reportReaderTouchStart.x,dy=touch.clientY-reportReaderTouchStart.y;reportReaderTouchStart=null;if(Math.abs(dx)>=55&&Math.abs(dx)>Math.abs(dy))moveReportReader(dx>0?-1:1);},{passive:true});
 document.addEventListener('keydown',e=>{const modal=document.getElementById('report-reader-modal');if(!modal||modal.classList.contains('hidden'))return;if(e.key==='ArrowLeft'){e.preventDefault();moveReportReader(-1);}else if(e.key==='ArrowRight'){e.preventDefault();moveReportReader(1);}else if(e.key==='Escape'){e.preventDefault();closeReportReader();}});
@@ -2242,9 +2342,14 @@ const renderSupportSummary=summary=>{
     if(summary.confluences.length===0){list.innerHTML='<span class="text-xs text-gray-400">目前無共振價位</span>';return;}
     list.innerHTML=summary.confluences.map(x=>{const isR=x.type==='pressure',sources=x.items.map(i=>`${i.method} ${i.label}`).join('、');return`<span class="inline-flex flex-col rounded-lg border ${isR?'border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20':'border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/20'} px-3 py-2" title="${escapeHTML(sources)}"><span class="text-xs font-black ${isR?'tw-red':'tw-green'}">${isR?'壓力':'支撐'} ${formatCalcPrice(x.value,summary.isTX)}｜${x.strength}</span><span class="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">${x.count} 種公式｜${escapeHTML(sources)}</span></span>`;}).join('');
 };
+const clearSupportPressureResults=()=>{lastSupportSummary=null;document.getElementById('calc-summary')?.classList.add('hidden');['cdp-ah','cdp-nh','cdp-cdp','cdp-nl','cdp-al','pv-r2','pv-r1','pv-pp','pv-s1','pv-s2','gr-191','gr-382','gr-500','gr-618','gr-809','fib-r3','fib-r2','fib-r1','fib-pp','fib-s1','fib-s2','fib-s3'].forEach(id=>{const element=document.getElementById(id);if(element)element.textContent='-';});};
 const calculateSupportPressure=(silent=false)=>{
     const h=parseFloat(document.getElementById('c-high').value),l=parseFloat(document.getElementById('c-low').value),c=parseFloat(document.getElementById('c-close').value);
-    if(!Number.isFinite(h)||!Number.isFinite(l)||!Number.isFinite(c)||h<l){if(!silent)showToast('輸入無效','error');return false;}
+    const warning=document.getElementById('calc-input-warning'),setWarning=(message,type='error')=>{if(!warning)return;if(!message){warning.classList.add('hidden');warning.textContent='';return;}warning.className=`col-span-2 md:col-span-5 rounded-lg border px-3 py-2 text-xs font-bold ${type==='error'?'border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-300':'border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-300'}`;warning.textContent=message;};
+    if(!Number.isFinite(h)||!Number.isFinite(l)||!Number.isFinite(c)){clearSupportPressureResults();if(silent)setWarning('');else{setWarning('請完整輸入最高、最低與收盤價。');showToast('請完整輸入數據','error');}return false;}
+    if(h<l){clearSupportPressureResults();setWarning('最高價不可低於最低價，請確認輸入內容。');if(!silent)showToast('最高價不可低於最低價','error');return false;}
+    if(c>h||c<l){clearSupportPressureResults();setWarning('收盤價應介於最高價與最低價之間，請確認盤別或數據。');if(!silent)showToast('收盤價超出最高／最低區間','error');return false;}
+    if(h===l){setWarning('最高價與最低價相同，所有計算價位將會重疊。','warning');}else setWarning('');
     const instrument=getCalcInstrument(),isTX=instrument.isTX,pp=(h+l+c)/3,cdp=(h+l+2*c)/4,df=h-l;
     const values={
         pvPp:pp,pvR1:(2*pp)-l,pvR2:pp+df,pvS1:(2*pp)-h,pvS2:pp-df,
@@ -2349,6 +2454,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
             syncBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up sm:mr-1.5"></i><span class="hidden sm:inline">立即同步</span>';
             syncBtn.classList.remove('bg-blue-800', 'border-blue-400');
         }
+        window.updateCloudHealthUI?.(status);
     };
     const performDirectCloudSync=async(showSuccess=true)=>{
         if(syncInProgress)return false;
@@ -2363,6 +2469,8 @@ document.addEventListener('DOMContentLoaded',async()=>{
     };
     updateSyncStatusUI('ready');
     document.getElementById('btn-sync-modal')?.addEventListener('click',()=>performDirectCloudSync(true));
+    window.addEventListener('offline',()=>{updateSyncStatusUI('error');window.updateCloudHealthUI?.('offline');});
+    window.addEventListener('online',()=>performDirectCloudSync(false));
     // --- 跨裝置同步功能綁定結束 ---
 
     // 初始化導航列按鈕事件 (修正"按下去沒反應"的關鍵區塊)
@@ -2640,6 +2748,141 @@ setChkDirection('long');
 
     await performDirectCloudSync(false);
 });
+</script>
+
+<script id="responsive-module-optimization">
+(function(){
+  'use strict';
+  const mobileWideColumns={
+    'module-journal':[9,10],
+    'module-favorites':[9],
+    'module-revenue':[7],
+    'module-report':[3],
+    'module-checklist':[4],
+    'module-plan':[]
+  };
+
+  function updateMobileSelectButton(type){
+    const button=document.querySelector(`[data-mobile-select-all="${type}"]`),selectAll=document.querySelector(`.select-all-cb[data-type="${type}"]`);
+    if(!button||!selectAll)return;
+    const allSelected=selectAll.checked&&!selectAll.indeterminate;
+    button.innerHTML=allSelected?'<i class="fa-solid fa-square-minus mr-1.5"></i>取消全選':'<i class="fa-solid fa-check-double mr-1.5"></i>全選目前清單';
+    button.setAttribute('aria-pressed',String(allSelected));
+  }
+
+  function ensureMobileSelectBar(table){
+    const selectAll=table.querySelector('.select-all-cb[data-type]'),wrapper=table.closest('.mobile-card-scroll');
+    if(!selectAll||!wrapper||document.querySelector(`[data-mobile-select-all="${selectAll.dataset.type}"]`))return;
+    const bar=document.createElement('div');
+    bar.className='sm:hidden flex items-center justify-between gap-3 px-3 py-2 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800';
+    bar.innerHTML=`<span class="text-[11px] font-bold text-gray-400"><i class="fa-solid fa-mobile-screen-button mr-1.5"></i>卡片清單</span><button type="button" data-mobile-select-all="${escapeHTML(selectAll.dataset.type)}" aria-pressed="false" class="min-h-[40px] rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 px-3 text-xs font-bold text-gray-600 dark:text-gray-200"></button>`;
+    wrapper.before(bar);updateMobileSelectButton(selectAll.dataset.type);
+  }
+
+  function decorateMobileCardTable(table){
+    const moduleId=table.closest('.tab-content')?.id||'',wideColumns=mobileWideColumns[moduleId]||[];
+    const labels=Array.from(table.querySelectorAll('thead th')).map((th,index)=>index===0?'選取':th.textContent.replace(/\s+/g,' ').trim());
+    table.querySelectorAll('tbody tr').forEach(row=>{
+      Array.from(row.children).forEach((cell,index)=>{
+        cell.dataset.mobileLabel=labels[index]||'';
+        if(wideColumns.includes(index))cell.dataset.mobileWide='true';else delete cell.dataset.mobileWide;
+      });
+    });
+    ensureMobileSelectBar(table);
+    const type=table.querySelector('.select-all-cb[data-type]')?.dataset.type;if(type)updateMobileSelectButton(type);
+  }
+
+  function initMobileCardTables(){
+    document.querySelectorAll('table.mobile-card-table').forEach(table=>{
+      decorateMobileCardTable(table);
+      const body=table.tBodies[0];if(body)new MutationObserver(()=>decorateMobileCardTable(table)).observe(body,{childList:true});
+    });
+  }
+
+  const getGlobalStockIndex=()=>{
+    const stocks=new Map(),admin=!!window.isAdminMode?.();
+    const add=(rawCode,rawName,module,date='')=>{
+      const code=String(rawCode||'').trim(),name=String(rawName||'').trim();if(!code)return;
+      const item=stocks.get(code)||{code,name:'',latest:'',counts:{journal:0,revenue:0,report:0,checklist:0,plan:0,favorite:0}};
+      if(!item.name&&name)item.name=name;
+      if(module&&Object.prototype.hasOwnProperty.call(item.counts,module))item.counts[module]++;
+      if(date&&String(date)>item.latest)item.latest=String(date);
+      stocks.set(code,item);
+    };
+    (state.journals||[]).forEach(item=>{add(item.code,item.name,'journal',item.date);if(admin&&item.isFavorite)add(item.code,item.name,'favorite',item.date);});
+    (state.revenueRecords||[]).forEach(item=>add(item.code,item.name,'revenue',item.month));
+    (state.reports||[]).forEach(item=>add(item.code,item.name,'report',item.date));
+    (state.checklists||[]).forEach(item=>add(item.code,item.name,'checklist',item.date));
+    if(admin)(state.plans||[]).forEach(item=>add(item.stock,item.name||state.codeToName?.[item.stock],'plan',item.entryDate));
+    Object.entries(state.codeToName||{}).forEach(([code,name])=>add(code,name));
+    Object.entries(state.epsData||{}).forEach(([code,item])=>add(item?.code||code,item?.name||state.codeToName?.[code]||''));
+    return Array.from(stocks.values());
+  };
+
+  let lastGlobalSearchResults=[];
+  const searchBadge=(label,count,theme)=>count?`<span class="rounded-md border px-1.5 py-0.5 text-[10px] font-bold ${theme}">${label} ${count}</span>`:'';
+  function renderGlobalSearch(){
+    const input=document.getElementById('global-search-input'),root=document.getElementById('global-search-results'),summary=document.getElementById('global-search-summary');if(!input||!root||!summary)return;
+    const query=input.value.trim().toLocaleLowerCase(),catalog=getGlobalStockIndex();
+    const score=item=>{const code=item.code.toLocaleLowerCase(),name=item.name.toLocaleLowerCase();if(code===query||name===query)return 0;if(code.startsWith(query)||name.startsWith(query))return 1;return 2;};
+    lastGlobalSearchResults=(query?catalog.filter(item=>item.code.toLocaleLowerCase().includes(query)||item.name.toLocaleLowerCase().includes(query)):catalog.filter(item=>Object.values(item.counts).some(Boolean)))
+      .sort((a,b)=>(query?score(a)-score(b):0)||String(b.latest).localeCompare(String(a.latest))||a.code.localeCompare(b.code,undefined,{numeric:true})).slice(0,20);
+    summary.textContent=query?`找到 ${lastGlobalSearchResults.length} 檔符合結果`:'最近有紀錄的股票';
+    root.innerHTML=lastGlobalSearchResults.length?lastGlobalSearchResults.map(item=>`<button type="button" data-global-stock-code="${escapeHTML(item.code)}" data-global-stock-name="${escapeHTML(item.name)}" class="group min-h-[68px] w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/80 dark:bg-gray-800/70 px-3 py-2.5 text-left hover:border-blue-300 dark:hover:border-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition"><div class="flex items-center justify-between gap-3"><div class="min-w-0"><span class="font-black text-blue-600 dark:text-blue-300 tabular-nums">${escapeHTML(item.code)}</span><span class="ml-2 font-bold text-gray-800 dark:text-gray-100">${escapeHTML(item.name||'未命名')}</span></div><i class="fa-solid fa-chevron-right shrink-0 text-gray-300 group-hover:text-blue-500"></i></div><div class="mt-2 flex flex-wrap gap-1">${searchBadge('日誌',item.counts.journal,'border-blue-200 text-blue-600 dark:border-blue-800 dark:text-blue-300')}${searchBadge('營收',item.counts.revenue,'border-pink-200 text-pink-600 dark:border-pink-800 dark:text-pink-300')}${searchBadge('報告',item.counts.report,'border-indigo-200 text-indigo-600 dark:border-indigo-800 dark:text-indigo-300')}${searchBadge('查核',item.counts.checklist,'border-cyan-200 text-cyan-600 dark:border-cyan-800 dark:text-cyan-300')}${searchBadge('規劃',item.counts.plan,'border-green-200 text-green-600 dark:border-green-800 dark:text-green-300')}${searchBadge('追蹤',item.counts.favorite,'border-amber-200 text-amber-600 dark:border-amber-800 dark:text-amber-300')}</div></button>`).join(''):'<div class="rounded-xl border border-dashed border-gray-300 dark:border-gray-700 p-8 text-center text-sm text-gray-400">查無符合的股票</div>';
+  }
+
+  let globalSearchLastFocus=null;
+  function setGlobalSearchOpen(open){
+    const modal=document.getElementById('global-search-modal'),input=document.getElementById('global-search-input');if(!modal||!input)return;
+    if(open){globalSearchLastFocus=document.activeElement;modal.classList.remove('hidden');modal.classList.add('flex');modal.setAttribute('aria-hidden','false');renderGlobalSearch();setTimeout(()=>{input.focus();input.select();},30);}
+    else{modal.classList.add('hidden');modal.classList.remove('flex');modal.setAttribute('aria-hidden','true');globalSearchLastFocus?.focus?.();}
+  }
+
+  function openGlobalStock(code,name){
+    const codeInput=document.getElementById('overview-code'),nameInput=document.getElementById('overview-name');if(codeInput)codeInput.value=code;if(nameInput)nameInput.value=name||'';
+    setGlobalSearchOpen(false);document.querySelector('.nav-btn[data-target="module-overview"]')?.click();renderStockOverview(code);window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  function jumpFromOverview(target){
+    const code=String(activeOverviewStock?.code||document.getElementById('overview-code')?.value||'').trim();if(!code)return showToast('請先查詢股票','error');
+    if(target==='module-journal'){
+      state.filters={...state.filters,start:'',end:'',code};document.getElementById('filter-start').value='';document.getElementById('filter-end').value='';document.getElementById('filter-code').value=code;processAndRenderJournals();
+    }else if(target==='module-revenue'){
+      state.revenueFilters={...state.revenueFilters,month:'',code};document.getElementById('filter-revenue-month').value='';document.getElementById('filter-revenue-code').value=code;renderRevenueRecords();
+    }else if(target==='module-report'){
+      state.reportFilters={...state.reportFilters,start:'',end:'',code};document.getElementById('filter-rep-start').value='';document.getElementById('filter-rep-end').value='';document.getElementById('filter-rep-code').value=code;renderReports();
+    }
+    saveLocalData();document.querySelector(`.nav-btn[data-target="${target}"]`)?.click();window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  document.addEventListener('DOMContentLoaded',()=>{
+    initMobileCardTables();
+    document.getElementById('btn-global-search')?.addEventListener('click',()=>setGlobalSearchOpen(true));
+    const mobileToolsButton=document.getElementById('btn-mobile-tools'),mobileToolsMenu=document.getElementById('mobile-tools-menu');
+    mobileToolsButton?.addEventListener('click',event=>{event.stopPropagation();const opening=mobileToolsMenu?.classList.contains('hidden');mobileToolsMenu?.classList.toggle('hidden',!opening);mobileToolsButton.setAttribute('aria-expanded',String(!!opening));});
+    mobileToolsMenu?.addEventListener('click',event=>{const button=event.target.closest('[data-mobile-tool-target]');if(!button)return;document.getElementById(button.dataset.mobileToolTarget)?.click();mobileToolsMenu.classList.add('hidden');mobileToolsButton?.setAttribute('aria-expanded','false');});
+    document.getElementById('global-search-close')?.addEventListener('click',()=>setGlobalSearchOpen(false));
+    document.getElementById('global-search-input')?.addEventListener('input',debounce(renderGlobalSearch,120));
+    document.getElementById('global-search-input')?.addEventListener('keydown',event=>{if(event.key==='Enter'&&lastGlobalSearchResults[0]){event.preventDefault();openGlobalStock(lastGlobalSearchResults[0].code,lastGlobalSearchResults[0].name);}});
+    document.getElementById('global-search-results')?.addEventListener('click',event=>{const button=event.target.closest('[data-global-stock-code]');if(button)openGlobalStock(button.dataset.globalStockCode,button.dataset.globalStockName);});
+    document.getElementById('global-search-modal')?.addEventListener('click',event=>{if(event.target.id==='global-search-modal')setGlobalSearchOpen(false);});
+    document.addEventListener('click',event=>{
+      if(mobileToolsMenu&&!mobileToolsMenu.classList.contains('hidden')&&!mobileToolsMenu.contains(event.target)&&event.target!==mobileToolsButton){mobileToolsMenu.classList.add('hidden');mobileToolsButton?.setAttribute('aria-expanded','false');}
+      const selectButton=event.target.closest('[data-mobile-select-all]');
+      if(selectButton){const selectAll=document.querySelector(`.select-all-cb[data-type="${selectButton.dataset.mobileSelectAll}"]`);if(selectAll){selectAll.checked=!(selectAll.checked&&!selectAll.indeterminate);selectAll.dispatchEvent(new Event('change',{bubbles:true}));setTimeout(()=>updateMobileSelectButton(selectButton.dataset.mobileSelectAll));}return;}
+      const jumpButton=event.target.closest('[data-overview-jump]');if(jumpButton)jumpFromOverview(jumpButton.dataset.overviewJump);
+      const navButton=event.target.closest('.nav-btn-mobile');if(navButton)setTimeout(()=>navButton.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'}));
+    });
+    document.addEventListener('change',event=>{const type=event.target?.dataset?.type;if(type&&(event.target.classList.contains('row-cb')||event.target.classList.contains('select-all-cb')))setTimeout(()=>updateMobileSelectButton(type));});
+    document.addEventListener('keydown',event=>{
+      const editing=event.target.closest?.('input,textarea,select,[contenteditable="true"]');
+      if((event.ctrlKey||event.metaKey)&&event.key.toLocaleLowerCase()==='k'){event.preventDefault();setGlobalSearchOpen(true);}
+      else if(event.key==='/'&&!editing){event.preventDefault();setGlobalSearchOpen(true);}
+      else if(event.key==='Escape'&&!document.getElementById('global-search-modal')?.classList.contains('hidden'))setGlobalSearchOpen(false);
+    });
+    window.addEventListener('storage',event=>{if(event.key==='ryan_admin_session_v1'&&!document.getElementById('global-search-modal')?.classList.contains('hidden'))renderGlobalSearch();});
+  });
+})();
 </script>
 
 <script id="ux-optimization">
