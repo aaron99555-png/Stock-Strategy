@@ -375,6 +375,21 @@ button { touch-action: manipulation; }
   html body main .tab-content .mobile-table-view-bar { background-color:var(--mobile-table-panel) !important; border-color:var(--mobile-table-border) !important; color:var(--mobile-table-text) !important; }
   html body main :is(#module-journal,#module-favorites) .card-panel > div:has(> .filter-toolbar),
   html body main :is(#module-journal,#module-favorites) .copy-section { background-color:var(--mobile-table-shell) !important; border-color:var(--mobile-table-border) !important; }
+  /* 手機清單模式：凍結欄與可橫向捲動欄皆使用不透明高對比深色 */
+  html.dark.mobile-view-list body main .tab-content .mobile-card-scroll { background:#020617 !important; scrollbar-color:#475569 #0f172a; }
+  html.dark.mobile-view-list body main .tab-content .mobile-card-scroll::-webkit-scrollbar-track { background:#0f172a !important; }
+  html.dark.mobile-view-list body main .tab-content .mobile-card-scroll::-webkit-scrollbar-thumb { background:#475569 !important; }
+  html.dark.mobile-view-list body main .tab-content table.mobile-card-table :is(thead,thead tr,thead th) { background:#0b1220 !important; color:#f1f5f9 !important; border-color:#475569 !important; }
+  html.dark.mobile-view-list body main .tab-content table.mobile-card-table tbody,
+  html.dark.mobile-view-list body main .tab-content table.mobile-card-table tbody tr { background:#111827 !important; color:#f8fafc !important; }
+  html.dark.mobile-view-list body main .tab-content table.mobile-card-table tbody td.sticky,
+  html.dark.mobile-view-list body main .tab-content table.mobile-card-table tbody td:not(.sticky) { background:#111827 !important; color:#f8fafc !important; border-color:#475569 !important; }
+  html.dark.mobile-view-list body main .tab-content table.mobile-card-table tbody tr:hover td.sticky,
+  html.dark.mobile-view-list body main .tab-content table.mobile-card-table tbody tr:hover td:not(.sticky) { background:#1e293b !important; color:#ffffff !important; }
+  html.dark.mobile-view-list body main .tab-content table.mobile-card-table thead th i { color:#93c5fd !important; opacity:1 !important; }
+  /* 法人報告欄位固定對齊：日期 55px、代號／股名 110px */
+  html.mobile-view-list #module-report table.mobile-card-table :is(th,td):nth-child(2) { width:55px !important; min-width:55px !important; max-width:55px !important; padding-left:.25rem !important; padding-right:.25rem !important; text-align:center !important; }
+  html.mobile-view-list #module-report table.mobile-card-table :is(th,td):nth-child(3) { width:110px !important; min-width:110px !important; max-width:110px !important; }
   /* 一般使用者不保留不可操作的勾選空欄，日期與代號欄同步向左校正 */
   html.viewer-mode body main .tab-content table.mobile-card-table thead th:first-child,
   html.viewer-mode body main .tab-content table.mobile-card-table tbody td:first-child { display:none !important; }
@@ -1486,14 +1501,45 @@ const generateId=()=>Date.now().toString(36)+Math.random().toString(36).substrin
 const normalizeReportDate=value=>{
     if(value==null||value==='')return null;
     if(value instanceof Date&&!isNaN(value))return`${value.getFullYear()}-${String(value.getMonth()+1).padStart(2,'0')}-${String(value.getDate()).padStart(2,'0')}`;
-    if(typeof value==='number'&&typeof XLSX!=='undefined'&&XLSX.SSF?.parse_date_code){
-        const parsed=XLSX.SSF.parse_date_code(value);
-        if(parsed)return`${parsed.y}-${String(parsed.m).padStart(2,'0')}-${String(parsed.d).padStart(2,'0')}`;
+    if(typeof value==='number'){
+        const digits=String(Math.trunc(value));
+        if(/^\d{8}$/.test(digits)){const year=digits.slice(0,4),month=digits.slice(4,6),day=digits.slice(6,8);return`${year}-${month}-${day}`;}
+        if(value>100000000000)return normalizeReportDate(new Date(value));
+        if(typeof XLSX!=='undefined'&&XLSX.SSF?.parse_date_code){const parsed=XLSX.SSF.parse_date_code(value);if(parsed)return`${parsed.y}-${String(parsed.m).padStart(2,'0')}-${String(parsed.d).padStart(2,'0')}`;}
+        if(value>0&&value<2958466){const parsedDate=new Date(Date.UTC(1899,11,30)+Math.floor(value)*86400000);if(!isNaN(parsedDate))return`${parsedDate.getUTCFullYear()}-${String(parsedDate.getUTCMonth()+1).padStart(2,'0')}-${String(parsedDate.getUTCDate()).padStart(2,'0')}`;}
     }
     const text=String(value).trim();
     const matched=text.match(/^(\d{4})[\/.-](\d{1,2})[\/.-](\d{1,2})/);
     if(matched)return`${matched[1]}-${matched[2].padStart(2,'0')}-${matched[3].padStart(2,'0')}`;
     return text;
+};
+const resolveReportRecordDate=report=>{
+    if(!report)return'';
+    const raw=report.date??report.reportDate??report['報告日期']??'';
+    let normalized='';
+    if(typeof raw==='number'&&raw>100000000000)normalized=normalizeReportDate(new Date(raw))||'';
+    else if(typeof raw==='string'&&/^\d{12,13}$/.test(raw.trim()))normalized=normalizeReportDate(new Date(Number(raw)))||'';
+    else if(typeof raw==='string'&&/^\d{4,6}(?:\.\d+)?$/.test(raw.trim()))normalized=normalizeReportDate(Number(raw))||'';
+    else normalized=normalizeReportDate(raw)||'';
+    if(/^\d{4}-\d{2}-\d{2}$/.test(normalized))return normalized;
+    const createdAt=Number(report.createdAt||0);
+    if(Number.isFinite(createdAt)&&createdAt>946684800000){const fallback=normalizeReportDate(new Date(createdAt));if(fallback)return fallback;}
+    return normalized;
+};
+const normalizeReportRecords=records=>{
+    let changed=false;
+    const normalized=(Array.isArray(records)?records:[]).map(report=>{
+        if(!report)return report;
+        const date=resolveReportRecordDate(report);
+        if(date&&date!==String(report.date||'')){changed=true;return{...report,date};}
+        return report;
+    });
+    return{records:normalized,changed};
+};
+const renderCompactReportDate=date=>{
+    const normalized=String(date||''),match=normalized.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if(!match)return'<span class="compact-date-value"><span class="compact-date-month-day">未填寫</span></span>';
+    return`<span class="compact-date-value"><span class="compact-date-year">${match[1]}</span><span class="compact-date-month-day">${match[2]}/${match[3]}</span></span>`;
 };
 
 const formatNumColor=(val,isP=false)=>{if(val==null||val==='-'||val==='')return'<span class="text-gray-400 dark:text-gray-500">-</span>';const n=parseFloat(val);if(isNaN(n))return'<span class="text-gray-400 dark:text-gray-500">-</span>';return`<span class="font-bold ${n>0?'tw-red':(n<0?'tw-green':'text-gray-900 dark:text-white')}">${isP?(n*100).toFixed(2)+'%':n.toString()}</span>`;};
@@ -1763,12 +1809,13 @@ async function loadFromCloud(showError=true){
         if(d){
             state.journals=cloudCollection(d.journals);
             const migratedStrategyTags=normalizeStrategyTags(state.journals);
-            state.plans=cloudCollection(d.plans);state.revenueRecords=cloudCollection(d.revenueRecords);state.reports=cloudCollection(d.reports);state.checklists=cloudCollection(d.checklists);if(d.trash!==undefined)state.trash=cloudCollection(d.trash);if(d.tagSettings)state.tagSettings=d.tagSettings;state.epsData=d.epsData||{};
+            state.plans=cloudCollection(d.plans);state.revenueRecords=cloudCollection(d.revenueRecords);const normalizedCloudReports=normalizeReportRecords(cloudCollection(d.reports));state.reports=normalizedCloudReports.records;state.checklists=cloudCollection(d.checklists);if(d.trash!==undefined)state.trash=cloudCollection(d.trash);if(d.tagSettings)state.tagSettings=d.tagSettings;state.epsData=d.epsData||{};
             state.customMarketHolidays=d.customMarketHolidaySettings?normalizeCustomMarketHolidays(cloudCollection(d.customMarketHolidaySettings.dates)):[];
             state.codeToName={};state.nameToCode={};
             [...state.journals,...state.plans.map(p=>({code:p.stock,name:p.name})),...state.revenueRecords,...state.reports,...state.checklists,...Object.values(state.epsData)].forEach(dt=>{if(dt&&dt.code&&dt.name){state.codeToName[dt.code]=dt.name;state.nameToCode[dt.name]=dt.code;}});
             const migratedManagedTags=window.ensureOptimizationState?.();window.syncCustomTagSettings?.();window.renderTrashManager?.();
             if(migratedStrategyTags)await putDataToCloud('journals',Object.fromEntries(state.journals.map(x=>[x.id,x])));
+            if(normalizedCloudReports.changed)await putDataToCloud('reports',Object.fromEntries(state.reports.map(x=>[x.id,x])));
             if((!d.tagSettings||migratedManagedTags)&&state.tagSettings)await putDataToCloud('tagSettings',state.tagSettings);
             if(d.trash===undefined&&state.trash?.length)await putDataToCloud('trash',Object.fromEntries(state.trash.map(x=>[x.id,x])));
         }else{
@@ -1804,6 +1851,7 @@ function loadLocalData(){
     if(sd){try{state={...state,...JSON.parse(sd)};}catch(e){}}else{const ts={"2330":"台積電","2317":"鴻海","2454":"聯發科","2382":"廣達","2603":"長榮"};Object.entries(ts).forEach(([c,n])=>{state.codeToName[c]=n;state.nameToCode[n]=c;});}
     const migratedStrategyTags=normalizeStrategyTags(state.journals);
     if(!state.revenueRecords)state.revenueRecords=[]; if(!state.reports)state.reports=[]; if(!state.checklists)state.checklists=[]; if(!Array.isArray(state.trash))state.trash=[];
+    const normalizedLocalReports=normalizeReportRecords(state.reports);state.reports=normalizedLocalReports.records;
     const normalizedMarketHolidays=normalizeCustomMarketHolidays(state.customMarketHolidays),migratedMarketHolidays=JSON.stringify(normalizedMarketHolidays)!==JSON.stringify(state.customMarketHolidays||[]);state.customMarketHolidays=normalizedMarketHolidays;
     if(!state.filters)state.filters={start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,tags:[],minScore:0,tagLogic:'OR'};
     if(!state.favFilters)state.favFilters={start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,tags:[],minScore:0,tagLogic:'OR'};
@@ -1818,7 +1866,7 @@ function loadLocalData(){
     if(state.filters.revenueHigh===undefined)state.filters.revenueHigh=false; if(state.favFilters.revenueHigh===undefined)state.favFilters.revenueHigh=false;
     if(state.filters.code===undefined)state.filters.code=''; if(state.favFilters.code===undefined)state.favFilters.code='';
     if(!state.reportSortConfig)state.reportSortConfig={key:'date',asc:false}; if(!state.checklistSortConfig)state.checklistSortConfig={key:'date',asc:false};
-    if(migratedStrategyTags||migratedFilterTags||migratedJournalFilter||migratedReportFilter||migratedMarketHolidays)saveLocalData();
+    if(migratedStrategyTags||migratedFilterTags||migratedJournalFilter||migratedReportFilter||migratedMarketHolidays||normalizedLocalReports.changed)saveLocalData();
     const applyLogicState=(lv,sel)=>{document.querySelectorAll(sel).forEach(b=>{if(b.dataset.logic===lv){b.classList.remove('text-gray-500','dark:text-gray-400','hover:text-gray-700','dark:hover:text-gray-200');b.classList.add('bg-white','dark:bg-gray-700','text-blue-600','dark:text-blue-400','shadow-sm');}else{b.classList.remove('bg-white','dark:bg-gray-700','text-blue-600','dark:text-blue-400','shadow-sm');b.classList.add('text-gray-500','dark:text-gray-400','hover:text-gray-700','dark:hover:text-gray-200');}});};
     applyLogicState(state.filters.tagLogic,'.logic-btn'); applyLogicState(state.favFilters.tagLogic,'.logic-btn-fav');
 }
@@ -2215,7 +2263,7 @@ function renderPlans(){const tb=document.getElementById('plan-table-body');if(!t
 
 let reportReaderItems=[],reportReaderIndex=0,reportReaderTouchStart=null,reportReaderBodyOverflow='',reportReaderEnteredFullscreen=false;
 const getReportReaderItems=()=>{
-    let reports=state.reports||[];
+    let reports=normalizeReportRecords(state.reports||[]).records;
     if(state.reportFilters){
         if(state.reportFilters.start)reports=reports.filter(report=>report.date>=state.reportFilters.start);
         if(state.reportFilters.end)reports=reports.filter(report=>report.date<=state.reportFilters.end);
@@ -2293,7 +2341,7 @@ document.getElementById('report-form')?.addEventListener('submit',async e=>{e.pr
 document.getElementById('report-table-body')?.addEventListener('click',async e=>{
     const button=e.target.closest('[data-action]');if(!button)return;
     const action=button.dataset.action,id=button.dataset.id;
-    if(action==='copy-report'){const report=state.reports.find(item=>item.id===id);if(report)executeCopy(`[${report.date||''}] ${report.code} / ${report.name}\n${report.content||''}`);}
+    if(action==='copy-report'){const report=state.reports.find(item=>item.id===id);if(report)executeCopy(`[${resolveReportRecordDate(report)}] ${report.code} / ${report.name}\n${report.content||''}`);}
     else if(action==='edit-report'){const report=state.reports.find(item=>item.id===id);if(report)window.openPromptModal("修改",report.content||"",async newContent=>{if(newContent!==null&&newContent.trim()!==""){report.content=newContent.trim();report.updatedAt=Date.now();saveLocalData();renderReports();await putDataToCloud(`reports/${id}`,report);showToast("修改成功");}});}
     else if(action==='delete-report'){window.openConfirmModal('確定刪除？',async()=>{state.reports=state.reports.filter(item=>item.id!==id);saveLocalData();renderReports();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();await deleteDataFromCloud(`reports/${id}`);showToast('已刪除');});}
 });
@@ -2304,9 +2352,9 @@ function renderReports(){
     if(!reports.length){tableBody.innerHTML='';emptyState.classList.remove('hidden');updateBatchUI('report');return;}
     emptyState.classList.add('hidden');
     tableBody.innerHTML=reports.map(report=>{
-        const formattedDate=report.date?report.date.replace(/-/g,'/'):'';
+        const reportDate=resolveReportRecordDate(report),formattedDate=reportDate?reportDate.replace(/-/g,'/'):'未填寫';
         const reportId=escapeHTML(report.id);
-        return`<tr class="table-row-hover border-b border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-sm"><td class="table-sticky-bg py-3 px-2 sm:px-3 text-center sticky left-0 z-20"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${reportId}" data-type="report" ${selectedIds.report&&selectedIds.report.has(report.id)?'checked':''}></td><td class="py-3 px-3 sm:px-4 font-medium text-gray-600 dark:text-gray-400">${escapeHTML(formattedDate)}</td><td class="py-3 px-3 sm:px-4"><span class="font-bold mr-2 text-gray-800 dark:text-gray-200">${escapeHTML(report.code)}</span><span class="text-gray-600 dark:text-gray-400">${escapeHTML(report.name)}</span></td><td class="report-summary-col report-summary-cell py-3 px-3 sm:px-4 text-gray-800 dark:text-gray-100 font-medium leading-relaxed">${escapeHTML(report.content||'')}</td><td class="py-3 px-2 text-center align-middle"><div class="flex flex-col items-center justify-center gap-1.5"><button type="button" title="複製報告" aria-label="複製 ${escapeHTML(report.code)} ${escapeHTML(report.name)} 報告" class="w-8 h-8 text-teal-600 dark:text-teal-400 bg-gray-100 dark:bg-gray-800 rounded-lg inline-flex items-center justify-center transition hover:scale-110" data-action="copy-report" data-id="${reportId}"><i class="fa-solid fa-copy pointer-events-none"></i></button><button type="button" title="修改報告" aria-label="修改 ${escapeHTML(report.code)} ${escapeHTML(report.name)} 報告" class="w-8 h-8 text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 rounded-lg inline-flex items-center justify-center transition hover:scale-110" data-action="edit-report" data-id="${reportId}"><i class="fa-solid fa-pen pointer-events-none"></i></button><button type="button" title="刪除報告" aria-label="刪除 ${escapeHTML(report.code)} ${escapeHTML(report.name)} 報告" class="w-8 h-8 text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-gray-800 rounded-lg inline-flex items-center justify-center transition hover:scale-110" data-action="delete-report" data-id="${reportId}"><i class="fa-solid fa-trash pointer-events-none"></i></button></div></td></tr>`;
+        return`<tr class="table-row-hover border-b border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-sm"><td class="table-sticky-bg py-3 px-2 sm:px-3 text-center sticky left-0 z-20"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${reportId}" data-type="report" ${selectedIds.report&&selectedIds.report.has(report.id)?'checked':''}></td><td data-compact-date="true" class="compact-date-cell py-3 px-1 font-medium text-gray-600 dark:text-gray-400" title="${escapeHTML(formattedDate)}" aria-label="報告日期 ${escapeHTML(formattedDate)}">${renderCompactReportDate(reportDate)}</td><td class="py-3 px-3 sm:px-4"><span class="font-bold mr-2 text-gray-800 dark:text-gray-200">${escapeHTML(report.code)}</span><span class="text-gray-600 dark:text-gray-400">${escapeHTML(report.name)}</span></td><td class="report-summary-col report-summary-cell py-3 px-3 sm:px-4 text-gray-800 dark:text-gray-100 font-medium leading-relaxed">${escapeHTML(report.content||'')}</td><td class="py-3 px-2 text-center align-middle"><div class="flex flex-col items-center justify-center gap-1.5"><button type="button" title="複製報告" aria-label="複製 ${escapeHTML(report.code)} ${escapeHTML(report.name)} 報告" class="w-8 h-8 text-teal-600 dark:text-teal-400 bg-gray-100 dark:bg-gray-800 rounded-lg inline-flex items-center justify-center transition hover:scale-110" data-action="copy-report" data-id="${reportId}"><i class="fa-solid fa-copy pointer-events-none"></i></button><button type="button" title="修改報告" aria-label="修改 ${escapeHTML(report.code)} ${escapeHTML(report.name)} 報告" class="w-8 h-8 text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 rounded-lg inline-flex items-center justify-center transition hover:scale-110" data-action="edit-report" data-id="${reportId}"><i class="fa-solid fa-pen pointer-events-none"></i></button><button type="button" title="刪除報告" aria-label="刪除 ${escapeHTML(report.code)} ${escapeHTML(report.name)} 報告" class="w-8 h-8 text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-gray-800 rounded-lg inline-flex items-center justify-center transition hover:scale-110" data-action="delete-report" data-id="${reportId}"><i class="fa-solid fa-trash pointer-events-none"></i></button></div></td></tr>`;
     }).join('');
     updateBatchUI('report');
 }
@@ -2790,7 +2838,7 @@ setChkDirection('long');
             const wsRevenue = XLSX.utils.json_to_sheet(state.revenueRecords.map(r => ({'創高月份':r.month,'代號':r.code,'股名':r.name,'備註':r.notes||''})));
             XLSX.utils.book_append_sheet(wb, wsRevenue, '營收創高');
             
-            const wsReport = XLSX.utils.json_to_sheet(state.reports.map(r => ({'報告日期':r.date,'代號':r.code,'股名':r.name,'摘要內容':r.content||''})));
+            const wsReport = XLSX.utils.json_to_sheet(state.reports.map(r => ({'報告日期':resolveReportRecordDate(r),'代號':r.code,'股名':r.name,'摘要內容':r.content||''})));
             XLSX.utils.book_append_sheet(wb, wsReport, '法人報告');
             
             const wsChecklist = XLSX.utils.json_to_sheet(state.checklists.map(c => ({'查核日期':c.date,'方向':c.direction==='long'?'多方':'空方','代號':c.code,'股名':c.name,'符合條件':c.checkedItems?c.checkedItems.join(', '):'','壓力':c.details?.pressure||'','支撐':c.details?.support||'','目標價':c.details?.target||'','法人籌碼':c.details?.chipsInst||'','集中度':c.details?.chipsConc||'','主力成本':c.details?.cost||'','本益比':c.details?.pe||'','獲利狀況':c.details?.profit||'','備註':c.details?.notes||''})));
@@ -2926,7 +2974,7 @@ setChkDirection('long');
                          const n = String(row['股名']).trim();
                          const id = `${c}_${Date.now()}_${Math.random().toString(36).substr(2,5)}`;
                          state.reports.push({
-                             id, date: row['報告日期'], code: c, name: n, content: row['摘要內容'] || '',
+                             id, date: normalizeReportDate(row['報告日期'])||'', code: c, name: n, content: row['摘要內容'] || '',
                              createdAt: Date.now(), updatedAt: Date.now()
                          });
                          importCount++;
