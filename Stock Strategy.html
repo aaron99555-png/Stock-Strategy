@@ -191,7 +191,8 @@ button { touch-action: manipulation; }
   button, .btn { min-height: 40px; }
   .header-brand { max-width:32% !important; }
   .header-actions { gap:0.2rem !important; }
-  .header-actions :is(#btn-admin-mode,#theme-toggle) { display:none !important; }
+  .header-actions #btn-admin-mode { display:none !important; }
+  .header-actions #theme-toggle { display:flex !important; }
   .header-actions :is(#btn-global-search,#theme-toggle,#btn-mobile-tools) { width:40px !important; height:40px !important; }
   .header-actions :is(#btn-admin-mode,#btn-sync-modal) { min-width:40px; min-height:40px; }
   #mobile-tools-menu { top:112px !important; }
@@ -248,7 +249,7 @@ button { touch-action: manipulation; }
   #toast-container > * { min-width:0 !important; width:100%; }
 }
 @media (max-width: 480px) {
-  .header-brand { flex:1 1 auto !important; min-width:0 !important; max-width:calc(100% - 134px) !important; }
+  .header-brand { flex:1 1 auto !important; min-width:0 !important; max-width:calc(100% - 174px) !important; }
   .header-brand .cool-title { display:block !important; min-width:0; font-size:13px !important; letter-spacing:.02em !important; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 }
 
@@ -290,7 +291,7 @@ button { touch-action: manipulation; }
             <div class="header-actions flex items-center gap-1 sm:gap-2 flex-shrink-0 relative z-10">
                 <button id="btn-global-search" type="button" class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/60 transition shadow-sm flex items-center justify-center" aria-label="全站快速查股" title="全站快速查股（Ctrl／⌘＋K）"><i class="fa-solid fa-magnifying-glass"></i></button>
                 <button id="btn-admin-mode" type="button" class="h-8 sm:h-9 px-2 sm:px-2.5 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors shadow-sm flex items-center justify-center" aria-label="進入管理者模式" title="管理者模式"><i class="fa-solid fa-lock text-sm"></i><span class="hidden 2xl:inline ml-1.5 text-xs font-medium">管理者</span></button>
-                <button id="theme-toggle" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-yellow-400 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors shadow-inner"><i class="fa-solid fa-moon dark:hidden text-sm sm:text-base"></i><i class="fa-solid fa-sun hidden dark:block text-sm sm:text-base"></i></button>
+                <button type="button" id="theme-toggle" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-yellow-400 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors shadow-inner" aria-label="切換日間或夜間模式" title="日／夜模式"><i class="fa-solid fa-moon dark:hidden text-sm sm:text-base"></i><i class="fa-solid fa-sun hidden dark:block text-sm sm:text-base"></i></button>
                 <div class="relative shrink-0"><button id="btn-sync-modal" class="text-xs sm:text-sm bg-blue-600 hover:bg-blue-500 text-white px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm border border-transparent flex items-center font-medium active:scale-95"><i class="fa-solid fa-cloud-arrow-up sm:mr-1.5"></i><span class="hidden sm:inline">跨裝置同步</span></button><span id="sync-health-status" class="pointer-events-none absolute -right-0.5 -top-0.5 w-2.5 h-2.5 rounded-full bg-gray-400 ring-2 ring-white dark:ring-gray-800 transition-colors" role="status" aria-label="雲端尚未同步" title="雲端尚未同步"></span></div>
                 <button id="btn-db-upload" onclick="document.getElementById('excel-upload').click()" class="hidden sm:flex text-xs sm:text-sm bg-purple-50 dark:bg-purple-900/40 hover:bg-purple-100 dark:hover:bg-purple-800/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-700/50 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm items-center font-medium active:scale-95"><i class="fa-solid fa-database sm:mr-1.5"></i><span class="hidden sm:inline">資料庫</span></button>
                 <input type="file" id="excel-upload" accept=".xlsx, .xls" class="hidden">
@@ -301,9 +302,8 @@ button { touch-action: manipulation; }
             </div>
         </div>
     </div>
-    <div id="mobile-quick-settings" class="sm:hidden grid grid-cols-2 gap-2 border-t border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-800/95 px-2 py-1.5" aria-label="手機快速設定">
-        <button type="button" id="btn-mobile-admin-entry" class="min-h-[40px] rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs font-black inline-flex items-center justify-center gap-2 shadow-sm active:scale-95" aria-label="進入管理者模式"><i class="fa-solid fa-lock" data-mobile-admin-icon></i><span data-mobile-admin-label>管理者登入</span></button>
-        <button type="button" id="btn-mobile-theme-entry" class="min-h-[40px] rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/25 text-amber-700 dark:text-amber-300 text-xs font-black inline-flex items-center justify-center gap-2 shadow-sm active:scale-95" aria-label="切換日間或夜間模式"><i class="fa-solid fa-circle-half-stroke" data-mobile-theme-icon></i><span>日／夜模式</span></button>
+    <div id="mobile-quick-settings" class="sm:hidden border-t border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-800/95 px-2 py-1.5" aria-label="手機管理者設定">
+        <button type="button" id="btn-mobile-admin-entry" class="w-full min-h-[40px] rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs font-black inline-flex items-center justify-center gap-2 shadow-sm active:scale-95" aria-label="進入管理者模式"><i class="fa-solid fa-lock" data-mobile-admin-icon></i><span data-mobile-admin-label>管理者登入</span></button>
     </div>
     <div class="mobile-module-nav lg:hidden border-t border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-800/95 px-2 py-2 flex gap-2 overflow-x-auto scrollbar-hide" aria-label="手機模組導覽">
         <button class="nav-btn-mobile active-blue" data-target="module-journal" data-color="blue">策略日誌</button>
@@ -2972,7 +2972,6 @@ setChkDirection('long');
     updateMobileViewControls();
     document.getElementById('btn-global-search')?.addEventListener('click',()=>setGlobalSearchOpen(true));
     document.getElementById('btn-mobile-admin-entry')?.addEventListener('click',()=>document.getElementById('btn-admin-mode')?.click());
-    document.getElementById('btn-mobile-theme-entry')?.addEventListener('click',()=>document.getElementById('theme-toggle')?.click());
     const mobileToolsButton=document.getElementById('btn-mobile-tools'),mobileToolsMenu=document.getElementById('mobile-tools-menu');
     mobileToolsButton?.addEventListener('click',event=>{event.stopPropagation();const opening=mobileToolsMenu?.classList.contains('hidden');mobileToolsMenu?.classList.toggle('hidden',!opening);mobileToolsButton.setAttribute('aria-expanded',String(!!opening));});
     mobileToolsMenu?.addEventListener('click',event=>{const button=event.target.closest('[data-mobile-tool-target]');if(!button)return;document.getElementById(button.dataset.mobileToolTarget)?.click();mobileToolsMenu.classList.add('hidden');mobileToolsButton?.setAttribute('aria-expanded','false');});
