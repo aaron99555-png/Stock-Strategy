@@ -80,6 +80,7 @@ html.viewer-mode [data-mobile-select-all] { display:none !important; }
 html.viewer-mode .row-cb,
 html.viewer-mode .select-all-cb { visibility:hidden !important; pointer-events:none !important; }
 html.viewer-mode [data-action="remove-tag"] { cursor:default !important; pointer-events:none !important; }
+html.admin-mode #btn-mobile-admin-entry { background:#059669 !important; border-color:#047857 !important; color:#fff !important; }
 </style>
 <style>
 ::-webkit-scrollbar { width:6px; height:8px; } ::-webkit-scrollbar-track { background:transparent; } ::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:4px; } .dark ::-webkit-scrollbar-thumb { background:#4b5563; }
@@ -190,8 +191,10 @@ button { touch-action: manipulation; }
   button, .btn { min-height: 40px; }
   .header-brand { max-width:32% !important; }
   .header-actions { gap:0.2rem !important; }
+  .header-actions :is(#btn-admin-mode,#theme-toggle) { display:none !important; }
   .header-actions :is(#btn-global-search,#theme-toggle,#btn-mobile-tools) { width:40px !important; height:40px !important; }
   .header-actions :is(#btn-admin-mode,#btn-sync-modal) { min-width:40px; min-height:40px; }
+  #mobile-tools-menu { top:112px !important; }
   .mobile-module-nav { position:fixed; left:0; right:0; bottom:0; z-index:80; padding:0.45rem 0.5rem max(0.45rem,env(safe-area-inset-bottom)); border-top:1px solid #e5e7eb; border-bottom:0 !important; box-shadow:0 -6px 18px rgba(15,23,42,.12); overscroll-behavior-x:contain; scroll-snap-type:x proximity; }
   .dark .mobile-module-nav { border-top-color:#374151; box-shadow:0 -6px 18px rgba(0,0,0,.32); }
   .mobile-module-nav .nav-btn-mobile { min-height:44px; padding:0.55rem 0.85rem; scroll-snap-align:center; }
@@ -298,6 +301,10 @@ button { touch-action: manipulation; }
                 <input type="file" id="backup-file" accept=".xlsx" class="hidden">
             </div>
         </div>
+    </div>
+    <div id="mobile-quick-settings" class="sm:hidden grid grid-cols-2 gap-2 border-t border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-800/95 px-2 py-1.5" aria-label="手機快速設定">
+        <button type="button" id="btn-mobile-admin-entry" class="min-h-[40px] rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs font-black inline-flex items-center justify-center gap-2 shadow-sm active:scale-95" aria-label="進入管理者模式"><i class="fa-solid fa-lock" data-mobile-admin-icon></i><span data-mobile-admin-label>管理者登入</span></button>
+        <button type="button" id="btn-mobile-theme-entry" class="min-h-[40px] rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/25 text-amber-700 dark:text-amber-300 text-xs font-black inline-flex items-center justify-center gap-2 shadow-sm active:scale-95" aria-label="切換日間或夜間模式"><i class="fa-solid fa-circle-half-stroke" data-mobile-theme-icon></i><span>日／夜模式</span></button>
     </div>
     <div class="mobile-module-nav lg:hidden border-t border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-800/95 px-2 py-2 flex gap-2 overflow-x-auto scrollbar-hide" aria-label="手機模組導覽">
         <button class="nav-btn-mobile active-blue" data-target="module-journal" data-color="blue">策略日誌</button>
@@ -2922,6 +2929,8 @@ setChkDirection('long');
     initMobileCardTables();
     updateMobileViewControls();
     document.getElementById('btn-global-search')?.addEventListener('click',()=>setGlobalSearchOpen(true));
+    document.getElementById('btn-mobile-admin-entry')?.addEventListener('click',()=>document.getElementById('btn-admin-mode')?.click());
+    document.getElementById('btn-mobile-theme-entry')?.addEventListener('click',()=>document.getElementById('theme-toggle')?.click());
     const mobileToolsButton=document.getElementById('btn-mobile-tools'),mobileToolsMenu=document.getElementById('mobile-tools-menu');
     mobileToolsButton?.addEventListener('click',event=>{event.stopPropagation();const opening=mobileToolsMenu?.classList.contains('hidden');mobileToolsMenu?.classList.toggle('hidden',!opening);mobileToolsButton.setAttribute('aria-expanded',String(!!opening));});
     mobileToolsMenu?.addEventListener('click',event=>{const button=event.target.closest('[data-mobile-tool-target]');if(!button)return;document.getElementById(button.dataset.mobileToolTarget)?.click();mobileToolsMenu.classList.add('hidden');mobileToolsButton?.setAttribute('aria-expanded','false');});
@@ -3925,10 +3934,10 @@ const SESSION={
     button.setAttribute('aria-label',adminMode?'退出管理者模式':'進入管理者模式');
     button.setAttribute('title',adminMode?'管理者模式已啟用，點擊可退出':'進入管理者模式');
     button.innerHTML=adminMode?'<i class="fa-solid fa-unlock-keyhole text-sm"></i><span class="inline sm:hidden ml-1.5 text-[11px] font-bold">管理中</span><span class="hidden 2xl:inline ml-1.5 text-xs font-medium">管理中</span>':'<i class="fa-solid fa-lock text-sm"></i><span class="inline sm:hidden ml-1.5 text-[11px] font-bold">登入</span><span class="hidden 2xl:inline ml-1.5 text-xs font-medium">管理者</span>';
-    var mobileLabel=document.querySelector('[data-mobile-admin-label]');
-    var mobileIcon=document.querySelector('[data-mobile-admin-icon]');
-    if(mobileLabel)mobileLabel.textContent=adminMode?'登出管理者模式':'管理者登入';
-    if(mobileIcon)mobileIcon.className=(adminMode?'fa-solid fa-unlock-keyhole':'fa-solid fa-lock')+' w-6';
+    document.querySelectorAll('[data-mobile-admin-label]').forEach(function(label){label.textContent=adminMode?'登出管理者':'管理者登入';});
+    document.querySelectorAll('[data-mobile-admin-icon]').forEach(function(icon){icon.className=(adminMode?'fa-solid fa-unlock-keyhole':'fa-solid fa-lock')+(icon.closest('#mobile-tools-menu')?' w-6':'');});
+    var mobileEntry=document.getElementById('btn-mobile-admin-entry');
+    if(mobileEntry)mobileEntry.setAttribute('aria-label',adminMode?'退出管理者模式':'進入管理者模式');
   }
 
   function applyAdminMode(enabled){
