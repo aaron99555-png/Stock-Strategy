@@ -4,6 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
+<meta name="app-version" content="105">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -494,7 +495,7 @@ html.dark body main :is(#module-journal,#module-favorites,#module-revenue,#modul
                 <button id="btn-admin-mode" type="button" class="h-8 sm:h-9 px-2 sm:px-2.5 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors shadow-sm flex items-center justify-center" aria-label="進入管理者模式" title="管理者模式"><i class="fa-solid fa-lock text-sm"></i><span class="hidden 2xl:inline ml-1.5 text-xs font-medium">管理者</span></button>
                 <button type="button" id="theme-toggle" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-yellow-400 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors shadow-inner" aria-label="切換日間或夜間模式" title="日／夜模式"><i class="fa-solid fa-moon dark:hidden text-sm sm:text-base"></i><i class="fa-solid fa-sun hidden dark:block text-sm sm:text-base"></i></button>
                 <div class="relative shrink-0"><button id="btn-sync-modal" class="text-xs sm:text-sm bg-blue-600 hover:bg-blue-500 text-white px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm border border-transparent flex items-center font-medium active:scale-95"><i class="fa-solid fa-cloud-arrow-up sm:mr-1.5"></i><span class="hidden sm:inline">跨裝置同步</span></button><span id="sync-health-status" class="pointer-events-none absolute -right-0.5 -top-0.5 w-2.5 h-2.5 rounded-full bg-gray-400 ring-2 ring-white dark:ring-gray-800 transition-colors" role="status" aria-label="雲端尚未同步" title="雲端尚未同步"></span></div>
-                <button id="btn-db-upload" onclick="document.getElementById('excel-upload').click()" class="hidden sm:flex text-xs sm:text-sm bg-purple-50 dark:bg-purple-900/40 hover:bg-purple-100 dark:hover:bg-purple-800/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-700/50 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm items-center font-medium active:scale-95"><i class="fa-solid fa-database sm:mr-1.5"></i><span class="hidden sm:inline">資料庫</span></button>
+                <button id="btn-db-upload" type="button" title="上傳參考資料庫或國內券商評估報告" onclick="document.getElementById('excel-upload').click()" class="hidden sm:flex text-xs sm:text-sm bg-purple-50 dark:bg-purple-900/40 hover:bg-purple-100 dark:hover:bg-purple-800/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-700/50 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm items-center font-medium active:scale-95"><i class="fa-solid fa-database sm:mr-1.5"></i><span class="hidden sm:inline">快速更新</span></button>
                 <input type="file" id="excel-upload" accept=".xlsx, .xls" class="hidden">
                 <button id="btn-import-backup" onclick="document.getElementById('backup-file').click()" class="hidden sm:flex text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm items-center active:scale-95"><i class="fa-solid fa-upload sm:mr-1.5"></i><span class="hidden sm:inline">匯入</span></button>
                 <button id="btn-export-backup" class="hidden sm:flex text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm items-center active:scale-95"><i class="fa-solid fa-download sm:mr-1.5"></i><span class="hidden sm:inline">匯出</span></button>
@@ -518,7 +519,7 @@ html.dark body main :is(#module-journal,#module-favorites,#module-revenue,#modul
 <div id="mobile-tools-menu" class="hidden sm:hidden fixed right-2 top-[62px] z-[90] w-[210px] rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-2 shadow-2xl">
     <button type="button" data-mobile-tool-target="btn-admin-mode" class="w-full min-h-[44px] rounded-lg px-3 text-left text-sm font-bold text-blue-600 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/30"><i class="fa-solid fa-lock w-6" data-mobile-admin-icon></i><span data-mobile-admin-label>管理者登入</span></button>
     <div data-admin-mobile-tool class="my-1 border-t border-gray-200 dark:border-gray-700"></div>
-    <button type="button" data-admin-mobile-tool data-mobile-tool-target="btn-db-upload" class="w-full min-h-[44px] rounded-lg px-3 text-left text-sm font-bold text-purple-600 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/30"><i class="fa-solid fa-database w-6"></i>資料庫 Excel</button>
+    <button type="button" data-admin-mobile-tool data-mobile-tool-target="btn-db-upload" class="w-full min-h-[44px] rounded-lg px-3 text-left text-sm font-bold text-purple-600 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/30"><i class="fa-solid fa-database w-6"></i>券商報告／資料庫</button>
     <button type="button" data-admin-mobile-tool data-mobile-tool-target="btn-import-backup" class="w-full min-h-[44px] rounded-lg px-3 text-left text-sm font-bold text-gray-600 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fa-solid fa-upload w-6"></i>匯入備份</button>
     <button type="button" data-admin-mobile-tool data-mobile-tool-target="btn-export-backup" class="w-full min-h-[44px] rounded-lg px-3 text-left text-sm font-bold text-gray-600 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fa-solid fa-download w-6"></i>匯出備份</button>
 </div>
@@ -3718,8 +3719,8 @@ const SESSION={
 
       '<div id="import-preview-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-[195] hidden items-center justify-center p-3">',
       '<div class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-2xl border border-gray-200 dark:border-gray-700 shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col modal-enter">',
-      '<div class="p-4 sm:p-5 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between"><div><h3 id="import-preview-title" class="text-lg sm:text-xl font-black text-purple-600 dark:text-purple-300"><i class="fa-solid fa-file-import mr-2"></i>匯入預覽</h3><p class="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 mt-1">確認新增、重複與異常資料後再執行。</p></div><button id="import-preview-close" type="button" class="w-9 h-9 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-500 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button></div>',
-      '<div class="p-4 sm:p-5 overflow-y-auto"><div id="import-preview-summary" class="grid grid-cols-3 gap-2 sm:gap-3 mb-4"></div><div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-700"><table class="w-full text-xs sm:text-sm"><thead class="bg-gray-100 dark:bg-gray-900 text-gray-500"><tr><th class="p-3 text-left">資料類型</th><th class="p-3 text-center">新增</th><th class="p-3 text-center">重複</th><th class="p-3 text-center">異常</th></tr></thead><tbody id="import-preview-table"></tbody></table></div>',
+      '<div class="p-4 sm:p-5 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between"><div><h3 id="import-preview-title" class="text-lg sm:text-xl font-black text-purple-600 dark:text-purple-300"><i class="fa-solid fa-file-import mr-2"></i>匯入預覽</h3><p id="import-preview-description" class="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 mt-1">確認新增、重複與異常資料後再執行。</p></div><button id="import-preview-close" type="button" class="w-9 h-9 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-500 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button></div>',
+      '<div class="p-4 sm:p-5 overflow-y-auto"><div id="import-preview-summary" class="grid grid-cols-3 gap-2 sm:gap-3 mb-4"></div><div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-700"><table class="w-full text-xs sm:text-sm"><thead class="bg-gray-100 dark:bg-gray-900 text-gray-500"><tr><th class="p-3 text-left">資料類型</th><th id="import-preview-new-label" class="p-3 text-center">新增</th><th id="import-preview-duplicate-label" class="p-3 text-center">重複</th><th class="p-3 text-center">異常</th></tr></thead><tbody id="import-preview-table"></tbody></table></div><div id="import-preview-details" class="hidden mt-4"></div>',
       '<label id="import-duplicate-option-wrap" class="mt-4 flex items-start gap-2 p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 cursor-pointer"><input type="checkbox" id="import-handle-duplicates" class="mt-0.5 w-4 h-4 accent-amber-600" checked><span><b class="block text-xs sm:text-sm text-amber-800 dark:text-amber-200">處理重複資料</b><span id="import-duplicate-option-text" class="text-[11px] text-amber-700/80 dark:text-amber-300/80">可合併資料會合併，其餘重複資料將略過。</span></span></label></div>',
       '<div class="p-4 sm:p-5 border-t border-gray-200 dark:border-gray-700 flex gap-2"><button id="import-preview-cancel" type="button" class="flex-1 h-11 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-200 font-bold">取消</button><button id="import-preview-confirm" type="button" class="flex-[2] h-11 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-bold"><i class="fa-solid fa-check mr-1.5"></i>確認匯入</button></div>',
       '</div></div>'
@@ -4032,6 +4033,49 @@ const SESSION={
     var preview=buildImportPreview('backup','手札備份匯入預覽',modules);preview.importedTagSettings=importedTagSettings;return preview;
   }
 
+  function normalizeImportHeader(value){return String(value==null?'':value).trim().replace(/\s+/g,'').replace(/[（）]/g,function(char){return char==='（'?'(':')';});}
+  function getBrokerReportSource(workbook){
+    var sheet=workbook&&workbook.Sheets&&workbook.Sheets[workbook.SheetNames&&workbook.SheetNames[0]];
+    if(!sheet)return null;
+    var matrix=XLSX.utils.sheet_to_json(sheet,{header:1,defval:null,raw:true}),headerIndex=-1,headerMap=null;
+    for(var rowIndex=0;rowIndex<Math.min(matrix.length,20);rowIndex++){
+      var headers=(matrix[rowIndex]||[]).map(normalizeImportHeader),map={
+        date:headers.indexOf('日期'),code:headers.indexOf('股票代號'),name:headers.indexOf('公司名稱'),broker:headers.indexOf('券商'),targetPrice:headers.indexOf('目標價')
+      };
+      if(Object.values(map).every(function(index){return index>=0;})){headerIndex=rowIndex;headerMap=map;break;}
+    }
+    if(headerIndex<0)return null;
+    return{sheet:sheet,matrix:matrix,headerIndex:headerIndex,headerMap:headerMap,rows:matrix.slice(headerIndex+1)};
+  }
+  function normalizeImportedTargetPrice(value){
+    if(typeof value==='number')return Number.isFinite(value)&&value>0?value:null;
+    var text=String(value==null?'':value).trim().replace(/,/g,'');
+    if(!text)return null;
+    var matched=text.match(/-?\d+(?:\.\d+)?/),number=matched?Number(matched[0]):NaN;
+    return Number.isFinite(number)&&number>0?number:null;
+  }
+  function parseBrokerReportWorkbook(workbook){
+    var source=getBrokerReportSource(workbook);
+    if(!source)return null;
+    var bestByCode=new Map(),invalidRows=0,validRows=0;
+    source.rows.forEach(function(cells,rowOffset){
+      cells=Array.isArray(cells)?cells:[];
+      if(cells.every(function(value){return value==null||String(value).trim()==='';}))return;
+      var map=source.headerMap,code=normalizeStockCodeValue(cells[map.code]),date=normalizeImportDate(cells[map.date]),name=String(cells[map.name]||'').trim(),broker=String(cells[map.broker]||'').trim(),targetPrice=normalizeImportedTargetPrice(cells[map.targetPrice]);
+      if(!isValidStockCode(code)||!date||!targetPrice||!isSafeImportedLabel(name,40)||!isSafeImportedLabel(broker,40)){invalidRows++;return;}
+      validRows++;
+      var item={code:code,name:name,broker:broker,targetPrice:targetPrice,reportDate:date,sourceRow:source.headerIndex+rowOffset+2},current=bestByCode.get(code);
+      if(!current||item.reportDate>current.reportDate||(item.reportDate===current.reportDate&&item.targetPrice>current.targetPrice))bestByCode.set(code,item);
+    });
+    var existingCodes=new Set(Object.keys(state.epsData||{}).map(normalizeStockCodeValue)),entries=Array.from(bestByCode.values()).sort(function(a,b){return a.code.localeCompare(b.code,'zh-Hant',{numeric:true});}).map(function(item){return{item:item,key:item.code,isDuplicate:existingCodes.has(item.code)};});
+    var module={key:'brokerReport',label:'券商目標價（每檔已擇優）',entries:entries,newCount:entries.filter(function(entry){return!entry.isDuplicate;}).length,duplicateCount:entries.filter(function(entry){return entry.isDuplicate;}).length,invalidCount:invalidRows};
+    var preview=buildImportPreview('brokerReport','券商評估報告快速更新', [module]);
+    preview.description='已依股票代號分組，先取最新日期；同日多筆再取最高目標價。';
+    preview.sourceCount=validRows+invalidRows;preview.selectedCount=entries.length;preview.discardedCount=Math.max(0,validRows-entries.length);
+    preview.details=entries.map(function(entry){return entry.item;});
+    return preview;
+  }
+
   function parseDatabaseWorkbook(workbook){
     var sheet=workbook.Sheets[workbook.SheetNames[0]],rows=XLSX.utils.sheet_to_json(sheet,{defval:null}),existing=Object.keys(state.epsData||{}),modules=[];
     modules.push(classifyModule('database','參考資料庫',rows,function(row){
@@ -4044,24 +4088,37 @@ const SESSION={
     return buildImportPreview('database','資料庫匯入預覽',modules);
   }
 
+  function parseExcelUploadWorkbook(workbook){return parseBrokerReportWorkbook(workbook)||parseDatabaseWorkbook(workbook);}
+
   function buildImportPreview(type,title,modules){
     return{type:type,title:title,modules:modules,newCount:modules.reduce(function(sum,module){return sum+module.newCount;},0),duplicateCount:modules.reduce(function(sum,module){return sum+module.duplicateCount;},0),invalidCount:modules.reduce(function(sum,module){return sum+module.invalidCount;},0)};
   }
 
   function renderImportPreview(preview){
     pendingImport=preview;
+    var isBrokerReport=preview.type==='brokerReport',newLabel=isBrokerReport?'可新增':'新增',duplicateLabel=isBrokerReport?'可更新':'重複';
     document.getElementById('import-preview-title').innerHTML='<i class="fa-solid fa-file-import mr-2"></i>'+escapeHTML(preview.title);
+    document.getElementById('import-preview-description').textContent=preview.description||(isBrokerReport?'確認擇優結果後再更新。':'確認新增、重複與異常資料後再執行。');
+    document.getElementById('import-preview-new-label').textContent=newLabel;
+    document.getElementById('import-preview-duplicate-label').textContent=duplicateLabel;
     document.getElementById('import-preview-summary').innerHTML=[
-      '<div class="rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 p-3 text-center"><div class="text-2xl font-black text-green-600 dark:text-green-300">'+preview.newCount+'</div><div class="text-[10px] font-bold text-green-700 dark:text-green-400">新增</div></div>',
-      '<div class="rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 p-3 text-center"><div class="text-2xl font-black text-amber-600 dark:text-amber-300">'+preview.duplicateCount+'</div><div class="text-[10px] font-bold text-amber-700 dark:text-amber-400">重複</div></div>',
+      '<div class="rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 p-3 text-center"><div class="text-2xl font-black text-green-600 dark:text-green-300">'+preview.newCount+'</div><div class="text-[10px] font-bold text-green-700 dark:text-green-400">'+newLabel+'</div></div>',
+      '<div class="rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 p-3 text-center"><div class="text-2xl font-black text-amber-600 dark:text-amber-300">'+preview.duplicateCount+'</div><div class="text-[10px] font-bold text-amber-700 dark:text-amber-400">'+duplicateLabel+'</div></div>',
       '<div class="rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-3 text-center"><div class="text-2xl font-black text-red-600 dark:text-red-300">'+preview.invalidCount+'</div><div class="text-[10px] font-bold text-red-700 dark:text-red-400">異常</div></div>'
     ].join('');
     document.getElementById('import-preview-table').innerHTML=preview.modules.map(function(module){
       return '<tr class="border-t border-gray-200 dark:border-gray-700"><td class="p-3 font-bold">'+escapeHTML(module.label)+'</td><td class="p-3 text-center text-green-600 font-bold">'+module.newCount+'</td><td class="p-3 text-center text-amber-600 font-bold">'+module.duplicateCount+'</td><td class="p-3 text-center text-red-600 font-bold">'+module.invalidCount+'</td></tr>';
     }).join('')||'<tr><td colspan="4" class="p-6 text-center text-gray-400">找不到可匯入的工作表</td></tr>';
+    var details=document.getElementById('import-preview-details');
+    if(isBrokerReport&&preview.details&&preview.details.length){
+      var visibleDetails=preview.details.slice(0,300),moreCount=Math.max(0,preview.details.length-visibleDetails.length);
+      details.innerHTML='<div class="mb-2 flex flex-wrap items-center justify-between gap-2"><div class="text-xs sm:text-sm font-black text-purple-700 dark:text-purple-300"><i class="fa-solid fa-filter-circle-dollar mr-1.5"></i>擇優結果 '+preview.selectedCount+' 檔</div><div class="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">原始 '+preview.sourceCount+' 筆；排除同代號非擇優 '+preview.discardedCount+' 筆</div></div><div class="max-h-[38vh] overflow-auto rounded-xl border border-gray-200 dark:border-gray-700"><table class="w-full min-w-[560px] text-xs"><thead class="sticky top-0 bg-purple-50 dark:bg-gray-900 text-purple-700 dark:text-purple-300"><tr><th class="p-2 text-left">代號／股名</th><th class="p-2 text-center">日期</th><th class="p-2 text-right">目標價</th><th class="p-2 text-left">券商</th></tr></thead><tbody>'+visibleDetails.map(function(item){return'<tr class="border-t border-gray-200 dark:border-gray-700"><td class="p-2"><b>'+escapeHTML(item.code)+'</b>／'+escapeHTML(item.name)+'</td><td class="p-2 text-center whitespace-nowrap">'+escapeHTML(String(item.reportDate||'').replace(/-/g,'/'))+'</td><td class="p-2 text-right font-black text-red-600 dark:text-red-400">'+Number(item.targetPrice).toLocaleString('zh-TW',{maximumFractionDigits:2})+'</td><td class="p-2 font-bold">'+escapeHTML(item.broker)+'</td></tr>';}).join('')+'</tbody></table></div>'+(moreCount?'<div class="mt-2 text-[10px] text-gray-400 text-right">另有 '+moreCount+' 檔已擇優，確認後會一併更新。</div>':'');
+      details.classList.remove('hidden');
+    }else{details.innerHTML='';details.classList.add('hidden');}
     var wrap=document.getElementById('import-duplicate-option-wrap');
     wrap.classList.toggle('hidden',preview.duplicateCount===0);
-    document.getElementById('import-duplicate-option-text').textContent=preview.type==='database'?'勾選後會使用 Excel 內容更新相同代號的參考資料。':'可合併資料會合併，其餘完全相同的資料將略過。';
+    document.getElementById('import-handle-duplicates').checked=true;
+    document.getElementById('import-duplicate-option-text').textContent=isBrokerReport?'勾選後會更新相同代號的日期、目標價及券商；原有 EPS、股期等資料會保留。':preview.type==='database'?'勾選後會使用 Excel 內容更新相同代號的參考資料。':'可合併資料會合併，其餘完全相同的資料將略過。';
     document.getElementById('import-preview-confirm').disabled=preview.newCount===0&&preview.duplicateCount===0;
     document.getElementById('import-preview-modal').classList.remove('hidden');
     document.getElementById('import-preview-modal').classList.add('flex');
@@ -4162,6 +4219,27 @@ const SESSION={
     showToast('資料庫匯入完成：新增 '+added+'、更新 '+updated+'、略過 '+skipped);
   }
 
+  async function commitBrokerReportImport(handleDuplicates){
+    var added=0,updated=0,skipped=0,module=pendingImport.modules[0],now=Date.now();
+    (module?module.entries:[]).forEach(function(entry){
+      var item=entry.item,current=state.epsData[item.code]||null;
+      if(current&&!handleDuplicates){skipped++;return;}
+      var next=Object.assign({},current||{}, {
+        code:item.code,
+        name:item.name||(current&&current.name)||'',
+        targetPrice:item.targetPrice,
+        broker:item.broker,
+        reportDate:item.reportDate,
+        updatedAt:now
+      });
+      state.epsData[item.code]=next;state.codeToName[item.code]=next.name;state.nameToCode[next.name]=item.code;
+      if(current)updated++;else added++;
+    });
+    saveLocalData();await patchDataToCloud('epsData',state.epsData);processAndRenderJournals();renderFavorites();renderRevenueRecords();
+    if(document.getElementById('module-overview')&&document.getElementById('module-overview').classList.contains('active'))renderStockOverview();
+    showToast('券商資料更新完成：新增 '+added+'、更新 '+updated+'、略過 '+skipped);
+  }
+
   async function confirmImport(){
     if(!pendingImport)return;
     var button=document.getElementById('import-preview-confirm');
@@ -4169,7 +4247,7 @@ const SESSION={
     button.disabled=true;button.innerHTML='<i class="fa-solid fa-spinner fa-spin mr-1.5"></i>匯入中';
     try{
       var handle=document.getElementById('import-handle-duplicates').checked;
-      if(pendingImport.type==='database')await commitDatabaseImport(handle);else await commitBackupImport(handle);
+      if(pendingImport.type==='brokerReport')await commitBrokerReportImport(handle);else if(pendingImport.type==='database')await commitDatabaseImport(handle);else await commitBackupImport(handle);
       closeImportPreview();
     }catch(error){console.error(error);showToast('匯入失敗，請確認檔案格式','error');}
     finally{button.disabled=false;button.innerHTML='<i class="fa-solid fa-check mr-1.5"></i>確認匯入';}
@@ -4187,7 +4265,7 @@ const SESSION={
       if(!/\.(xlsx|xls)$/i.test(file.name||''))throw new Error('不支援的 Excel 檔案格式');
       await ensureXLSXLoaded();
       var data=await file.arrayBuffer(),workbook=XLSX.read(data);
-      var preview=input.id==='excel-upload'?parseDatabaseWorkbook(workbook):parseBackupWorkbook(workbook);
+      var preview=input.id==='excel-upload'?parseExcelUploadWorkbook(workbook):parseBackupWorkbook(workbook);
       renderImportPreview(preview);
     }catch(error){console.error(error);const message=/Excel|套件|格式/.test(error?.message||'')?error.message:'無法讀取 Excel，請確認檔案格式';showToast(message,'error');}
     finally{input.value='';}
