@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="110">
+<meta name="app-version" content="112">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -589,9 +589,23 @@ html.dark body main :is(#module-journal,#module-favorites,#module-revenue,#modul
                             <div class="col-span-6 sm:col-span-4 lg:col-span-2"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">基準日</label><input type="date" id="streak-base-date" class="input-base text-center"></div>
                             <div id="streak-holiday-controls" class="col-span-6 sm:col-span-4 lg:col-span-2"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium"><i class="fa-solid fa-calendar-xmark mr-1 text-amber-500"></i>自訂休市日</label><div class="flex items-center gap-1.5"><input type="date" id="streak-holiday-date" aria-label="自訂休市日期" title="臨時休市可自行加入，計算時會強制略過" class="input-base flex-1 min-w-0 text-center"><button type="button" id="streak-add-holiday-btn" aria-label="加入自訂休市日" title="加入自訂休市日" class="shrink-0 w-[42px] h-[42px] rounded-lg bg-amber-500 hover:bg-amber-400 text-white text-sm font-bold transition active:scale-95"><i class="fa-solid fa-plus"></i></button></div></div>
                             <div class="col-span-6 sm:col-span-4 lg:col-span-2"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">判定方式</label><select id="streak-mode" class="input-base text-center"><option value="consecutive">N 日連續出現</option><option value="window">N 日內重複出現</option></select></div>
-                            <div class="col-span-6 sm:col-span-4 lg:col-span-2"><label id="streak-day-count-label" class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">連續交易日數</label><input type="number" id="streak-min-days" min="2" max="60" step="1" inputmode="numeric" value="2" class="input-base text-center" aria-describedby="streak-mode-description"></div>
-                            <div class="col-span-12 sm:col-span-4 lg:col-span-2 flex items-end"><label class="w-full h-[42px] flex items-center justify-center gap-2 cursor-pointer bg-white dark:bg-gray-800 border border-violet-200 dark:border-violet-700/70 rounded-lg px-2 text-[11px] sm:text-xs font-bold text-violet-700 dark:text-violet-300 hover:bg-violet-50 dark:hover:bg-violet-900/30 transition"><input type="checkbox" id="streak-exclude-horses" class="w-4 h-4 rounded border-violet-300 accent-violet-600" checked><span>排除赤兔馬／千里馬</span></label></div>
+                            <div class="col-span-6 sm:col-span-4 lg:col-span-1"><label id="streak-day-count-label" class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">連續日數</label><input type="number" id="streak-min-days" min="2" max="60" step="1" inputmode="numeric" value="2" class="input-base text-center" aria-describedby="streak-mode-description"></div>
+                            <div id="streak-min-occurrences-wrap" class="hidden col-span-6 sm:col-span-4 lg:col-span-1"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">至少幾次</label><input type="number" id="streak-min-occurrences" min="2" max="2" step="1" inputmode="numeric" value="2" class="input-base text-center" aria-label="至少出現次數"></div>
+                            <div class="col-span-12 sm:col-span-4 lg:col-span-2"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">赤兔馬／千里馬</label><select id="streak-horse-mode" class="input-base text-center text-xs"><option value="excludeStock">整檔排除</option><option value="ignoreTags">只忽略馬標籤</option><option value="include">不排除</option></select></div>
                             <div class="col-span-12 sm:col-span-8 lg:col-span-2 flex items-end gap-2"><button type="submit" id="streak-query-btn" class="flex-1 min-w-0 h-[42px] bg-violet-600 hover:bg-violet-500 text-white rounded-lg font-bold text-xs sm:text-sm transition shadow-sm active:scale-95"><i class="fa-solid fa-magnifying-glass mr-1"></i>比對</button><button type="button" id="streak-copy-btn" disabled class="flex-1 min-w-0 h-[42px] bg-violet-600 hover:bg-violet-500 text-white rounded-lg font-bold text-xs sm:text-sm border border-violet-600 transition active:scale-95 disabled:bg-gray-100 dark:disabled:bg-gray-700 disabled:text-gray-400 disabled:border-gray-300 dark:disabled:border-gray-600 disabled:cursor-not-allowed disabled:opacity-60"><i class="fa-solid fa-copy mr-1"></i>複製</button></div>
+                            <div class="col-span-12 mt-1 pt-2 border-t border-violet-100 dark:border-violet-900/40 grid grid-cols-12 gap-2 items-start">
+                                <div class="col-span-12 sm:col-span-4 lg:col-span-3"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium"><i class="fa-solid fa-filter mr-1 text-violet-500"></i>策略條件</label><select id="streak-tag-filter-mode" class="input-base text-center"><option value="all">不限策略</option><option value="include">包含任一所選策略</option><option value="exclude">排除所選策略</option></select></div>
+                                <details id="streak-tag-filter-details" class="col-span-12 sm:col-span-8 lg:col-span-9 rounded-lg border border-violet-200 dark:border-violet-800/70 bg-white dark:bg-gray-800 overflow-hidden">
+                                    <summary class="h-[42px] px-3 flex items-center justify-between cursor-pointer text-xs font-bold text-violet-700 dark:text-violet-300 select-none"><span id="streak-tag-filter-label">選擇策略（0）</span><span class="text-[10px] font-normal text-gray-400">點擊展開</span></summary>
+                                    <div class="border-t border-violet-100 dark:border-violet-900/40 p-3"><div id="streak-tag-options" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1.5"></div><div class="mt-2 flex justify-end"><button type="button" id="streak-clear-tags-btn" class="h-8 px-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-[11px] font-bold text-gray-500 dark:text-gray-300 hover:text-red-500 transition">清除策略條件</button></div></div>
+                                </details>
+                            </div>
+                            <div class="col-span-12 grid grid-cols-12 gap-2 items-end">
+                                <div class="col-span-6 sm:col-span-4 lg:col-span-3"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">結果排序</label><select id="streak-result-sort" class="input-base text-center text-xs"><option value="strength">訊號強度</option><option value="occurrences">出現次數</option><option value="streak">連續日數</option><option value="epsGrowth">EPS成長率</option><option value="heat">訊號熱度</option><option value="code">股票代號</option></select></div>
+                                <div class="col-span-6 sm:col-span-4 lg:col-span-3"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">熱度篩選</label><select id="streak-heat-filter" class="input-base text-center text-xs"><option value="all">全部熱度</option><option value="新進雷達">新進雷達</option><option value="升溫">升溫</option><option value="持續">持續</option><option value="降溫">降溫</option><option value="資料不足">資料不足</option></select></div>
+                                <div class="col-span-6 sm:col-span-4 lg:col-span-2"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">最低強度</label><select id="streak-min-strength" class="input-base text-center text-xs"><option value="0">不限</option><option value="50">50分以上</option><option value="65">65分以上</option><option value="80">80分以上</option></select></div>
+                                <div class="col-span-6 sm:col-span-12 lg:col-span-4"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">快速條件</label><div class="grid grid-cols-3 gap-1.5"><button type="button" data-streak-preset="consecutive-2" class="h-[42px] rounded-lg border border-violet-200 dark:border-violet-700 bg-white dark:bg-gray-800 text-[10px] sm:text-[11px] font-bold text-violet-700 dark:text-violet-300 hover:bg-violet-50 dark:hover:bg-violet-900/30 transition">2日連續</button><button type="button" data-streak-preset="window-5-3" class="h-[42px] rounded-lg border border-violet-200 dark:border-violet-700 bg-white dark:bg-gray-800 text-[10px] sm:text-[11px] font-bold text-violet-700 dark:text-violet-300 hover:bg-violet-50 dark:hover:bg-violet-900/30 transition">5日3次</button><button type="button" data-streak-preset="window-10-4" class="h-[42px] rounded-lg border border-violet-200 dark:border-violet-700 bg-white dark:bg-gray-800 text-[10px] sm:text-[11px] font-bold text-violet-700 dark:text-violet-300 hover:bg-violet-50 dark:hover:bg-violet-900/30 transition">10日4次</button></div></div>
+                            </div>
                             <div class="col-span-12 mt-1 pt-2 border-t border-violet-100 dark:border-violet-900/40 flex flex-col sm:flex-row sm:items-center gap-2">
                                 <span class="shrink-0 text-[10px] sm:text-xs font-bold text-gray-500 dark:text-gray-400">已設定休市日</span>
                                 <div id="streak-holiday-list" class="flex flex-1 flex-wrap gap-2" aria-live="polite"><span class="text-[11px] text-gray-400">尚未設定自訂休市日</span></div>
@@ -601,6 +615,7 @@ html.dark body main :is(#module-journal,#module-favorites,#module-revenue,#modul
                     </div>
                 </div>
                 <div id="streak-summary" class="px-4 sm:px-5 py-3 text-xs sm:text-sm text-gray-500 dark:text-gray-400">請選擇判定方式、基準日與 N 日後開始比對。</div>
+                <div id="streak-stats" class="hidden grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 px-4 sm:px-5 pb-3"></div>
                 <div id="streak-results" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 px-4 sm:px-5 pb-5 max-h-[640px] lg:max-h-[75vh] overflow-y-auto"></div>
             </div>
         </div>
@@ -1860,6 +1875,7 @@ function renderDynamicTags(){
             renderFilterTags();processAndRenderJournals();renderFavorites();
         });
     });
+    if(typeof renderStreakStrategyOptions==='function')renderStreakStrategyOptions();
 }
 
 window.removeFilterTag=tag=>{
@@ -2094,11 +2110,11 @@ function resetSessionFiltersToDefaults(syncControls=false){
     if(revenueMonth)revenueMonth.value='';if(revenueCode)revenueCode.value='';
     ['filter-rep-start','filter-rep-end','filter-rep-code'].forEach(id=>{const input=document.getElementById(id);if(input)input.value='';});
     applyFilterLogicState('OR','.logic-btn');applyFilterLogicState('OR','.logic-btn-fav');renderFilterTags();
-    const streakBase=document.getElementById('streak-base-date'),streakMode=document.getElementById('streak-mode'),streakDays=document.getElementById('streak-min-days'),streakExclude=document.getElementById('streak-exclude-horses'),streakHoliday=document.getElementById('streak-holiday-date');
-    if(streakBase){streakBase.value='';initStreakBaseDate();}if(streakMode)streakMode.value='consecutive';if(streakDays)streakDays.value='2';if(streakExclude)streakExclude.checked=true;if(streakHoliday)streakHoliday.value='';
+    const streakBase=document.getElementById('streak-base-date'),streakMode=document.getElementById('streak-mode'),streakDays=document.getElementById('streak-min-days'),streakOccurrences=document.getElementById('streak-min-occurrences'),streakHorseMode=document.getElementById('streak-horse-mode'),streakHoliday=document.getElementById('streak-holiday-date'),streakTagMode=document.getElementById('streak-tag-filter-mode'),streakSort=document.getElementById('streak-result-sort'),streakHeat=document.getElementById('streak-heat-filter'),streakStrength=document.getElementById('streak-min-strength');
+    if(streakBase){streakBase.value='';initStreakBaseDate();}if(streakMode)streakMode.value='consecutive';if(streakDays)streakDays.value='2';if(streakOccurrences)streakOccurrences.value='2';if(streakHorseMode)streakHorseMode.value='excludeStock';if(streakHoliday)streakHoliday.value='';if(streakTagMode)streakTagMode.value='all';if(streakSort)streakSort.value='strength';if(streakHeat)streakHeat.value='all';if(streakStrength)streakStrength.value='0';document.querySelectorAll('.streak-tag-cb').forEach(input=>input.checked=false);document.getElementById('streak-tag-filter-details')?.removeAttribute('open');
     updateStreakModeUI();lastJournalStreakResult=null;
-    const streakSummary=document.getElementById('streak-summary'),streakResults=document.getElementById('streak-results'),streakCopy=document.getElementById('streak-copy-btn');
-    if(streakSummary)streakSummary.textContent='請設定 N 日後開始比對。';if(streakResults){streakResults.innerHTML='';streakResults.classList.add('hidden');}if(streakCopy)streakCopy.disabled=true;
+    const streakSummary=document.getElementById('streak-summary'),streakStats=document.getElementById('streak-stats'),streakResults=document.getElementById('streak-results'),streakCopy=document.getElementById('streak-copy-btn');
+    if(streakSummary)streakSummary.textContent='請設定 N 日後開始比對。';if(streakStats){streakStats.innerHTML='';streakStats.classList.add('hidden');}if(streakResults){streakResults.innerHTML='';streakResults.classList.add('hidden');}if(streakCopy)streakCopy.disabled=true;
     document.querySelectorAll('.has-active-filter').forEach(element=>element.classList.remove('has-active-filter'));
 }
 
@@ -2222,13 +2238,34 @@ const persistCustomMarketHolidays=async()=>{
 };
 
 const normalizeStreakMode=mode=>mode==='window'?'window':'consecutive';
+const normalizeStreakHorseMode=mode=>mode===true||mode==='excludeStock'?'excludeStock':mode==='ignoreTags'?'ignoreTags':'include';
+const STREAK_HORSE_TAGS=new Set(['赤兔馬','千里馬']);
+const normalizeStreakTagFilterMode=mode=>mode==='include'||mode==='exclude'?mode:'all';
+const getSelectedStreakTags=()=>Array.from(document.querySelectorAll('.streak-tag-cb:checked')).map(input=>normalizeStrategyTagName(input.value)).filter(Boolean);
+const updateStreakTagFilterUI=()=>{
+    const modeInput=document.getElementById('streak-tag-filter-mode'),details=document.getElementById('streak-tag-filter-details'),label=document.getElementById('streak-tag-filter-label'),selected=getSelectedStreakTags(),mode=normalizeStreakTagFilterMode(modeInput?.value);
+    if(details){details.classList.toggle('opacity-60',mode==='all');details.classList.toggle('border-amber-300',mode!=='all'&&selected.length===0);}
+    if(label)label.textContent=mode==='all'?`選擇策略（未啟用）`:`${mode==='include'?'包含':'排除'}策略（${selected.length}）`;
+};
+const renderStreakStrategyOptions=()=>{
+    const root=document.getElementById('streak-tag-options');if(!root)return;
+    const selected=new Set(getSelectedStreakTags()),tags=[...new Set(TAG_CATEGORIES.flatMap(category=>category.tags||[]).map(normalizeStrategyTagName).filter(tag=>tag&&!NON_STRATEGY_COPY_TAGS.has(tag)))];
+    root.innerHTML=tags.map(tag=>`<label class="flex items-center gap-2 cursor-pointer rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40 px-2 py-1.5 hover:border-violet-300 dark:hover:border-violet-700 transition"><input type="checkbox" class="streak-tag-cb w-3.5 h-3.5 rounded border-violet-300 accent-violet-600" value="${escapeHTML(tag)}" ${selected.has(tag)?'checked':''}><span class="text-[11px] font-medium text-gray-700 dark:text-gray-200 truncate" title="${escapeHTML(tag)}">${escapeHTML(tag)}</span></label>`).join('');
+    updateStreakTagFilterUI();
+};
+const invalidateStreakResults=(message='條件已變更，請重新比對。')=>{
+    lastJournalStreakResult=null;const summary=document.getElementById('streak-summary'),stats=document.getElementById('streak-stats'),root=document.getElementById('streak-results'),copyBtn=document.getElementById('streak-copy-btn');
+    if(summary)summary.textContent=message;if(stats){stats.innerHTML='';stats.classList.add('hidden');}if(root){root.innerHTML='';root.classList.add('hidden');}if(copyBtn)copyBtn.disabled=true;
+};
 const updateStreakModeUI=()=>{
-    const modeInput=document.getElementById('streak-mode'),daysLabel=document.getElementById('streak-day-count-label'),description=document.getElementById('streak-mode-description'),daysInput=document.getElementById('streak-min-days');
+    const modeInput=document.getElementById('streak-mode'),daysLabel=document.getElementById('streak-day-count-label'),description=document.getElementById('streak-mode-description'),daysInput=document.getElementById('streak-min-days'),occurrencesWrap=document.getElementById('streak-min-occurrences-wrap'),occurrencesInput=document.getElementById('streak-min-occurrences');
     if(!modeInput||!daysLabel||!description||!daysInput)return;
     const mode=normalizeStreakMode(modeInput.value),isWindow=mode==='window';
-    daysLabel.textContent=isWindow?'觀察交易日數':'連續交易日數';
-    description.textContent=isWindow?'重複模式會統計最近 N 個有效交易日，列出出現至少 2 次的股票與各日策略；週末及休市日不計入。':'連續模式會找出最近 N 個有效交易日每天都有訊號的股票；週末及休市日不計入。';
+    daysLabel.textContent=isWindow?'觀察日數':'連續日數';
+    description.textContent=isWindow?'重複模式會統計最近 N 個有效交易日，列出至少出現 M 次的股票；週末及休市日不計入。':'連續模式會依完整交易日序列判定；任何未出現訊號的交易日都會中斷連續紀錄。';
     daysInput.setAttribute('aria-label',isWindow?'觀察交易日數':'連續交易日數');
+    if(occurrencesWrap)occurrencesWrap.classList.toggle('hidden',!isWindow);
+    if(occurrencesInput){const days=Math.max(2,Math.min(60,parseInt(daysInput.value)||2));occurrencesInput.disabled=!isWindow;occurrencesInput.max=String(days);occurrencesInput.value=String(Math.max(2,Math.min(days,parseInt(occurrencesInput.value)||2)));}
 };
 
 const enumerateTradingDates=(baseDate,earliestDate,customHolidays)=>{
@@ -2243,83 +2280,157 @@ const enumerateTradingDates=(baseDate,earliestDate,customHolidays)=>{
     return dates;
 };
 
-const analyzeJournalStreaks=(journals,requestedBase,minDays,excludeHorses=false,mode='consecutive')=>{
-    const wantedBase=requestedBase||getToday(),minimum=Math.max(2,Math.min(60,parseInt(minDays)||2)),analysisMode=normalizeStreakMode(mode),excludeHorseTags=!!excludeHorses,customHolidays=new Set(normalizeCustomMarketHolidays(state.customMarketHolidays));
+const matchesStreakTagFilter=(days,filterMode,selectedTags)=>{
+    const mode=normalizeStreakTagFilterMode(filterMode),wanted=new Set((selectedTags||[]).map(normalizeStrategyTagName).filter(Boolean));
+    if(mode==='all')return true;if(!wanted.size)return false;
+    const matched=(days||[]).some(day=>(day.tags||[]).some(tag=>wanted.has(normalizeStrategyTagName(tag))));
+    return mode==='include'?matched:!matched;
+};
+const getStreakTagCounts=days=>{
+    const counts={};(days||[]).forEach(day=>(day.tags||[]).forEach(tag=>{const normalized=normalizeStrategyTagName(tag);if(normalized)counts[normalized]=(counts[normalized]||0)+1;}));
+    return Object.entries(counts).map(([tag,count])=>({tag,count})).sort((a,b)=>b.count-a.count||a.tag.localeCompare(b.tag,'zh-Hant'));
+};
+const getStreakStockIndicators=code=>{
+    const normalized=String(code||'').trim(),eps=getEpsInfo(normalized,{}),growth=parseFloat(eps.epsGrowth);
+    return{hasReport:(state.reports||[]).some(item=>String(item.code||'').trim()===normalized),hasRevenueHigh:(state.revenueRecords||[]).some(item=>String(item.code||'').trim()===normalized),positiveEpsGrowth:Number.isFinite(growth)&&growth>0};
+};
+const getStreakHeatStatus=(current,previous,hasFullHistory,qualification)=>{
+    if(!hasFullHistory)return'資料不足';
+    if(previous<qualification)return'新進雷達';
+    if(current>previous)return'升溫';
+    if(current<previous)return'降溫';
+    return'持續';
+};
+const calculateStreakStrength=(item,context)=>{
+    const indicators=getStreakStockIndicators(item.code),frequencyScore=Math.min(50,Math.round((item.currentWindowOccurrences/Math.max(1,context.minDays))*50));
+    const extra=context.mode==='consecutive'?Math.max(0,item.streak-context.minDays):Math.max(0,item.occurrences-context.minOccurrences),persistenceScore=Math.min(15,5+extra*5),consistencyScore=Math.min(15,item.commonTags.length*5);
+    const score=Math.max(0,Math.min(100,frequencyScore+persistenceScore+consistencyScore+(indicators.positiveEpsGrowth?10:0)+(indicators.hasReport?5:0)+(indicators.hasRevenueHigh?5:0)));
+    return{score,indicators,scoreDetail:`頻率 ${frequencyScore}＋持續 ${persistenceScore}＋共同策略 ${consistencyScore}＋EPS ${indicators.positiveEpsGrowth?10:0}＋法人 ${indicators.hasReport?5:0}＋營收 ${indicators.hasRevenueHigh?5:0}`};
+};
+
+const analyzeJournalStreaks=(journals,requestedBase,minDays,horseMode='excludeStock',mode='consecutive',minOccurrences=2,tagFilterMode='all',selectedTags=[])=>{
+    const wantedBase=requestedBase||getToday(),minimum=Math.max(2,Math.min(60,parseInt(minDays)||2)),analysisMode=normalizeStreakMode(mode),occurrenceMinimum=Math.max(2,Math.min(minimum,parseInt(minOccurrences)||2)),normalizedTagFilterMode=normalizeStreakTagFilterMode(tagFilterMode),normalizedSelectedTags=[...new Set((selectedTags||[]).map(normalizeStrategyTagName).filter(Boolean))],normalizedHorseMode=normalizeStreakHorseMode(horseMode),customHolidays=new Set(normalizeCustomMarketHolidays(state.customMarketHolidays));
     const eligible=(journals||[]).filter(item=>item&&item.date&&item.date<=wantedBase&&isJournalTradingDate(item.date,customHolidays)&&String(item.code||'').trim());
     const recordDates=[...new Set(eligible.map(item=>item.date))].sort().reverse();
-    if(!recordDates.length)return{requestedBase:wantedBase,baseDate:null,minDays:minimum,mode:analysisMode,excludeHorses:excludeHorseTags,customHolidays:[...customHolidays],availableDays:0,windowDays:0,results:[]};
+    if(!recordDates.length)return{requestedBase:wantedBase,baseDate:null,minDays:minimum,minOccurrences:occurrenceMinimum,mode:analysisMode,tagFilterMode:normalizedTagFilterMode,selectedTags:normalizedSelectedTags,horseMode:normalizedHorseMode,excludeHorses:normalizedHorseMode==='excludeStock',customHolidays:[...customHolidays],availableDays:0,windowDays:0,historyWindowDays:0,results:[]};
     const baseDate=recordDates[0],dates=enumerateTradingDates(baseDate,recordDates[recordDates.length-1],customHolidays),byDate=new Map();
     [...eligible].sort((a,b)=>(a.createdAt||0)-(b.createdAt||0)).forEach(item=>{
         const code=String(item.code||'').trim();
         if(!byDate.has(item.date))byDate.set(item.date,new Map());
-        const dateMap=byDate.get(item.date),entry=dateMap.get(code)||{code,name:item.name||state.codeToName[code]||'',tags:[]};
+        const dateMap=byDate.get(item.date),entry=dateMap.get(code)||{code,name:item.name||state.codeToName[code]||'',tags:[],ids:[]};
         if(!entry.name&&item.name)entry.name=item.name;
         (item.tags||[]).map(normalizeStrategyTagName).filter(Boolean).forEach(tag=>{if(!entry.tags.includes(tag))entry.tags.push(tag);});
+        if(item.id&&!entry.ids.includes(item.id))entry.ids.push(item.id);
         dateMap.set(code,entry);
     });
-    const results=[];
+    const results=[],windowDates=dates.slice(0,minimum),previousWindowDates=dates.slice(minimum,minimum*2),hasFullHistory=previousWindowDates.length===minimum;
     if(analysisMode==='window'){
-        const windowDates=dates.slice(0,minimum),candidateCodes=new Set();
+        const candidateCodes=new Set();
         windowDates.forEach(date=>(byDate.get(date)||new Map()).forEach((entry,code)=>candidateCodes.add(code)));
         candidateCodes.forEach(code=>{
-            const days=windowDates.map(date=>{const entry=byDate.get(date)?.get(code);return entry?{date,tags:[...entry.tags]}:null;}).filter(Boolean);
-            if(days.length<2)return;
-            if(excludeHorseTags&&days.some(day=>day.tags.some(tag=>tag==='赤兔馬'||tag==='千里馬')))return;
+            let days=windowDates.map(date=>{const entry=byDate.get(date)?.get(code);return entry?{date,tags:[...entry.tags]}:null;}).filter(Boolean);
+            if(normalizedHorseMode==='excludeStock'&&days.some(day=>day.tags.some(tag=>STREAK_HORSE_TAGS.has(tag))))return;
+            if(normalizedHorseMode==='ignoreTags')days=days.map(day=>({...day,tags:day.tags.filter(tag=>!STREAK_HORSE_TAGS.has(tag))})).filter(day=>day.tags.length);
+            if(days.length<occurrenceMinimum)return;
+            if(!matchesStreakTagFilter(days,normalizedTagFilterMode,normalizedSelectedTags))return;
             const latestEntry=byDate.get(days[0].date)?.get(code),commonTags=days[0].tags.filter(tag=>days.every(day=>day.tags.includes(tag)));
-            results.push({code,name:latestEntry?.name||state.codeToName[code]||'',streak:days.length,occurrences:days.length,commonTags,days});
+            results.push({code,name:latestEntry?.name||state.codeToName[code]||'',latestJournalId:latestEntry?.ids?.at(-1)||'',streak:days.length,occurrences:days.length,commonTags,days});
         });
     }else{
         (byDate.get(baseDate)||new Map()).forEach((baseEntry,code)=>{
             const days=[];
             for(const date of dates){
                 const entry=byDate.get(date)?.get(code);if(!entry)break;
-                days.push({date,tags:[...entry.tags]});
+                let tags=[...entry.tags];if(normalizedHorseMode==='ignoreTags'){tags=tags.filter(tag=>!STREAK_HORSE_TAGS.has(tag));if(!tags.length)break;}days.push({date,tags});
             }
             if(days.length<minimum)return;
-            if(excludeHorseTags&&days.some(day=>day.tags.some(tag=>tag==='赤兔馬'||tag==='千里馬')))return;
+            if(normalizedHorseMode==='excludeStock'&&days.some(day=>day.tags.some(tag=>STREAK_HORSE_TAGS.has(tag))))return;
+            if(!matchesStreakTagFilter(days,normalizedTagFilterMode,normalizedSelectedTags))return;
             const commonTags=days.length?days[0].tags.filter(tag=>days.every(day=>day.tags.includes(tag))):[];
-            results.push({code,name:baseEntry.name||state.codeToName[code]||'',streak:days.length,occurrences:days.length,commonTags,days});
+            results.push({code,name:baseEntry.name||state.codeToName[code]||'',latestJournalId:baseEntry.ids?.at(-1)||'',streak:days.length,occurrences:days.length,commonTags,days});
         });
     }
-    results.sort((a,b)=>b.occurrences-a.occurrences||a.code.localeCompare(b.code,undefined,{numeric:true}));
-    return{requestedBase:wantedBase,baseDate,minDays:minimum,mode:analysisMode,excludeHorses:excludeHorseTags,customHolidays:[...customHolidays],availableDays:dates.length,windowDays:Math.min(minimum,dates.length),results};
+    results.forEach(item=>{
+        const hasEffectiveSignal=date=>{const entry=byDate.get(date)?.get(item.code);if(!entry)return false;return normalizedHorseMode!=='ignoreTags'||entry.tags.some(tag=>!STREAK_HORSE_TAGS.has(tag));};
+        item.currentWindowOccurrences=windowDates.filter(hasEffectiveSignal).length;
+        item.previousWindowOccurrences=previousWindowDates.filter(hasEffectiveSignal).length;
+        item.tagCounts=getStreakTagCounts(item.days);
+        item.heat=getStreakHeatStatus(item.currentWindowOccurrences,item.previousWindowOccurrences,hasFullHistory,analysisMode==='window'?occurrenceMinimum:minimum);
+        Object.assign(item,calculateStreakStrength(item,{mode:analysisMode,minDays:minimum,minOccurrences:occurrenceMinimum}));
+    });
+    results.sort((a,b)=>b.score-a.score||b.occurrences-a.occurrences||a.code.localeCompare(b.code,undefined,{numeric:true}));
+    return{requestedBase:wantedBase,baseDate,minDays:minimum,minOccurrences:occurrenceMinimum,mode:analysisMode,tagFilterMode:normalizedTagFilterMode,selectedTags:normalizedSelectedTags,horseMode:normalizedHorseMode,excludeHorses:normalizedHorseMode==='excludeStock',customHolidays:[...customHolidays],availableDays:dates.length,windowDays:Math.min(minimum,dates.length),historyWindowDays:previousWindowDates.length,results};
 };
 
 const renderStreakTag=tag=>`<span class="inline-flex px-2 py-0.5 rounded-md border text-[10px] font-bold ${getTagStyle(tag,true)}">${escapeHTML(tag)}</span>`;
+const renderStreakHeatBadge=heat=>{
+    const styles={'新進雷達':'bg-cyan-100 dark:bg-cyan-900/50 text-cyan-700 dark:text-cyan-200 border-cyan-200 dark:border-cyan-700','升溫':'bg-red-100 dark:bg-red-900/45 text-red-700 dark:text-red-200 border-red-200 dark:border-red-700','持續':'bg-amber-100 dark:bg-amber-900/45 text-amber-700 dark:text-amber-200 border-amber-200 dark:border-amber-700','降溫':'bg-blue-100 dark:bg-blue-900/45 text-blue-700 dark:text-blue-200 border-blue-200 dark:border-blue-700','資料不足':'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-300 border-gray-200 dark:border-gray-700'};
+    const icons={'新進雷達':'fa-bolt','升溫':'fa-arrow-trend-up','持續':'fa-wave-square','降溫':'fa-arrow-trend-down','資料不足':'fa-circle-info'};
+    return`<span class="inline-flex items-center gap-1 rounded-full border px-2 py-1 text-[10px] font-black ${styles[heat]||styles['資料不足']}"><i class="fa-solid ${icons[heat]||icons['資料不足']}"></i>${escapeHTML(heat||'資料不足')}</span>`;
+};
+const renderStreakStrength=({score,scoreDetail})=>{
+    const tone=score>=80?'bg-red-500':score>=65?'bg-orange-500':score>=50?'bg-violet-500':'bg-slate-400',textTone=score>=80?'text-red-600 dark:text-red-300':score>=65?'text-orange-600 dark:text-orange-300':'text-violet-600 dark:text-violet-300';
+    return`<div class="mt-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50/80 dark:bg-gray-800/60 px-2.5 py-2" title="${escapeHTML(scoreDetail||'')}"><div class="flex items-center justify-between gap-2 text-[10px] font-bold"><span class="text-gray-500 dark:text-gray-300">訊號強度</span><span class="${textTone}">${score} 分</span></div><div class="mt-1.5 h-1.5 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden"><div class="h-full rounded-full ${tone}" style="width:${score}%"></div></div></div>`;
+};
+const filterAndSortStreakResults=(results,sortMode='strength',heatFilter='all',minStrength=0)=>{
+    const minimum=Math.max(0,Math.min(100,parseInt(minStrength)||0)),heatOrder={'新進雷達':5,'升溫':4,'持續':3,'降溫':2,'資料不足':1};
+    const filtered=(results||[]).filter(item=>item.score>=minimum&&(heatFilter==='all'||item.heat===heatFilter));
+    filtered.sort((a,b)=>{
+        let difference=0;
+        if(sortMode==='occurrences')difference=b.occurrences-a.occurrences;
+        else if(sortMode==='streak')difference=b.streak-a.streak;
+        else if(sortMode==='epsGrowth'){const aGrowth=parseFloat(getEpsInfo(a.code,{}).epsGrowth),bGrowth=parseFloat(getEpsInfo(b.code,{}).epsGrowth);difference=(Number.isFinite(bGrowth)?bGrowth:-Infinity)-(Number.isFinite(aGrowth)?aGrowth:-Infinity);}
+        else if(sortMode==='heat')difference=(heatOrder[b.heat]||0)-(heatOrder[a.heat]||0);
+        else if(sortMode==='code')return a.code.localeCompare(b.code,undefined,{numeric:true});
+        else difference=b.score-a.score;
+        return difference||b.score-a.score||b.occurrences-a.occurrences||a.code.localeCompare(b.code,undefined,{numeric:true});
+    });
+    return filtered;
+};
+const renderStreakStats=(analysis,qualifiedResults)=>{
+    const root=document.getElementById('streak-stats');if(!root)return;
+    if(!analysis?.baseDate){root.innerHTML='';root.classList.add('hidden');return;}
+    const source=qualifiedResults||[],average=source.length?Math.round(source.reduce((sum,item)=>sum+item.score,0)/source.length):0,stats=[['符合條件',source.length,'text-violet-600 dark:text-violet-300'],['目前顯示',analysis.results.length,'text-blue-600 dark:text-blue-300'],['平均強度',`${average}分`,'text-orange-600 dark:text-orange-300'],['新進雷達',source.filter(item=>item.heat==='新進雷達').length,'text-cyan-600 dark:text-cyan-300'],['升溫',source.filter(item=>item.heat==='升溫').length,'text-red-600 dark:text-red-300'],['降溫',source.filter(item=>item.heat==='降溫').length,'text-blue-600 dark:text-blue-300']];
+    root.innerHTML=stats.map(([label,value,tone])=>`<div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900/40 px-2.5 py-2 text-center"><div class="text-[10px] text-gray-400 dark:text-gray-500">${label}</div><div class="mt-0.5 text-sm font-black ${tone}">${value}</div></div>`).join('');root.classList.remove('hidden');
+};
 const renderStreakStockInfoIcons=code=>{
     const normalizedCode=String(code||'').trim(),hasReport=(state.reports||[]).some(report=>String(report.code||'').trim()===normalizedCode),hasRevenueHigh=(state.revenueRecords||[]).some(record=>String(record.code||'').trim()===normalizedCode);
     return`${hasReport?renderReportIndicator():''}${hasRevenueHigh?'<span title="有營收創高紀錄" aria-label="有營收創高紀錄" class="inline-flex shrink-0 w-5 h-5 items-center justify-center rounded-full bg-pink-100 dark:bg-pink-900/50 text-pink-600 dark:text-pink-300 text-[10px]"><i class="fa-solid fa-chart-line"></i></span>':''}`;
 };
 function renderJournalStreaks(){
-    const baseInput=document.getElementById('streak-base-date'),modeInput=document.getElementById('streak-mode'),daysInput=document.getElementById('streak-min-days'),excludeInput=document.getElementById('streak-exclude-horses'),summary=document.getElementById('streak-summary'),root=document.getElementById('streak-results'),copyBtn=document.getElementById('streak-copy-btn');
-    if(!baseInput||!modeInput||!daysInput||!excludeInput||!summary||!root||!copyBtn)return;
-    const dayCount=Math.max(2,Math.min(60,parseInt(daysInput.value)||2));daysInput.value=String(dayCount);
-    const analysis=analyzeJournalStreaks(state.journals,baseInput.value,dayCount,excludeInput.checked,modeInput.value);lastJournalStreakResult=analysis;
-    copyBtn.disabled=analysis.results.length===0;
+    const baseInput=document.getElementById('streak-base-date'),modeInput=document.getElementById('streak-mode'),daysInput=document.getElementById('streak-min-days'),occurrencesInput=document.getElementById('streak-min-occurrences'),horseModeInput=document.getElementById('streak-horse-mode'),tagModeInput=document.getElementById('streak-tag-filter-mode'),sortInput=document.getElementById('streak-result-sort'),heatInput=document.getElementById('streak-heat-filter'),strengthInput=document.getElementById('streak-min-strength'),summary=document.getElementById('streak-summary'),root=document.getElementById('streak-results'),copyBtn=document.getElementById('streak-copy-btn');
+    if(!baseInput||!modeInput||!daysInput||!occurrencesInput||!horseModeInput||!tagModeInput||!sortInput||!heatInput||!strengthInput||!summary||!root||!copyBtn)return;
+    const dayCount=Math.max(2,Math.min(60,parseInt(daysInput.value)||2)),occurrenceCount=Math.max(2,Math.min(dayCount,parseInt(occurrencesInput.value)||2)),horseMode=normalizeStreakHorseMode(horseModeInput.value),tagFilterMode=normalizeStreakTagFilterMode(tagModeInput.value),selectedTags=getSelectedStreakTags();daysInput.value=String(dayCount);occurrencesInput.max=String(dayCount);occurrencesInput.value=String(occurrenceCount);
+    if(tagFilterMode!=='all'&&!selectedTags.length){updateStreakTagFilterUI();return showToast('請先選擇要包含或排除的策略','error');}
+    if(tagFilterMode==='include'&&horseMode!=='include'&&selectedTags.some(tag=>STREAK_HORSE_TAGS.has(tag)))return showToast('包含馬策略時，請將赤兔馬／千里馬設為「不排除」','error');
+    const analysis=analyzeJournalStreaks(state.journals,baseInput.value,dayCount,horseMode,modeInput.value,occurrenceCount,tagFilterMode,selectedTags),qualifiedResults=[...analysis.results];
+    analysis.qualifiedCount=qualifiedResults.length;analysis.resultSort=sortInput.value;analysis.heatFilter=heatInput.value;analysis.minStrength=Math.max(0,parseInt(strengthInput.value)||0);analysis.results=filterAndSortStreakResults(qualifiedResults,analysis.resultSort,analysis.heatFilter,analysis.minStrength);lastJournalStreakResult=analysis;
+    copyBtn.disabled=analysis.results.length===0;renderStreakStats(analysis,qualifiedResults);
     if(!analysis.baseDate){
         summary.innerHTML='<span class="text-amber-600 dark:text-amber-400"><i class="fa-solid fa-circle-info mr-1.5"></i>基準日前沒有策略日誌資料。</span>';
         root.innerHTML='';root.classList.add('hidden');return;
     }
     const adjusted=analysis.baseDate!==analysis.requestedBase;
-    const modeSummary=analysis.mode==='window'?`最近 ${analysis.minDays} 個交易日內重複出現至少 2 次${analysis.windowDays<analysis.minDays?`（目前有 ${analysis.windowDays} 日資料）`:''}`:`至少連續 ${analysis.minDays} 個交易日`;
-    summary.innerHTML=`<span class="font-bold text-violet-700 dark:text-violet-300">找到 ${analysis.results.length} 檔</span>｜實際基準日 ${escapeHTML(analysis.baseDate.replace(/-/g,'/'))}｜${modeSummary}｜週末、休市日不計${analysis.customHolidays.length?`｜自訂休市 ${analysis.customHolidays.length} 日`:''}${analysis.excludeHorses?'｜已排除赤兔馬、千里馬':''}${adjusted?`<span class="ml-2 text-amber-600 dark:text-amber-400">（${escapeHTML(analysis.requestedBase.replace(/-/g,'/'))} 無資料，已往前取最近紀錄日）</span>`:''}`;
+    const modeSummary=analysis.mode==='window'?`最近 ${analysis.minDays} 個交易日內至少出現 ${analysis.minOccurrences} 次${analysis.windowDays<analysis.minDays?`（目前有 ${analysis.windowDays} 日資料）`:''}`:`至少連續 ${analysis.minDays} 個交易日`,tagSummary=analysis.tagFilterMode==='all'?'':`｜${analysis.tagFilterMode==='include'?'包含':'排除'}策略：${analysis.selectedTags.join('、')}`,horseSummary=analysis.horseMode==='excludeStock'?'整檔排除赤兔馬、千里馬':analysis.horseMode==='ignoreTags'?'只忽略赤兔馬、千里馬標籤':'不排除赤兔馬、千里馬',displaySummary=analysis.results.length===analysis.qualifiedCount?`找到 ${analysis.qualifiedCount} 檔`:`符合 ${analysis.qualifiedCount} 檔，顯示 ${analysis.results.length} 檔`;
+    summary.innerHTML=`<span class="font-bold text-violet-700 dark:text-violet-300">${displaySummary}</span>｜實際基準日 ${escapeHTML(analysis.baseDate.replace(/-/g,'/'))}｜${modeSummary}｜${horseSummary}｜週末、休市日不計${analysis.customHolidays.length?`｜自訂休市 ${analysis.customHolidays.length} 日`:''}${escapeHTML(tagSummary)}${analysis.heatFilter!=='all'?`｜熱度：${escapeHTML(analysis.heatFilter)}`:''}${analysis.minStrength?`｜強度 ≥ ${analysis.minStrength}`:''}${adjusted?`<span class="ml-2 text-amber-600 dark:text-amber-400">（${escapeHTML(analysis.requestedBase.replace(/-/g,'/'))} 無資料，已往前取最近紀錄日）</span>`:''}`;
     if(!analysis.results.length){root.innerHTML='';root.classList.add('hidden');return;}
     root.classList.remove('hidden');
     root.innerHTML=analysis.results.map(item=>{
         const common=item.commonTags.length?item.commonTags.map(renderStreakTag).join(''):'<span class="text-[10px] text-gray-400">每日策略不同</span>';
         const infoIcons=renderStreakStockInfoIcons(item.code);
         const daily=item.days.map(day=>`<div class="flex items-start gap-2 py-1.5 border-t border-gray-100 dark:border-gray-700/60 first:border-t-0"><span class="w-[78px] shrink-0 text-[11px] font-bold text-gray-500 dark:text-gray-400 tabular-nums">${escapeHTML(day.date.replace(/-/g,'/'))}</span><div class="flex flex-wrap gap-1">${day.tags.length?day.tags.map(renderStreakTag).join(''):'<span class="text-[10px] text-gray-400">無策略標籤</span>'}</div></div>`).join('');
-        const resultBadge=analysis.mode==='window'?`${analysis.minDays} 日內 ${item.occurrences} 次`:`連續 ${item.streak} 日`;
-        return`<article class="rounded-xl border border-violet-200 dark:border-violet-800/60 bg-white dark:bg-gray-900/35 p-3 sm:p-4 shadow-sm"><div class="flex items-start justify-between gap-3"><div class="min-w-0 flex flex-wrap items-center gap-1 rounded-lg px-1 -mx-1"${getYahooStockAttributes(item.code)}><span class="font-black text-violet-700 dark:text-violet-300 mr-1">${escapeHTML(item.code)}</span><span class="font-bold text-gray-800 dark:text-gray-100">${escapeHTML(item.name||'未命名')}</span>${infoIcons}</div><span class="shrink-0 rounded-full bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 px-2.5 py-1 text-[10px] font-black">${resultBadge}</span></div><div class="flex flex-wrap items-center gap-1 mt-3 mb-2"><span class="text-[10px] text-gray-500 dark:text-gray-400 mr-1">共同策略</span>${common}</div><div>${daily}</div></article>`;
+        const resultBadge=analysis.mode==='window'?`${analysis.minDays} 日內 ${item.occurrences} 次`:`連續 ${item.streak} 日`,tagFrequency=item.tagCounts.slice(0,5).map(entry=>`<span class="inline-flex items-center rounded-md border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-1.5 py-0.5 text-[10px] font-bold text-gray-600 dark:text-gray-200">${escapeHTML(entry.tag)} ×${entry.count}</span>`).join(''),journal=state.journals.find(record=>String(record.id)===String(item.latestJournalId)),favoriteLevel=journal?(journal.isFavorite===true?1:(parseInt(journal.isFavorite)||0)):0,trackingButton=hasStoredAdminAccess()&&journal?`<button type="button" data-streak-action="favorite" data-id="${escapeHTML(journal.id)}" title="${favoriteLevel?'調整追蹤等級':'加入追蹤'}" class="h-8 px-2.5 rounded-lg border ${favoriteLevel?'border-amber-300 bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-300':'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-300'} text-[11px] font-bold hover:scale-105 transition"><i class="fa-solid fa-star mr-1"></i>${favoriteLevel?`追蹤 ${favoriteLevel}★`:'加入追蹤'}</button>`:'';
+        return`<article class="rounded-xl border border-violet-200 dark:border-violet-800/60 bg-white dark:bg-gray-900/35 p-3 sm:p-4 shadow-sm"><div class="flex items-start justify-between gap-2"><div class="min-w-0 flex flex-wrap items-center gap-1 rounded-lg px-1 -mx-1"${getYahooStockAttributes(item.code)}><span class="font-black text-violet-700 dark:text-violet-300 mr-1">${escapeHTML(item.code)}</span><span class="font-bold text-gray-800 dark:text-gray-100">${escapeHTML(item.name||'未命名')}</span>${infoIcons}</div><span class="shrink-0 rounded-full bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 px-2.5 py-1 text-[10px] font-black">${resultBadge}</span></div><div class="flex flex-wrap items-center gap-1.5 mt-2">${renderStreakHeatBadge(item.heat)}<span class="text-[10px] text-gray-400">前期 ${item.previousWindowOccurrences} 次 → 本期 ${item.currentWindowOccurrences} 次</span></div>${renderStreakStrength(item)}<div class="flex flex-wrap items-center gap-1 mt-3 mb-2"><span class="text-[10px] text-gray-500 dark:text-gray-400 mr-1">共同策略</span>${common}</div><div class="flex flex-wrap items-center gap-1 mb-2"><span class="text-[10px] text-gray-500 dark:text-gray-400 mr-1">策略頻率</span>${tagFrequency||'<span class="text-[10px] text-gray-400">無策略標籤</span>'}</div><div>${daily}</div><div class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700/70 flex flex-wrap gap-2"><button type="button" data-streak-action="overview" data-code="${escapeHTML(item.code)}" data-name="${escapeHTML(item.name||'')}" class="h-8 px-2.5 rounded-lg border border-violet-200 dark:border-violet-700 bg-violet-50 dark:bg-violet-900/30 text-violet-700 dark:text-violet-200 text-[11px] font-bold hover:scale-105 transition"><i class="fa-solid fa-chart-pie mr-1"></i>個股總覽</button>${trackingButton}</div></article>`;
     }).join('');
 }
 
 const buildJournalStreakCopyText=analysis=>{
-    const modeText=analysis.mode==='window'?`${analysis.minDays} 日內重複出現至少 2 次`:`至少連續 ${analysis.minDays} 個交易日`;
-    const lines=[`【策略訊號雷達】`,`基準日：${analysis.baseDate||analysis.requestedBase}｜${modeText}｜週末、休市日不計${analysis.customHolidays.length?`｜自訂休市 ${analysis.customHolidays.length} 日`:''}${analysis.excludeHorses?'｜排除赤兔馬、千里馬':''}`,`共 ${analysis.results.length} 檔`,''];
+    const modeText=analysis.mode==='window'?`${analysis.minDays} 日內至少出現 ${analysis.minOccurrences} 次`:`至少連續 ${analysis.minDays} 個交易日`,tagText=analysis.tagFilterMode==='all'?'':`｜${analysis.tagFilterMode==='include'?'包含':'排除'}策略：${analysis.selectedTags.join('、')}`,horseText=analysis.horseMode==='excludeStock'?'整檔排除赤兔馬、千里馬':analysis.horseMode==='ignoreTags'?'只忽略赤兔馬、千里馬標籤':'不排除赤兔馬、千里馬';
+    const lines=[`【策略訊號雷達】`,`基準日：${analysis.baseDate||analysis.requestedBase}｜${modeText}｜${horseText}｜週末、休市日不計${analysis.customHolidays.length?`｜自訂休市 ${analysis.customHolidays.length} 日`:''}${tagText}${analysis.heatFilter!=='all'?`｜熱度：${analysis.heatFilter}`:''}${analysis.minStrength?`｜強度至少 ${analysis.minStrength} 分`:''}`,`共 ${analysis.results.length} 檔`,''];
     analysis.results.forEach(item=>{
-        lines.push(`${item.code} ${item.name}｜${analysis.mode==='window'?`${analysis.minDays} 日內出現 ${item.occurrences} 次`:`連續 ${item.streak} 日`}`);
+        lines.push(`${item.code} ${item.name}｜${analysis.mode==='window'?`${analysis.minDays} 日內出現 ${item.occurrences} 次`:`連續 ${item.streak} 日`}｜強度 ${item.score} 分｜${item.heat}`);
         if(item.commonTags.length)lines.push(`共同策略：${item.commonTags.join('、')}`);
+        if(item.tagCounts.length)lines.push(`策略頻率：${item.tagCounts.map(entry=>`${entry.tag}×${entry.count}`).join('、')}`);
         item.days.forEach(day=>lines.push(`- ${day.date.replace(/-/g,'/')}：${day.tags.length?day.tags.join('、'):'無策略標籤'}`));
         lines.push('');
     });
@@ -2337,7 +2448,19 @@ const addCustomMarketHoliday=async()=>{
 };
 
 document.getElementById('streak-search-form')?.addEventListener('submit',e=>{e.preventDefault();renderJournalStreaks();});
-document.getElementById('streak-mode')?.addEventListener('change',()=>{updateStreakModeUI();lastJournalStreakResult=null;const summary=document.getElementById('streak-summary'),root=document.getElementById('streak-results'),copyBtn=document.getElementById('streak-copy-btn');if(summary)summary.textContent='請設定 N 日後開始比對。';if(root){root.innerHTML='';root.classList.add('hidden');}if(copyBtn)copyBtn.disabled=true;});
+document.getElementById('streak-mode')?.addEventListener('change',()=>{updateStreakModeUI();invalidateStreakResults('判定方式已變更，請重新比對。');});
+document.getElementById('streak-min-days')?.addEventListener('change',()=>{updateStreakModeUI();invalidateStreakResults();});
+document.getElementById('streak-min-occurrences')?.addEventListener('change',()=>invalidateStreakResults());
+document.getElementById('streak-horse-mode')?.addEventListener('change',()=>invalidateStreakResults('赤兔馬／千里馬條件已變更，請重新比對。'));
+document.getElementById('streak-tag-filter-mode')?.addEventListener('change',()=>{updateStreakTagFilterUI();invalidateStreakResults('策略條件已變更，請重新比對。');});
+document.getElementById('streak-tag-options')?.addEventListener('change',e=>{if(!e.target.classList.contains('streak-tag-cb'))return;updateStreakTagFilterUI();invalidateStreakResults('策略條件已變更，請重新比對。');});
+document.getElementById('streak-clear-tags-btn')?.addEventListener('click',()=>{document.querySelectorAll('.streak-tag-cb').forEach(input=>input.checked=false);const mode=document.getElementById('streak-tag-filter-mode');if(mode)mode.value='all';updateStreakTagFilterUI();invalidateStreakResults('策略條件已清除，請重新比對。');});
+['streak-result-sort','streak-heat-filter','streak-min-strength'].forEach(id=>document.getElementById(id)?.addEventListener('change',()=>{if(lastJournalStreakResult)renderJournalStreaks();else invalidateStreakResults();}));
+document.getElementById('streak-search-form')?.addEventListener('click',e=>{
+    const button=e.target.closest('[data-streak-preset]');if(!button)return;
+    const [mode,days,occurrences]=button.dataset.streakPreset.split('-'),modeInput=document.getElementById('streak-mode'),daysInput=document.getElementById('streak-min-days'),occurrencesInput=document.getElementById('streak-min-occurrences');
+    if(modeInput)modeInput.value=mode;if(daysInput)daysInput.value=days||'2';if(occurrencesInput)occurrencesInput.value=occurrences||'2';updateStreakModeUI();renderJournalStreaks();
+});
 document.getElementById('streak-copy-btn')?.addEventListener('click',()=>{if(!lastJournalStreakResult?.results.length)return showToast('目前沒有可複製的結果','error');executeCopy(buildJournalStreakCopyText(lastJournalStreakResult)+copyFootnote);});
 document.getElementById('streak-add-holiday-btn')?.addEventListener('click',addCustomMarketHoliday);
 document.getElementById('streak-holiday-date')?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addCustomMarketHoliday();}});
@@ -2360,6 +2483,18 @@ document.getElementById('streak-toggle-btn')?.addEventListener('click',()=>{
     try{localStorage.setItem(STREAK_PANEL_STORAGE_KEY,String(collapsed));}catch(e){}
 });
 document.getElementById('streak-pin-btn')?.addEventListener('click',()=>setStreakPanelPinned(!streakPanelPinned,true));
+document.getElementById('streak-results')?.addEventListener('click',async e=>{
+    const button=e.target.closest('[data-streak-action]');if(!button)return;e.preventDefault();e.stopPropagation();
+    if(button.dataset.streakAction==='overview'){
+        const code=button.dataset.code||'',name=button.dataset.name||state.codeToName[code]||'';document.querySelector('[data-target="module-overview"]')?.click();
+        const codeInput=document.getElementById('overview-code'),nameInput=document.getElementById('overview-name');if(codeInput)codeInput.value=code;if(nameInput)nameInput.value=name;renderStockOverview(code);setTimeout(()=>document.getElementById('module-overview')?.scrollIntoView({behavior:'smooth',block:'start'}),30);return;
+    }
+    if(button.dataset.streakAction==='favorite'){
+        if(!window.isAdminMode||!window.isAdminMode())return showToast('加入追蹤僅限管理者使用','error');
+        const journal=state.journals.find(item=>String(item.id)===String(button.dataset.id));if(!journal)return showToast('找不到對應的策略日誌','error');
+        const next=((journal.isFavorite===true?1:(parseInt(journal.isFavorite)||0))+1)%4;journal.isFavorite=next;journal.updatedAt=Date.now();saveLocalData();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();await putDataToCloud(`journals/${journal.id}`,journal);showToast(['已取消追蹤','已加入一星追蹤','已升級二次追蹤','已升級三次追蹤'][next]);
+    }
+});
 const getVisibleRowCheckboxes=t=>Array.from(document.querySelectorAll(`.row-cb[data-type="${t}"]`));
 function updateBatchUI(t){
     const b=document.getElementById(`batch-bar-${t}`),c=document.getElementById(`batch-count-${t}`);
@@ -4757,7 +4892,7 @@ const SESSION={
   document.addEventListener('click',function(event){
     var restrictedModule=event.target.closest('[data-target="module-plan"], [data-target="module-favorites"]');
     if(restrictedModule&&!adminMode){requireAdmin(event,'此模組僅限管理者查看');return;}
-    var restrictedAction=event.target.closest('#btn-journal-submit, #btn-revenue-submit, #btn-report-submit, [data-action="add-plan"], [data-action="toggle-fav"], [data-action="remove-tag"], [data-action="edit-notes"], [data-action="delete-journal"], [data-action="edit-report"], [data-action="delete-report"], [data-action="delete-revenue"], [data-batch-delete-type], [data-tag-action="delete"], #streak-holiday-date, #streak-add-holiday-btn, #streak-clear-holidays-btn, [data-remove-holiday], #btn-tag-manager, #btn-trash-manager, #btn-undo-import, #btn-db-upload, #btn-import-backup, #btn-export-backup');
+    var restrictedAction=event.target.closest('#btn-journal-submit, #btn-revenue-submit, #btn-report-submit, [data-action="add-plan"], [data-action="toggle-fav"], [data-streak-action="favorite"], [data-action="remove-tag"], [data-action="edit-notes"], [data-action="delete-journal"], [data-action="edit-report"], [data-action="delete-report"], [data-action="delete-revenue"], [data-batch-delete-type], [data-tag-action="delete"], #streak-holiday-date, #streak-add-holiday-btn, #streak-clear-holidays-btn, [data-remove-holiday], #btn-tag-manager, #btn-trash-manager, #btn-undo-import, #btn-db-upload, #btn-import-backup, #btn-export-backup');
     if(restrictedAction&&!adminMode){requireAdmin(event,'此操作僅限管理者使用');return;}
   },true);
 
