@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="105">
+<meta name="app-version" content="107">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -3720,7 +3720,7 @@ const SESSION={
       '<div id="import-preview-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-[195] hidden items-center justify-center p-3">',
       '<div class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-2xl border border-gray-200 dark:border-gray-700 shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col modal-enter">',
       '<div class="p-4 sm:p-5 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between"><div><h3 id="import-preview-title" class="text-lg sm:text-xl font-black text-purple-600 dark:text-purple-300"><i class="fa-solid fa-file-import mr-2"></i>匯入預覽</h3><p id="import-preview-description" class="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 mt-1">確認新增、重複與異常資料後再執行。</p></div><button id="import-preview-close" type="button" class="w-9 h-9 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-500 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button></div>',
-      '<div class="p-4 sm:p-5 overflow-y-auto"><div id="import-preview-summary" class="grid grid-cols-3 gap-2 sm:gap-3 mb-4"></div><div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-700"><table class="w-full text-xs sm:text-sm"><thead class="bg-gray-100 dark:bg-gray-900 text-gray-500"><tr><th class="p-3 text-left">資料類型</th><th id="import-preview-new-label" class="p-3 text-center">新增</th><th id="import-preview-duplicate-label" class="p-3 text-center">重複</th><th class="p-3 text-center">異常</th></tr></thead><tbody id="import-preview-table"></tbody></table></div><div id="import-preview-details" class="hidden mt-4"></div>',
+      '<div class="p-4 sm:p-5 overflow-y-auto"><div id="import-preview-summary" class="grid grid-cols-3 gap-2 sm:gap-3 mb-4"></div><div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-700"><table class="w-full text-xs sm:text-sm"><thead class="bg-gray-100 dark:bg-gray-900 text-gray-500"><tr><th class="p-3 text-left">資料類型</th><th id="import-preview-new-label" class="p-3 text-center">新增</th><th id="import-preview-duplicate-label" class="p-3 text-center">重複</th><th class="p-3 text-center">異常</th></tr></thead><tbody id="import-preview-table"></tbody></table></div><div id="import-preview-errors" class="hidden mt-4"></div><div id="import-preview-details" class="hidden mt-4"></div>',
       '<label id="import-duplicate-option-wrap" class="mt-4 flex items-start gap-2 p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 cursor-pointer"><input type="checkbox" id="import-handle-duplicates" class="mt-0.5 w-4 h-4 accent-amber-600" checked><span><b class="block text-xs sm:text-sm text-amber-800 dark:text-amber-200">處理重複資料</b><span id="import-duplicate-option-text" class="text-[11px] text-amber-700/80 dark:text-amber-300/80">可合併資料會合併，其餘重複資料將略過。</span></span></label></div>',
       '<div class="p-4 sm:p-5 border-t border-gray-200 dark:border-gray-700 flex gap-2"><button id="import-preview-cancel" type="button" class="flex-1 h-11 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-200 font-bold">取消</button><button id="import-preview-confirm" type="button" class="flex-[2] h-11 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-bold"><i class="fa-solid fa-check mr-1.5"></i>確認匯入</button></div>',
       '</div></div>'
@@ -4033,36 +4033,56 @@ const SESSION={
     var preview=buildImportPreview('backup','手札備份匯入預覽',modules);preview.importedTagSettings=importedTagSettings;return preview;
   }
 
+  var BROKER_REPORT_REQUIRED_HEADERS=[{key:'date',label:'日期'},{key:'code',label:'股票代號'},{key:'name',label:'公司名稱'},{key:'broker',label:'券商'},{key:'targetPrice',label:'目標價'}];
   function normalizeImportHeader(value){return String(value==null?'':value).trim().replace(/\s+/g,'').replace(/[（）]/g,function(char){return char==='（'?'(':')';});}
   function getBrokerReportSource(workbook){
     var sheet=workbook&&workbook.Sheets&&workbook.Sheets[workbook.SheetNames&&workbook.SheetNames[0]];
     if(!sheet)return null;
-    var matrix=XLSX.utils.sheet_to_json(sheet,{header:1,defval:null,raw:true}),headerIndex=-1,headerMap=null;
+    var matrix=XLSX.utils.sheet_to_json(sheet,{header:1,defval:null,raw:true}),candidate={headerIndex:-1,headerMap:{date:-1,code:-1,name:-1,broker:-1,targetPrice:-1},matchedCount:-1,headers:[]};
     for(var rowIndex=0;rowIndex<Math.min(matrix.length,20);rowIndex++){
-      var headers=(matrix[rowIndex]||[]).map(normalizeImportHeader),map={
+      var headers=(matrix[rowIndex]||[]).map(normalizeImportHeader),headerMap={
         date:headers.indexOf('日期'),code:headers.indexOf('股票代號'),name:headers.indexOf('公司名稱'),broker:headers.indexOf('券商'),targetPrice:headers.indexOf('目標價')
-      };
-      if(Object.values(map).every(function(index){return index>=0;})){headerIndex=rowIndex;headerMap=map;break;}
+      },matchedCount=Object.values(headerMap).filter(function(index){return index>=0;}).length;
+      if(matchedCount>candidate.matchedCount)candidate={headerIndex:rowIndex,headerMap:headerMap,matchedCount:matchedCount,headers:headers};
     }
-    if(headerIndex<0)return null;
-    return{sheet:sheet,matrix:matrix,headerIndex:headerIndex,headerMap:headerMap,rows:matrix.slice(headerIndex+1)};
+    var hasReportTitle=matrix.slice(0,8).some(function(row){return(row||[]).some(function(value){return/國內券商.*(?:評估|研究).*報告/.test(String(value||'').replace(/\s+/g,''));});}),hasEpsHeader=candidate.headers.some(function(header){return/(?:EPS|每股盈餘|11[45]年)/i.test(header);});
+    if(!hasReportTitle&&(hasEpsHeader||!(candidate.matchedCount>=4&&candidate.headerMap.date>=0)))return null;
+    var missingHeaders=BROKER_REPORT_REQUIRED_HEADERS.filter(function(header){return candidate.headerMap[header.key]<0;}).map(function(header){return header.label;});
+    return{sheet:sheet,matrix:matrix,headerIndex:candidate.headerIndex,headerMap:candidate.headerMap,missingHeaders:missingHeaders,rows:matrix.slice(candidate.headerIndex+1)};
   }
   function normalizeImportedTargetPrice(value){
     if(typeof value==='number')return Number.isFinite(value)&&value>0?value:null;
-    var text=String(value==null?'':value).trim().replace(/,/g,'');
+    var text=String(value==null?'':value).trim().replace(/\s+/g,'').replace(/,/g,'').replace(/^NT\$/i,'').replace(/^\$/,'').replace(/元$/,'');
     if(!text)return null;
-    var matched=text.match(/-?\d+(?:\.\d+)?/),number=matched?Number(matched[0]):NaN;
+    if(!/^\+?\d+(?:\.\d+)?$/.test(text))return null;
+    var number=Number(text);
     return Number.isFinite(number)&&number>0?number:null;
+  }
+  function isValidImportedDate(value){
+    var matched=String(value||'').match(/^(\d{4})-(\d{2})-(\d{2})$/);if(!matched)return false;
+    var year=Number(matched[1]),month=Number(matched[2]),day=Number(matched[3]),date=new Date(Date.UTC(year,month-1,day));
+    return date.getUTCFullYear()===year&&date.getUTCMonth()===month-1&&date.getUTCDate()===day;
   }
   function parseBrokerReportWorkbook(workbook){
     var source=getBrokerReportSource(workbook);
     if(!source)return null;
-    var bestByCode=new Map(),invalidRows=0,validRows=0;
+    if(source.missingHeaders.length){
+      var missingModule={key:'brokerReport',label:'券商目標價',entries:[],newCount:0,duplicateCount:0,invalidCount:source.missingHeaders.length},missingPreview=buildImportPreview('brokerReport','券商評估報告格式錯誤',[missingModule]);
+      missingPreview.description='必要欄位標題不完整，請修正後重新上傳。';missingPreview.hasBlockingErrors=true;missingPreview.sourceCount=0;missingPreview.selectedCount=0;missingPreview.discardedCount=0;missingPreview.details=[];
+      missingPreview.errors=[{rowNumber:'標題列',code:'—',name:'—',fields:source.missingHeaders,messages:source.missingHeaders.map(function(field){return'缺少必要欄位「'+field+'」';})}];
+      return missingPreview;
+    }
+    var bestByCode=new Map(),invalidRows=0,validRows=0,rowErrors=[];
     source.rows.forEach(function(cells,rowOffset){
       cells=Array.isArray(cells)?cells:[];
       if(cells.every(function(value){return value==null||String(value).trim()==='';}))return;
-      var map=source.headerMap,code=normalizeStockCodeValue(cells[map.code]),date=normalizeImportDate(cells[map.date]),name=String(cells[map.name]||'').trim(),broker=String(cells[map.broker]||'').trim(),targetPrice=normalizeImportedTargetPrice(cells[map.targetPrice]);
-      if(!isValidStockCode(code)||!date||!targetPrice||!isSafeImportedLabel(name,40)||!isSafeImportedLabel(broker,40)){invalidRows++;return;}
+      var map=source.headerMap,rawDate=cells[map.date],rawCode=cells[map.code],rawName=cells[map.name],rawBroker=cells[map.broker],rawTargetPrice=cells[map.targetPrice],code=normalizeStockCodeValue(rawCode),date=normalizeImportDate(rawDate),name=String(rawName||'').trim(),broker=String(rawBroker||'').trim(),targetPrice=normalizeImportedTargetPrice(rawTargetPrice),issues=[];
+      if(rawDate==null||String(rawDate).trim()==='')issues.push({field:'日期',reason:'不得空白'});else if(!isValidImportedDate(date))issues.push({field:'日期',reason:'格式無效，請使用 YYYY/MM/DD 或有效的 Excel 日期'});
+      if(rawCode==null||String(rawCode).trim()==='')issues.push({field:'股票代號',reason:'不得空白'});else if(!isValidStockCode(code))issues.push({field:'股票代號',reason:'格式無效，需為 4～6 碼股票代號'});
+      if(!name)issues.push({field:'公司名稱',reason:'不得空白'});else if(!isSafeImportedLabel(name,40))issues.push({field:'公司名稱',reason:'含不支援符號或超過 40 字'});
+      if(!broker)issues.push({field:'券商',reason:'不得空白'});else if(!isSafeImportedLabel(broker,40))issues.push({field:'券商',reason:'含不支援符號或超過 40 字'});
+      if(rawTargetPrice==null||String(rawTargetPrice).trim()==='')issues.push({field:'目標價',reason:'不得空白'});else if(!targetPrice)issues.push({field:'目標價',reason:'必須是大於 0 的單一數字'});
+      if(issues.length){invalidRows++;rowErrors.push({rowNumber:source.headerIndex+rowOffset+2,code:code||String(rawCode||'').trim()||'—',name:name||'—',fields:issues.map(function(issue){return issue.field;}),messages:issues.map(function(issue){return issue.field+'：'+issue.reason;})});return;}
       validRows++;
       var item={code:code,name:name,broker:broker,targetPrice:targetPrice,reportDate:date,sourceRow:source.headerIndex+rowOffset+2},current=bestByCode.get(code);
       if(!current||item.reportDate>current.reportDate||(item.reportDate===current.reportDate&&item.targetPrice>current.targetPrice))bestByCode.set(code,item);
@@ -4070,22 +4090,73 @@ const SESSION={
     var existingCodes=new Set(Object.keys(state.epsData||{}).map(normalizeStockCodeValue)),entries=Array.from(bestByCode.values()).sort(function(a,b){return a.code.localeCompare(b.code,'zh-Hant',{numeric:true});}).map(function(item){return{item:item,key:item.code,isDuplicate:existingCodes.has(item.code)};});
     var module={key:'brokerReport',label:'券商目標價（每檔已擇優）',entries:entries,newCount:entries.filter(function(entry){return!entry.isDuplicate;}).length,duplicateCount:entries.filter(function(entry){return entry.isDuplicate;}).length,invalidCount:invalidRows};
     var preview=buildImportPreview('brokerReport','券商評估報告快速更新', [module]);
-    preview.description='已依股票代號分組，先取最新日期；同日多筆再取最高目標價。';
+    preview.description=invalidRows?'已完成擇優，但發現 '+invalidRows+' 列欄位異常；異常資料不會匯入。':'已依股票代號分組，先取最新日期；同日多筆再取最高目標價。';
     preview.sourceCount=validRows+invalidRows;preview.selectedCount=entries.length;preview.discardedCount=Math.max(0,validRows-entries.length);
-    preview.details=entries.map(function(entry){return entry.item;});
+    preview.details=entries.map(function(entry){return entry.item;});preview.errors=rowErrors;preview.hasBlockingErrors=false;
     return preview;
   }
 
+  var DATABASE_IMPORT_FIELDS=[
+    {key:'code',label:'股票代號',required:true,aliases:['代號','股票代號','股票代碼','股號','證券代號','Code','stock_id']},
+    {key:'name',label:'股名／公司名稱',required:true,aliases:['股名','股票名稱','公司名稱','公司','名稱','證券名稱','Name','stock_name']},
+    {key:'eps2025',label:'114年／2025 EPS',aliases:['25EPS','2025EPS','2025','今年EPS','本年EPS','114年EPS','114EPS','2025年EPS','2025EPS(估)','114年EPS(估)','預估114年EPS','114年預估EPS']},
+    {key:'eps2026',label:'115年／2026 EPS',aliases:['26EPS','預26EPS','2026EPS','2026','明年EPS','預估26EPS','預估2026EPS','115年EPS','115EPS','2026年EPS','2026EPS(估)','115年EPS(估)','115EPS(估)','2026估EPS','預估EPS','預估115年EPS','115年預估EPS','2026預估EPS','2026年預估EPS']},
+    {key:'epsGrowth',label:'EPS成長率',aliases:['EPS成長率','成長率','預估成長率','YoY','YOY','EPSYoY']},
+    {key:'targetPrice',label:'目標價',aliases:['最高目標價','最高目標價(元)','目標價','目標價(元)','TargetPrice','TP']},
+    {key:'broker',label:'券商',aliases:['券商','發布券商','Broker']},
+    {key:'reportDate',label:'報告日期',aliases:['報告日期','報告日','日期','ReportDate','report_date']},
+    {key:'futures',label:'股期',aliases:['股期','期貨']}
+  ];
+  function findDatabaseHeaderIndex(headers,aliases){
+    var normalizedAliases=aliases.map(normalizeImportHeader);for(var index=0;index<headers.length;index++)if(normalizedAliases.includes(headers[index]))return index;return-1;
+  }
+  function getDatabaseImportSource(workbook){
+    var sheet=workbook&&workbook.Sheets&&workbook.Sheets[workbook.SheetNames&&workbook.SheetNames[0]];if(!sheet)return null;
+    var matrix=XLSX.utils.sheet_to_json(sheet,{header:1,defval:null,raw:true}),candidate={headerIndex:0,headerMap:{},matchedCount:-1};
+    for(var rowIndex=0;rowIndex<Math.min(matrix.length,25);rowIndex++){
+      var headers=(matrix[rowIndex]||[]).map(normalizeImportHeader),headerMap={},matchedCount=0;
+      DATABASE_IMPORT_FIELDS.forEach(function(field){headerMap[field.key]=findDatabaseHeaderIndex(headers,field.aliases);if(headerMap[field.key]>=0)matchedCount++;});
+      if(matchedCount>candidate.matchedCount)candidate={headerIndex:rowIndex,headerMap:headerMap,matchedCount:matchedCount};
+    }
+    var missingHeaders=DATABASE_IMPORT_FIELDS.filter(function(field){return field.required&&candidate.headerMap[field.key]<0;}).map(function(field){return field.label;});
+    return{sheet:sheet,matrix:matrix,headerIndex:candidate.headerIndex,headerMap:candidate.headerMap,missingHeaders:missingHeaders,rows:matrix.slice(candidate.headerIndex+1)};
+  }
+  function isImportedBlankMarker(value){return value==null||/^\s*(?:|[-—–]|N\/?A|NA|無)\s*$/i.test(String(value));}
+  function normalizeImportedOptionalNumber(value,allowPercent){
+    if(isImportedBlankMarker(value))return{present:false,valid:true,value:null};
+    if(typeof value==='number')return{present:true,valid:Number.isFinite(value),value:Number.isFinite(value)?value:null};
+    var text=String(value).trim().replace(/\s+/g,'').replace(/,/g,''),hasPercent=/%$/.test(text);if(hasPercent)text=text.slice(0,-1);
+    if(hasPercent&&!allowPercent)return{present:true,valid:false,value:null};
+    if(!/^[+-]?\d+(?:\.\d+)?$/.test(text))return{present:true,valid:false,value:null};
+    var number=Number(text);return{present:true,valid:Number.isFinite(number),value:Number.isFinite(number)?number:null};
+  }
   function parseDatabaseWorkbook(workbook){
-    var sheet=workbook.Sheets[workbook.SheetNames[0]],rows=XLSX.utils.sheet_to_json(sheet,{defval:null}),existing=Object.keys(state.epsData||{}),modules=[];
-    modules.push(classifyModule('database','參考資料庫',rows,function(row){
-      var code=row['代號']??row['股票代號']??row['Code']??row['stock_id'];
-      var name=row['股名']||row['股票名稱']||row['Name']||row['stock_name'];
-      var c=normalizeStockCodeValue(code),n=String(name||'').trim();
-      if(!isValidStockCode(c)||!n)return null;
-      return{code:c,name:n,eps2025:row['25 EPS']??row['2025 EPS']??row['25EPS']??row['2025EPS']??row['2025']??row['今年EPS']??row['本年EPS']??null,eps2026:row['26 EPS']??row['預26 EPS']??row['2026 EPS']??row['26EPS']??row['2026EPS']??row['預估26EPS']??row['預估2026EPS']??row['2026']??row['明年EPS']??null,epsGrowth:row['EPS成長率']??row['成長率']??row['預估成長率']??row['YoY']??row['YOY']??null,targetPrice:row['最高目標價']??row['目標價']??row['Target Price']??row['TP']??null,broker:row['券商']??row['發布券商']??row['Broker']??null,reportDate:normalizeReportDate(row['報告日期']??row['報告日']??row['Report Date']??row['report_date']??Object.values(row)[8]??null),futures:row['股期']==='●'||row['股期']==='是'||row['股期']==='Y'||row['期貨']==='●'?'●':null};
-    },existing.map(function(code){return{code:normalizeStockCodeValue(code)};}),function(item){return String(item.code||'');}));
-    return buildImportPreview('database','資料庫匯入預覽',modules);
+    var source=getDatabaseImportSource(workbook);if(!source)return buildImportPreview('database','資料庫格式錯誤',[]);
+    if(source.missingHeaders.length){
+      var missingModule={key:'database',label:'EPS／目標價參考資料庫',entries:[],newCount:0,duplicateCount:0,invalidCount:source.missingHeaders.length},missingPreview=buildImportPreview('database','EPS／目標價資料庫格式錯誤',[missingModule]);
+      missingPreview.description='必要欄位標題不完整，請修正後重新上傳。';missingPreview.hasBlockingErrors=true;missingPreview.errors=[{rowNumber:'標題列',code:'—',name:'—',fields:source.missingHeaders,messages:source.missingHeaders.map(function(field){return'缺少必要欄位「'+field+'」';})}];return missingPreview;
+    }
+    var existingCodes=new Set(Object.keys(state.epsData||{}).map(normalizeStockCodeValue)),acceptedCodeRows=new Map(),entries=[],rowErrors=[],validRows=0,invalidRows=0;
+    source.rows.forEach(function(cells,rowOffset){
+      cells=Array.isArray(cells)?cells:[];if(cells.every(function(value){return value==null||String(value).trim()==='';}))return;
+      var map=source.headerMap,rowNumber=source.headerIndex+rowOffset+2,rawCode=cells[map.code],rawName=cells[map.name],code=normalizeStockCodeValue(rawCode),name=String(rawName||'').trim(),issues=[],item={code:code,name:name};
+      if(rawCode==null||String(rawCode).trim()==='')issues.push({field:'股票代號',reason:'不得空白'});else if(!isValidStockCode(code))issues.push({field:'股票代號',reason:'格式無效，需為 4～6 碼股票代號'});
+      if(!name)issues.push({field:'股名／公司名稱',reason:'不得空白'});else if(!isSafeImportedLabel(name,40))issues.push({field:'股名／公司名稱',reason:'含不支援符號或超過 40 字'});
+      [['eps2025','114年／2025 EPS',false],['eps2026','115年／2026 EPS',false],['epsGrowth','EPS成長率',true]].forEach(function(config){
+        var key=config[0],label=config[1],index=map[key];if(index<0)return;var parsed=normalizeImportedOptionalNumber(cells[index],config[2]);
+        if(!parsed.valid)issues.push({field:label,reason:config[2]?'必須是數字或百分比':'必須是有效數字，可使用負數表示虧損'});else if(parsed.present)item[key]=parsed.value;
+      });
+      if(map.targetPrice>=0){var rawTarget=cells[map.targetPrice];if(!isImportedBlankMarker(rawTarget)){var targetPrice=normalizeImportedTargetPrice(rawTarget);if(!targetPrice)issues.push({field:'目標價',reason:'必須是大於 0 的單一數字'});else item.targetPrice=targetPrice;}}
+      if(map.broker>=0&&!isImportedBlankMarker(cells[map.broker])){var broker=String(cells[map.broker]).trim();if(!isSafeImportedLabel(broker,40))issues.push({field:'券商',reason:'含不支援符號或超過 40 字'});else item.broker=broker;}
+      if(map.reportDate>=0&&!isImportedBlankMarker(cells[map.reportDate])){var reportDate=normalizeImportDate(cells[map.reportDate]);if(!isValidImportedDate(reportDate))issues.push({field:'報告日期',reason:'格式無效，請使用 YYYY/MM/DD 或有效的 Excel 日期'});else item.reportDate=reportDate;}
+      if(map.futures>=0&&!isImportedBlankMarker(cells[map.futures])){var futuresText=String(cells[map.futures]).trim().toUpperCase(),yesValues=['●','是','Y','YES','1','有'],noValues=['否','N','NO','0','無','-','—'];if(yesValues.includes(futuresText))item.futures='●';else if(noValues.includes(futuresText))item.futures=null;else issues.push({field:'股期',reason:'僅接受「●、是、Y」或「否、N」'});}
+      if(!issues.length&&acceptedCodeRows.has(code))issues.push({field:'股票代號',reason:'檔案內重複，前一筆位於 Excel 第 '+acceptedCodeRows.get(code)+' 列'});
+      if(issues.length){invalidRows++;rowErrors.push({rowNumber:rowNumber,code:code||String(rawCode||'').trim()||'—',name:name||'—',fields:issues.map(function(issue){return issue.field;}),messages:issues.map(function(issue){return issue.field+'：'+issue.reason;})});return;}
+      acceptedCodeRows.set(code,rowNumber);validRows++;entries.push({item:item,key:code,isDuplicate:existingCodes.has(code)});
+    });
+    if(!validRows&&!invalidRows){invalidRows=1;rowErrors.push({rowNumber:'資料區',code:'—',name:'—',fields:['資料'],messages:['找不到可匯入的資料列']});}
+    var module={key:'database',label:'EPS／目標價參考資料庫',entries:entries,newCount:entries.filter(function(entry){return!entry.isDuplicate;}).length,duplicateCount:entries.filter(function(entry){return entry.isDuplicate;}).length,invalidCount:invalidRows},preview=buildImportPreview('database','EPS／目標價資料庫匯入預覽',[module]);
+    preview.description=invalidRows?'發現 '+invalidRows+' 列欄位異常；異常資料不會匯入，其餘有效資料可繼續更新。':'已完成 EPS、目標價及相關欄位檢查。';preview.errors=rowErrors;preview.hasBlockingErrors=!validRows&&invalidRows===1&&rowErrors[0].rowNumber==='資料區';preview.sourceCount=validRows+invalidRows;preview.selectedCount=entries.length;return preview;
   }
 
   function parseExcelUploadWorkbook(workbook){return parseBrokerReportWorkbook(workbook)||parseDatabaseWorkbook(workbook);}
@@ -4096,7 +4167,7 @@ const SESSION={
 
   function renderImportPreview(preview){
     pendingImport=preview;
-    var isBrokerReport=preview.type==='brokerReport',newLabel=isBrokerReport?'可新增':'新增',duplicateLabel=isBrokerReport?'可更新':'重複';
+    var isBrokerReport=preview.type==='brokerReport',isDatabase=preview.type==='database',newLabel=isBrokerReport||isDatabase?'可新增':'新增',duplicateLabel=isBrokerReport||isDatabase?'可更新':'重複';
     document.getElementById('import-preview-title').innerHTML='<i class="fa-solid fa-file-import mr-2"></i>'+escapeHTML(preview.title);
     document.getElementById('import-preview-description').textContent=preview.description||(isBrokerReport?'確認擇優結果後再更新。':'確認新增、重複與異常資料後再執行。');
     document.getElementById('import-preview-new-label').textContent=newLabel;
@@ -4109,6 +4180,12 @@ const SESSION={
     document.getElementById('import-preview-table').innerHTML=preview.modules.map(function(module){
       return '<tr class="border-t border-gray-200 dark:border-gray-700"><td class="p-3 font-bold">'+escapeHTML(module.label)+'</td><td class="p-3 text-center text-green-600 font-bold">'+module.newCount+'</td><td class="p-3 text-center text-amber-600 font-bold">'+module.duplicateCount+'</td><td class="p-3 text-center text-red-600 font-bold">'+module.invalidCount+'</td></tr>';
     }).join('')||'<tr><td colspan="4" class="p-6 text-center text-gray-400">找不到可匯入的工作表</td></tr>';
+    var errorDetails=document.getElementById('import-preview-errors'),previewErrors=Array.isArray(preview.errors)?preview.errors:[];
+    if(previewErrors.length){
+      var visibleErrors=previewErrors.slice(0,300),hiddenErrorCount=Math.max(0,previewErrors.length-visibleErrors.length),errorTitle=preview.hasBlockingErrors?'檔案格式錯誤':'發現 '+previewErrors.length+' 列異常（將自動略過）';
+      errorDetails.innerHTML='<div class="mb-2 flex flex-wrap items-center justify-between gap-2"><div class="text-xs sm:text-sm font-black text-red-700 dark:text-red-300"><i class="fa-solid fa-triangle-exclamation mr-1.5"></i>'+escapeHTML(errorTitle)+'</div><div class="text-[10px] sm:text-xs text-red-600 dark:text-red-400">請依 Excel 列號修正下列欄位</div></div><div class="max-h-[38vh] overflow-auto rounded-xl border border-red-200 dark:border-red-800"><table class="w-full min-w-[720px] text-xs"><thead class="sticky top-0 bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300"><tr><th class="p-2 text-center">Excel 列</th><th class="p-2 text-left">代號／公司</th><th class="p-2 text-left">錯誤欄位</th><th class="p-2 text-left">錯誤原因</th></tr></thead><tbody>'+visibleErrors.map(function(error){return'<tr class="border-t border-red-100 dark:border-red-900/70 bg-white dark:bg-gray-900"><td class="p-2 text-center font-black text-red-600 dark:text-red-400 whitespace-nowrap">'+escapeHTML(error.rowNumber)+'</td><td class="p-2"><b>'+escapeHTML(error.code||'—')+'</b>／'+escapeHTML(error.name||'—')+'</td><td class="p-2">'+(error.fields||[]).map(function(field){return'<span class="inline-flex mr-1 mb-1 rounded-md bg-red-100 dark:bg-red-900/50 px-1.5 py-0.5 font-bold text-red-700 dark:text-red-300">'+escapeHTML(field)+'</span>';}).join('')+'</td><td class="p-2 leading-relaxed text-red-700 dark:text-red-300">'+(error.messages||[]).map(escapeHTML).join('<br>')+'</td></tr>';}).join('')+'</tbody></table></div>'+(hiddenErrorCount?'<div class="mt-2 text-[10px] text-red-500 text-right">另有 '+hiddenErrorCount+' 列異常，請修正後重新上傳查看。</div>':'');
+      errorDetails.classList.remove('hidden');
+    }else{errorDetails.innerHTML='';errorDetails.classList.add('hidden');}
     var details=document.getElementById('import-preview-details');
     if(isBrokerReport&&preview.details&&preview.details.length){
       var visibleDetails=preview.details.slice(0,300),moreCount=Math.max(0,preview.details.length-visibleDetails.length);
@@ -4116,10 +4193,12 @@ const SESSION={
       details.classList.remove('hidden');
     }else{details.innerHTML='';details.classList.add('hidden');}
     var wrap=document.getElementById('import-duplicate-option-wrap');
-    wrap.classList.toggle('hidden',preview.duplicateCount===0);
+    wrap.classList.toggle('hidden',preview.duplicateCount===0||preview.hasBlockingErrors===true);
     document.getElementById('import-handle-duplicates').checked=true;
     document.getElementById('import-duplicate-option-text').textContent=isBrokerReport?'勾選後會更新相同代號的日期、目標價及券商；原有 EPS、股期等資料會保留。':preview.type==='database'?'勾選後會使用 Excel 內容更新相同代號的參考資料。':'可合併資料會合併，其餘完全相同的資料將略過。';
-    document.getElementById('import-preview-confirm').disabled=preview.newCount===0&&preview.duplicateCount===0;
+    var confirmButton=document.getElementById('import-preview-confirm');
+    confirmButton.disabled=preview.hasBlockingErrors===true||(preview.newCount===0&&preview.duplicateCount===0);
+    confirmButton.innerHTML=preview.hasBlockingErrors?'<i class="fa-solid fa-ban mr-1.5"></i>請先修正檔案':(isBrokerReport||isDatabase)&&previewErrors.length?'<i class="fa-solid fa-check mr-1.5"></i>匯入有效資料':'<i class="fa-solid fa-check mr-1.5"></i>確認匯入';
     document.getElementById('import-preview-modal').classList.remove('hidden');
     document.getElementById('import-preview-modal').classList.add('flex');
   }
@@ -4207,14 +4286,14 @@ const SESSION={
   }
 
   async function commitDatabaseImport(handleDuplicates){
-    var added=0,updated=0,skipped=0,module=pendingImport.modules[0];
+    var added=0,updated=0,skipped=0,module=pendingImport.modules[0],now=Date.now();
     (module?module.entries:[]).forEach(function(entry){
-      var item=entry.item,exists=!!state.epsData[item.code];
-      if(exists&&!handleDuplicates){skipped++;return;}
-      state.epsData[item.code]=item;state.codeToName[item.code]=item.name;state.nameToCode[item.name]=item.code;
-      if(exists)updated++;else added++;
+      var item=entry.item,current=state.epsData[item.code]||null;
+      if(current&&!handleDuplicates){skipped++;return;}
+      var next=Object.assign({},current||{},item,{updatedAt:now});state.epsData[item.code]=next;state.codeToName[item.code]=next.name;state.nameToCode[next.name]=item.code;
+      if(current)updated++;else added++;
     });
-    saveLocalData();await patchDataToCloud('epsData',state.epsData);processAndRenderJournals();renderFavorites();
+    saveLocalData();await patchDataToCloud('epsData',state.epsData);processAndRenderJournals();renderFavorites();renderRevenueRecords();
     if(document.getElementById('module-overview')&&document.getElementById('module-overview').classList.contains('active'))renderStockOverview();
     showToast('資料庫匯入完成：新增 '+added+'、更新 '+updated+'、略過 '+skipped);
   }
