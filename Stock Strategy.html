@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="109">
+<meta name="app-version" content="110">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -29,6 +29,8 @@ tailwind.config={darkMode:'class',theme:{extend:{colors:{gray:{50:'#f8fafc',100:
 @layer components {
 .card-panel { @apply bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 transition-colors duration-300; }
 .input-base { @apply w-full h-[42px] bg-gray-50 dark:bg-gray-700/80 border border-gray-300 dark:border-gray-600 rounded-lg px-2 sm:px-3 text-gray-900 dark:text-white text-[13px] sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 transition shadow-inner; -webkit-appearance:none !important; -moz-appearance:none !important; appearance:none !important; box-sizing:border-box; margin:0; }
+.stock-code-invalid { border-color:#ef4444 !important; box-shadow:0 0 0 3px rgba(239,68,68,.22) !important; }
+html.dark .stock-code-invalid { border-color:#f87171 !important; box-shadow:0 0 0 3px rgba(248,113,113,.28) !important; }
 .btn-copy-base { @apply text-xs font-medium px-2.5 py-1.5 rounded-lg transition border shadow-sm whitespace-nowrap active:scale-95; }
 .nav-btn { @apply px-3 sm:px-4 py-2 rounded-lg font-bold transition-all duration-200 text-xs sm:text-sm flex items-center text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800/60 hover:bg-gray-200 dark:hover:bg-gray-700 border-b-2 border-transparent cursor-pointer; }
 .nav-btn.active-blue { @apply text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/60 border-blue-500 shadow-sm; }
@@ -1377,6 +1379,36 @@ const normalizeStockCodeValue=value=>{
     return code;
 };
 const isValidStockCode=value=>/^\d{4,6}[A-Z]?$/.test(String(value||''));
+const resolveKnownStock=value=>{
+    const code=normalizeStockCodeValue(value),epsRecord=state.epsData?.[code];
+    const name=String(state.codeToName?.[code]||epsRecord?.name||'').trim();
+    return{code,name,valid:Boolean(isValidStockCode(code)&&name)};
+};
+const setStockPairValidity=(codeInput,nameInput,message='')=>{
+    if(!codeInput)return;
+    codeInput.setCustomValidity?.(message);
+    codeInput.classList.toggle('stock-code-invalid',Boolean(message));
+    if(message){codeInput.setAttribute('aria-invalid','true');codeInput.title=message;}
+    else{codeInput.removeAttribute('aria-invalid');codeInput.removeAttribute('title');}
+    if(nameInput){nameInput.setCustomValidity?.(message);nameInput.classList.toggle('stock-code-invalid',Boolean(message));if(message)nameInput.setAttribute('aria-invalid','true');else nameInput.removeAttribute('aria-invalid');}
+};
+const validateStockFormPair=(codeId,nameId,{focus=true,notify=true}={})=>{
+    const codeInput=document.getElementById(codeId),nameInput=document.getElementById(nameId);
+    if(!codeInput||!nameInput)return null;
+    const raw=codeInput.value.trim(),stock=resolveKnownStock(raw);
+    let message='';
+    if(!raw)message='請輸入股票代號';
+    else if(!isValidStockCode(stock.code))message=`股票代號「${raw}」格式錯誤，請輸入 4～6 碼數字代號`;
+    else if(!stock.name)message=`找不到股票代號「${stock.code}」，請確認代號是否正確`;
+    if(message){
+        nameInput.value='';setStockPairValidity(codeInput,nameInput,message);
+        if(notify)showToast(message,'error');
+        if(focus){codeInput.focus();codeInput.select?.();}
+        return null;
+    }
+    codeInput.value=stock.code;nameInput.value=stock.name;setStockPairValidity(codeInput,nameInput,'');
+    return stock;
+};
 const isSafeImportedLabel=(value,maxLength=30)=>{const text=String(value||'').trim();return Boolean(text&&text.length<=maxLength&&!/[<>"'`\u0000-\u001F\u007F]/.test(text));};
 const hasStoredAdminAccess=()=>{
     try{return localStorage.getItem(ADMIN_SESSION_STORAGE_KEY)==='1'||(typeof window.isAdminMode==='function'&&window.isAdminMode());}
@@ -1649,7 +1681,7 @@ const updatePreview=(c,tId='j-preview',col='blue')=>{
 window.copyPreviewData=c=>{const d=state.epsData[c];if(!d)return;const sn=state.codeToName[c]||d.name||'';let t=`【${c} ${sn}】參考資料\n25 EPS: ${d.eps2025??'-'}\n預26 EPS: ${d.eps2026??'-'}\nEPS成長率: ${d.epsGrowth!=null?(d.epsGrowth*100).toFixed(2)+'%':'-'}\n法人最高目標價: ${d.targetPrice??'-'}\n券商: ${d.broker??'-'}\n報告日期: ${d.reportDate??'-'}\n`;if(d.futures==='●')t+=`*含股期`;executeCopy(t.trim());};
 document.addEventListener('click',event=>{const button=event.target.closest('[data-copy-preview-code]');if(button)window.copyPreviewData(button.dataset.copyPreviewCode);});
 
-const bindAutoFill=(cId,nId,cb=null)=>{
+const bindAutoFill=(cId,nId,cb=null,strict=false)=>{
     const codeInput=document.getElementById(cId),nameInput=document.getElementById(nId);
     if(!codeInput||!nameInput)return;
     let lastNotifiedCode=null;
@@ -1669,22 +1701,30 @@ const bindAutoFill=(cId,nId,cb=null)=>{
         }
         return match;
     };
-    const syncFromCode=(useFirstMatch=false)=>{
-        const raw=codeInput.value.trim(),candidate=useFirstMatch&&raw?resolveMatch(state.codeToName,raw):raw;
-        const code=state.codeToName[candidate]?candidate:'';
-        if(code){codeInput.value=code;nameInput.value=state.codeToName[code];}
-        notify(code);
+    const syncFromCode=(useFirstMatch=false,markInvalid=false)=>{
+        const raw=codeInput.value.trim(),normalized=normalizeStockCodeValue(raw);
+        let stock=resolveKnownStock(normalized);
+        if(!stock.valid&&useFirstMatch&&raw){const candidate=resolveMatch(state.codeToName,raw.toUpperCase());if(candidate)stock=resolveKnownStock(candidate);}
+        if(stock.valid){codeInput.value=stock.code;nameInput.value=stock.name;setStockPairValidity(codeInput,nameInput,'');notify(stock.code);return stock.code;}
+        nameInput.value='';notify('');
+        if(strict&&markInvalid&&raw){
+            const message=isValidStockCode(normalized)?`找不到股票代號「${normalized}」，請確認代號是否正確`:`股票代號「${raw}」格式錯誤，請輸入 4～6 碼數字代號`;
+            setStockPairValidity(codeInput,nameInput,message);
+        }else setStockPairValidity(codeInput,nameInput,'');
+        return '';
     };
     const syncFromName=(useFirstMatch=false)=>{
         const raw=nameInput.value.trim(),name=useFirstMatch&&raw?resolveMatch(state.nameToCode,raw):raw,code=state.nameToCode[name]||'';
-        if(code){nameInput.value=name;codeInput.value=code;}
+        if(code){nameInput.value=name;codeInput.value=code;setStockPairValidity(codeInput,nameInput,'');}
+        else if(strict){codeInput.value='';setStockPairValidity(codeInput,nameInput,'');}
         notify(code);
     };
-    codeInput.addEventListener('input',()=>syncFromCode(false));
-    codeInput.addEventListener('change',()=>syncFromCode(false));
+    codeInput.addEventListener('input',()=>syncFromCode(false,false));
+    codeInput.addEventListener('change',()=>syncFromCode(false,true));
+    codeInput.addEventListener('blur',()=>syncFromCode(false,true));
     nameInput.addEventListener('input',()=>syncFromName(false));
     nameInput.addEventListener('change',()=>syncFromName(false));
-    codeInput.addEventListener('keydown',e=>{if(e.key==='Enter')syncFromCode(true);});
+    codeInput.addEventListener('keydown',e=>{if(e.key==='Enter')syncFromCode(true,true);});
     nameInput.addEventListener('keydown',e=>{if(e.key==='Enter')syncFromName(true);});
 };
 
@@ -2370,10 +2410,12 @@ document.getElementById('btn-clear-rep-filters')?.addEventListener('click', () =
 document.getElementById('journal-form')?.addEventListener('submit', async e => {
     e.preventDefault();
     const d = document.getElementById('j-date').value;
-    const c = document.getElementById('j-code').value.trim();
-    const n = document.getElementById('j-name').value.trim();
+    const stock = validateStockFormPair('j-code','j-name');
+    if (!stock) return;
+    const c = stock.code;
+    const n = stock.name;
     const nt = document.getElementById('j-notes').value.trim();
-    if (!c || !n || !d) return showToast('請填寫完整資訊', 'error');
+    if (!d) return showToast('請選擇日期', 'error');
 
     const selectedTag = document.querySelector('.tag-input:checked')?.value || '';
     const tags = selectedTag ? [selectedTag] : [];
@@ -2430,7 +2472,18 @@ document.getElementById('journal-form')?.addEventListener('submit', async e => {
     setTimeout(() => document.getElementById('j-code').focus(), 15);
 });
 
-document.getElementById('revenue-form')?.addEventListener('submit',async e=>{e.preventDefault();const m=document.getElementById('r-month').value,c=document.getElementById('r-code').value.trim(),n=document.getElementById('r-name').value.trim(),nt=document.getElementById('r-notes').value.trim();if(!m||!c||!n)return;const dId=`${c}_${m}`,eIdx=state.revenueRecords.findIndex(r=>r.id===dId);let mn=nt;if(eIdx!==-1){const o=state.revenueRecords[eIdx].notes||'';if(nt&&o&&o!==nt&&!o.includes(nt))mn=o+'；'+nt;else if(!nt)mn=o;}const p={id:dId,month:m,code:c,name:n,notes:mn,createdAt:eIdx!==-1?state.revenueRecords[eIdx].createdAt:Date.now(),updatedAt:Date.now()};if(eIdx!==-1)state.revenueRecords[eIdx]=p;else state.revenueRecords.push(p);saveLocalData();renderRevenueRecords();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();await putDataToCloud(`revenueRecords/${dId}`,p);showToast('營收創高已建立');e.target.reset();document.getElementById('r-month').value=m;setTimeout(()=>document.getElementById('r-code').focus(),15);});
+document.getElementById('revenue-form')?.addEventListener('submit',async e=>{
+    e.preventDefault();
+    const m=document.getElementById('r-month').value,stock=validateStockFormPair('r-code','r-name');
+    if(!stock)return;
+    if(!m)return showToast('請選擇月份','error');
+    const c=stock.code,n=stock.name,nt=document.getElementById('r-notes').value.trim(),dId=`${c}_${m}`,eIdx=state.revenueRecords.findIndex(r=>r.id===dId);
+    let mn=nt;
+    if(eIdx!==-1){const o=state.revenueRecords[eIdx].notes||'';if(nt&&o&&o!==nt&&!o.includes(nt))mn=o+'；'+nt;else if(!nt)mn=o;}
+    const p={id:dId,month:m,code:c,name:n,notes:mn,createdAt:eIdx!==-1?state.revenueRecords[eIdx].createdAt:Date.now(),updatedAt:Date.now()};
+    if(eIdx!==-1)state.revenueRecords[eIdx]=p;else state.revenueRecords.push(p);
+    saveLocalData();renderRevenueRecords();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();await putDataToCloud(`revenueRecords/${dId}`,p);showToast('營收創高已建立');e.target.reset();document.getElementById('r-month').value=m;setTimeout(()=>document.getElementById('r-code').focus(),15);
+});
 document.getElementById('revenue-table-body')?.addEventListener('click',async e=>{const b=e.target.closest('[data-action]');if(!b)return;const a=b.dataset.action,id=b.dataset.id;if(a==='edit-notes'){const r=state.revenueRecords.find(x=>x.id===id);if(!r)return;window.openPromptModal("修改備註說明",r.notes||"",async nn=>{if(nn!==null){r.notes=nn.trim();r.updatedAt=Date.now();saveLocalData();renderRevenueRecords();await putDataToCloud(`revenueRecords/${id}`,r);showToast("修改成功");}});}else if(a==='delete-revenue'){window.openConfirmModal('確定刪除？',async()=>{state.revenueRecords=state.revenueRecords.filter(x=>x.id!==id);saveLocalData();renderRevenueRecords();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();await deleteDataFromCloud(`revenueRecords/${id}`);showToast('已刪除');});}});
 function renderRevenueRecords(){const tb=document.getElementById('revenue-table-body'),em=document.getElementById('revenue-empty');if(!tb||!em)return;let fr=state.revenueRecords;if(state.revenueFilters){if(state.revenueFilters.month)fr=fr.filter(r=>r.month===state.revenueFilters.month);if(state.revenueFilters.code){const query=state.revenueFilters.code.toLocaleLowerCase();fr=fr.filter(r=>[r.code,r.name,r.notes].some(value=>String(value||'').toLocaleLowerCase().includes(query)));}}if(fr.length===0){setHTMLIfChanged(tb,'');em.classList.remove('hidden');updateBatchUI('revenue');return;}em.classList.add('hidden');const sr=[...fr].sort((a,b)=>{let vA,vB;switch(state.revenueSortConfig.key){case'month':vA=a.month;vB=b.month;break;case'code':vA=a.code;vB=b.code;break;case'eps2025':vA=getEpsInfo(a.code,{}).eps2025??-9999;vB=getEpsInfo(b.code,{}).eps2025??-9999;break;case'eps2026':vA=getEpsInfo(a.code,{}).eps2026??-9999;vB=getEpsInfo(b.code,{}).eps2026??-9999;break;case'epsGrowth':vA=getEpsInfo(a.code,{}).epsGrowth??-9999;vB=getEpsInfo(b.code,{}).epsGrowth??-9999;break;case'targetPrice':vA=getEpsInfo(a.code,{}).targetPrice??-9999;vB=getEpsInfo(b.code,{}).targetPrice??-9999;break;case'notes':vA=a.notes||'';vB=b.notes||'';break;default:vA=a.createdAt||0;vB=b.createdAt||0;break;}if(vA===vB)return(b.createdAt||0)-(a.createdAt||0);return state.revenueSortConfig.asc?(vA>vB?1:-1):(vA>vB?-1:1);});let rh='';sr.forEach(r=>{const p=r.month.split('-'),dm=`${p[0]}/${p[1]}`,tc=MONTH_TEXT_COLORS[(parseInt(p[1],10)-1)%12],ei=getEpsInfo(r.code,{});rh+=`<tr class="table-row-hover border-b border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-sm"><td class="table-sticky-bg py-3 px-2 sm:px-3 text-center sticky left-0 z-20"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${r.id}" data-type="revenue" ${selectedIds['revenue'].has(r.id)?'checked':''}></td><td class="py-3 px-3 sm:px-4 font-bold ${tc}">${escapeHTML(dm)}</td><td class="py-3 px-3 sm:px-4"><span class="font-medium mr-2">${escapeHTML(r.code)}</span><span class="text-gray-600 dark:text-gray-300">${escapeHTML(r.name)}</span></td><td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2025)}</td><td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2026)}</td><td class="py-3 px-3 sm:px-4 text-right">${formatNumColor(ei.epsGrowth,true)}</td><td class="py-3 px-3 sm:px-4 text-right">${formatTargetPrice(ei.targetPrice)}</td><td class="py-3 px-3 sm:px-4 text-gray-600 dark:text-gray-300 w-full">${escapeHTML(r.notes||'')}</td><td class="py-3 px-3 sm:px-4 text-center whitespace-nowrap"><button class="mr-1 text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" data-action="edit-notes" data-id="${r.id}"><i class="fa-solid fa-comment-dots pointer-events-none"></i></button><button class="text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" data-action="delete-revenue" data-id="${r.id}"><i class="fa-solid fa-trash pointer-events-none"></i></button></td></tr>`;});setHTMLIfChanged(tb,rh);updateBatchUI('revenue');}
 
@@ -2438,14 +2491,25 @@ const pE=document.getElementById('p-entry'),pS=document.getElementById('p-stop')
 const updatePlanRiskPreview=()=>{const root=document.getElementById('plan-risk-preview'),entry=parseFloat(document.getElementById('p-entry')?.value),stop=parseFloat(document.getElementById('p-stop')?.value),target=parseFloat(document.getElementById('p-target')?.value),qty=Math.max(0.01,parseFloat(document.getElementById('p-qty')?.value)||1);if(!root)return;if(!Number.isFinite(entry)||!Number.isFinite(stop)){root.className='col-span-12 rounded-xl border border-green-200 dark:border-green-800/70 bg-green-50/70 dark:bg-green-900/15 px-3 py-2.5 text-xs text-gray-500 dark:text-gray-300';root.innerHTML='<i class="fa-solid fa-scale-balanced mr-1.5 text-green-600 dark:text-green-400"></i>輸入進場價、停損與停利後，自動計算風險報酬。';return;}const risk=entry-stop;if(risk<=0){root.className='col-span-12 rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20 px-3 py-2.5 text-xs font-bold text-amber-600 dark:text-amber-300';root.innerHTML='<i class="fa-solid fa-triangle-exclamation mr-1.5"></i>停損價需低於進場價。';return;}const shares=qty*1000,maxLoss=risk*shares,reward=Number.isFinite(target)?target-entry:NaN,ratio=Number.isFinite(reward)&&reward>0?reward/risk:NaN;root.className='col-span-12 rounded-xl border border-green-200 dark:border-green-800/70 bg-green-50/70 dark:bg-green-900/15 px-3 py-2.5 text-xs text-gray-600 dark:text-gray-200';root.innerHTML=`<div class="flex flex-wrap gap-x-5 gap-y-1"><span><b class="text-green-700 dark:text-green-300">預估最大風險</b> $${Math.round(maxLoss).toLocaleString('zh-TW')}</span><span><b class="text-blue-700 dark:text-blue-300">風險幅度</b> ${((risk/entry)*100).toFixed(2)}%</span><span><b class="text-red-600 dark:text-red-300">風險報酬比</b> ${Number.isFinite(ratio)?`1：${ratio.toFixed(2)}`:'請輸入有效停利價'}</span></div>`;};
 pE?.addEventListener('input',e=>{const v=parseFloat(e.target.value);if(!isNaN(v)&&pS)pS.value=(v*0.95).toFixed(2);updatePlanRiskPreview();});
 ['p-stop','p-target','p-qty'].forEach(id=>document.getElementById(id)?.addEventListener('input',updatePlanRiskPreview));
-document.getElementById('plan-form')?.addEventListener('submit',async e=>{e.preventDefault();const id=generateId(),d=document.getElementById('p-date').value,s=document.getElementById('p-stock').value.trim(),n=document.getElementById('p-name').value.trim(),q=Math.max(0.01,Math.round((parseFloat(document.getElementById('p-qty').value)||1)*100)/100),p={id,entryDate:d,stock:s,name:n,qty:q,entry:parseFloat(pE.value),stop:parseFloat(pS.value),target:parseFloat(document.getElementById('p-target').value)||null,note:document.getElementById('p-note').value.trim(),status:'持倉中',pnl:0,createdAt:Date.now(),updatedAt:Date.now()};state.plans.push(p);saveLocalData();renderPlans();await putDataToCloud(`plans/${id}`,p);showToast('建立成功');e.target.reset();updatePlanRiskPreview();document.getElementById('p-date').value=d;setTimeout(()=>document.getElementById('p-stock').focus(),15);});
+document.getElementById('plan-form')?.addEventListener('submit',async e=>{
+    e.preventDefault();
+    const stock=validateStockFormPair('p-stock','p-name');if(!stock)return;
+    const id=generateId(),d=document.getElementById('p-date').value,s=stock.code,n=stock.name,q=Math.max(0.01,Math.round((parseFloat(document.getElementById('p-qty').value)||1)*100)/100),p={id,entryDate:d,stock:s,name:n,qty:q,entry:parseFloat(pE.value),stop:parseFloat(pS.value),target:parseFloat(document.getElementById('p-target').value)||null,note:document.getElementById('p-note').value.trim(),status:'持倉中',pnl:0,createdAt:Date.now(),updatedAt:Date.now()};
+    state.plans.push(p);saveLocalData();renderPlans();await putDataToCloud(`plans/${id}`,p);showToast('建立成功');e.target.reset();updatePlanRiskPreview();document.getElementById('p-date').value=d;setTimeout(()=>document.getElementById('p-stock').focus(),15);
+});
 
 window.openCloseModal=(id,def,mode='close')=>{
     const m=document.getElementById('close-plan-modal'),ti=document.getElementById('close-plan-modal-title'),ef=document.getElementById('edit-plan-fields'),cf=document.getElementById('close-plan-fields'),ea=document.getElementById('edit-plan-actions');
     document.getElementById('modal-plan-id').value=id;
     if(mode==='edit'){ti.innerHTML='<i class="fa-solid fa-pen-to-square text-blue-500 mr-2"></i>修改交易規劃';ef.classList.remove('hidden');cf.classList.add('hidden');ea.classList.remove('hidden');const p=state.plans.find(x=>x.id===id);if(p){document.getElementById('modal-plan-date').value=p.entryDate||'';document.getElementById('modal-plan-status').value=p.status||'持倉中';document.getElementById('modal-plan-stock').value=p.stock||'';document.getElementById('modal-plan-name').value=p.name||'';document.getElementById('modal-plan-qty').value=p.qty||1;document.getElementById('modal-plan-entry').value=p.entry||'';document.getElementById('modal-plan-target').value=p.target||'';document.getElementById('modal-plan-stop').value=p.stop||'';document.getElementById('modal-plan-note').value=p.note||'';}}else{ti.innerHTML='平倉結算';ef.classList.add('hidden');cf.classList.remove('hidden');ea.classList.add('hidden');document.getElementById('modal-exit-price').value=def||'';}m.classList.remove('hidden');
 };
-document.getElementById('edit-plan-form').addEventListener('submit',async e=>{e.preventDefault();const id=document.getElementById('modal-plan-id').value,p=state.plans.find(x=>x.id===id);if(!p||document.getElementById('edit-plan-fields').classList.contains('hidden'))return;p.entryDate=document.getElementById('modal-plan-date').value;p.status=document.getElementById('modal-plan-status').value;p.stock=document.getElementById('modal-plan-stock').value.trim();p.name=document.getElementById('modal-plan-name').value.trim();p.qty=Math.max(0.01,Math.round((parseFloat(document.getElementById('modal-plan-qty').value)||1)*100)/100);p.entry=parseFloat(document.getElementById('modal-plan-entry').value)||0;p.target=parseFloat(document.getElementById('modal-plan-target').value)||null;p.stop=parseFloat(document.getElementById('modal-plan-stop').value)||0;p.note=document.getElementById('modal-plan-note').value.trim();p.updatedAt=Date.now();if(p.status!=='持倉中'&&!p.exitPrice)p.pnl=0;else if(p.status==='持倉中'){p.exitPrice=null;p.pnl=0;}saveLocalData();renderPlans();await putDataToCloud(`plans/${id}`,p);document.getElementById('close-plan-modal').classList.add('hidden');showToast('更新成功');});
+document.getElementById('edit-plan-form').addEventListener('submit',async e=>{
+    e.preventDefault();
+    const id=document.getElementById('modal-plan-id').value,p=state.plans.find(x=>x.id===id);
+    if(!p||document.getElementById('edit-plan-fields').classList.contains('hidden'))return;
+    const stock=validateStockFormPair('modal-plan-stock','modal-plan-name');if(!stock)return;
+    p.entryDate=document.getElementById('modal-plan-date').value;p.status=document.getElementById('modal-plan-status').value;p.stock=stock.code;p.name=stock.name;p.qty=Math.max(0.01,Math.round((parseFloat(document.getElementById('modal-plan-qty').value)||1)*100)/100);p.entry=parseFloat(document.getElementById('modal-plan-entry').value)||0;p.target=parseFloat(document.getElementById('modal-plan-target').value)||null;p.stop=parseFloat(document.getElementById('modal-plan-stop').value)||0;p.note=document.getElementById('modal-plan-note').value.trim();p.updatedAt=Date.now();if(p.status!=='持倉中'&&!p.exitPrice)p.pnl=0;else if(p.status==='持倉中'){p.exitPrice=null;p.pnl=0;}saveLocalData();renderPlans();await putDataToCloud(`plans/${id}`,p);document.getElementById('close-plan-modal').classList.add('hidden');showToast('更新成功');
+});
 document.getElementById('btn-cancel-modal')?.addEventListener('click',e=>{e.preventDefault();document.getElementById('close-plan-modal').classList.add('hidden');});
 const closeTrade=st=>{window.openConfirmModal(`確定以「${st}」結算？`,async()=>{const id=document.getElementById('modal-plan-id').value,ex=parseFloat(document.getElementById('modal-exit-price').value);if(isNaN(ex))return showToast('無效金額','error');const p=state.plans.find(x=>x.id===id);if(!p)return;const pnl=Math.round((ex-p.entry)*p.qty*1000);p.status=st;p.exitPrice=ex;p.pnl=pnl;p.updatedAt=Date.now();saveLocalData();renderPlans();await putDataToCloud(`plans/${id}`,p);document.getElementById('close-plan-modal').classList.add('hidden');showToast(`結算損益: $${pnl}`);});};
 document.getElementById('btn-win')?.addEventListener('click',()=>closeTrade('已停利')); document.getElementById('btn-loss')?.addEventListener('click',()=>closeTrade('已停損'));
@@ -2528,7 +2592,14 @@ document.getElementById('report-reader-content-wrap')?.addEventListener('touchst
 document.getElementById('report-reader-content-wrap')?.addEventListener('touchend',e=>{if(!reportReaderTouchStart)return;const touch=e.changedTouches[0];if(!touch)return;const dx=touch.clientX-reportReaderTouchStart.x,dy=touch.clientY-reportReaderTouchStart.y;reportReaderTouchStart=null;if(Math.abs(dx)>=55&&Math.abs(dx)>Math.abs(dy))moveReportReader(dx>0?-1:1);},{passive:true});
 document.addEventListener('keydown',e=>{const modal=document.getElementById('report-reader-modal');if(!modal||modal.classList.contains('hidden'))return;if(e.key==='ArrowLeft'){e.preventDefault();moveReportReader(-1);}else if(e.key==='ArrowRight'){e.preventDefault();moveReportReader(1);}else if(e.key==='Escape'){e.preventDefault();closeReportReader();}});
 
-document.getElementById('report-form')?.addEventListener('submit',async e=>{e.preventDefault();const d=document.getElementById('rep-date').value,c=document.getElementById('rep-code').value.trim(),n=document.getElementById('rep-name').value.trim(),con=document.getElementById('rep-content').value.trim();if(!c||!n||!con||!d)return;const id=`${c}_${Date.now()}`,p={id,date:d,code:c,name:n,content:con,createdAt:Date.now(),updatedAt:Date.now()};state.reports.push(p);saveLocalData();renderReports();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();await putDataToCloud(`reports/${id}`,p);showToast('報告已加入');e.target.reset();document.getElementById('rep-date').value=d;setTimeout(()=>document.getElementById('rep-code').focus(),15);});
+document.getElementById('report-form')?.addEventListener('submit',async e=>{
+    e.preventDefault();
+    const d=document.getElementById('rep-date').value,stock=validateStockFormPair('rep-code','rep-name'),con=document.getElementById('rep-content').value.trim();
+    if(!stock)return;
+    if(!con||!d)return showToast(!d?'請選擇報告日期':'請輸入報告摘要','error');
+    const c=stock.code,n=stock.name,id=`${c}_${Date.now()}`,p={id,date:d,code:c,name:n,content:con,createdAt:Date.now(),updatedAt:Date.now()};
+    state.reports.push(p);saveLocalData();renderReports();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();await putDataToCloud(`reports/${id}`,p);showToast('報告已加入');e.target.reset();document.getElementById('rep-date').value=d;setTimeout(()=>document.getElementById('rep-code').focus(),15);
+});
 document.getElementById('report-table-body')?.addEventListener('click',async e=>{
     const button=e.target.closest('[data-action]');if(!button)return;
     const action=button.dataset.action,id=button.dataset.id;
@@ -2556,9 +2627,13 @@ function renderChkCheckboxGrid(){const g=document.getElementById('chk-checkbox-g
 window.toggleChkItem=i=>{chkSelectedItems.has(i)?chkSelectedItems.delete(i):chkSelectedItems.add(i);renderChkCheckboxGrid();};
 const setChkDirection=d=>{chkCurrentDirection=d;chkSelectedItems.clear();const l=document.getElementById('chk-btn-long'),s=document.getElementById('chk-btn-short');if(l&&s){if(d==='long'){l.className="flex-1 sm:flex-none px-6 py-2 rounded-lg text-sm font-bold transition-all bg-gray-100 dark:bg-gray-700 text-red-500 shadow-sm border border-gray-200 dark:border-gray-600";s.className="flex-1 sm:flex-none px-6 py-2 rounded-lg text-sm font-bold transition-all text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 border border-transparent";}else{s.className="flex-1 sm:flex-none px-6 py-2 rounded-lg text-sm font-bold transition-all bg-gray-100 dark:bg-gray-700 text-emerald-500 shadow-sm border border-gray-200 dark:border-gray-600";l.className="flex-1 sm:flex-none px-6 py-2 rounded-lg text-sm font-bold transition-all text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 border border-transparent";}}renderChkCheckboxGrid();};
 document.getElementById('chk-btn-long')?.addEventListener('click',()=>setChkDirection('long')); document.getElementById('chk-btn-short')?.addEventListener('click',()=>setChkDirection('short'));
-const resetChkForm=()=>{chkEditingId=null;document.getElementById('chk-form-title').innerText='建立新查核';['chk-code','chk-name','chk-pressure','chk-support','chk-target','chk-chips-inst','chk-chips-conc','chk-cost','chk-notes'].forEach(id=>{const el=document.getElementById(id); if(el) el.value='';});const p=document.getElementById('chk-preview');if(p)p.classList.add('hidden');setChkDirection('long');};
+const resetChkForm=()=>{chkEditingId=null;document.getElementById('chk-form-title').innerText='建立新查核';['chk-code','chk-name','chk-pressure','chk-support','chk-target','chk-chips-inst','chk-chips-conc','chk-cost','chk-notes'].forEach(id=>{const el=document.getElementById(id); if(el) el.value='';});setStockPairValidity(document.getElementById('chk-code'),document.getElementById('chk-name'),'');const p=document.getElementById('chk-preview');if(p)p.classList.add('hidden');setChkDirection('long');};
 document.getElementById('chk-btn-cancel')?.addEventListener('click',resetChkForm);
-document.getElementById('chk-btn-submit')?.addEventListener('click',async()=>{const d=document.getElementById('chk-date').value,c=document.getElementById('chk-code').value.trim(),n=document.getElementById('chk-name').value.trim();if(!c||!n)return showToast('請完整輸入！','error');const isEditing=!!chkEditingId,p={id:chkEditingId||generateId(),date:d,code:c,name:n,direction:chkCurrentDirection,checkedItems:Array.from(chkSelectedItems),details:{pressure:document.getElementById('chk-pressure').value.trim(),support:document.getElementById('chk-support').value.trim(),target:document.getElementById('chk-target').value.trim(),chipsInst:document.getElementById('chk-chips-inst').value.trim(),chipsConc:document.getElementById('chk-chips-conc').value.trim(),cost:document.getElementById('chk-cost').value.trim(),notes:document.getElementById('chk-notes').value.trim()},createdAt:chkEditingId?(state.checklists.find(x=>x.id===chkEditingId)?.createdAt||Date.now()):Date.now(),updatedAt:Date.now()};if(chkEditingId){const i=state.checklists.findIndex(x=>x.id===chkEditingId);if(i!==-1)state.checklists[i]=p;}else state.checklists.push(p);resetChkForm();saveLocalData();renderChecklists();await putDataToCloud(`checklists/${p.id}`,p);showToast(isEditing?'更新成功':'建立成功');});
+document.getElementById('chk-btn-submit')?.addEventListener('click',async()=>{
+    const d=document.getElementById('chk-date').value,stock=validateStockFormPair('chk-code','chk-name');if(!stock)return;
+    const c=stock.code,n=stock.name,isEditing=!!chkEditingId,p={id:chkEditingId||generateId(),date:d,code:c,name:n,direction:chkCurrentDirection,checkedItems:Array.from(chkSelectedItems),details:{pressure:document.getElementById('chk-pressure').value.trim(),support:document.getElementById('chk-support').value.trim(),target:document.getElementById('chk-target').value.trim(),chipsInst:document.getElementById('chk-chips-inst').value.trim(),chipsConc:document.getElementById('chk-chips-conc').value.trim(),cost:document.getElementById('chk-cost').value.trim(),notes:document.getElementById('chk-notes').value.trim()},createdAt:chkEditingId?(state.checklists.find(x=>x.id===chkEditingId)?.createdAt||Date.now()):Date.now(),updatedAt:Date.now()};
+    if(chkEditingId){const i=state.checklists.findIndex(x=>x.id===chkEditingId);if(i!==-1)state.checklists[i]=p;}else state.checklists.push(p);resetChkForm();saveLocalData();renderChecklists();await putDataToCloud(`checklists/${p.id}`,p);showToast(isEditing?'更新成功':'建立成功');
+});
 
 function renderChecklists(){const tb=document.getElementById('checklist-table-body'),em=document.getElementById('checklist-empty');if(!tb||!em)return;if(!state.checklists||state.checklists.length===0){setHTMLIfChanged(tb,'');em.classList.remove('hidden');updateBatchUI('checklist');return;}em.classList.add('hidden');const sc=[...state.checklists].sort((a,b)=>{let vA,vB;switch(state.checklistSortConfig?state.checklistSortConfig.key:'createdAt'){case'date':vA=a.date;vB=b.date;break;case'code':vA=a.code;vB=b.code;break;case'direction':vA=a.direction||'';vB=b.direction||'';break;case'match':vA=(a.checkedItems?.length||0)/(CHK_CONFIG[a.direction]?.length||1);vB=(b.checkedItems?.length||0)/(CHK_CONFIG[b.direction]?.length||1);break;case'target':vA=parseFloat(a.details?.target)||-9999;vB=parseFloat(b.details?.target)||-9999;break;default:vA=a.createdAt||0;vB=b.createdAt||0;break;}if(vA===vB)return(b.createdAt||0)-(a.createdAt||0);return (state.checklistSortConfig?state.checklistSortConfig.asc:false)?(vA>vB?1:-1):(vA>vB?-1:1);});let rh='';sc.forEach(r=>{const t=CHK_CONFIG[r.direction]?.length||1,c=r.checkedItems?.length||0,s=Math.round((c/t)*100)||0,bc=s>70?(r.direction==='long'?'bg-red-500':'bg-emerald-500'):'bg-amber-400',db=r.direction==='long'?'<span class="px-2.5 py-1 bg-red-50 text-red-700 text-xs font-bold rounded-lg border border-red-200">📈 多方</span>':'<span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-lg border border-emerald-200">📉 空方</span>',fd=r.date?r.date.replace(/-/g,'/'):'';rh+=`<tr class="table-row-hover border-b border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-sm"><td class="table-sticky-bg py-3 px-2 w-[40px] text-center sticky left-0 z-20"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${r.id}" data-type="checklist" ${selectedIds['checklist']&&selectedIds['checklist'].has(r.id)?'checked':''}></td><td class="py-3 px-2 sm:px-3 font-medium text-gray-600 dark:text-gray-400">${escapeHTML(fd)}</td><td class="py-3 px-2 sm:px-3"><div class="font-bold text-gray-800 dark:text-gray-200">${escapeHTML(r.code)}</div><div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">${escapeHTML(r.name)}</div></td><td class="py-3 px-2 sm:px-3 text-center">${db}</td><td class="py-3 px-2 sm:px-3"><div class="flex items-center gap-3"><div class="w-24 bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden"><div class="h-full rounded-full ${bc}" style="width:${s}%"></div></div><span class="text-xs font-bold text-gray-600 dark:text-gray-400">${c}/${t}</span></div></td><td class="py-3 px-2 sm:px-3 text-right font-bold text-gray-800 dark:text-gray-200">${r.details?.target?'$'+escapeHTML(r.details.target):'-'}</td><td class="py-3 px-2 sm:px-3 text-center whitespace-nowrap"><button class="mr-1 text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" data-action="edit-checklist" data-id="${r.id}"><i class="fa-solid fa-pen pointer-events-none"></i></button><button class="text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" data-action="delete-checklist" data-id="${r.id}"><i class="fa-solid fa-trash pointer-events-none"></i></button></td></tr>`;});setHTMLIfChanged(tb,rh);updateBatchUI('checklist');}
 document.getElementById('checklist-table-body')?.addEventListener('click',async e=>{const b=e.target.closest('[data-action]');if(!b)return;const a=b.dataset.action,id=b.dataset.id;if(a==='delete-checklist'){window.openConfirmModal('確定刪除？',async()=>{state.checklists=state.checklists.filter(c=>c.id!==id);saveLocalData();renderChecklists();await deleteDataFromCloud(`checklists/${id}`);showToast('已刪除');});}else if(a==='edit-checklist'){const r=state.checklists.find(c=>c.id===id);if(!r)return;chkEditingId=id;document.getElementById('chk-form-title').innerText='編輯查核紀錄';document.getElementById('chk-date').value=r.date;document.getElementById('chk-code').value=r.code;document.getElementById('chk-name').value=r.name;setChkDirection(r.direction);chkSelectedItems=new Set(r.checkedItems||[]);renderChkCheckboxGrid();document.getElementById('chk-pressure').value=r.details?.pressure||'';document.getElementById('chk-support').value=r.details?.support||'';document.getElementById('chk-target').value=r.details?.target||'';document.getElementById('chk-chips-inst').value=r.details?.chipsInst||'';document.getElementById('chk-chips-conc').value=r.details?.chipsConc||'';document.getElementById('chk-cost').value=r.details?.cost||'';document.getElementById('chk-notes').value=r.details?.notes||'';updatePreview(r.code,'chk-preview','cyan');document.querySelector('[data-target="module-checklist"]').click();window.scrollTo({top:0,behavior:'smooth'});}});
@@ -2989,7 +3064,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
     });
 
     loadLocalData(); clearTransientSearchFields(); initStreakBaseDate(); updateStreakModeUI(); initStreakPanelToggle(); renderCustomMarketHolidays(); syncDuplicateCompareToggles(); renderDynamicTags(); bindDatalistAutoUpdate();
-    bindAutoFill('j-code','j-name',c=>updatePreview(c,'j-preview','blue')); bindAutoFill('overview-code','overview-name',c=>{if(c)renderStockOverview(c);}); bindAutoFill('c-code','c-name'); bindAutoFill('r-code','r-name'); bindAutoFill('rep-code','rep-name'); bindAutoFill('p-stock','p-name'); bindAutoFill('modal-plan-stock','modal-plan-name'); 
+    bindAutoFill('j-code','j-name',c=>updatePreview(c,'j-preview','blue'),true); bindAutoFill('overview-code','overview-name',c=>{if(c)renderStockOverview(c);}); bindAutoFill('c-code','c-name'); bindAutoFill('r-code','r-name',null,true); bindAutoFill('rep-code','rep-name',null,true); bindAutoFill('p-stock','p-name',null,true); bindAutoFill('modal-plan-stock','modal-plan-name',null,true); 
     bindAutoFill('chk-code','chk-name',c=>{
         updatePreview(c,'chk-preview','cyan');
         const tp = document.getElementById('chk-target');
@@ -2998,7 +3073,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
         } else if (tp) {
             tp.value = '';
         }
-    });
+    },true);
     ['chk-code','chk-name'].forEach(id=>document.getElementById(id)?.addEventListener('keydown',e=>{
         if(e.key==='Enter'){
             e.preventDefault();
