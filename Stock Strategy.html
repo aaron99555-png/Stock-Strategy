@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="107">
+<meta name="app-version" content="109">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -74,6 +74,7 @@ html.viewer-mode #streak-clear-holidays-btn,
 html.viewer-mode [data-remove-holiday],
 html.viewer-mode #btn-tag-manager,
 html.viewer-mode #btn-trash-manager,
+html.viewer-mode #btn-undo-import,
 html.viewer-mode #btn-db-upload,
 html.viewer-mode #btn-import-backup,
 html.viewer-mode #btn-export-backup,
@@ -520,6 +521,7 @@ html.dark body main :is(#module-journal,#module-favorites,#module-revenue,#modul
     <button type="button" data-mobile-tool-target="btn-admin-mode" class="w-full min-h-[44px] rounded-lg px-3 text-left text-sm font-bold text-blue-600 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/30"><i class="fa-solid fa-lock w-6" data-mobile-admin-icon></i><span data-mobile-admin-label>管理者登入</span></button>
     <div data-admin-mobile-tool class="my-1 border-t border-gray-200 dark:border-gray-700"></div>
     <button type="button" data-admin-mobile-tool data-mobile-tool-target="btn-db-upload" class="w-full min-h-[44px] rounded-lg px-3 text-left text-sm font-bold text-purple-600 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/30"><i class="fa-solid fa-database w-6"></i>券商報告／資料庫</button>
+    <button type="button" data-admin-mobile-tool data-mobile-tool-target="btn-undo-import" class="w-full min-h-[44px] rounded-lg px-3 text-left text-sm font-bold text-amber-600 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-900/30"><i class="fa-solid fa-clock-rotate-left w-6"></i>復原上次匯入</button>
     <button type="button" data-admin-mobile-tool data-mobile-tool-target="btn-import-backup" class="w-full min-h-[44px] rounded-lg px-3 text-left text-sm font-bold text-gray-600 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fa-solid fa-upload w-6"></i>匯入備份</button>
     <button type="button" data-admin-mobile-tool data-mobile-tool-target="btn-export-backup" class="w-full min-h-[44px] rounded-lg px-3 text-left text-sm font-bold text-gray-600 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fa-solid fa-download w-6"></i>匯出備份</button>
 </div>
@@ -949,7 +951,7 @@ html.dark body main :is(#module-journal,#module-favorites,#module-revenue,#modul
                         <span class="text-xs text-gray-500 dark:text-gray-400 px-1 sm:px-2 hidden sm:inline"><i class="fa-solid fa-filter mr-1"></i>區間</span>
                         <input type="date" id="filter-rep-start" class="bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-0.5 sm:px-1 w-[75px] sm:w-auto text-center h-full box-border m-0">
                         <span class="text-gray-400 mx-0.5 sm:mx-1">-</span>
-                        <input type="date" id="filter-rep-end" class="filter-end bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-0.5 sm:px-1 w-[75px] sm:w-auto text-center h-full box-border m-0">
+                        <input type="date" id="filter-rep-end" class="bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-0.5 sm:px-1 w-[75px] sm:w-auto text-center h-full box-border m-0">
                     </div>
                     <div class="flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 h-[38px] sm:h-auto box-border">
                         <i class="fa-solid fa-search text-gray-400 text-[10px] sm:text-xs ml-1 sm:ml-2"></i>
@@ -1368,6 +1370,7 @@ let cloudSyncInterval=null, state={journals:[],plans:[],revenueRecords:[],report
 const selectedIds={journal:new Set(),fav:new Set(),plan:new Set(),revenue:new Set(),report:new Set(),checklist:new Set()};
 
 const escapeHTML=str=>(!str&&str!==0)?'':String(str).replace(/[&<>'"]/g,tag=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[tag]||tag));
+const setHTMLIfChanged=(element,html)=>{if(!element)return false;if(element.__ryanRenderedHTML===html)return false;element.innerHTML=html;element.__ryanRenderedHTML=html;return true;};
 const normalizeStockCodeValue=value=>{
     let code=String(value??'').trim().toUpperCase().replace(/\.0+$/,'');
     if(/^\d{1,3}$/.test(code))code=code.padStart(4,'0');
@@ -1754,7 +1757,7 @@ const initCollapsible=(buttonId,wrapperId,chevronId,pinButtonId,pinKey,label,par
 };
 
 const setupLogicBtns=(sel,fKey,cb)=>{
-    document.querySelectorAll(sel).forEach(btn=>{btn.addEventListener('click',e=>{const lg=e.target.dataset.logic;state[fKey].tagLogic=lg;document.querySelectorAll(sel).forEach(b=>{b.classList.remove('bg-white','dark:bg-gray-700','text-blue-600','dark:text-blue-400','shadow-sm');b.classList.add('text-gray-500','dark:text-gray-400','hover:text-gray-700','dark:hover:text-gray-200');});e.target.classList.remove('text-gray-500','dark:text-gray-400','hover:text-gray-700','dark:hover:text-gray-200');e.target.classList.add('bg-white','dark:bg-gray-700','text-blue-600','dark:text-blue-400','shadow-sm');cb();saveLocalData();});});
+    document.querySelectorAll(sel).forEach(btn=>{btn.addEventListener('click',e=>{const lg=e.target.dataset.logic;state[fKey].tagLogic=lg;document.querySelectorAll(sel).forEach(b=>{b.classList.remove('bg-white','dark:bg-gray-700','text-blue-600','dark:text-blue-400','shadow-sm');b.classList.add('text-gray-500','dark:text-gray-400','hover:text-gray-700','dark:hover:text-gray-200');});e.target.classList.remove('text-gray-500','dark:text-gray-400','hover:text-gray-700','dark:hover:text-gray-200');e.target.classList.add('bg-white','dark:bg-gray-700','text-blue-600','dark:text-blue-400','shadow-sm');cb();});});
 };
 
 const JOURNAL_FORM_TAG_KEY='ryan_journal_form_tag_v1';
@@ -1814,7 +1817,7 @@ function renderDynamicTags(){
                 state.favFilters.tags=state.favFilters.tags.filter(t=>t!==v);
             }
             document.querySelectorAll('.filter-tag-cb').forEach(c=>{if(c.value===v)c.checked=isC;});
-            renderFilterTags();processAndRenderJournals();renderFavorites();saveLocalData();
+            renderFilterTags();processAndRenderJournals();renderFavorites();
         });
     });
 }
@@ -1823,7 +1826,7 @@ window.removeFilterTag=tag=>{
     state.filters.tags=state.filters.tags.filter(t=>t!==tag);
     state.favFilters.tags=state.favFilters.tags.filter(t=>t!==tag);
     document.querySelectorAll('.filter-tag-cb').forEach(cb=>{if(cb.value===tag)cb.checked=false;});
-    renderFilterTags();processAndRenderJournals();renderFavorites();saveLocalData();
+    renderFilterTags();processAndRenderJournals();renderFavorites();
 };
 
 function renderFilterTags(){
@@ -1837,7 +1840,11 @@ document.addEventListener('click',event=>{const button=event.target.closest('[da
 ['', '-fav'].forEach(s=>{const b=document.getElementById('filter-tag-btn'+s),p=document.getElementById('filter-tag-panel'+s);if(b&&p){b.addEventListener('click',e=>{e.stopPropagation();p.classList.toggle('hidden');});document.addEventListener('click',e=>{if(!p.contains(e.target)&&e.target!==b)p.classList.add('hidden');});}});
 
 let lastLocalSaveErrorAt=0;
-const getPersistableState=()=>hasStoredAdminAccess()?state:{...state,journals:(state.journals||[]).map(sanitizeJournalForViewer),plans:[],trash:[]};
+const getPersistableState=()=>{
+    const persisted=hasStoredAdminAccess()?{...state}:{...state,journals:(state.journals||[]).map(sanitizeJournalForViewer),plans:[],trash:[]};
+    ['filters','favFilters','revenueFilters','reportFilters','journalFiltersDefaultTodayV1','reportFiltersDefaultAllV1'].forEach(key=>delete persisted[key]);
+    return persisted;
+};
 function saveLocalData(){
     try{localStorage.setItem(LOCAL_STORAGE_KEY,JSON.stringify(getPersistableState()));return true;}
     catch(error){console.error('本機資料儲存失敗',error);if(Date.now()-lastLocalSaveErrorAt>15000){lastLocalSaveErrorAt=Date.now();showToast('本機儲存空間不足，請先匯出備份或清理瀏覽器空間','error');}return false;}
@@ -1881,21 +1888,31 @@ const sanitizeCloudJournalPayload=value=>{
     return value;
 };
 const PUBLIC_CLOUD_PATHS={journals:'publicJournals',revenueRecords:'revenueRecords',reports:'reports',checklists:'checklists',tagSettings:'tagSettings',epsData:'epsData',customMarketHolidaySettings:'customMarketHolidaySettings'};
-const fetchCloudJSON=async path=>{
-    const response=await fetch(`${DB_URL}/data/${getSyncPath()}/${path}.json`,{cache:'no-store'});
+const cloudReadCache=new Map();let conditionalCloudReadSupported=true;
+const hashCloudText=text=>{let hash=2166136261;for(let index=0;index<text.length;index++){hash^=text.charCodeAt(index);hash=Math.imul(hash,16777619);}return(hash>>>0).toString(36);};
+const getCloudReadURL=path=>`${DB_URL}/data/${getSyncPath()}${path?`/${path}`:''}.json`;
+const readCloudResource=async path=>{
+    const cached=cloudReadCache.get(path),headers={};
+    if(conditionalCloudReadSupported){headers['X-Firebase-ETag']='true';if(cached?.etag)headers['If-None-Match']=cached.etag;}
+    let response;
+    try{response=await fetch(getCloudReadURL(path),{cache:'no-store',headers});}
+    catch(error){
+        if(!conditionalCloudReadSupported)throw error;
+        conditionalCloudReadSupported=false;response=await fetch(getCloudReadURL(path),{cache:'no-store'});
+    }
+    if(response.status===304&&cached)return{value:cached.value,notModified:true,signature:cached.signature};
     if(!response.ok){const error=new Error(`雲端讀取失敗 (${response.status})`);error.status=response.status;throw error;}
-    return response.json();
+    const text=await response.text(),value=text?JSON.parse(text):null,etag=response.headers.get('ETag')||'',signature=etag||hashCloudText(text);
+    cloudReadCache.set(path,{value,etag,signature});return{value,notModified:false,signature};
 };
 const fetchCloudPayload=async adminAccess=>{
     if(adminAccess){
-        const response=await fetch(`${DB_URL}/data/${getSyncPath()}.json`,{cache:'no-store'});
-        if(!response.ok){const error=new Error(`雲端讀取失敗 (${response.status})`);error.status=response.status;throw error;}
-        return response.json();
+        const resource=await readCloudResource('');return{data:resource.value,notModified:resource.notModified,signature:`admin|${resource.signature}`};
     }
-    const entries=await Promise.all(Object.entries(PUBLIC_CLOUD_PATHS).map(async([key,path])=>[key,await fetchCloudJSON(path)]));
-    const payload=Object.fromEntries(entries);
-    if(payload.journals==null)payload.journals=sanitizeCloudJournalPayload(await fetchCloudJSON('journals'));
-    return payload;
+    const entries=await Promise.all(Object.entries(PUBLIC_CLOUD_PATHS).map(async([key,path])=>[key,await readCloudResource(path)]));
+    const payload=Object.fromEntries(entries.map(([key,resource])=>[key,resource.value]));
+    if(payload.journals==null)payload.journals={};
+    return{data:payload,notModified:entries.every(([,resource])=>resource.notModified),signature:`viewer|${entries.map(([key,resource])=>`${key}:${resource.signature}`).join('|')}`};
 };
 const hasCollectionRecords=value=>Array.isArray(value)?value.some(Boolean):!!(value&&typeof value==='object'&&Object.keys(value).length);
 const hasSyncPayload=data=>!!(data&&(hasCollectionRecords(data.journals)||hasCollectionRecords(data.plans)||hasCollectionRecords(data.revenueRecords)||hasCollectionRecords(data.reports)||hasCollectionRecords(data.checklists)||hasCollectionRecords(data.trash)||hasCollectionRecords(data.epsData)||hasCollectionRecords(data.tagSettings?.categories)||hasCollectionRecords(data.customMarketHolidaySettings?.dates)));
@@ -1919,8 +1936,8 @@ async function performCloudLoad(showError,forceApply,adminAccess){
     if(!isCloudMode())return false;
     try{
         if(adminAccess&&!(await flushPendingCloudWrites(false))){if(showError)showToast('尚有本機資料等待同步，已停止雲端覆蓋','error');return false;}
-        const d=await fetchCloudPayload(adminAccess),signature=`${adminAccess?'admin':'viewer'}|${JSON.stringify(d??null)}`;
-        if(!forceApply&&signature===lastAppliedCloudSignature){markCloudSyncSuccess();return true;}
+        const cloudResult=await fetchCloudPayload(adminAccess),d=cloudResult.data,signature=cloudResult.signature;
+        if(!forceApply&&(cloudResult.notModified||signature===lastAppliedCloudSignature)){markCloudSyncSuccess();return true;}
         const hasRemoteData=adminAccess?d!=null:Object.values(d||{}).some(value=>value!=null);
         if(hasRemoteData){
             state.journals=cloudCollection(d.journals).map(item=>adminAccess?item:sanitizeJournalForViewer(item));
@@ -2003,40 +2020,57 @@ function loadLocalData(){
     if(!state.revenueRecords)state.revenueRecords=[]; if(!state.reports)state.reports=[]; if(!state.checklists)state.checklists=[]; if(!Array.isArray(state.trash))state.trash=[];
     const normalizedLocalReports=normalizeReportRecords(state.reports);state.reports=normalizedLocalReports.records;
     const normalizedMarketHolidays=normalizeCustomMarketHolidays(state.customMarketHolidays),migratedMarketHolidays=JSON.stringify(normalizedMarketHolidays)!==JSON.stringify(state.customMarketHolidays||[]);state.customMarketHolidays=normalizedMarketHolidays;
-    if(!state.filters)state.filters={start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,tags:[],minScore:0,tagLogic:'OR'};
-    if(!state.favFilters)state.favFilters={start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,tags:[],minScore:0,tagLogic:'OR'};
-    const migratedFilterTags=normalizeFilterStrategyTags(state.filters)|normalizeFilterStrategyTags(state.favFilters);
-    if(!state.revenueFilters)state.revenueFilters={month:'',code:''}; if(!state.reportFilters)state.reportFilters={start:'',end:'',code:''};
+    resetSessionFiltersToDefaults(false);
     if(state.copyCompareDuplicates===undefined)state.copyCompareDuplicates=false;
-    let migratedJournalFilter=false;
-    if(!state.journalFiltersDefaultTodayV1){const today=getToday();state.filters={...state.filters,start:today,end:today};state.journalFiltersDefaultTodayV1=true;migratedJournalFilter=true;}
-    let migratedReportFilter=false;
-    if(!state.reportFiltersDefaultAllV1){state.reportFilters={start:'',end:'',code:''};state.reportFiltersDefaultAllV1=true;migratedReportFilter=true;}
-    if(state.filters.tagLogic===undefined)state.filters.tagLogic='OR'; if(state.favFilters.tagLogic===undefined)state.favFilters.tagLogic='OR';
-    if(state.filters.revenueHigh===undefined)state.filters.revenueHigh=false; if(state.favFilters.revenueHigh===undefined)state.favFilters.revenueHigh=false;
-    if(state.filters.code===undefined)state.filters.code=''; if(state.favFilters.code===undefined)state.favFilters.code='';
     if(!state.reportSortConfig)state.reportSortConfig={key:'date',asc:false}; if(!state.checklistSortConfig)state.checklistSortConfig={key:'date',asc:false};
     const removedAdminLocalData=!hasStoredAdminAccess()&&((state.plans||[]).length||(state.trash||[]).length||(state.journals||[]).some(item=>Object.prototype.hasOwnProperty.call(item||{},'isFavorite')));
     if(!hasStoredAdminAccess())stripAdminState();
-    if(migratedStrategyTags||migratedFilterTags||migratedJournalFilter||migratedReportFilter||migratedMarketHolidays||normalizedLocalReports.changed||removedAdminLocalData)saveLocalData();
-    const applyLogicState=(lv,sel)=>{document.querySelectorAll(sel).forEach(b=>{if(b.dataset.logic===lv){b.classList.remove('text-gray-500','dark:text-gray-400','hover:text-gray-700','dark:hover:text-gray-200');b.classList.add('bg-white','dark:bg-gray-700','text-blue-600','dark:text-blue-400','shadow-sm');}else{b.classList.remove('bg-white','dark:bg-gray-700','text-blue-600','dark:text-blue-400','shadow-sm');b.classList.add('text-gray-500','dark:text-gray-400','hover:text-gray-700','dark:hover:text-gray-200');}});};
-    applyLogicState(state.filters.tagLogic,'.logic-btn'); applyLogicState(state.favFilters.tagLogic,'.logic-btn-fav');
+    if(migratedStrategyTags||migratedMarketHolidays||normalizedLocalReports.changed||removedAdminLocalData)saveLocalData();
+    applyFilterLogicState(state.filters.tagLogic,'.logic-btn'); applyFilterLogicState(state.favFilters.tagLogic,'.logic-btn-fav');
+}
+
+function createDefaultJournalFilters(){const today=getToday();return{start:today,end:today,code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,tags:[],minScore:0,tagLogic:'OR'};}
+function applyFilterLogicState(logic,selector){
+    document.querySelectorAll(selector).forEach(button=>{
+        const active=button.dataset.logic===(logic||'OR');
+        button.classList.toggle('bg-white',active);button.classList.toggle('dark:bg-gray-700',active);button.classList.toggle('text-blue-600',active);button.classList.toggle('dark:text-blue-400',active);button.classList.toggle('shadow-sm',active);
+        button.classList.toggle('text-gray-500',!active);button.classList.toggle('dark:text-gray-400',!active);button.classList.toggle('hover:text-gray-700',!active);button.classList.toggle('dark:hover:text-gray-200',!active);
+    });
+}
+function resetSessionFiltersToDefaults(syncControls=false){
+    state.filters=createDefaultJournalFilters();
+    state.favFilters=createDefaultJournalFilters();
+    state.revenueFilters={month:'',code:''};
+    state.reportFilters={start:'',end:'',code:''};
+    if(!syncControls)return;
+    const today=state.filters.start;
+    document.querySelectorAll('.filter-start').forEach(input=>input.value=today);
+    document.querySelectorAll('.filter-end').forEach(input=>input.value=today);
+    document.querySelectorAll('.filter-code').forEach(input=>input.value='');
+    document.querySelectorAll('.filter-futures,.filter-exclude-negative-growth,.filter-revenue-high').forEach(input=>input.checked=false);
+    document.querySelectorAll('.filter-score').forEach(input=>input.value='0');
+    document.querySelectorAll('.filter-tag-cb').forEach(input=>input.checked=false);
+    const revenueMonth=document.getElementById('filter-revenue-month'),revenueCode=document.getElementById('filter-revenue-code');
+    if(revenueMonth)revenueMonth.value='';if(revenueCode)revenueCode.value='';
+    ['filter-rep-start','filter-rep-end','filter-rep-code'].forEach(id=>{const input=document.getElementById(id);if(input)input.value='';});
+    applyFilterLogicState('OR','.logic-btn');applyFilterLogicState('OR','.logic-btn-fav');renderFilterTags();
+    const streakBase=document.getElementById('streak-base-date'),streakMode=document.getElementById('streak-mode'),streakDays=document.getElementById('streak-min-days'),streakExclude=document.getElementById('streak-exclude-horses'),streakHoliday=document.getElementById('streak-holiday-date');
+    if(streakBase){streakBase.value='';initStreakBaseDate();}if(streakMode)streakMode.value='consecutive';if(streakDays)streakDays.value='2';if(streakExclude)streakExclude.checked=true;if(streakHoliday)streakHoliday.value='';
+    updateStreakModeUI();lastJournalStreakResult=null;
+    const streakSummary=document.getElementById('streak-summary'),streakResults=document.getElementById('streak-results'),streakCopy=document.getElementById('streak-copy-btn');
+    if(streakSummary)streakSummary.textContent='請設定 N 日後開始比對。';if(streakResults){streakResults.innerHTML='';streakResults.classList.add('hidden');}if(streakCopy)streakCopy.disabled=true;
+    document.querySelectorAll('.has-active-filter').forEach(element=>element.classList.remove('has-active-filter'));
 }
 
 function clearTransientSearchFields(){
-    state.filters={...state.filters,code:''};
-    state.favFilters={...state.favFilters,code:''};
-    state.revenueFilters={...state.revenueFilters,code:''};
-    state.reportFilters={...state.reportFilters,code:''};
     [
-        'filter-code','filter-code-fav','filter-revenue-code','filter-rep-code','global-search-input',
+        'global-search-input',
         'j-code','j-name','overview-code','overview-name','r-code','r-name','rep-code','rep-name',
         'p-stock','p-name','chk-code','chk-name'
     ].forEach(id=>{
         const input=document.getElementById(id);
         if(input){input.value='';input.setAttribute('value','');}
     });
-    saveLocalData();
 }
 
 const getFilteredAndSortedData=(dl,cf,cs)=>{
@@ -2061,7 +2095,7 @@ const renderTableRows=(data,tbId,emId,isFav=false)=>{
     const stockCount=new Set(data.map(item=>String(item.code||'').trim()).filter(Boolean)).size;
     if(countEl){countEl.dataset.stockCount=String(stockCount);countEl.innerHTML=`<i class="fa-solid fa-chart-simple"></i>目前顯示 ${stockCount} 檔股票`;}
     document.querySelectorAll(`[data-mobile-stock-count="${lt}"]`).forEach(el=>{el.innerHTML=`<i class="fa-solid fa-chart-simple"></i>顯示 ${stockCount} 檔`;});
-    if(data.length===0){tb.innerHTML='';em.classList.remove('hidden');updateBatchUI(lt);return;}
+    if(data.length===0){setHTMLIfChanged(tb,'');em.classList.remove('hidden');updateBatchUI(lt);return;}
     em.classList.add('hidden'); let rh='';
     data.forEach(i=>{
         const ei=i.ei||getEpsInfo(i.code,i),sc=i.score!==undefined?i.score:getScore(i.tags,ei);
@@ -2071,7 +2105,7 @@ const renderTableRows=(data,tbId,emId,isFav=false)=>{
         const fd=i.date?i.date.replace(/-/g,'/'):'',rbh=getRevenueMonthsHtml(i.code),hr=state.reports.some(r=>String(r.code||'').trim()===String(i.code||'').trim()),rb=hr?renderReportIndicator():'',futuresBadge=ei.futures?'<span class="shrink-0 bg-sky-600 text-white text-[9px] px-1 rounded ml-1">期</span>':'';
         rh+=`<tr class="table-row-hover transition border-b border-gray-200 dark:border-gray-700/50 text-gray-900 dark:text-white text-sm ${ei.futures?"bg-sky-50 dark:bg-sky-900 hover:bg-sky-100 dark:hover:bg-sky-800":"bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800"}"><td class="table-sticky-bg py-3 px-2 w-[40px] min-w-[40px] max-w-[40px] text-center sticky left-0 z-20 ${ei.futures?"!bg-sky-50 dark:!bg-sky-900":""}"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${i.id}" data-type="${lt}" ${selectedIds[lt].has(i.id)?'checked':''}></td><td class="table-sticky-bg py-3 px-1 sm:px-2 w-[85px] min-w-[85px] max-w-[85px] text-center sticky left-[40px] z-20 font-medium whitespace-nowrap text-xs sm:text-sm text-gray-600 dark:text-gray-400 ${ei.futures?"!bg-sky-50 dark:!bg-sky-900":""}">${escapeHTML(fd)}</td><td class="table-sticky-bg py-2 px-2 sm:px-3 w-[95px] min-w-[95px] max-w-[95px] sticky left-[125px] z-20 border-r border-gray-200 dark:border-gray-700/50 overflow-hidden ${ei.futures?"!bg-sky-50 dark:!bg-sky-900":""}"${getYahooStockAttributes(i.code)}><div class="text-[10px] sm:text-[11px] text-gray-500 dark:text-gray-400 mb-0.5 leading-none flex items-center">${escapeHTML(i.code)}${rb}</div><div class="font-bold text-[14px] sm:text-[15px] leading-tight tracking-wide text-gray-800 dark:text-gray-200 flex items-center min-w-0"><span class="truncate">${escapeHTML(i.name)}</span>${futuresBadge}</div></td><td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2025)}</td><td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2026)}</td><td class="py-3 px-3 sm:px-4 text-right">${formatNumColor(ei.epsGrowth,true)}</td><td class="py-3 px-3 sm:px-4 text-center font-bold">${sc}</td><td class="py-3 px-3 sm:px-4 text-right">${formatTargetPrice(ei.targetPrice)}</td><td class="py-2 px-3 whitespace-normal w-[100px] min-w-[100px] text-center">${rbh}</td><td class="py-2 px-3 align-top whitespace-normal min-w-[120px] sm:min-w-[140px] lg:w-[320px] lg:min-w-[320px] xl:w-[380px] xl:min-w-[380px] lg:max-w-[460px]">${th}</td>${!isFav?`<td class="py-3 px-3 align-top text-gray-600 dark:text-gray-300 max-w-[80px] sm:max-w-[150px] lg:w-[190px] lg:min-w-[190px] lg:max-w-[220px] truncate lg:whitespace-pre-wrap lg:overflow-visible lg:text-clip lg:break-words text-xs leading-relaxed" title="${escapeHTML(i.notes||'')}">${escapeHTML(i.notes||'')}</td>`:''}<td class="py-3 px-3 text-center whitespace-nowrap"><button class="mr-1 hover:scale-110 text-green-600 dark:text-green-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="add-plan" data-code="${escapeHTML(i.code)}" title="加入交易規劃"><i class="fa-solid fa-chess-knight pointer-events-none"></i></button><button class="mr-1 hover:scale-110 ${fc} bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="toggle-fav" data-id="${i.id}" title="${ft}">${fi}</button><button class="mr-1 hover:scale-110 text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="edit-notes" data-id="${i.id}" title="修改備註"><i class="fa-solid fa-comment-dots pointer-events-none"></i></button><button class="text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="delete-journal" data-id="${i.id}" title="刪除"><i class="fa-solid fa-trash pointer-events-none"></i></button></td></tr>`;
     });
-    tb.innerHTML=rh; updateBatchUI(lt);
+    setHTMLIfChanged(tb,rh); updateBatchUI(lt);
 };
 
 const handleJournalTableAction=async(e)=>{
@@ -2157,12 +2191,24 @@ const updateStreakModeUI=()=>{
     daysInput.setAttribute('aria-label',isWindow?'觀察交易日數':'連續交易日數');
 };
 
+const enumerateTradingDates=(baseDate,earliestDate,customHolidays)=>{
+    if(!isValidISODate(baseDate)||!isValidISODate(earliestDate))return[];
+    const [year,month,day]=baseDate.split('-').map(Number),cursor=new Date(Date.UTC(year,month-1,day)),dates=[];
+    for(let guard=0;guard<5000;guard++){
+        const iso=`${cursor.getUTCFullYear()}-${String(cursor.getUTCMonth()+1).padStart(2,'0')}-${String(cursor.getUTCDate()).padStart(2,'0')}`;
+        if(iso<earliestDate)break;
+        if(isJournalTradingDate(iso,customHolidays))dates.push(iso);
+        cursor.setUTCDate(cursor.getUTCDate()-1);
+    }
+    return dates;
+};
+
 const analyzeJournalStreaks=(journals,requestedBase,minDays,excludeHorses=false,mode='consecutive')=>{
     const wantedBase=requestedBase||getToday(),minimum=Math.max(2,Math.min(60,parseInt(minDays)||2)),analysisMode=normalizeStreakMode(mode),excludeHorseTags=!!excludeHorses,customHolidays=new Set(normalizeCustomMarketHolidays(state.customMarketHolidays));
     const eligible=(journals||[]).filter(item=>item&&item.date&&item.date<=wantedBase&&isJournalTradingDate(item.date,customHolidays)&&String(item.code||'').trim());
-    const dates=[...new Set(eligible.map(item=>item.date))].sort().reverse();
-    if(!dates.length)return{requestedBase:wantedBase,baseDate:null,minDays:minimum,mode:analysisMode,excludeHorses:excludeHorseTags,customHolidays:[...customHolidays],availableDays:0,windowDays:0,results:[]};
-    const baseDate=dates[0],byDate=new Map();
+    const recordDates=[...new Set(eligible.map(item=>item.date))].sort().reverse();
+    if(!recordDates.length)return{requestedBase:wantedBase,baseDate:null,minDays:minimum,mode:analysisMode,excludeHorses:excludeHorseTags,customHolidays:[...customHolidays],availableDays:0,windowDays:0,results:[]};
+    const baseDate=recordDates[0],dates=enumerateTradingDates(baseDate,recordDates[recordDates.length-1],customHolidays),byDate=new Map();
     [...eligible].sort((a,b)=>(a.createdAt||0)-(b.createdAt||0)).forEach(item=>{
         const code=String(item.code||'').trim();
         if(!byDate.has(item.date))byDate.set(item.date,new Map());
@@ -2305,21 +2351,21 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-batch-dele
 document.getElementById('btn-batch-delete-cancel')?.addEventListener('click',()=>document.getElementById('batch-delete-modal').classList.add('hidden'));
 
 const filterFields=[{key:'start',cls:'filter-start',type:'value'},{key:'end',cls:'filter-end',type:'value'},{key:'code',cls:'filter-code',type:'value'},{key:'futuresOnly',cls:'filter-futures',type:'checked'},{key:'excludeNegativeGrowth',cls:'filter-exclude-negative-growth',type:'checked'},{key:'revenueHigh',cls:'filter-revenue-high',type:'checked'},{key:'minScore',cls:'filter-score',type:'value',isInt:true}];
-const handleFilterChange=debounce((f,el)=>{let v=el.type==='checkbox'?el.checked:el.value;if(f.isInt)v=parseInt(v)||0;if(f.type==='value'&&el.type==='text')v=v.trim();state.filters[f.key]=v;state.favFilters[f.key]=v;document.querySelectorAll(`.${f.cls}`).forEach(o=>{if(f.type==='checked')o.checked=v;else o.value=v;});processAndRenderJournals();renderFavorites();saveLocalData();},300);
-filterFields.forEach(f=>{document.querySelectorAll(`.${f.cls}`).forEach(el=>{const evt=(f.type==='value'&&el.type==='text')?'input':'change';if(evt==='input'){el.addEventListener('input',e=>handleFilterChange(f,e.target));}else{el.addEventListener('change',e=>{let v=e.target.type==='checkbox'?e.target.checked:e.target.value;if(f.isInt)v=parseInt(v)||0;state.filters[f.key]=v;state.favFilters[f.key]=v;document.querySelectorAll(`.${f.cls}`).forEach(o=>{if(f.type==='checked')o.checked=v;else o.value=v;});processAndRenderJournals();renderFavorites();saveLocalData();});}});});
+const handleFilterChange=debounce((f,el)=>{let v=el.type==='checkbox'?el.checked:el.value;if(f.isInt)v=parseInt(v)||0;if(f.type==='value'&&el.type==='text')v=v.trim();state.filters[f.key]=v;state.favFilters[f.key]=v;document.querySelectorAll(`.${f.cls}`).forEach(o=>{if(f.type==='checked')o.checked=v;else o.value=v;});processAndRenderJournals();renderFavorites();},300);
+filterFields.forEach(f=>{document.querySelectorAll(`.${f.cls}`).forEach(el=>{const evt=(f.type==='value'&&el.type==='text')?'input':'change';if(evt==='input'){el.addEventListener('input',e=>handleFilterChange(f,e.target));}else{el.addEventListener('change',e=>{let v=e.target.type==='checkbox'?e.target.checked:e.target.value;if(f.isInt)v=parseInt(v)||0;state.filters[f.key]=v;state.favFilters[f.key]=v;document.querySelectorAll(`.${f.cls}`).forEach(o=>{if(f.type==='checked')o.checked=v;else o.value=v;});processAndRenderJournals();renderFavorites();});}});});
 
-['btn-clear-filters','btn-clear-filters-fav'].forEach(bId=>{document.getElementById(bId)?.addEventListener('click',()=>{const t=getToday();state.filters={start:t,end:t,code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,minScore:0,tags:[],tagLogic:'OR'};state.favFilters={start:t,end:t,code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,minScore:0,tags:[],tagLogic:'OR'};document.querySelectorAll('.filter-start').forEach(el=>el.value=t);document.querySelectorAll('.filter-end').forEach(el=>el.value=t);document.querySelectorAll('.filter-code').forEach(el=>el.value='');document.querySelectorAll('.filter-futures, .filter-exclude-negative-growth, .filter-revenue-high').forEach(el=>el.checked=false);document.querySelectorAll('.filter-score').forEach(el=>el.value="0");document.querySelectorAll('.filter-tag-cb').forEach(cb=>cb.checked=false);document.querySelectorAll('.logic-btn, .logic-btn-fav').forEach(b=>{if(b.dataset.logic==='OR'){b.classList.remove('text-gray-500','dark:text-gray-400');b.classList.add('bg-white','dark:bg-gray-700','text-blue-600','dark:text-blue-400','shadow-sm');}else{b.classList.remove('bg-white','dark:bg-gray-700','text-blue-600','dark:text-blue-400','shadow-sm');b.classList.add('text-gray-500','dark:text-gray-400');}});renderFilterTags();processAndRenderJournals();renderFavorites();saveLocalData();showToast('已清除篩選');});});
+['btn-clear-filters','btn-clear-filters-fav'].forEach(bId=>{document.getElementById(bId)?.addEventListener('click',()=>{const t=getToday();state.filters={start:t,end:t,code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,minScore:0,tags:[],tagLogic:'OR'};state.favFilters={start:t,end:t,code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,minScore:0,tags:[],tagLogic:'OR'};document.querySelectorAll('.filter-start').forEach(el=>el.value=t);document.querySelectorAll('.filter-end').forEach(el=>el.value=t);document.querySelectorAll('.filter-code').forEach(el=>el.value='');document.querySelectorAll('.filter-futures, .filter-exclude-negative-growth, .filter-revenue-high').forEach(el=>el.checked=false);document.querySelectorAll('.filter-score').forEach(el=>el.value="0");document.querySelectorAll('.filter-tag-cb').forEach(cb=>cb.checked=false);document.querySelectorAll('.logic-btn, .logic-btn-fav').forEach(b=>{if(b.dataset.logic==='OR'){b.classList.remove('text-gray-500','dark:text-gray-400');b.classList.add('bg-white','dark:bg-gray-700','text-blue-600','dark:text-blue-400','shadow-sm');}else{b.classList.remove('bg-white','dark:bg-gray-700','text-blue-600','dark:text-blue-400','shadow-sm');b.classList.add('text-gray-500','dark:text-gray-400');}});renderFilterTags();processAndRenderJournals();renderFavorites();showToast('已清除篩選');});});
 
-const handleRevenueFilterChange = debounce(() => { state.revenueFilters.month = document.getElementById('filter-revenue-month').value; state.revenueFilters.code = document.getElementById('filter-revenue-code').value.trim(); renderRevenueRecords(); saveLocalData(); }, 300);
+const handleRevenueFilterChange = debounce(() => { state.revenueFilters.month = document.getElementById('filter-revenue-month').value; state.revenueFilters.code = document.getElementById('filter-revenue-code').value.trim(); renderRevenueRecords(); }, 300);
 document.getElementById('filter-revenue-month')?.addEventListener('change', handleRevenueFilterChange);
 document.getElementById('filter-revenue-code')?.addEventListener('input', handleRevenueFilterChange);
-document.getElementById('btn-clear-revenue-filters')?.addEventListener('click', () => { state.revenueFilters = { month: '', code: '' }; document.getElementById('filter-revenue-month').value = ''; document.getElementById('filter-revenue-code').value = ''; renderRevenueRecords(); saveLocalData(); showToast('已清除篩選'); });
+document.getElementById('btn-clear-revenue-filters')?.addEventListener('click', () => { state.revenueFilters = { month: '', code: '' }; document.getElementById('filter-revenue-month').value = ''; document.getElementById('filter-revenue-code').value = ''; renderRevenueRecords(); showToast('已清除篩選'); });
 
-const handleReportFilterChange = debounce(() => { state.reportFilters.start = document.getElementById('filter-rep-start').value; state.reportFilters.end = document.getElementById('filter-rep-end').value; state.reportFilters.code = document.getElementById('filter-rep-code').value.trim(); renderReports(); saveLocalData(); }, 300);
+const handleReportFilterChange = debounce(() => { state.reportFilters.start = document.getElementById('filter-rep-start').value; state.reportFilters.end = document.getElementById('filter-rep-end').value; state.reportFilters.code = document.getElementById('filter-rep-code').value.trim(); renderReports(); }, 300);
 document.getElementById('filter-rep-start')?.addEventListener('change', handleReportFilterChange);
 document.getElementById('filter-rep-end')?.addEventListener('change', handleReportFilterChange);
 document.getElementById('filter-rep-code')?.addEventListener('input', handleReportFilterChange);
-document.getElementById('btn-clear-rep-filters')?.addEventListener('click', () => { state.reportFilters = { start: '', end: '', code: '' }; document.getElementById('filter-rep-start').value = ''; document.getElementById('filter-rep-end').value = ''; document.getElementById('filter-rep-code').value = ''; renderReports(); saveLocalData(); showToast('已顯示全部法人報告'); });
+document.getElementById('btn-clear-rep-filters')?.addEventListener('click', () => { state.reportFilters = { start: '', end: '', code: '' }; document.getElementById('filter-rep-start').value = ''; document.getElementById('filter-rep-end').value = ''; document.getElementById('filter-rep-code').value = ''; renderReports(); showToast('已顯示全部法人報告'); });
 
 document.getElementById('journal-form')?.addEventListener('submit', async e => {
     e.preventDefault();
@@ -2386,7 +2432,7 @@ document.getElementById('journal-form')?.addEventListener('submit', async e => {
 
 document.getElementById('revenue-form')?.addEventListener('submit',async e=>{e.preventDefault();const m=document.getElementById('r-month').value,c=document.getElementById('r-code').value.trim(),n=document.getElementById('r-name').value.trim(),nt=document.getElementById('r-notes').value.trim();if(!m||!c||!n)return;const dId=`${c}_${m}`,eIdx=state.revenueRecords.findIndex(r=>r.id===dId);let mn=nt;if(eIdx!==-1){const o=state.revenueRecords[eIdx].notes||'';if(nt&&o&&o!==nt&&!o.includes(nt))mn=o+'；'+nt;else if(!nt)mn=o;}const p={id:dId,month:m,code:c,name:n,notes:mn,createdAt:eIdx!==-1?state.revenueRecords[eIdx].createdAt:Date.now(),updatedAt:Date.now()};if(eIdx!==-1)state.revenueRecords[eIdx]=p;else state.revenueRecords.push(p);saveLocalData();renderRevenueRecords();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();await putDataToCloud(`revenueRecords/${dId}`,p);showToast('營收創高已建立');e.target.reset();document.getElementById('r-month').value=m;setTimeout(()=>document.getElementById('r-code').focus(),15);});
 document.getElementById('revenue-table-body')?.addEventListener('click',async e=>{const b=e.target.closest('[data-action]');if(!b)return;const a=b.dataset.action,id=b.dataset.id;if(a==='edit-notes'){const r=state.revenueRecords.find(x=>x.id===id);if(!r)return;window.openPromptModal("修改備註說明",r.notes||"",async nn=>{if(nn!==null){r.notes=nn.trim();r.updatedAt=Date.now();saveLocalData();renderRevenueRecords();await putDataToCloud(`revenueRecords/${id}`,r);showToast("修改成功");}});}else if(a==='delete-revenue'){window.openConfirmModal('確定刪除？',async()=>{state.revenueRecords=state.revenueRecords.filter(x=>x.id!==id);saveLocalData();renderRevenueRecords();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();await deleteDataFromCloud(`revenueRecords/${id}`);showToast('已刪除');});}});
-function renderRevenueRecords(){const tb=document.getElementById('revenue-table-body'),em=document.getElementById('revenue-empty');if(!tb||!em)return;let fr=state.revenueRecords;if(state.revenueFilters){if(state.revenueFilters.month)fr=fr.filter(r=>r.month===state.revenueFilters.month);if(state.revenueFilters.code){const query=state.revenueFilters.code.toLocaleLowerCase();fr=fr.filter(r=>[r.code,r.name,r.notes].some(value=>String(value||'').toLocaleLowerCase().includes(query)));}}if(fr.length===0){tb.innerHTML='';em.classList.remove('hidden');updateBatchUI('revenue');return;}em.classList.add('hidden');const sr=[...fr].sort((a,b)=>{let vA,vB;switch(state.revenueSortConfig.key){case'month':vA=a.month;vB=b.month;break;case'code':vA=a.code;vB=b.code;break;case'eps2025':vA=getEpsInfo(a.code,{}).eps2025??-9999;vB=getEpsInfo(b.code,{}).eps2025??-9999;break;case'eps2026':vA=getEpsInfo(a.code,{}).eps2026??-9999;vB=getEpsInfo(b.code,{}).eps2026??-9999;break;case'epsGrowth':vA=getEpsInfo(a.code,{}).epsGrowth??-9999;vB=getEpsInfo(b.code,{}).epsGrowth??-9999;break;case'targetPrice':vA=getEpsInfo(a.code,{}).targetPrice??-9999;vB=getEpsInfo(b.code,{}).targetPrice??-9999;break;case'notes':vA=a.notes||'';vB=b.notes||'';break;default:vA=a.createdAt||0;vB=b.createdAt||0;break;}if(vA===vB)return(b.createdAt||0)-(a.createdAt||0);return state.revenueSortConfig.asc?(vA>vB?1:-1):(vA>vB?-1:1);});let rh='';sr.forEach(r=>{const p=r.month.split('-'),dm=`${p[0]}/${p[1]}`,tc=MONTH_TEXT_COLORS[(parseInt(p[1],10)-1)%12],ei=getEpsInfo(r.code,{});rh+=`<tr class="table-row-hover border-b border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-sm"><td class="table-sticky-bg py-3 px-2 sm:px-3 text-center sticky left-0 z-20"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${r.id}" data-type="revenue" ${selectedIds['revenue'].has(r.id)?'checked':''}></td><td class="py-3 px-3 sm:px-4 font-bold ${tc}">${escapeHTML(dm)}</td><td class="py-3 px-3 sm:px-4"><span class="font-medium mr-2">${escapeHTML(r.code)}</span><span class="text-gray-600 dark:text-gray-300">${escapeHTML(r.name)}</span></td><td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2025)}</td><td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2026)}</td><td class="py-3 px-3 sm:px-4 text-right">${formatNumColor(ei.epsGrowth,true)}</td><td class="py-3 px-3 sm:px-4 text-right">${formatTargetPrice(ei.targetPrice)}</td><td class="py-3 px-3 sm:px-4 text-gray-600 dark:text-gray-300 w-full">${escapeHTML(r.notes||'')}</td><td class="py-3 px-3 sm:px-4 text-center whitespace-nowrap"><button class="mr-1 text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" data-action="edit-notes" data-id="${r.id}"><i class="fa-solid fa-comment-dots pointer-events-none"></i></button><button class="text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" data-action="delete-revenue" data-id="${r.id}"><i class="fa-solid fa-trash pointer-events-none"></i></button></td></tr>`;});tb.innerHTML=rh;updateBatchUI('revenue');}
+function renderRevenueRecords(){const tb=document.getElementById('revenue-table-body'),em=document.getElementById('revenue-empty');if(!tb||!em)return;let fr=state.revenueRecords;if(state.revenueFilters){if(state.revenueFilters.month)fr=fr.filter(r=>r.month===state.revenueFilters.month);if(state.revenueFilters.code){const query=state.revenueFilters.code.toLocaleLowerCase();fr=fr.filter(r=>[r.code,r.name,r.notes].some(value=>String(value||'').toLocaleLowerCase().includes(query)));}}if(fr.length===0){setHTMLIfChanged(tb,'');em.classList.remove('hidden');updateBatchUI('revenue');return;}em.classList.add('hidden');const sr=[...fr].sort((a,b)=>{let vA,vB;switch(state.revenueSortConfig.key){case'month':vA=a.month;vB=b.month;break;case'code':vA=a.code;vB=b.code;break;case'eps2025':vA=getEpsInfo(a.code,{}).eps2025??-9999;vB=getEpsInfo(b.code,{}).eps2025??-9999;break;case'eps2026':vA=getEpsInfo(a.code,{}).eps2026??-9999;vB=getEpsInfo(b.code,{}).eps2026??-9999;break;case'epsGrowth':vA=getEpsInfo(a.code,{}).epsGrowth??-9999;vB=getEpsInfo(b.code,{}).epsGrowth??-9999;break;case'targetPrice':vA=getEpsInfo(a.code,{}).targetPrice??-9999;vB=getEpsInfo(b.code,{}).targetPrice??-9999;break;case'notes':vA=a.notes||'';vB=b.notes||'';break;default:vA=a.createdAt||0;vB=b.createdAt||0;break;}if(vA===vB)return(b.createdAt||0)-(a.createdAt||0);return state.revenueSortConfig.asc?(vA>vB?1:-1):(vA>vB?-1:1);});let rh='';sr.forEach(r=>{const p=r.month.split('-'),dm=`${p[0]}/${p[1]}`,tc=MONTH_TEXT_COLORS[(parseInt(p[1],10)-1)%12],ei=getEpsInfo(r.code,{});rh+=`<tr class="table-row-hover border-b border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-sm"><td class="table-sticky-bg py-3 px-2 sm:px-3 text-center sticky left-0 z-20"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${r.id}" data-type="revenue" ${selectedIds['revenue'].has(r.id)?'checked':''}></td><td class="py-3 px-3 sm:px-4 font-bold ${tc}">${escapeHTML(dm)}</td><td class="py-3 px-3 sm:px-4"><span class="font-medium mr-2">${escapeHTML(r.code)}</span><span class="text-gray-600 dark:text-gray-300">${escapeHTML(r.name)}</span></td><td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2025)}</td><td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2026)}</td><td class="py-3 px-3 sm:px-4 text-right">${formatNumColor(ei.epsGrowth,true)}</td><td class="py-3 px-3 sm:px-4 text-right">${formatTargetPrice(ei.targetPrice)}</td><td class="py-3 px-3 sm:px-4 text-gray-600 dark:text-gray-300 w-full">${escapeHTML(r.notes||'')}</td><td class="py-3 px-3 sm:px-4 text-center whitespace-nowrap"><button class="mr-1 text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" data-action="edit-notes" data-id="${r.id}"><i class="fa-solid fa-comment-dots pointer-events-none"></i></button><button class="text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" data-action="delete-revenue" data-id="${r.id}"><i class="fa-solid fa-trash pointer-events-none"></i></button></td></tr>`;});setHTMLIfChanged(tb,rh);updateBatchUI('revenue');}
 
 const pE=document.getElementById('p-entry'),pS=document.getElementById('p-stop');
 const updatePlanRiskPreview=()=>{const root=document.getElementById('plan-risk-preview'),entry=parseFloat(document.getElementById('p-entry')?.value),stop=parseFloat(document.getElementById('p-stop')?.value),target=parseFloat(document.getElementById('p-target')?.value),qty=Math.max(0.01,parseFloat(document.getElementById('p-qty')?.value)||1);if(!root)return;if(!Number.isFinite(entry)||!Number.isFinite(stop)){root.className='col-span-12 rounded-xl border border-green-200 dark:border-green-800/70 bg-green-50/70 dark:bg-green-900/15 px-3 py-2.5 text-xs text-gray-500 dark:text-gray-300';root.innerHTML='<i class="fa-solid fa-scale-balanced mr-1.5 text-green-600 dark:text-green-400"></i>輸入進場價、停損與停利後，自動計算風險報酬。';return;}const risk=entry-stop;if(risk<=0){root.className='col-span-12 rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20 px-3 py-2.5 text-xs font-bold text-amber-600 dark:text-amber-300';root.innerHTML='<i class="fa-solid fa-triangle-exclamation mr-1.5"></i>停損價需低於進場價。';return;}const shares=qty*1000,maxLoss=risk*shares,reward=Number.isFinite(target)?target-entry:NaN,ratio=Number.isFinite(reward)&&reward>0?reward/risk:NaN;root.className='col-span-12 rounded-xl border border-green-200 dark:border-green-800/70 bg-green-50/70 dark:bg-green-900/15 px-3 py-2.5 text-xs text-gray-600 dark:text-gray-200';root.innerHTML=`<div class="flex flex-wrap gap-x-5 gap-y-1"><span><b class="text-green-700 dark:text-green-300">預估最大風險</b> $${Math.round(maxLoss).toLocaleString('zh-TW')}</span><span><b class="text-blue-700 dark:text-blue-300">風險幅度</b> ${((risk/entry)*100).toFixed(2)}%</span><span><b class="text-red-600 dark:text-red-300">風險報酬比</b> ${Number.isFinite(ratio)?`1：${ratio.toFixed(2)}`:'請輸入有效停利價'}</span></div>`;};
@@ -2404,7 +2450,7 @@ document.getElementById('btn-cancel-modal')?.addEventListener('click',e=>{e.prev
 const closeTrade=st=>{window.openConfirmModal(`確定以「${st}」結算？`,async()=>{const id=document.getElementById('modal-plan-id').value,ex=parseFloat(document.getElementById('modal-exit-price').value);if(isNaN(ex))return showToast('無效金額','error');const p=state.plans.find(x=>x.id===id);if(!p)return;const pnl=Math.round((ex-p.entry)*p.qty*1000);p.status=st;p.exitPrice=ex;p.pnl=pnl;p.updatedAt=Date.now();saveLocalData();renderPlans();await putDataToCloud(`plans/${id}`,p);document.getElementById('close-plan-modal').classList.add('hidden');showToast(`結算損益: $${pnl}`);});};
 document.getElementById('btn-win')?.addEventListener('click',()=>closeTrade('已停利')); document.getElementById('btn-loss')?.addEventListener('click',()=>closeTrade('已停損'));
 document.getElementById('plan-table-body')?.addEventListener('click',async e=>{const b=e.target.closest('[data-action]');if(!b)return;const a=b.dataset.action,id=b.dataset.id;if(a==='delete-plan'){window.openConfirmModal('確定刪除？',async()=>{state.plans=state.plans.filter(x=>x.id!==id);saveLocalData();renderPlans();await deleteDataFromCloud(`plans/${id}`);showToast('已刪除');});}else if(a==='edit-plan'){window.openCloseModal(id,null,'edit');}else if(a==='close-plan'){const p=state.plans.find(x=>x.id===id);window.openCloseModal(id,p?.target||p?.entry,'close');}});
-function renderPlans(){const tb=document.getElementById('plan-table-body');if(!tb)return;tb.innerHTML='';let cc=0,wc=0,tp=0,rh='';const sp=[...state.plans].sort((a,b)=>{let vA,vB;switch(state.planSortConfig.key){case'entryDate':vA=a.entryDate||'';vB=b.entryDate||'';break;case'stock':vA=a.stock;vB=b.stock;break;case'qty':vA=a.qty;vB=b.qty;break;case'entry':vA=a.entry;vB=b.entry;break;case'target':vA=a.target||0;vB=b.target||0;break;case'stop':vA=a.stop;vB=b.stop;break;case'status':const o={'持倉中':1,'已停利':2,'已停損':3};vA=o[a.status]||99;vB=o[b.status]||99;break;default:vA=a.createdAt||0;vB=b.createdAt||0;break;}if(vA===vB)return(a.createdAt||0)-(b.createdAt||0);return state.planSortConfig.asc?(vA>vB?1:-1):(vA>vB?-1:1);});sp.forEach(i=>{const isC=i.status!=='持倉中';if(isC){cc++;if(i.status==='已停利')wc++;tp+=i.pnl||0;}const cm=i.stock.match(/\d{4}/),isF=cm?getEpsInfo(cm[0],{}).futures:false,dn=i.name||state.codeToName[i.stock]||'',fd=i.entryDate?i.entryDate.replace(/-/g,'/'):'';rh+=`<tr class="table-row-hover border-b border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-sm ${isC?'opacity-50':''}"><td class="table-sticky-bg py-3 px-2 sm:px-3 text-center sticky left-0 z-20"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${i.id}" data-type="plan" ${selectedIds['plan'].has(i.id)?'checked':''}></td><td class="py-3 px-3 sm:px-4 font-medium text-gray-600 dark:text-gray-400">${escapeHTML(fd)}</td><td class="py-3 px-3 sm:px-4 font-medium">${isF?'<span class="bg-sky-600 text-white text-[10px] px-1.5 py-0.5 rounded mr-1.5 shadow-sm">期</span>':''}<span class="font-bold mr-1.5 text-gray-800 dark:text-gray-200">${escapeHTML(i.stock)}</span><span class="text-gray-600 dark:text-gray-400">${escapeHTML(dn)}</span><div class="text-[10px] text-gray-400 mt-0.5">${escapeHTML(i.note||'')}</div></td><td class="py-3 px-3 sm:px-4">${i.qty}</td><td class="py-3 px-3 sm:px-4">${i.entry}</td><td class="py-3 px-3 sm:px-4 tw-red font-bold">${i.target||'-'}</td><td class="py-3 px-3 sm:px-4 tw-green font-bold">${i.stop}</td><td class="py-3 px-3 sm:px-4"><span class="px-2 py-1 rounded-md text-xs font-medium ${i.status==='持倉中'?'bg-blue-100 text-blue-700':(i.status==='已停利'?'bg-red-100 text-red-700':'bg-green-100 text-green-700')}">${i.status}</span></td><td class="py-3 px-3 sm:px-4 whitespace-nowrap">${!isC?`<button data-action="close-plan" data-id="${i.id}" class="text-xs bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 px-3 py-1.5 rounded-lg transition shadow-sm mr-2 active:scale-95">結算</button>`:`<span class="mr-3 ${i.pnl>0?'tw-red':'tw-green'} font-bold">${formatNumColor(i.pnl)}</span>`}<button data-action="edit-plan" data-id="${i.id}" class="text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110 mr-1"><i class="fa-solid fa-pen pointer-events-none"></i></button><button data-action="delete-plan" data-id="${i.id}" class="text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110"><i class="fa-solid fa-trash pointer-events-none"></i></button></td></tr>`;});tb.innerHTML=rh;document.getElementById('stat-total').textContent=cc;document.getElementById('stat-winrate').textContent=cc>0?Math.round((wc/cc)*100)+'%':'0%';document.getElementById('stat-pnl').textContent=tp.toString();document.getElementById('stat-pnl').className=`text-2xl font-bold ${tp>0?'tw-red':(tp<0?'tw-green':'text-gray-900 dark:text-white')} transition-colors duration-300`;updateBatchUI('plan');}
+function renderPlans(){const tb=document.getElementById('plan-table-body');if(!tb)return;let cc=0,wc=0,tp=0,rh='';const sp=[...state.plans].sort((a,b)=>{let vA,vB;switch(state.planSortConfig.key){case'entryDate':vA=a.entryDate||'';vB=b.entryDate||'';break;case'stock':vA=a.stock;vB=b.stock;break;case'qty':vA=a.qty;vB=b.qty;break;case'entry':vA=a.entry;vB=b.entry;break;case'target':vA=a.target||0;vB=b.target||0;break;case'stop':vA=a.stop;vB=b.stop;break;case'status':const o={'持倉中':1,'已停利':2,'已停損':3};vA=o[a.status]||99;vB=o[b.status]||99;break;default:vA=a.createdAt||0;vB=b.createdAt||0;break;}if(vA===vB)return(a.createdAt||0)-(b.createdAt||0);return state.planSortConfig.asc?(vA>vB?1:-1):(vA>vB?-1:1);});sp.forEach(i=>{const isC=i.status!=='持倉中';if(isC){cc++;if(i.status==='已停利')wc++;tp+=i.pnl||0;}const cm=i.stock.match(/\d{4}/),isF=cm?getEpsInfo(cm[0],{}).futures:false,dn=i.name||state.codeToName[i.stock]||'',fd=i.entryDate?i.entryDate.replace(/-/g,'/'):'';rh+=`<tr class="table-row-hover border-b border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-sm ${isC?'opacity-50':''}"><td class="table-sticky-bg py-3 px-2 sm:px-3 text-center sticky left-0 z-20"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${i.id}" data-type="plan" ${selectedIds['plan'].has(i.id)?'checked':''}></td><td class="py-3 px-3 sm:px-4 font-medium text-gray-600 dark:text-gray-400">${escapeHTML(fd)}</td><td class="py-3 px-3 sm:px-4 font-medium">${isF?'<span class="bg-sky-600 text-white text-[10px] px-1.5 py-0.5 rounded mr-1.5 shadow-sm">期</span>':''}<span class="font-bold mr-1.5 text-gray-800 dark:text-gray-200">${escapeHTML(i.stock)}</span><span class="text-gray-600 dark:text-gray-400">${escapeHTML(dn)}</span><div class="text-[10px] text-gray-400 mt-0.5">${escapeHTML(i.note||'')}</div></td><td class="py-3 px-3 sm:px-4">${i.qty}</td><td class="py-3 px-3 sm:px-4">${i.entry}</td><td class="py-3 px-3 sm:px-4 tw-red font-bold">${i.target||'-'}</td><td class="py-3 px-3 sm:px-4 tw-green font-bold">${i.stop}</td><td class="py-3 px-3 sm:px-4"><span class="px-2 py-1 rounded-md text-xs font-medium ${i.status==='持倉中'?'bg-blue-100 text-blue-700':(i.status==='已停利'?'bg-red-100 text-red-700':'bg-green-100 text-green-700')}">${i.status}</span></td><td class="py-3 px-3 sm:px-4 whitespace-nowrap">${!isC?`<button data-action="close-plan" data-id="${i.id}" class="text-xs bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 px-3 py-1.5 rounded-lg transition shadow-sm mr-2 active:scale-95">結算</button>`:`<span class="mr-3 ${i.pnl>0?'tw-red':'tw-green'} font-bold">${formatNumColor(i.pnl)}</span>`}<button data-action="edit-plan" data-id="${i.id}" class="text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110 mr-1"><i class="fa-solid fa-pen pointer-events-none"></i></button><button data-action="delete-plan" data-id="${i.id}" class="text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110"><i class="fa-solid fa-trash pointer-events-none"></i></button></td></tr>`;});setHTMLIfChanged(tb,rh);document.getElementById('stat-total').textContent=cc;document.getElementById('stat-winrate').textContent=cc>0?Math.round((wc/cc)*100)+'%':'0%';document.getElementById('stat-pnl').textContent=tp.toString();document.getElementById('stat-pnl').className=`text-2xl font-bold ${tp>0?'tw-red':(tp<0?'tw-green':'text-gray-900 dark:text-white')} transition-colors duration-300`;updateBatchUI('plan');}
 
 let reportReaderItems=[],reportReaderIndex=0,reportReaderTouchStart=null,reportReaderBodyOverflow='',reportReaderEnteredFullscreen=false;
 const getReportReaderItems=()=>{
@@ -2494,13 +2540,13 @@ function renderReports(){
     const tableBody=document.getElementById('report-table-body'),emptyState=document.getElementById('report-empty'),readerButton=document.getElementById('btn-open-report-reader');if(!tableBody||!emptyState)return;
     const reports=getReportReaderItems();
     if(readerButton)readerButton.disabled=reports.length===0;
-    if(!reports.length){tableBody.innerHTML='';emptyState.classList.remove('hidden');updateBatchUI('report');return;}
+    if(!reports.length){setHTMLIfChanged(tableBody,'');emptyState.classList.remove('hidden');updateBatchUI('report');return;}
     emptyState.classList.add('hidden');
-    tableBody.innerHTML=reports.map(report=>{
+    setHTMLIfChanged(tableBody,reports.map(report=>{
         const reportDate=resolveReportRecordDate(report),formattedDate=reportDate?reportDate.replace(/-/g,'/'):'未填寫';
         const reportId=escapeHTML(report.id);
         return`<tr class="table-row-hover border-b border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-sm"><td class="table-sticky-bg py-3 px-2 sm:px-3 text-center sticky left-0 z-20"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${reportId}" data-type="report" ${selectedIds.report&&selectedIds.report.has(report.id)?'checked':''}></td><td data-compact-date="true" class="compact-date-cell py-3 px-1 font-medium text-gray-600 dark:text-gray-400" title="${escapeHTML(formattedDate)}" aria-label="報告日期 ${escapeHTML(formattedDate)}">${renderCompactReportDate(reportDate)}</td><td class="py-3 px-3 sm:px-4"><span class="font-bold mr-2 text-gray-800 dark:text-gray-200">${escapeHTML(report.code)}</span><span class="text-gray-600 dark:text-gray-400">${escapeHTML(report.name)}</span></td><td class="report-summary-col report-summary-cell py-3 px-3 sm:px-4 text-gray-800 dark:text-gray-100 font-medium leading-relaxed">${escapeHTML(report.content||'')}</td><td class="py-3 px-2 text-center align-middle"><div class="flex flex-col items-center justify-center gap-1.5"><button type="button" title="複製報告" aria-label="複製 ${escapeHTML(report.code)} ${escapeHTML(report.name)} 報告" class="w-8 h-8 text-teal-600 dark:text-teal-400 bg-gray-100 dark:bg-gray-800 rounded-lg inline-flex items-center justify-center transition hover:scale-110" data-action="copy-report" data-id="${reportId}"><i class="fa-solid fa-copy pointer-events-none"></i></button><button type="button" title="修改報告" aria-label="修改 ${escapeHTML(report.code)} ${escapeHTML(report.name)} 報告" class="w-8 h-8 text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 rounded-lg inline-flex items-center justify-center transition hover:scale-110" data-action="edit-report" data-id="${reportId}"><i class="fa-solid fa-pen pointer-events-none"></i></button><button type="button" title="刪除報告" aria-label="刪除 ${escapeHTML(report.code)} ${escapeHTML(report.name)} 報告" class="w-8 h-8 text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-gray-800 rounded-lg inline-flex items-center justify-center transition hover:scale-110" data-action="delete-report" data-id="${reportId}"><i class="fa-solid fa-trash pointer-events-none"></i></button></div></td></tr>`;
-    }).join('');
+    }).join(''));
     updateBatchUI('report');
 }
 
@@ -2514,7 +2560,7 @@ const resetChkForm=()=>{chkEditingId=null;document.getElementById('chk-form-titl
 document.getElementById('chk-btn-cancel')?.addEventListener('click',resetChkForm);
 document.getElementById('chk-btn-submit')?.addEventListener('click',async()=>{const d=document.getElementById('chk-date').value,c=document.getElementById('chk-code').value.trim(),n=document.getElementById('chk-name').value.trim();if(!c||!n)return showToast('請完整輸入！','error');const isEditing=!!chkEditingId,p={id:chkEditingId||generateId(),date:d,code:c,name:n,direction:chkCurrentDirection,checkedItems:Array.from(chkSelectedItems),details:{pressure:document.getElementById('chk-pressure').value.trim(),support:document.getElementById('chk-support').value.trim(),target:document.getElementById('chk-target').value.trim(),chipsInst:document.getElementById('chk-chips-inst').value.trim(),chipsConc:document.getElementById('chk-chips-conc').value.trim(),cost:document.getElementById('chk-cost').value.trim(),notes:document.getElementById('chk-notes').value.trim()},createdAt:chkEditingId?(state.checklists.find(x=>x.id===chkEditingId)?.createdAt||Date.now()):Date.now(),updatedAt:Date.now()};if(chkEditingId){const i=state.checklists.findIndex(x=>x.id===chkEditingId);if(i!==-1)state.checklists[i]=p;}else state.checklists.push(p);resetChkForm();saveLocalData();renderChecklists();await putDataToCloud(`checklists/${p.id}`,p);showToast(isEditing?'更新成功':'建立成功');});
 
-function renderChecklists(){const tb=document.getElementById('checklist-table-body'),em=document.getElementById('checklist-empty');if(!tb||!em)return;if(!state.checklists||state.checklists.length===0){tb.innerHTML='';em.classList.remove('hidden');updateBatchUI('checklist');return;}em.classList.add('hidden');const sc=[...state.checklists].sort((a,b)=>{let vA,vB;switch(state.checklistSortConfig?state.checklistSortConfig.key:'createdAt'){case'date':vA=a.date;vB=b.date;break;case'code':vA=a.code;vB=b.code;break;case'direction':vA=a.direction||'';vB=b.direction||'';break;case'match':vA=(a.checkedItems?.length||0)/(CHK_CONFIG[a.direction]?.length||1);vB=(b.checkedItems?.length||0)/(CHK_CONFIG[b.direction]?.length||1);break;case'target':vA=parseFloat(a.details?.target)||-9999;vB=parseFloat(b.details?.target)||-9999;break;default:vA=a.createdAt||0;vB=b.createdAt||0;break;}if(vA===vB)return(b.createdAt||0)-(a.createdAt||0);return (state.checklistSortConfig?state.checklistSortConfig.asc:false)?(vA>vB?1:-1):(vA>vB?-1:1);});let rh='';sc.forEach(r=>{const t=CHK_CONFIG[r.direction]?.length||1,c=r.checkedItems?.length||0,s=Math.round((c/t)*100)||0,bc=s>70?(r.direction==='long'?'bg-red-500':'bg-emerald-500'):'bg-amber-400',db=r.direction==='long'?'<span class="px-2.5 py-1 bg-red-50 text-red-700 text-xs font-bold rounded-lg border border-red-200">📈 多方</span>':'<span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-lg border border-emerald-200">📉 空方</span>',fd=r.date?r.date.replace(/-/g,'/'):'';rh+=`<tr class="table-row-hover border-b border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-sm"><td class="table-sticky-bg py-3 px-2 w-[40px] text-center sticky left-0 z-20"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${r.id}" data-type="checklist" ${selectedIds['checklist']&&selectedIds['checklist'].has(r.id)?'checked':''}></td><td class="py-3 px-2 sm:px-3 font-medium text-gray-600 dark:text-gray-400">${escapeHTML(fd)}</td><td class="py-3 px-2 sm:px-3"><div class="font-bold text-gray-800 dark:text-gray-200">${escapeHTML(r.code)}</div><div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">${escapeHTML(r.name)}</div></td><td class="py-3 px-2 sm:px-3 text-center">${db}</td><td class="py-3 px-2 sm:px-3"><div class="flex items-center gap-3"><div class="w-24 bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden"><div class="h-full rounded-full ${bc}" style="width:${s}%"></div></div><span class="text-xs font-bold text-gray-600 dark:text-gray-400">${c}/${t}</span></div></td><td class="py-3 px-2 sm:px-3 text-right font-bold text-gray-800 dark:text-gray-200">${r.details?.target?'$'+escapeHTML(r.details.target):'-'}</td><td class="py-3 px-2 sm:px-3 text-center whitespace-nowrap"><button class="mr-1 text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" data-action="edit-checklist" data-id="${r.id}"><i class="fa-solid fa-pen pointer-events-none"></i></button><button class="text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" data-action="delete-checklist" data-id="${r.id}"><i class="fa-solid fa-trash pointer-events-none"></i></button></td></tr>`;});tb.innerHTML=rh;updateBatchUI('checklist');}
+function renderChecklists(){const tb=document.getElementById('checklist-table-body'),em=document.getElementById('checklist-empty');if(!tb||!em)return;if(!state.checklists||state.checklists.length===0){setHTMLIfChanged(tb,'');em.classList.remove('hidden');updateBatchUI('checklist');return;}em.classList.add('hidden');const sc=[...state.checklists].sort((a,b)=>{let vA,vB;switch(state.checklistSortConfig?state.checklistSortConfig.key:'createdAt'){case'date':vA=a.date;vB=b.date;break;case'code':vA=a.code;vB=b.code;break;case'direction':vA=a.direction||'';vB=b.direction||'';break;case'match':vA=(a.checkedItems?.length||0)/(CHK_CONFIG[a.direction]?.length||1);vB=(b.checkedItems?.length||0)/(CHK_CONFIG[b.direction]?.length||1);break;case'target':vA=parseFloat(a.details?.target)||-9999;vB=parseFloat(b.details?.target)||-9999;break;default:vA=a.createdAt||0;vB=b.createdAt||0;break;}if(vA===vB)return(b.createdAt||0)-(a.createdAt||0);return (state.checklistSortConfig?state.checklistSortConfig.asc:false)?(vA>vB?1:-1):(vA>vB?-1:1);});let rh='';sc.forEach(r=>{const t=CHK_CONFIG[r.direction]?.length||1,c=r.checkedItems?.length||0,s=Math.round((c/t)*100)||0,bc=s>70?(r.direction==='long'?'bg-red-500':'bg-emerald-500'):'bg-amber-400',db=r.direction==='long'?'<span class="px-2.5 py-1 bg-red-50 text-red-700 text-xs font-bold rounded-lg border border-red-200">📈 多方</span>':'<span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-lg border border-emerald-200">📉 空方</span>',fd=r.date?r.date.replace(/-/g,'/'):'';rh+=`<tr class="table-row-hover border-b border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-sm"><td class="table-sticky-bg py-3 px-2 w-[40px] text-center sticky left-0 z-20"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${r.id}" data-type="checklist" ${selectedIds['checklist']&&selectedIds['checklist'].has(r.id)?'checked':''}></td><td class="py-3 px-2 sm:px-3 font-medium text-gray-600 dark:text-gray-400">${escapeHTML(fd)}</td><td class="py-3 px-2 sm:px-3"><div class="font-bold text-gray-800 dark:text-gray-200">${escapeHTML(r.code)}</div><div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">${escapeHTML(r.name)}</div></td><td class="py-3 px-2 sm:px-3 text-center">${db}</td><td class="py-3 px-2 sm:px-3"><div class="flex items-center gap-3"><div class="w-24 bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden"><div class="h-full rounded-full ${bc}" style="width:${s}%"></div></div><span class="text-xs font-bold text-gray-600 dark:text-gray-400">${c}/${t}</span></div></td><td class="py-3 px-2 sm:px-3 text-right font-bold text-gray-800 dark:text-gray-200">${r.details?.target?'$'+escapeHTML(r.details.target):'-'}</td><td class="py-3 px-2 sm:px-3 text-center whitespace-nowrap"><button class="mr-1 text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" data-action="edit-checklist" data-id="${r.id}"><i class="fa-solid fa-pen pointer-events-none"></i></button><button class="text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" data-action="delete-checklist" data-id="${r.id}"><i class="fa-solid fa-trash pointer-events-none"></i></button></td></tr>`;});setHTMLIfChanged(tb,rh);updateBatchUI('checklist');}
 document.getElementById('checklist-table-body')?.addEventListener('click',async e=>{const b=e.target.closest('[data-action]');if(!b)return;const a=b.dataset.action,id=b.dataset.id;if(a==='delete-checklist'){window.openConfirmModal('確定刪除？',async()=>{state.checklists=state.checklists.filter(c=>c.id!==id);saveLocalData();renderChecklists();await deleteDataFromCloud(`checklists/${id}`);showToast('已刪除');});}else if(a==='edit-checklist'){const r=state.checklists.find(c=>c.id===id);if(!r)return;chkEditingId=id;document.getElementById('chk-form-title').innerText='編輯查核紀錄';document.getElementById('chk-date').value=r.date;document.getElementById('chk-code').value=r.code;document.getElementById('chk-name').value=r.name;setChkDirection(r.direction);chkSelectedItems=new Set(r.checkedItems||[]);renderChkCheckboxGrid();document.getElementById('chk-pressure').value=r.details?.pressure||'';document.getElementById('chk-support').value=r.details?.support||'';document.getElementById('chk-target').value=r.details?.target||'';document.getElementById('chk-chips-inst').value=r.details?.chipsInst||'';document.getElementById('chk-chips-conc').value=r.details?.chipsConc||'';document.getElementById('chk-cost').value=r.details?.cost||'';document.getElementById('chk-notes').value=r.details?.notes||'';updatePreview(r.code,'chk-preview','cyan');document.querySelector('[data-target="module-checklist"]').click();window.scrollTo({top:0,behavior:'smooth'});}});
 
 // ======================= 個股總覽 ======================= //
@@ -2972,7 +3018,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
     document.querySelectorAll('#filter-tags-container .filter-tag-cb').forEach(cb=>cb.checked=state.filters.tags.includes(cb.value));document.querySelectorAll('#filter-tags-container-fav .filter-tag-cb').forEach(cb=>cb.checked=state.favFilters.tags.includes(cb.value));renderFilterTags();
 
     window.addEventListener('pageshow',()=>requestAnimationFrame(()=>{
-        clearTransientSearchFields();
+        resetSessionFiltersToDefaults(true);clearTransientSearchFields();
         processAndRenderJournals();renderFavorites();renderRevenueRecords();renderReports();
     }));
 
@@ -3199,7 +3245,7 @@ setChkDirection('long');
     }else if(target==='module-report'){
       state.reportFilters={...state.reportFilters,start:'',end:'',code};document.getElementById('filter-rep-start').value='';document.getElementById('filter-rep-end').value='';document.getElementById('filter-rep-code').value=code;renderReports();
     }
-    saveLocalData();document.querySelector(`.nav-btn[data-target="${target}"]`)?.click();window.scrollTo({top:0,behavior:'smooth'});
+    document.querySelector(`.nav-btn[data-target="${target}"]`)?.click();window.scrollTo({top:0,behavior:'smooth'});
   }
 
   const mobileMoreModules=new Set(['module-checklist','module-revenue','module-plan','module-favorites']);
@@ -3604,6 +3650,7 @@ const SESSION={
   var DEFAULT_TAG_CATEGORIES=JSON.parse(JSON.stringify(TAG_CATEGORIES));
   var VALID_THEMES=['rose','blue','amber','purple','teal'];
   var pendingImport=null;
+  var IMPORT_RECOVERY_DB='ryan_stock_import_recovery_v1',IMPORT_RECOVERY_STORE='snapshots',IMPORT_RECOVERY_KEY='latestImport',importRecoveryMemory=null;
   var TYPE_CONFIG={
     journal:{stateKey:'journals',cloud:'journals',label:'策略日誌'},
     plan:{stateKey:'plans',cloud:'plans',label:'交易規劃'},
@@ -3613,6 +3660,66 @@ const SESSION={
   };
 
   function clone(value){return JSON.parse(JSON.stringify(value));}
+  function openImportRecoveryDB(){
+    return new Promise(function(resolve,reject){
+      if(!window.indexedDB){resolve(null);return;}
+      var request=indexedDB.open(IMPORT_RECOVERY_DB,1);
+      request.onupgradeneeded=function(){var db=request.result;if(!db.objectStoreNames.contains(IMPORT_RECOVERY_STORE))db.createObjectStore(IMPORT_RECOVERY_STORE);};
+      request.onsuccess=function(){resolve(request.result);};request.onerror=function(){reject(request.error||new Error('無法開啟匯入還原資料庫'));};
+    });
+  }
+  async function saveImportRecoverySnapshot(snapshot){
+    importRecoveryMemory=clone(snapshot);
+    try{
+      var db=await openImportRecoveryDB();if(!db)return true;
+      await new Promise(function(resolve,reject){var tx=db.transaction(IMPORT_RECOVERY_STORE,'readwrite');tx.objectStore(IMPORT_RECOVERY_STORE).put(snapshot,IMPORT_RECOVERY_KEY);tx.oncomplete=resolve;tx.onerror=function(){reject(tx.error||new Error('還原點儲存失敗'));};});db.close();
+      return true;
+    }catch(error){console.warn('匯入還原點改存於本次工作階段',error);return true;}
+  }
+  async function loadImportRecoverySnapshot(){
+    if(importRecoveryMemory)return clone(importRecoveryMemory);
+    try{
+      var db=await openImportRecoveryDB();if(!db)return null;
+      var snapshot=await new Promise(function(resolve,reject){var request=db.transaction(IMPORT_RECOVERY_STORE,'readonly').objectStore(IMPORT_RECOVERY_STORE).get(IMPORT_RECOVERY_KEY);request.onsuccess=function(){resolve(request.result||null);};request.onerror=function(){reject(request.error||new Error('還原點讀取失敗'));};});db.close();
+      if(snapshot)importRecoveryMemory=clone(snapshot);return snapshot;
+    }catch(error){console.warn('讀取匯入還原點失敗',error);return null;}
+  }
+  async function clearImportRecoverySnapshot(){
+    importRecoveryMemory=null;
+    try{var db=await openImportRecoveryDB();if(!db)return;await new Promise(function(resolve,reject){var tx=db.transaction(IMPORT_RECOVERY_STORE,'readwrite');tx.objectStore(IMPORT_RECOVERY_STORE).delete(IMPORT_RECOVERY_KEY);tx.oncomplete=resolve;tx.onerror=function(){reject(tx.error||new Error('還原點清除失敗'));};});db.close();}catch(error){console.warn('清除匯入還原點失敗',error);}
+  }
+  function getImportTypeLabel(type){return type==='brokerReport'?'券商評估報告':type==='database'?'EPS／目標價資料庫':'手札備份';}
+  async function createImportRecoveryPoint(type){
+    var snapshot={version:1,createdAt:Date.now(),type:type,label:getImportTypeLabel(type),data:{journals:clone(state.journals||[]),plans:clone(state.plans||[]),revenueRecords:clone(state.revenueRecords||[]),reports:clone(state.reports||[]),checklists:clone(state.checklists||[]),epsData:clone(state.epsData||{}),tagSettings:clone(state.tagSettings||null)}};
+    await saveImportRecoverySnapshot(snapshot);await refreshUndoImportButton();return snapshot;
+  }
+  async function refreshUndoImportButton(){
+    var snapshot=await loadImportRecoverySnapshot(),button=document.getElementById('btn-undo-import'),mobileButton=document.querySelector('[data-mobile-tool-target="btn-undo-import"]'),available=!!snapshot;
+    [button,mobileButton].forEach(function(item){if(!item)return;item.disabled=!available;item.classList.toggle('opacity-40',!available);item.classList.toggle('cursor-not-allowed',!available);});
+    if(button)button.title=available?'復原至上次匯入「'+snapshot.label+'」前的資料':'尚無可復原的匯入紀錄';
+    if(mobileButton)mobileButton.title=button?button.title:'';
+  }
+  async function restoreLastImport(){
+    if(!window.isAdminMode||!window.isAdminMode())return showToast('復原匯入僅限管理者使用','error');
+    var snapshot=await loadImportRecoverySnapshot();if(!snapshot)return showToast('目前沒有可復原的匯入紀錄','error');
+    var timeLabel=new Date(snapshot.createdAt).toLocaleString('zh-TW',{hour12:false});
+    openConfirmModal('確定復原「'+snapshot.label+'」匯入前的資料？還原點時間：'+timeLabel+'。匯入後新增或修改的相關資料也會一併還原。',async function(){
+      var data=snapshot.data||{};
+      state.journals=clone(data.journals||[]);state.plans=clone(data.plans||[]);state.revenueRecords=clone(data.revenueRecords||[]);state.reports=clone(data.reports||[]);state.checklists=clone(data.checklists||[]);state.epsData=clone(data.epsData||{});state.tagSettings=clone(data.tagSettings||null);
+      Object.values(selectedIds).forEach(function(set){set.clear();});rebuildStockLookup();window.ensureOptimizationState();window.syncCustomTagSettings();saveLocalData();
+      processAndRenderJournals();renderFavorites();renderRevenueRecords();renderReports();renderChecklists();renderPlans();if(document.getElementById('module-overview')?.classList.contains('active'))renderStockOverview();
+      var synced=(await Promise.all([
+        putDataToCloud('journals',Object.fromEntries(state.journals.map(function(item){return[item.id,item];}))),
+        putDataToCloud('revenueRecords',Object.fromEntries(state.revenueRecords.map(function(item){return[item.id,item];}))),
+        putDataToCloud('reports',Object.fromEntries(state.reports.map(function(item){return[item.id,item];}))),
+        putDataToCloud('checklists',Object.fromEntries(state.checklists.map(function(item){return[item.id,item];}))),
+        putDataToCloud('plans',Object.fromEntries(state.plans.map(function(item){return[item.id,item];}))),
+        putDataToCloud('epsData',state.epsData),putDataToCloud('tagSettings',state.tagSettings)
+      ])).every(Boolean);
+      if(synced){await clearImportRecoverySnapshot();await refreshUndoImportButton();showToast('已復原至上次匯入前的資料');}
+      else showToast('本機已復原，部分雲端資料等待重新同步','error');
+    });
+  }
   function normalizeTagMeta(name,categoryTheme,meta){
     var source=meta&&typeof meta==='object'?meta:{};
     return{
@@ -3691,7 +3798,8 @@ const SESSION={
     if(importButton){
       importButton.insertAdjacentHTML('beforebegin',[
         '<button id="btn-tag-manager" type="button" class="relative text-xs sm:text-sm bg-rose-50 dark:bg-rose-900/40 hover:bg-rose-100 dark:hover:bg-rose-800/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-700/50 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center font-medium active:scale-95" title="自訂標籤管理"><i class="fa-solid fa-tags sm:mr-1.5"></i><span class="hidden sm:inline">標籤</span></button>',
-        '<button id="btn-trash-manager" type="button" class="relative text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center active:scale-95" title="垃圾桶與資料復原"><i class="fa-solid fa-trash-arrow-up sm:mr-1.5"></i><span class="hidden sm:inline">垃圾桶</span><span id="trash-nav-count" class="hidden absolute -top-2 -right-2 min-w-5 h-5 px-1 rounded-full bg-red-600 text-white text-[10px] font-black items-center justify-center border-2 border-white dark:border-gray-800"></span></button>'
+        '<button id="btn-trash-manager" type="button" class="relative text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center active:scale-95" title="垃圾桶與資料復原"><i class="fa-solid fa-trash-arrow-up sm:mr-1.5"></i><span class="hidden sm:inline">垃圾桶</span><span id="trash-nav-count" class="hidden absolute -top-2 -right-2 min-w-5 h-5 px-1 rounded-full bg-red-600 text-white text-[10px] font-black items-center justify-center border-2 border-white dark:border-gray-800"></span></button>',
+        '<button id="btn-undo-import" type="button" disabled class="relative text-xs sm:text-sm bg-amber-50 dark:bg-amber-900/30 hover:bg-amber-100 dark:hover:bg-amber-800/50 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-700/50 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center font-medium active:scale-95 opacity-40 cursor-not-allowed" title="尚無可復原的匯入紀錄"><i class="fa-solid fa-clock-rotate-left sm:mr-1.5"></i><span class="hidden sm:inline">復原匯入</span></button>'
       ].join(''));
     }
     document.body.insertAdjacentHTML('beforeend',[
@@ -4323,8 +4431,9 @@ const SESSION={
     if(!pendingImport)return;
     var button=document.getElementById('import-preview-confirm');
     if(button.disabled)return;
-    button.disabled=true;button.innerHTML='<i class="fa-solid fa-spinner fa-spin mr-1.5"></i>匯入中';
+    button.disabled=true;button.innerHTML='<i class="fa-solid fa-spinner fa-spin mr-1.5"></i>建立還原點';
     try{
+      await createImportRecoveryPoint(pendingImport.type);button.innerHTML='<i class="fa-solid fa-spinner fa-spin mr-1.5"></i>匯入中';
       var handle=document.getElementById('import-handle-duplicates').checked;
       if(pendingImport.type==='brokerReport')await commitBrokerReportImport(handle);else if(pendingImport.type==='database')await commitDatabaseImport(handle);else await commitBackupImport(handle);
       closeImportPreview();
@@ -4406,6 +4515,7 @@ const SESSION={
     document.getElementById('import-preview-close').addEventListener('click',closeImportPreview);
     document.getElementById('import-preview-cancel').addEventListener('click',closeImportPreview);
     document.getElementById('import-preview-confirm').addEventListener('click',confirmImport);
+    document.getElementById('btn-undo-import').addEventListener('click',restoreLastImport);
     window.confirmBatchDelete=function(type){
       if(!window.isAdminMode||!window.isAdminMode())return showToast('批次刪除僅限管理者使用','error');
       updateBatchUI(type);
@@ -4422,6 +4532,7 @@ const SESSION={
     injectOptimizationUI();
     bindOptimizationEvents();
     renderTagManager();window.renderTrashManager();resetTagForm();
+    refreshUndoImportButton();
     if(changed)saveLocalData();
   });
 })();
@@ -4571,7 +4682,7 @@ const SESSION={
   document.addEventListener('click',function(event){
     var restrictedModule=event.target.closest('[data-target="module-plan"], [data-target="module-favorites"]');
     if(restrictedModule&&!adminMode){requireAdmin(event,'此模組僅限管理者查看');return;}
-    var restrictedAction=event.target.closest('#btn-journal-submit, #btn-revenue-submit, #btn-report-submit, [data-action="add-plan"], [data-action="toggle-fav"], [data-action="remove-tag"], [data-action="edit-notes"], [data-action="delete-journal"], [data-action="edit-report"], [data-action="delete-report"], [data-action="delete-revenue"], [data-batch-delete-type], [data-tag-action="delete"], #streak-holiday-date, #streak-add-holiday-btn, #streak-clear-holidays-btn, [data-remove-holiday], #btn-tag-manager, #btn-trash-manager, #btn-db-upload, #btn-import-backup, #btn-export-backup');
+    var restrictedAction=event.target.closest('#btn-journal-submit, #btn-revenue-submit, #btn-report-submit, [data-action="add-plan"], [data-action="toggle-fav"], [data-action="remove-tag"], [data-action="edit-notes"], [data-action="delete-journal"], [data-action="edit-report"], [data-action="delete-report"], [data-action="delete-revenue"], [data-batch-delete-type], [data-tag-action="delete"], #streak-holiday-date, #streak-add-holiday-btn, #streak-clear-holidays-btn, [data-remove-holiday], #btn-tag-manager, #btn-trash-manager, #btn-undo-import, #btn-db-upload, #btn-import-backup, #btn-export-backup');
     if(restrictedAction&&!adminMode){requireAdmin(event,'此操作僅限管理者使用');return;}
   },true);
 
