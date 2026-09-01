@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="121">
+<meta name="app-version" content="122">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -1358,7 +1358,7 @@ html.dark body main :is(#module-journal,#module-favorites,#module-revenue,#modul
         <button type="button" id="btn-batch-delete-cancel" class="w-full mt-3 bg-gray-100 dark:bg-transparent hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 py-2.5 rounded-lg text-sm transition active:scale-95">取消</button>
     </div>
 </div>
-<div id="confirm-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center z-[100] hidden transition-opacity duration-300">
+<div id="confirm-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center hidden transition-opacity duration-300 z-[2147483647]" style="z-index:2147483647;">
     <div class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl p-6 border border-gray-200 dark:border-gray-700 w-[340px] max-w-[90%] shadow-2xl mx-4 modal-enter">
         <h3 class="font-bold mb-3 text-xl flex items-center text-blue-600 dark:text-blue-400"><i class="fa-solid fa-circle-question mr-2"></i>確認操作</h3>
         <p id="confirm-modal-msg" class="text-sm text-gray-600 dark:text-gray-300 mb-5 leading-relaxed"></p>
