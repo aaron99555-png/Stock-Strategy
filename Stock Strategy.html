@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="119">
+<meta name="app-version" content="121">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -1530,12 +1530,15 @@ const hasStoredAdminAccess=()=>{
     catch(error){return typeof window.isAdminMode==='function'&&window.isAdminMode();}
 };
 const sanitizeJournalForViewer=item=>{const sanitized={...(item||{})};delete sanitized.isFavorite;return sanitized;};
+let stockNameSearchIndex=[];
 const rebuildStockLookup=()=>{
     state.codeToName={};state.nameToCode={};
     const planItems=hasStoredAdminAccess()?(state.plans||[]).map(plan=>({code:plan.stock,name:plan.name})):[];
     [...(state.journals||[]),...planItems,...(state.revenueRecords||[]),...(state.reports||[]),...(state.checklists||[]),...Object.values(state.epsData||{})].forEach(item=>{
         if(item&&item.code&&item.name){state.codeToName[item.code]=item.name;state.nameToCode[item.name]=item.code;}
     });
+    stockNameSearchIndex=Object.entries(state.nameToCode).map(([name,code])=>({name,code,search:String(name).toLocaleLowerCase()}));
+    if(typeof invalidateAnalysisCaches==='function')invalidateAnalysisCaches();
 };
 const stripAdminState=()=>{
     state.journals=(state.journals||[]).map(sanitizeJournalForViewer);state.plans=[];state.trash=[];
@@ -1826,23 +1829,37 @@ const getEpsInfo=(c,j)=>{const e=state.epsData[c]||{};return{eps2025:e.eps2025??
 const NON_STRATEGY_COPY_TAGS=new Set(['特別追蹤','非凡重點','總編概念股']);
 const getScore=(t,e)=>{let s=0;if(t)s=t.filter(x=>!NON_STRATEGY_COPY_TAGS.has(x)).length;const g=parseFloat(e?.epsGrowth),e26=parseFloat(e?.eps2026);if(!isNaN(g)&&g>0&&!isNaN(e26)&&e26>0)s+=1;return s;};
 const normalizeMomentumRecordType=record=>record?.type==='largeHolder'?'largeHolder':'revenue';
+let analysisCacheVersion=0;
+const momentumMetricsCache=new Map(),stockStrengthCache=new Map();
+const invalidateAnalysisCaches=()=>{
+    analysisCacheVersion++;
+    momentumMetricsCache.clear();
+    stockStrengthCache.clear();
+};
+
 const getMomentumRecordDate=record=>normalizeMomentumRecordType(record)==='largeHolder'?String(record.date||''):String(record.month||'');
 const monthSerial=value=>{const match=String(value||'').match(/^(\d{4})-(\d{2})/);return match?Number(match[1])*12+(Number(match[2])-1):null;};
 const fridaySerial=value=>{if(!/^\d{4}-\d{2}-\d{2}$/.test(String(value||'')))return null;const d=new Date(`${value}T12:00:00`);if(!Number.isFinite(d.getTime()))return null;const delta=(5-d.getDay()+7)%7;d.setDate(d.getDate()+delta);return Math.floor(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/604800000);};
 const getMomentumQualifyingCodes=(type,mode,windowSize,minCount)=>{mode=String(mode||'none');if(mode==='none')return null;const size=Math.max(1,parseInt(windowSize)||1),need=Math.max(1,parseInt(minCount)||1),groups=new Map();(state.revenueRecords||[]).forEach(record=>{if(normalizeMomentumRecordType(record)!==type)return;const code=String(record.code||'').trim();if(!code)return;const serial=type==='largeHolder'?fridaySerial(record.date):monthSerial(record.month);if(serial===null)return;if(!groups.has(code))groups.set(code,new Set());groups.get(code).add(serial);});const matched=new Set();groups.forEach((set,code)=>{const values=[...set].sort((a,b)=>b-a);if(!values.length)return;const latest=values[0];if(mode==='consecutive'){let ok=true;for(let i=0;i<size;i++){if(!set.has(latest-i)){ok=false;break;}}if(ok)matched.add(code);}else if(mode==='window'){const count=values.filter(value=>value<=latest&&value>latest-size).length;if(count>=need)matched.add(code);}});return matched;};
 const applyRevenueMomentumFilters=rows=>{let filtered=[...rows],f=state.revenueFilters||{};if(f.type&&f.type!=='all')filtered=filtered.filter(r=>normalizeMomentumRecordType(r)===f.type);if(f.month)filtered=filtered.filter(r=>normalizeMomentumRecordType(r)==='revenue'&&r.month===f.month);if(f.code){const query=String(f.code).toLocaleLowerCase();filtered=filtered.filter(r=>[r.code,r.name,r.notes,normalizeMomentumRecordType(r)==='largeHolder'?'千張大戶持股增加':'營收創高'].some(value=>String(value||'').toLocaleLowerCase().includes(query)));}const revenueCodes=getMomentumQualifyingCodes('revenue',f.revenuePattern,f.revenueN,f.revenueCount),holderCodes=getMomentumQualifyingCodes('largeHolder',f.holderPattern,f.holderN,f.holderCount);if(revenueCodes)filtered=filtered.filter(r=>revenueCodes.has(String(r.code||'').trim()));if(holderCodes)filtered=filtered.filter(r=>holderCodes.has(String(r.code||'').trim()));if(Number(f.minMomentum||0)>0)filtered=filtered.filter(r=>getMomentumMetrics(r.code).score>=Number(f.minMomentum));return filtered;};
 const getMomentumMetrics=(code,referenceDate=getToday())=>{
-    const c=String(code||''),records=(state.revenueRecords||[]).filter(r=>String(r.code)===c),revSerials=[...new Set(records.filter(r=>normalizeMomentumRecordType(r)==='revenue').map(r=>monthSerial(r.month)).filter(v=>v!==null))].sort((a,b)=>b-a),holderSerials=[...new Set(records.filter(r=>normalizeMomentumRecordType(r)==='largeHolder').map(r=>fridaySerial(r.date)).filter(v=>v!==null))].sort((a,b)=>b-a);
+    const c=String(code||''),cacheKey=`${analysisCacheVersion}|${c}|${referenceDate}`;
+    if(momentumMetricsCache.has(cacheKey))return momentumMetricsCache.get(cacheKey);
+    const records=(state.revenueRecords||[]).filter(r=>String(r.code)===c),revSerials=[...new Set(records.filter(r=>normalizeMomentumRecordType(r)==='revenue').map(r=>monthSerial(r.month)).filter(v=>v!==null))].sort((a,b)=>b-a),holderSerials=[...new Set(records.filter(r=>normalizeMomentumRecordType(r)==='largeHolder').map(r=>fridaySerial(r.date)).filter(v=>v!==null))].sort((a,b)=>b-a);
     const streak=(values)=>{if(!values.length)return 0;const set=new Set(values);let n=0,cur=values[0];while(set.has(cur-n))n++;return n;};
     const revenueStreak=streak(revSerials),holderStreak=streak(holderSerials),revenueRecent3=revSerials.length?revSerials.filter(v=>v<=revSerials[0]&&v>revSerials[0]-3).length:0,holderRecent4=holderSerials.length?holderSerials.filter(v=>v<=holderSerials[0]&&v>holderSerials[0]-4).length:0;
     const hasRevenue=revSerials.length>0,hasHolder=holderSerials.length>0,hasReport=(state.reports||[]).some(r=>String(r.code)===c),recentJournals=(state.journals||[]).filter(j=>String(j.code)===c&&dayDiffISO(j.date,referenceDate)!==null&&dayDiffISO(j.date,referenceDate)>=0&&dayDiffISO(j.date,referenceDate)<14),strategyRepeated=recentJournals.length>=2;
     let score=0;if(hasRevenue)score+=10;if(revenueStreak>=2)score+=5;if(revenueStreak>=3)score+=10;if(revenueRecent3>=2)score+=10;if(hasHolder)score+=10;if(holderStreak>=2)score+=5;if(holderStreak>=3)score+=10;if(holderRecent4>=3)score+=10;if(recentJournals.length)score+=5;if(strategyRepeated)score+=5;if(hasReport)score+=5;if(hasRevenue&&hasHolder)score+=5;score=Math.min(100,score);
     const allHolder=(state.revenueRecords||[]).filter(r=>normalizeMomentumRecordType(r)==='largeHolder').map(r=>fridaySerial(r.date)).filter(v=>v!==null),globalLatestHolder=allHolder.length?Math.max(...allHolder):null,holderInterrupted=holderSerials.length>0&&globalLatestHolder!==null&&holderSerials[0]<globalLatestHolder&&holderStreak>=2;
     const firstRevenue=hasRevenue&&revenueRecent3===1,firstHolder=hasHolder&&holderRecent4===1,resonance=hasRevenue&&hasHolder;
-    return{score,revenueStreak,holderStreak,revenueRecent3,holderRecent4,hasRevenue,hasHolder,hasReport,recentJournals:recentJournals.length,strategyRepeated,resonance,firstRevenue,firstHolder,holderInterrupted};
+    const result={score,revenueStreak,holderStreak,revenueRecent3,holderRecent4,hasRevenue,hasHolder,hasReport,recentJournals:recentJournals.length,strategyRepeated,resonance,firstRevenue,firstHolder,holderInterrupted};
+    momentumMetricsCache.set(cacheKey,result);
+    return result;
 };
 const getStockStrengthMetrics=(code,referenceDate=getToday())=>{
-    const c=String(code||''),m=getMomentumMetrics(c,referenceDate),journals=(state.journals||[]).filter(j=>String(j.code)===c),recent14=journals.filter(j=>{const d=dayDiffISO(j.date,referenceDate);return d!==null&&d>=0&&d<14;}),recent7=recent14.filter(j=>dayDiffISO(j.date,referenceDate)<7),previous7=recent14.filter(j=>{const d=dayDiffISO(j.date,referenceDate);return d>=7&&d<14;}),uniqueTags=new Set(recent14.flatMap(j=>j.tags||[]).filter(t=>!NON_STRATEGY_COPY_TAGS.has(t))),eps=getEpsInfo(c,journals[0]||{});
+    const c=String(code||''),cacheKey=`${analysisCacheVersion}|${c}|${referenceDate}`;
+    if(stockStrengthCache.has(cacheKey))return stockStrengthCache.get(cacheKey);
+    const m=getMomentumMetrics(c,referenceDate),journals=(state.journals||[]).filter(j=>String(j.code)===c),recent14=journals.filter(j=>{const d=dayDiffISO(j.date,referenceDate);return d!==null&&d>=0&&d<14;}),recent7=recent14.filter(j=>dayDiffISO(j.date,referenceDate)<7),previous7=recent14.filter(j=>{const d=dayDiffISO(j.date,referenceDate);return d>=7&&d<14;}),uniqueTags=new Set(recent14.flatMap(j=>j.tags||[]).filter(t=>!NON_STRATEGY_COPY_TAGS.has(t))),eps=getEpsInfo(c,journals[0]||{});
     const strategyScore=Math.min(20,recent14.length*4)+Math.min(10,uniqueTags.size*2),fundamentalScore=(m.hasReport?5:0)+((Number(eps.epsGrowth)>0)?10:0)+(Number(eps.targetPrice)>0?5:0),score=Math.min(100,Math.round(m.score*.5+strategyScore+fundamentalScore));
     const grade=score>=85?'S':score>=70?'A':score>=55?'B':'C',accelerating=recent7.length>previous7.length&&recent7.length>=2;
     let lifecycle='觀察',icon='⚪';
@@ -1852,7 +1869,9 @@ const getStockStrengthMetrics=(code,referenceDate=getToday())=>{
     else if(accelerating||recent14.length>=2||m.holderStreak>=2||m.revenueStreak>=2){lifecycle='升溫';icon='🔥';}
     else if(recent14.length===1||m.firstRevenue||m.firstHolder){lifecycle='萌芽';icon='🆕';}
     else if(journals.length&&recent14.length===0){lifecycle='降溫';icon='🟡';}
-    return{score,grade,lifecycle,icon,accelerating,recent14:recent14.length,recent7:recent7.length,previous7:previous7.length,uniqueTags:uniqueTags.size,momentum:m,eps};
+    const result={score,grade,lifecycle,icon,accelerating,recent14:recent14.length,recent7:recent7.length,previous7:previous7.length,uniqueTags:uniqueTags.size,momentum:m,eps};
+    stockStrengthCache.set(cacheKey,result);
+    return result;
 };
 const renderStockStrengthBadges=(code,referenceDate=getToday())=>{const x=getStockStrengthMetrics(code,referenceDate),gradeClass=x.grade==='S'?'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300':x.grade==='A'?'bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300':x.grade==='B'?'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300':'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300';return`<span class="inline-flex rounded-md ${gradeClass} px-1.5 py-0.5 text-[10px] font-black mr-1 mb-1">${x.grade}級 ${x.score}</span><span class="inline-flex rounded-md bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 px-1.5 py-0.5 text-[10px] font-black mr-1 mb-1">${x.icon}${x.lifecycle}</span>${x.accelerating?'<span class="inline-flex rounded-md bg-rose-100 dark:bg-rose-900/40 text-rose-700 dark:text-rose-300 px-1.5 py-0.5 text-[10px] font-black mr-1 mb-1">↗訊號加速</span>':''}`;};
 const renderWarRoom=()=>{
@@ -1917,25 +1936,44 @@ const bindAutoFill=(cId,nId,cb=null,strict=false)=>{
         else if(strict){codeInput.value='';setStockPairValidity(codeInput,nameInput,'');}
         notify(code);
     };
+    // v121：1~3 碼不查；4 碼以上停止輸入後自動查詢。
+    // 若繼續輸入第 5、6 碼，會取消前一次排程，等真正打完再查，避免輸入途中卡頓。
     let codeLookupTimer=null,isComposingCode=false;
     const cancelCodeLookup=()=>{if(codeLookupTimer){clearTimeout(codeLookupTimer);codeLookupTimer=null;}};
-    codeInput.addEventListener('compositionstart',()=>{isComposingCode=true;cancelCodeLookup();});
-    codeInput.addEventListener('compositionend',()=>{isComposingCode=false;cancelCodeLookup();codeLookupTimer=setTimeout(()=>syncFromCode(false,false),120);});
-    codeInput.addEventListener('input',()=>{
+    const scheduleCodeLookup=()=>{
         cancelCodeLookup();
         if(isComposingCode)return;
         const raw=codeInput.value.trim();
-        // 輸入途中不查表、不改寫欄位，避免第 4 碼就搶先帶入造成 5~6 碼代號輸入卡頓。
-        if(!raw){nameInput.value='';setStockPairValidity(codeInput,nameInput,'');notify('');return;}
-        if(/^\d{1,3}$/.test(raw)){nameInput.value='';setStockPairValidity(codeInput,nameInput,'');return;}
-        codeLookupTimer=setTimeout(()=>{codeLookupTimer=null;syncFromCode(false,false);},160);
-    });
-    codeInput.addEventListener('change',()=>{cancelCodeLookup();syncFromCode(false,true);});
-    codeInput.addEventListener('blur',()=>{cancelCodeLookup();syncFromCode(false,true);});
-    nameInput.addEventListener('input',()=>syncFromName(false));
-    nameInput.addEventListener('change',()=>syncFromName(false));
-    codeInput.addEventListener('keydown',e=>{if(e.key==='Enter'){cancelCodeLookup();syncFromCode(true,true);}});
-    nameInput.addEventListener('keydown',e=>{if(e.key==='Enter')syncFromName(true);});
+        if(!raw){
+            nameInput.value='';
+            setStockPairValidity(codeInput,nameInput,'');
+            notify('');
+            return;
+        }
+        if(!/^\d{4,}$/.test(raw))return;
+        codeLookupTimer=setTimeout(()=>{
+            codeLookupTimer=null;
+            syncFromCode(false,true);
+        },320);
+    };
+    codeInput.addEventListener('compositionstart',()=>{isComposingCode=true;cancelCodeLookup();});
+    codeInput.addEventListener('compositionend',()=>{isComposingCode=false;scheduleCodeLookup();});
+    codeInput.addEventListener('input',scheduleCodeLookup);
+    codeInput.addEventListener('change',()=>{cancelCodeLookup();if(/^\d{4,}$/.test(codeInput.value.trim()))syncFromCode(false,true);});
+    codeInput.addEventListener('blur',()=>{cancelCodeLookup();if(/^\d{4,}$/.test(codeInput.value.trim()))syncFromCode(false,true);});
+    codeInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();cancelCodeLookup();if(/^\d{4,}$/.test(codeInput.value.trim()))syncFromCode(true,true);}});
+    // 股名搜尋也改成延後處理，避免中文輸入法組字時一直同步。
+    let nameLookupTimer=null,isComposingName=false;
+    const scheduleNameLookup=()=>{
+        clearTimeout(nameLookupTimer);
+        if(isComposingName)return;
+        nameLookupTimer=setTimeout(()=>syncFromName(false),280);
+    };
+    nameInput.addEventListener('compositionstart',()=>{isComposingName=true;clearTimeout(nameLookupTimer);});
+    nameInput.addEventListener('compositionend',()=>{isComposingName=false;scheduleNameLookup();});
+    nameInput.addEventListener('input',scheduleNameLookup);
+    nameInput.addEventListener('change',()=>{clearTimeout(nameLookupTimer);syncFromName(false);});
+    nameInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();clearTimeout(nameLookupTimer);syncFromName(true);}});
 };
 
 const bindDatalistAutoUpdate=()=>{
@@ -1950,21 +1988,20 @@ const bindDatalistAutoUpdate=()=>{
         const query=input.value.trim().toLowerCase();
         if(!query)return;
         t=setTimeout(()=>{
-            const value=input.value.trim().toLowerCase();
+            const value=input.value.trim().toLocaleLowerCase();
             if(value!==query)return;
             const prefix=[],contains=[];
-            for(const key in state.nameToCode){
-                const normalized=key.toLowerCase();
-                if(normalized.startsWith(value)){
-                    prefix.push([key,state.nameToCode[key]]);
+            for(const item of stockNameSearchIndex){
+                if(item.search.startsWith(value)){
+                    prefix.push([item.name,item.code]);
                     if(prefix.length===6)break;
-                }else if(normalized.includes(value)&&contains.length<6){
-                    contains.push([key,state.nameToCode[key]]);
+                }else if(item.search.includes(value)&&contains.length<6){
+                    contains.push([item.name,item.code]);
                 }
             }
             const matches=prefix.concat(contains).slice(0,6);
             list.innerHTML=matches.map(([key,other])=>`<option value="${escapeHTML(key)}">${escapeHTML(other)}</option>`).join('');
-        },160);
+        },320);
     });
 };
 
@@ -2097,6 +2134,7 @@ const getPersistableState=()=>{
     return persisted;
 };
 function saveLocalData(){
+    invalidateAnalysisCaches();
     try{localStorage.setItem(LOCAL_STORAGE_KEY,JSON.stringify(getPersistableState()));return true;}
     catch(error){console.error('本機資料儲存失敗',error);if(Date.now()-lastLocalSaveErrorAt>15000){lastLocalSaveErrorAt=Date.now();showToast('本機儲存空間不足，請先匯出備份或清理瀏覽器空間','error');}return false;}
 }
@@ -2461,7 +2499,7 @@ const handleJournalTableAction=async(e)=>{
     else if(a==='add-plan'){const c=b.dataset.code;document.querySelector('[data-target="module-plan"]').click();document.getElementById('p-stock').value=c;if(state.codeToName[c])document.getElementById('p-name').value=state.codeToName[c];document.getElementById('p-entry').focus();showToast('已代入股號與股名');}
     else if(a==='toggle-fav'){const j=state.journals.find(x=>x.id===id);if(j){let n=((j.isFavorite===true?1:(parseInt(j.isFavorite)||0))+1)%4;j.isFavorite=n;j.updatedAt=Date.now();saveLocalData();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();await putDataToCloud(`journals/${id}`,j);showToast(['已取消追蹤','已加入一星追蹤','已升級二次追蹤','已升級三次追蹤'][n]);}}
     else if(a==='edit-notes'){const j=state.journals.find(x=>x.id===id);if(!j)return;window.openPromptModal("修改備註說明",j.notes||"",async(nn)=>{if(nn!==null){j.notes=nn.trim();j.updatedAt=Date.now();saveLocalData();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();await putDataToCloud(`journals/${id}`,j);showToast("備註修改成功");}});}
-    else if(a==='delete-journal'){window.openConfirmModal('確定要刪除這筆紀錄嗎？',async()=>{state.journals=state.journals.filter(x=>x.id!==id);saveLocalData();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();await deleteDataFromCloud(`journals/${id}`);showToast('紀錄已刪除');});}
+    else if(a==='delete-journal'){window.openConfirmModal('確定要刪除這筆紀錄嗎？',async()=>{state.journals=state.journals.filter(x=>x.id!==id);saveLocalData();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();await recordDeletionTombstone('journals',id);await deleteDataFromCloud(`journals/${id}`);showToast('紀錄已刪除');});}
 };
 document.getElementById('journal-table-body')?.addEventListener('click',handleJournalTableAction); document.getElementById('fav-table-body')?.addEventListener('click',handleJournalTableAction);
 function processAndRenderJournals(){refreshJournalInsightCache();const data=getFilteredAndSortedData(state.journals,state.filters,state.sortConfig);renderTableRows(data,'journal-table-body','journal-empty');renderJournalDashboard(data);renderWarRoom();if(lastJournalStreakResult)renderJournalStreaks();}
@@ -2835,13 +2873,13 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-batch-dele
 document.getElementById('btn-batch-delete-cancel')?.addEventListener('click',()=>document.getElementById('batch-delete-modal').classList.add('hidden'));
 
 const filterFields=[{key:'start',cls:'filter-start',type:'value'},{key:'end',cls:'filter-end',type:'value'},{key:'code',cls:'filter-code',type:'value'},{key:'futuresOnly',cls:'filter-futures',type:'checked'},{key:'excludeNegativeGrowth',cls:'filter-exclude-negative-growth',type:'checked'},{key:'revenueHigh',cls:'filter-revenue-high',type:'checked'},{key:'largeHolder14',cls:'filter-large-holder',type:'checked'},{key:'minScore',cls:'filter-score',type:'value',isInt:true},{key:'status',cls:'filter-journal-status',type:'value'},{key:'quick',cls:'filter-journal-quick',type:'value'}];
-const handleFilterChange=debounce((f,el)=>{let v=el.type==='checkbox'?el.checked:el.value;if(f.isInt)v=parseInt(v)||0;if(f.type==='value'&&el.type==='text')v=v.trim();state.filters[f.key]=v;state.favFilters[f.key]=v;document.querySelectorAll(`.${f.cls}`).forEach(o=>{if(f.type==='checked')o.checked=v;else o.value=v;});processAndRenderJournals();renderFavorites();},300);
+const handleFilterChange=debounce((f,el)=>{let v=el.type==='checkbox'?el.checked:el.value;if(f.isInt)v=parseInt(v)||0;if(f.type==='value'&&el.type==='text')v=v.trim();state.filters[f.key]=v;state.favFilters[f.key]=v;document.querySelectorAll(`.${f.cls}`).forEach(o=>{if(f.type==='checked')o.checked=v;else o.value=v;});processAndRenderJournals();renderFavorites();},450);
 filterFields.forEach(f=>{document.querySelectorAll(`.${f.cls}`).forEach(el=>{const evt=(f.type==='value'&&el.type==='text')?'input':'change';if(evt==='input'){el.addEventListener('input',e=>handleFilterChange(f,e.target));}else{el.addEventListener('change',e=>{let v=e.target.type==='checkbox'?e.target.checked:e.target.value;if(f.isInt)v=parseInt(v)||0;state.filters[f.key]=v;state.favFilters[f.key]=v;document.querySelectorAll(`.${f.cls}`).forEach(o=>{if(f.type==='checked')o.checked=v;else o.value=v;});processAndRenderJournals();renderFavorites();});}});});
 
 ['btn-clear-filters','btn-clear-filters-fav'].forEach(bId=>{document.getElementById(bId)?.addEventListener('click',()=>{const t=getToday();state.filters=createDefaultJournalFilters();state.favFilters=createDefaultJournalFilters();document.querySelectorAll('.filter-start').forEach(el=>el.value=t);document.querySelectorAll('.filter-end').forEach(el=>el.value=t);document.querySelectorAll('.filter-code').forEach(el=>el.value='');document.querySelectorAll('.filter-futures, .filter-exclude-negative-growth, .filter-revenue-high').forEach(el=>el.checked=false);document.querySelectorAll('.filter-score').forEach(el=>el.value="0");document.querySelectorAll('.filter-journal-status,.filter-journal-quick').forEach(el=>el.value='all');document.querySelectorAll('.filter-tag-cb').forEach(cb=>cb.checked=false);document.querySelectorAll('.logic-btn, .logic-btn-fav').forEach(b=>{if(b.dataset.logic==='OR'){b.classList.remove('text-gray-500','dark:text-gray-400');b.classList.add('bg-white','dark:bg-gray-700','text-blue-600','dark:text-blue-400','shadow-sm');}else{b.classList.remove('bg-white','dark:bg-gray-700','text-blue-600','dark:text-blue-400','shadow-sm');b.classList.add('text-gray-500','dark:text-gray-400');}});renderFilterTags();processAndRenderJournals();renderFavorites();showToast('已清除篩選');});});
 
 const syncRevenuePatternUI=()=>{const revenueMode=document.getElementById('filter-revenue-pattern')?.value||'none',holderMode=document.getElementById('filter-holder-pattern')?.value||'none';document.getElementById('filter-revenue-pattern-count-wrap')?.classList.toggle('hidden',revenueMode!=='window');document.getElementById('filter-holder-pattern-count-wrap')?.classList.toggle('hidden',holderMode!=='window');};
-const handleRevenueFilterChange = debounce(() => { const f=state.revenueFilters;f.month=document.getElementById('filter-revenue-month')?.value||'';f.code=document.getElementById('filter-revenue-code')?.value.trim()||'';f.type=document.getElementById('filter-revenue-type')?.value||'all';f.revenuePattern=document.getElementById('filter-revenue-pattern')?.value||'none';f.revenueN=Math.max(1,parseInt(document.getElementById('filter-revenue-pattern-n')?.value)||3);f.revenueCount=Math.max(1,parseInt(document.getElementById('filter-revenue-pattern-count')?.value)||2);f.holderPattern=document.getElementById('filter-holder-pattern')?.value||'none';f.holderN=Math.max(1,parseInt(document.getElementById('filter-holder-pattern-n')?.value)||3);f.holderCount=Math.max(1,parseInt(document.getElementById('filter-holder-pattern-count')?.value)||2);syncRevenuePatternUI();renderRevenueRecords(); }, 250);
+const handleRevenueFilterChange = debounce(() => { const f=state.revenueFilters;f.month=document.getElementById('filter-revenue-month')?.value||'';f.code=document.getElementById('filter-revenue-code')?.value.trim()||'';f.type=document.getElementById('filter-revenue-type')?.value||'all';f.revenuePattern=document.getElementById('filter-revenue-pattern')?.value||'none';f.revenueN=Math.max(1,parseInt(document.getElementById('filter-revenue-pattern-n')?.value)||3);f.revenueCount=Math.max(1,parseInt(document.getElementById('filter-revenue-pattern-count')?.value)||2);f.holderPattern=document.getElementById('filter-holder-pattern')?.value||'none';f.holderN=Math.max(1,parseInt(document.getElementById('filter-holder-pattern-n')?.value)||3);f.holderCount=Math.max(1,parseInt(document.getElementById('filter-holder-pattern-count')?.value)||2);syncRevenuePatternUI();renderRevenueRecords(); }, 420);
 ['filter-revenue-month','filter-revenue-type','filter-revenue-pattern','filter-revenue-pattern-n','filter-revenue-pattern-count','filter-holder-pattern','filter-holder-pattern-n','filter-holder-pattern-count','filter-momentum-score'].forEach(id=>document.getElementById(id)?.addEventListener('change',handleRevenueFilterChange));
 document.getElementById('filter-revenue-code')?.addEventListener('input', handleRevenueFilterChange);
 document.getElementById('btn-clear-revenue-filters')?.addEventListener('click', () => { state.revenueFilters={month:'',code:'',type:'all',revenuePattern:'none',revenueN:3,revenueCount:2,holderPattern:'none',holderN:3,holderCount:2,minMomentum:0};[['filter-revenue-month',''],['filter-revenue-code',''],['filter-revenue-type','all'],['filter-revenue-pattern','none'],['filter-revenue-pattern-n','3'],['filter-revenue-pattern-count','2'],['filter-holder-pattern','none'],['filter-holder-pattern-n','3'],['filter-holder-pattern-count','2'],['filter-momentum-score','0']].forEach(([id,value])=>{const el=document.getElementById(id);if(el)el.value=value;});syncRevenuePatternUI();renderRevenueRecords();showToast('已清除篩選'); });
@@ -2849,7 +2887,7 @@ syncRevenuePatternUI();
 
 document.getElementById('btn-copy-revenue')?.addEventListener('click',async()=>{let rows=applyRevenueMomentumFilters(state.revenueRecords.map(r=>({...r,type:normalizeMomentumRecordType(r)})));rows.sort((a,b)=>getMomentumRecordDate(b).localeCompare(getMomentumRecordDate(a)));if(!rows.length)return showToast('目前沒有可複製的營收籌碼動能資料','error');const content=['【營收籌碼動能】',...rows.map(r=>`${normalizeMomentumRecordType(r)==='largeHolder'?'千張大戶增加':'營收創高'}｜${getMomentumRecordDate(r).replace(/-/g,'/')}｜${r.code} ${r.name}${r.notes?'｜'+r.notes:''}`)].join('\n');await copyText(content);showToast('營收籌碼動能清單已複製');});
 
-const handleReportFilterChange = debounce(() => { state.reportFilters.start = document.getElementById('filter-rep-start').value; state.reportFilters.end = document.getElementById('filter-rep-end').value; state.reportFilters.code = document.getElementById('filter-rep-code').value.trim(); renderReports(); }, 300);
+const handleReportFilterChange = debounce(() => { state.reportFilters.start = document.getElementById('filter-rep-start').value; state.reportFilters.end = document.getElementById('filter-rep-end').value; state.reportFilters.code = document.getElementById('filter-rep-code').value.trim(); renderReports(); }, 450);
 document.getElementById('filter-rep-start')?.addEventListener('change', handleReportFilterChange);
 document.getElementById('filter-rep-end')?.addEventListener('change', handleReportFilterChange);
 document.getElementById('filter-rep-code')?.addEventListener('input', handleReportFilterChange);
@@ -2941,11 +2979,11 @@ document.getElementById('revenue-form')?.addEventListener('submit',async e=>{
     let mn=nt;if(eIdx!==-1){const o=state.revenueRecords[eIdx].notes||'';if(nt&&o&&o!==nt&&!o.includes(nt))mn=o+'；'+nt;else if(!nt)mn=o;}
     const old=eIdx!==-1?state.revenueRecords[eIdx]:null,p={id:dId,type,month:type==='revenue'?m:'',date:type==='largeHolder'?d:'',code:c,name:n,notes:mn,createdAt:old?.createdAt||Date.now(),updatedAt:Date.now()};
     if(eIdx!==-1)state.revenueRecords[eIdx]=p;else state.revenueRecords.push(p);
-    if(old?.id&&old.id!==dId)await deleteDataFromCloud(`revenueRecords/${old.id}`);
+    if(old?.id&&old.id!==dId)await recordDeletionTombstone('revenueRecords',old.id);await deleteDataFromCloud(`revenueRecords/${old.id}`);
     saveLocalData();renderRevenueRecords();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();await putDataToCloud(`revenueRecords/${dId}`,p);showToast(type==='largeHolder'?'千張大戶持股增加已建立':'營收創高已建立');
     e.target.reset();document.getElementById('r-type').value=type;if(type==='revenue')document.getElementById('r-month').value=m;else document.getElementById('r-date').value=d;syncMomentumFormType();setTimeout(()=>document.getElementById('r-code').focus(),15);
 });
-document.getElementById('revenue-table-body')?.addEventListener('click',async e=>{const b=e.target.closest('[data-action]');if(!b)return;const a=b.dataset.action,id=b.dataset.id;if(a==='edit-notes'){const r=state.revenueRecords.find(x=>x.id===id);if(!r)return;window.openPromptModal("修改備註說明",r.notes||"",async nn=>{if(nn!==null){r.notes=nn.trim();r.updatedAt=Date.now();saveLocalData();renderRevenueRecords();await putDataToCloud(`revenueRecords/${id}`,r);showToast("修改成功");}});}else if(a==='delete-revenue'){window.openConfirmModal('確定刪除？',async()=>{state.revenueRecords=state.revenueRecords.filter(x=>x.id!==id);saveLocalData();renderRevenueRecords();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();await deleteDataFromCloud(`revenueRecords/${id}`);showToast('已刪除');});}});
+document.getElementById('revenue-table-body')?.addEventListener('click',async e=>{const b=e.target.closest('[data-action]');if(!b)return;const a=b.dataset.action,id=b.dataset.id;if(a==='edit-notes'){const r=state.revenueRecords.find(x=>x.id===id);if(!r)return;window.openPromptModal("修改備註說明",r.notes||"",async nn=>{if(nn!==null){r.notes=nn.trim();r.updatedAt=Date.now();saveLocalData();renderRevenueRecords();await putDataToCloud(`revenueRecords/${id}`,r);showToast("修改成功");}});}else if(a==='delete-revenue'){window.openConfirmModal('確定刪除？',async()=>{state.revenueRecords=state.revenueRecords.filter(x=>x.id!==id);saveLocalData();renderRevenueRecords();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();await recordDeletionTombstone('revenueRecords',id);await deleteDataFromCloud(`revenueRecords/${id}`);showToast('已刪除');});}});
 function renderRevenueRecords(){renderRevenueMomentumDashboard();const tb=document.getElementById('revenue-table-body'),em=document.getElementById('revenue-empty');if(!tb||!em)return;let fr=applyRevenueMomentumFilters(state.revenueRecords.map(r=>({...r,type:normalizeMomentumRecordType(r)})));if(fr.length===0){setHTMLIfChanged(tb,'');em.classList.remove('hidden');updateBatchUI('revenue');return;}em.classList.add('hidden');const sr=[...fr].sort((a,b)=>{let vA,vB;switch(state.revenueSortConfig.key){case'month':vA=getMomentumRecordDate(a);vB=getMomentumRecordDate(b);break;case'type':vA=a.type;vB=b.type;break;case'code':vA=a.code;vB=b.code;break;case'eps2025':vA=getEpsInfo(a.code,{}).eps2025??-9999;vB=getEpsInfo(b.code,{}).eps2025??-9999;break;case'eps2026':vA=getEpsInfo(a.code,{}).eps2026??-9999;vB=getEpsInfo(b.code,{}).eps2026??-9999;break;case'epsGrowth':vA=getEpsInfo(a.code,{}).epsGrowth??-9999;vB=getEpsInfo(b.code,{}).epsGrowth??-9999;break;case'targetPrice':vA=getEpsInfo(a.code,{}).targetPrice??-9999;vB=getEpsInfo(b.code,{}).targetPrice??-9999;break;case'momentumScore':vA=getMomentumMetrics(a.code).score;vB=getMomentumMetrics(b.code).score;break;case'notes':vA=a.notes||'';vB=b.notes||'';break;default:vA=a.createdAt||0;vB=b.createdAt||0;break;}if(vA===vB)return(b.createdAt||0)-(a.createdAt||0);return state.revenueSortConfig.asc?(vA>vB?1:-1):(vA>vB?-1:1);});let rh='';sr.forEach(r=>{const isLarge=r.type==='largeHolder',period=isLarge?String(r.date||'').replace(/-/g,'/'):String(r.month||'').replace(/-/g,'/'),p=String(r.month||'').split('-'),tc=isLarge?'text-violet-600 dark:text-violet-400':MONTH_TEXT_COLORS[((parseInt(p[1],10)||1)-1)%12],typeBadge=isLarge?'<span class="inline-flex items-center rounded-md bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-200 px-2 py-1 text-[10px] font-black"><i class="fa-solid fa-users mr-1"></i>千張大戶增加</span>':'<span class="inline-flex items-center rounded-md bg-pink-100 dark:bg-pink-900/40 text-pink-700 dark:text-pink-200 px-2 py-1 text-[10px] font-black"><i class="fa-solid fa-chart-line mr-1"></i>營收創高</span>',ei=getEpsInfo(r.code,{});rh+=`<tr class="table-row-hover border-b border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-sm"><td class="table-sticky-bg py-3 px-2 sm:px-3 text-center sticky left-0 z-20"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${r.id}" data-type="revenue" ${selectedIds['revenue'].has(r.id)?'checked':''}></td><td class="py-3 px-3 sm:px-4 font-bold ${tc}">${escapeHTML(period)}</td><td class="py-3 px-3 sm:px-4">${typeBadge}</td><td class="py-3 px-3 sm:px-4"><span class="font-medium mr-2">${escapeHTML(r.code)}</span><span class="text-gray-600 dark:text-gray-300">${escapeHTML(r.name)}</span></td><td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2025)}</td><td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2026)}</td><td class="py-3 px-3 sm:px-4 text-right">${formatNumColor(ei.epsGrowth,true)}</td><td class="py-3 px-3 sm:px-4 text-right">${formatTargetPrice(ei.targetPrice)}</td><td class="py-3 px-3 sm:px-4 whitespace-normal min-w-[180px]"><div class="flex flex-wrap gap-1">${renderMomentumBadges(r.code)}</div></td><td class="py-3 px-3 sm:px-4 text-gray-600 dark:text-gray-300 w-full">${escapeHTML(r.notes||'')}</td><td class="py-3 px-3 sm:px-4 text-center whitespace-nowrap"><button class="mr-1 text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" data-action="edit-notes" data-id="${r.id}"><i class="fa-solid fa-comment-dots pointer-events-none"></i></button><button class="text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" data-action="delete-revenue" data-id="${r.id}"><i class="fa-solid fa-trash pointer-events-none"></i></button></td></tr>`;});setHTMLIfChanged(tb,rh);updateBatchUI('revenue');}
 
 const pE=document.getElementById('p-entry'),pS=document.getElementById('p-stop');
@@ -2974,7 +3012,7 @@ document.getElementById('edit-plan-form').addEventListener('submit',async e=>{
 document.getElementById('btn-cancel-modal')?.addEventListener('click',e=>{e.preventDefault();document.getElementById('close-plan-modal').classList.add('hidden');});
 const closeTrade=st=>{window.openConfirmModal(`確定以「${st}」結算？`,async()=>{const id=document.getElementById('modal-plan-id').value,ex=parseFloat(document.getElementById('modal-exit-price').value);if(isNaN(ex))return showToast('無效金額','error');const p=state.plans.find(x=>x.id===id);if(!p)return;const pnl=Math.round((ex-p.entry)*p.qty*1000);p.status=st;p.exitPrice=ex;p.pnl=pnl;p.updatedAt=Date.now();saveLocalData();renderPlans();await putDataToCloud(`plans/${id}`,p);document.getElementById('close-plan-modal').classList.add('hidden');showToast(`結算損益: $${pnl}`);});};
 document.getElementById('btn-win')?.addEventListener('click',()=>closeTrade('已停利')); document.getElementById('btn-loss')?.addEventListener('click',()=>closeTrade('已停損'));
-document.getElementById('plan-table-body')?.addEventListener('click',async e=>{const b=e.target.closest('[data-action]');if(!b)return;const a=b.dataset.action,id=b.dataset.id;if(a==='delete-plan'){window.openConfirmModal('確定刪除？',async()=>{state.plans=state.plans.filter(x=>x.id!==id);saveLocalData();renderPlans();await deleteDataFromCloud(`plans/${id}`);showToast('已刪除');});}else if(a==='edit-plan'){window.openCloseModal(id,null,'edit');}else if(a==='close-plan'){const p=state.plans.find(x=>x.id===id);window.openCloseModal(id,p?.target||p?.entry,'close');}});
+document.getElementById('plan-table-body')?.addEventListener('click',async e=>{const b=e.target.closest('[data-action]');if(!b)return;const a=b.dataset.action,id=b.dataset.id;if(a==='delete-plan'){window.openConfirmModal('確定刪除？',async()=>{state.plans=state.plans.filter(x=>x.id!==id);saveLocalData();renderPlans();await recordDeletionTombstone('plans',id);await deleteDataFromCloud(`plans/${id}`);showToast('已刪除');});}else if(a==='edit-plan'){window.openCloseModal(id,null,'edit');}else if(a==='close-plan'){const p=state.plans.find(x=>x.id===id);window.openCloseModal(id,p?.target||p?.entry,'close');}});
 function renderPlans(){const tb=document.getElementById('plan-table-body');if(!tb)return;let cc=0,wc=0,tp=0,rh='';const sp=[...state.plans].sort((a,b)=>{let vA,vB;switch(state.planSortConfig.key){case'entryDate':vA=a.entryDate||'';vB=b.entryDate||'';break;case'stock':vA=a.stock;vB=b.stock;break;case'qty':vA=a.qty;vB=b.qty;break;case'entry':vA=a.entry;vB=b.entry;break;case'target':vA=a.target||0;vB=b.target||0;break;case'stop':vA=a.stop;vB=b.stop;break;case'status':const o={'持倉中':1,'已停利':2,'已停損':3};vA=o[a.status]||99;vB=o[b.status]||99;break;default:vA=a.createdAt||0;vB=b.createdAt||0;break;}if(vA===vB)return(a.createdAt||0)-(b.createdAt||0);return state.planSortConfig.asc?(vA>vB?1:-1):(vA>vB?-1:1);});sp.forEach(i=>{const isC=i.status!=='持倉中';if(isC){cc++;if(i.status==='已停利')wc++;tp+=i.pnl||0;}const cm=i.stock.match(/\d{4}/),isF=cm?getEpsInfo(cm[0],{}).futures:false,dn=i.name||state.codeToName[i.stock]||'',fd=i.entryDate?i.entryDate.replace(/-/g,'/'):'';rh+=`<tr class="table-row-hover border-b border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-sm ${isC?'opacity-50':''}"><td class="table-sticky-bg py-3 px-2 sm:px-3 text-center sticky left-0 z-20"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${i.id}" data-type="plan" ${selectedIds['plan'].has(i.id)?'checked':''}></td><td class="py-3 px-3 sm:px-4 font-medium text-gray-600 dark:text-gray-400">${escapeHTML(fd)}</td><td class="py-3 px-3 sm:px-4 font-medium">${isF?'<span class="bg-sky-600 text-white text-[10px] px-1.5 py-0.5 rounded mr-1.5 shadow-sm">期</span>':''}<span class="font-bold mr-1.5 text-gray-800 dark:text-gray-200">${escapeHTML(i.stock)}</span><span class="text-gray-600 dark:text-gray-400">${escapeHTML(dn)}</span><div class="text-[10px] text-gray-400 mt-0.5">${escapeHTML(i.note||'')}</div></td><td class="py-3 px-3 sm:px-4">${i.qty}</td><td class="py-3 px-3 sm:px-4">${i.entry}</td><td class="py-3 px-3 sm:px-4 tw-red font-bold">${i.target||'-'}</td><td class="py-3 px-3 sm:px-4 tw-green font-bold">${i.stop}</td><td class="py-3 px-3 sm:px-4"><span class="px-2 py-1 rounded-md text-xs font-medium ${i.status==='持倉中'?'bg-blue-100 text-blue-700':(i.status==='已停利'?'bg-red-100 text-red-700':'bg-green-100 text-green-700')}">${i.status}</span></td><td class="py-3 px-3 sm:px-4 whitespace-nowrap">${!isC?`<button data-action="close-plan" data-id="${i.id}" class="text-xs bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 px-3 py-1.5 rounded-lg transition shadow-sm mr-2 active:scale-95">結算</button>`:`<span class="mr-3 ${i.pnl>0?'tw-red':'tw-green'} font-bold">${formatNumColor(i.pnl)}</span>`}<button data-action="edit-plan" data-id="${i.id}" class="text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110 mr-1"><i class="fa-solid fa-pen pointer-events-none"></i></button><button data-action="delete-plan" data-id="${i.id}" class="text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110"><i class="fa-solid fa-trash pointer-events-none"></i></button></td></tr>`;});setHTMLIfChanged(tb,rh);document.getElementById('stat-total').textContent=cc;document.getElementById('stat-winrate').textContent=cc>0?Math.round((wc/cc)*100)+'%':'0%';document.getElementById('stat-pnl').textContent=tp.toString();document.getElementById('stat-pnl').className=`text-2xl font-bold ${tp>0?'tw-red':(tp<0?'tw-green':'text-gray-900 dark:text-white')} transition-colors duration-300`;updateBatchUI('plan');}
 
 let reportReaderItems=[],reportReaderIndex=0,reportReaderTouchStart=null,reportReaderBodyOverflow='',reportReaderEnteredFullscreen=false;
@@ -3066,7 +3104,7 @@ document.getElementById('report-table-body')?.addEventListener('click',async e=>
     const action=button.dataset.action,id=button.dataset.id;
     if(action==='copy-report'){const report=state.reports.find(item=>item.id===id);if(report)executeCopy(`[${resolveReportRecordDate(report)}] ${report.code} / ${report.name}\n${report.content||''}`);}
     else if(action==='edit-report'){const report=state.reports.find(item=>item.id===id);if(report)window.openPromptModal("修改",report.content||"",async newContent=>{if(newContent!==null&&newContent.trim()!==""){report.content=newContent.trim();report.updatedAt=Date.now();saveLocalData();renderReports();await putDataToCloud(`reports/${id}`,report);showToast("修改成功");}});}
-    else if(action==='delete-report'){window.openConfirmModal('確定刪除？',async()=>{state.reports=state.reports.filter(item=>item.id!==id);saveLocalData();renderReports();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();await deleteDataFromCloud(`reports/${id}`);showToast('已刪除');});}
+    else if(action==='delete-report'){window.openConfirmModal('確定刪除？',async()=>{state.reports=state.reports.filter(item=>item.id!==id);saveLocalData();renderReports();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();await recordDeletionTombstone('reports',id);await deleteDataFromCloud(`reports/${id}`);showToast('已刪除');});}
 });
 function renderReports(){
     const tableBody=document.getElementById('report-table-body'),emptyState=document.getElementById('report-empty'),readerButton=document.getElementById('btn-open-report-reader');if(!tableBody||!emptyState)return;
@@ -3097,7 +3135,7 @@ document.getElementById('chk-btn-submit')?.addEventListener('click',async()=>{
 });
 
 function renderChecklists(){const tb=document.getElementById('checklist-table-body'),em=document.getElementById('checklist-empty');if(!tb||!em)return;if(!state.checklists||state.checklists.length===0){setHTMLIfChanged(tb,'');em.classList.remove('hidden');updateBatchUI('checklist');return;}em.classList.add('hidden');const sc=[...state.checklists].sort((a,b)=>{let vA,vB;switch(state.checklistSortConfig?state.checklistSortConfig.key:'createdAt'){case'date':vA=a.date;vB=b.date;break;case'code':vA=a.code;vB=b.code;break;case'direction':vA=a.direction||'';vB=b.direction||'';break;case'match':vA=(a.checkedItems?.length||0)/(CHK_CONFIG[a.direction]?.length||1);vB=(b.checkedItems?.length||0)/(CHK_CONFIG[b.direction]?.length||1);break;case'target':vA=parseFloat(a.details?.target)||-9999;vB=parseFloat(b.details?.target)||-9999;break;default:vA=a.createdAt||0;vB=b.createdAt||0;break;}if(vA===vB)return(b.createdAt||0)-(a.createdAt||0);return (state.checklistSortConfig?state.checklistSortConfig.asc:false)?(vA>vB?1:-1):(vA>vB?-1:1);});let rh='';sc.forEach(r=>{const t=CHK_CONFIG[r.direction]?.length||1,c=r.checkedItems?.length||0,s=Math.round((c/t)*100)||0,bc=s>70?(r.direction==='long'?'bg-red-500':'bg-emerald-500'):'bg-amber-400',db=r.direction==='long'?'<span class="px-2.5 py-1 bg-red-50 text-red-700 text-xs font-bold rounded-lg border border-red-200">📈 多方</span>':'<span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-lg border border-emerald-200">📉 空方</span>',fd=r.date?r.date.replace(/-/g,'/'):'';rh+=`<tr class="table-row-hover border-b border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-sm"><td class="table-sticky-bg py-3 px-2 w-[40px] text-center sticky left-0 z-20"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${r.id}" data-type="checklist" ${selectedIds['checklist']&&selectedIds['checklist'].has(r.id)?'checked':''}></td><td class="py-3 px-2 sm:px-3 font-medium text-gray-600 dark:text-gray-400">${escapeHTML(fd)}</td><td class="py-3 px-2 sm:px-3"><div class="font-bold text-gray-800 dark:text-gray-200">${escapeHTML(r.code)}</div><div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">${escapeHTML(r.name)}</div></td><td class="py-3 px-2 sm:px-3 text-center">${db}</td><td class="py-3 px-2 sm:px-3"><div class="flex items-center gap-3"><div class="w-24 bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden"><div class="h-full rounded-full ${bc}" style="width:${s}%"></div></div><span class="text-xs font-bold text-gray-600 dark:text-gray-400">${c}/${t}</span></div></td><td class="py-3 px-2 sm:px-3 text-right font-bold text-gray-800 dark:text-gray-200">${r.details?.target?'$'+escapeHTML(r.details.target):'-'}</td><td class="py-3 px-2 sm:px-3 text-center whitespace-nowrap"><button class="mr-1 text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" data-action="edit-checklist" data-id="${r.id}"><i class="fa-solid fa-pen pointer-events-none"></i></button><button class="text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" data-action="delete-checklist" data-id="${r.id}"><i class="fa-solid fa-trash pointer-events-none"></i></button></td></tr>`;});setHTMLIfChanged(tb,rh);updateBatchUI('checklist');}
-document.getElementById('checklist-table-body')?.addEventListener('click',async e=>{const b=e.target.closest('[data-action]');if(!b)return;const a=b.dataset.action,id=b.dataset.id;if(a==='delete-checklist'){window.openConfirmModal('確定刪除？',async()=>{state.checklists=state.checklists.filter(c=>c.id!==id);saveLocalData();renderChecklists();await deleteDataFromCloud(`checklists/${id}`);showToast('已刪除');});}else if(a==='edit-checklist'){const r=state.checklists.find(c=>c.id===id);if(!r)return;chkEditingId=id;document.getElementById('chk-form-title').innerText='編輯查核紀錄';document.getElementById('chk-date').value=r.date;document.getElementById('chk-code').value=r.code;document.getElementById('chk-name').value=r.name;setChkDirection(r.direction);chkSelectedItems=new Set(r.checkedItems||[]);renderChkCheckboxGrid();document.getElementById('chk-pressure').value=r.details?.pressure||'';document.getElementById('chk-support').value=r.details?.support||'';document.getElementById('chk-target').value=r.details?.target||'';document.getElementById('chk-chips-inst').value=r.details?.chipsInst||'';document.getElementById('chk-chips-conc').value=r.details?.chipsConc||'';document.getElementById('chk-cost').value=r.details?.cost||'';document.getElementById('chk-notes').value=r.details?.notes||'';updatePreview(r.code,'chk-preview','cyan');document.querySelector('[data-target="module-checklist"]').click();window.scrollTo({top:0,behavior:'smooth'});}});
+document.getElementById('checklist-table-body')?.addEventListener('click',async e=>{const b=e.target.closest('[data-action]');if(!b)return;const a=b.dataset.action,id=b.dataset.id;if(a==='delete-checklist'){window.openConfirmModal('確定刪除？',async()=>{state.checklists=state.checklists.filter(c=>c.id!==id);saveLocalData();renderChecklists();await recordDeletionTombstone('checklists',id);await deleteDataFromCloud(`checklists/${id}`);showToast('已刪除');});}else if(a==='edit-checklist'){const r=state.checklists.find(c=>c.id===id);if(!r)return;chkEditingId=id;document.getElementById('chk-form-title').innerText='編輯查核紀錄';document.getElementById('chk-date').value=r.date;document.getElementById('chk-code').value=r.code;document.getElementById('chk-name').value=r.name;setChkDirection(r.direction);chkSelectedItems=new Set(r.checkedItems||[]);renderChkCheckboxGrid();document.getElementById('chk-pressure').value=r.details?.pressure||'';document.getElementById('chk-support').value=r.details?.support||'';document.getElementById('chk-target').value=r.details?.target||'';document.getElementById('chk-chips-inst').value=r.details?.chipsInst||'';document.getElementById('chk-chips-conc').value=r.details?.chipsConc||'';document.getElementById('chk-cost').value=r.details?.cost||'';document.getElementById('chk-notes').value=r.details?.notes||'';updatePreview(r.code,'chk-preview','cyan');document.querySelector('[data-target="module-checklist"]').click();window.scrollTo({top:0,behavior:'smooth'});}});
 
 // ======================= 個股總覽 ======================= //
 let activeOverviewStock=null;
@@ -3918,7 +3956,7 @@ setChkDirection('long');
     mobileToolsButton?.addEventListener('click',event=>{event.stopPropagation();const opening=mobileToolsMenu?.classList.contains('hidden');mobileToolsMenu?.classList.toggle('hidden',!opening);mobileToolsButton.setAttribute('aria-expanded',String(!!opening));});
     mobileToolsMenu?.addEventListener('click',event=>{const button=event.target.closest('[data-mobile-tool-target]');if(!button)return;document.getElementById(button.dataset.mobileToolTarget)?.click();mobileToolsMenu.classList.add('hidden');mobileToolsButton?.setAttribute('aria-expanded','false');});
     document.getElementById('global-search-close')?.addEventListener('click',()=>setGlobalSearchOpen(false));
-    document.getElementById('global-search-input')?.addEventListener('input',debounce(renderGlobalSearch,120));
+    document.getElementById('global-search-input')?.addEventListener('input',debounce(renderGlobalSearch,220));
     document.getElementById('global-search-input')?.addEventListener('keydown',event=>{if(event.key==='Enter'&&lastGlobalSearchResults[0]){event.preventDefault();openGlobalStock(lastGlobalSearchResults[0].code,lastGlobalSearchResults[0].name);}});
     document.getElementById('global-search-results')?.addEventListener('click',event=>{const button=event.target.closest('[data-global-stock-code]');if(button)openGlobalStock(button.dataset.globalStockCode,button.dataset.globalStockName);});
     document.getElementById('global-search-modal')?.addEventListener('click',event=>{if(event.target.id==='global-search-modal')setGlobalSearchOpen(false);});
