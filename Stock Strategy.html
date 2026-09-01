@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="122">
+<meta name="app-version" content="123">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -49,6 +49,65 @@ html.dark .stock-code-invalid { border-color:#f87171 !important; box-shadow:0 0 
 .nav-btn-mobile.active-indigo { @apply bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border-indigo-300 dark:border-indigo-700 shadow-sm; }
 .nav-btn-mobile.active-cyan { @apply bg-cyan-100 dark:bg-cyan-900/60 text-cyan-700 dark:text-cyan-300 border-cyan-300 dark:border-cyan-700 shadow-sm; }
 }
+
+/* v123 作戰工作台：桌機縮短留白、手機第一層只留最重要資訊 */
+@media (min-width:640px){
+  #module-journal #journal-add-section{margin-bottom:1rem!important}
+  #module-journal .mobile-card-scroll table th{padding-top:.55rem!important;padding-bottom:.55rem!important;font-size:12px}
+  #module-journal #journal-table-body td{padding-top:.5rem!important;padding-bottom:.5rem!important}
+  #module-journal #journal-table-body tr{height:auto}
+  #module-journal .copy-section{padding-top:.45rem!important;padding-bottom:.45rem!important}
+  #module-journal #batch-bar-journal{padding-top:.45rem!important;padding-bottom:.45rem!important}
+}
+@media (min-width:1024px){
+  #journal-war-room #war-room-stats>div{min-height:34px!important}
+  #journal-war-room #war-room-ranking{height:100%;align-content:start}
+}
+@media (max-width:639px){
+  #journal-war-room{margin-bottom:.65rem!important}
+  #journal-war-room>div:first-child{padding:.55rem .7rem!important}
+  #journal-war-room>div:first-child p{display:none}
+  #journal-war-room>div:nth-child(2){padding:.45rem!important}
+  #journal-war-room #war-room-stats{gap:.28rem!important;margin-bottom:.4rem!important}
+  #journal-war-room #war-room-stats>div{min-height:32px!important}
+  #journal-war-room #war-room-ranking{gap:.28rem!important;padding:.28rem!important}
+  html.mobile-view-card #module-journal table.mobile-card-table tbody tr,
+  html.mobile-view-card #module-favorites table.mobile-card-table tbody tr{
+    gap:.38rem .5rem!important;
+    padding:.58rem!important;
+  }
+  html.mobile-view-card #module-journal table.mobile-card-table tbody td:nth-child(3),
+  html.mobile-view-card #module-favorites table.mobile-card-table tbody td:nth-child(3){
+    grid-column:1/-1!important;
+    padding-right:2.5rem!important;
+  }
+  html.mobile-view-card #module-journal table.mobile-card-table tbody td:nth-child(3)::before,
+  html.mobile-view-card #module-favorites table.mobile-card-table tbody td:nth-child(3)::before{display:none!important}
+  html.mobile-view-card #module-journal table.mobile-card-table tbody td:nth-child(3) .font-bold,
+  html.mobile-view-card #module-favorites table.mobile-card-table tbody td:nth-child(3) .font-bold{
+    font-size:16px!important;
+  }
+  html.mobile-view-card #module-journal table.mobile-card-table tbody td:nth-child(5),
+  html.mobile-view-card #module-favorites table.mobile-card-table tbody td:nth-child(5),
+  html.mobile-view-card #module-journal table.mobile-card-table tbody td:nth-child(9),
+  html.mobile-view-card #module-favorites table.mobile-card-table tbody td:nth-child(9){
+    border-radius:.55rem;
+    background:rgba(241,245,249,.72)!important;
+    padding:.42rem .5rem!important;
+  }
+  html.dark.mobile-view-card #module-journal table.mobile-card-table tbody td:nth-child(5),
+  html.dark.mobile-view-card #module-favorites table.mobile-card-table tbody td:nth-child(5),
+  html.dark.mobile-view-card #module-journal table.mobile-card-table tbody td:nth-child(9),
+  html.dark.mobile-view-card #module-favorites table.mobile-card-table tbody td:nth-child(9){
+    background:rgba(30,41,59,.72)!important;
+  }
+  html.mobile-view-card #module-journal table.mobile-card-table tbody td:nth-child(10),
+  html.mobile-view-card #module-favorites table.mobile-card-table tbody td:nth-child(10){
+    grid-column:1/-1!important;
+    padding-top:.15rem!important;
+  }
+}
+
 </style>
 
 <style id="admin-mode-style">
@@ -533,15 +592,15 @@ html.dark body main :is(#module-journal,#module-favorites,#module-revenue,#modul
 
     <!-- 策略日誌 -->
     <div id="module-journal" class="tab-content active">
-        <section id="journal-war-room" class="card-panel mb-6 border-t-4 border-rose-500 overflow-hidden">
-            <div class="px-4 sm:px-5 py-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-rose-50 via-orange-50 to-amber-50 dark:from-rose-950/30 dark:via-orange-950/20 dark:to-amber-950/20">
+        <section id="journal-war-room" class="card-panel mb-3 sm:mb-4 border-t-4 border-rose-500 overflow-hidden">
+            <div class="px-3 sm:px-4 py-2.5 sm:py-3 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-rose-50 via-orange-50 to-amber-50 dark:from-rose-950/30 dark:via-orange-950/20 dark:to-amber-950/20">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <div><h2 class="font-black text-rose-600 dark:text-rose-300 text-lg sm:text-xl"><i class="fa-solid fa-crosshairs mr-2"></i>今日作戰室</h2><p class="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 mt-1">整合策略、營收、千張大戶、法人與 EPS，自動找出目前最值得優先觀察的股票。</p></div>
+                    <div><h2 class="font-black text-rose-600 dark:text-rose-300 text-base sm:text-lg"><i class="fa-solid fa-crosshairs mr-2"></i>今日作戰室</h2><p class="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 mt-1">整合策略、營收、千張大戶、法人與 EPS，自動找出目前最值得優先觀察的股票。</p></div>
                     <span id="war-room-date" class="text-[11px] font-bold text-gray-500 dark:text-gray-400"></span>
                 </div>
             </div>
-            <div class="p-3 sm:p-4">
-                <div id="war-room-stats" class="grid grid-cols-3 lg:grid-cols-6 gap-2 mb-3"></div>
+            <div class="p-2 sm:p-3 lg:grid lg:grid-cols-[minmax(250px,0.78fr)_minmax(0,2.22fr)] lg:gap-2.5 lg:items-stretch">
+                <div id="war-room-stats" class="grid grid-cols-3 gap-1.5 mb-2 lg:mb-0 content-start"></div>
                 <div class="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
                     <div class="px-2 py-1.5 bg-gray-50 dark:bg-gray-900 flex items-center justify-between"><span class="text-[11px] font-black text-gray-700 dark:text-gray-200"><i class="fa-solid fa-ranking-star text-amber-500 mr-1"></i>強度排行 TOP 6</span><span class="text-[9px] text-gray-400">點股票查看</span></div>
                     <div id="war-room-ranking" class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-1 p-1 bg-white dark:bg-gray-800"></div>
@@ -3680,8 +3739,10 @@ setChkDirection('long');
     'module-plan':[]
   };
   const mobileDetailColumns={
-    'module-journal':[3,4,5,6,7,8,10],
-    'module-favorites':[3,4,5,6,7,8],
+    // 手機卡片第一層：日期、代號/股名、26EPS、營收/籌碼、策略強度。
+    // 25EPS、成長率、分數、目標價、備註收進「詳情」。
+    'module-journal':[3,5,6,7,10],
+    'module-favorites':[3,5,6,7],
     'module-revenue':[3,4,5,6,7],
     'module-report':[],
     'module-checklist':[4,5],
@@ -3764,7 +3825,12 @@ setChkDirection('long');
 
   function decorateMobileCardTable(table){
     const moduleId=table.closest('.tab-content')?.id||'',wideColumns=mobileWideColumns[moduleId]||[],detailColumns=mobileDetailColumns[moduleId]||[];
-    const labels=Array.from(table.querySelectorAll('thead th')).map((th,index)=>index===0?'選取':th.textContent.replace(/\s+/g,' ').trim());
+    const labels=Array.from(table.querySelectorAll('thead th')).map((th,index)=>{
+      if(index===0)return'選取';
+      const raw=th.textContent.replace(/\s+/g,' ').trim();
+      const compactLabels={'26 EPS':'26EPS','25 EPS':'25EPS','營收／籌碼':'籌碼動能','策略標籤':'策略／強度','目標價':'目標價','成長率':'EPS成長'};
+      return compactLabels[raw]||raw;
+    });
     table.querySelectorAll('tbody tr').forEach(row=>{
       Array.from(row.children).forEach((cell,index)=>{
         cell.dataset.mobileLabel=labels[index]||'';
