@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="117.2">
+<meta name="app-version" content="119">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -1917,12 +1917,24 @@ const bindAutoFill=(cId,nId,cb=null,strict=false)=>{
         else if(strict){codeInput.value='';setStockPairValidity(codeInput,nameInput,'');}
         notify(code);
     };
-    codeInput.addEventListener('input',()=>syncFromCode(false,false));
-    codeInput.addEventListener('change',()=>syncFromCode(false,true));
-    codeInput.addEventListener('blur',()=>syncFromCode(false,true));
+    let codeLookupTimer=null,isComposingCode=false;
+    const cancelCodeLookup=()=>{if(codeLookupTimer){clearTimeout(codeLookupTimer);codeLookupTimer=null;}};
+    codeInput.addEventListener('compositionstart',()=>{isComposingCode=true;cancelCodeLookup();});
+    codeInput.addEventListener('compositionend',()=>{isComposingCode=false;cancelCodeLookup();codeLookupTimer=setTimeout(()=>syncFromCode(false,false),120);});
+    codeInput.addEventListener('input',()=>{
+        cancelCodeLookup();
+        if(isComposingCode)return;
+        const raw=codeInput.value.trim();
+        // 輸入途中不查表、不改寫欄位，避免第 4 碼就搶先帶入造成 5~6 碼代號輸入卡頓。
+        if(!raw){nameInput.value='';setStockPairValidity(codeInput,nameInput,'');notify('');return;}
+        if(/^\d{1,3}$/.test(raw)){nameInput.value='';setStockPairValidity(codeInput,nameInput,'');return;}
+        codeLookupTimer=setTimeout(()=>{codeLookupTimer=null;syncFromCode(false,false);},160);
+    });
+    codeInput.addEventListener('change',()=>{cancelCodeLookup();syncFromCode(false,true);});
+    codeInput.addEventListener('blur',()=>{cancelCodeLookup();syncFromCode(false,true);});
     nameInput.addEventListener('input',()=>syncFromName(false));
     nameInput.addEventListener('change',()=>syncFromName(false));
-    codeInput.addEventListener('keydown',e=>{if(e.key==='Enter')syncFromCode(true,true);});
+    codeInput.addEventListener('keydown',e=>{if(e.key==='Enter'){cancelCodeLookup();syncFromCode(true,true);}});
     nameInput.addEventListener('keydown',e=>{if(e.key==='Enter')syncFromName(true);});
 };
 
@@ -4761,26 +4773,52 @@ const SESSION={
     {key:'code',label:'股票代號',required:true,aliases:['代號','股票代號','股票代碼','股號','證券代號','Code','stock_id']},
     {key:'name',label:'股名／公司名稱',required:true,aliases:['股名','股票名稱','公司名稱','公司','名稱','證券名稱','Name','stock_name']},
     {key:'eps2025',label:'114年／2025 EPS',aliases:['25EPS','2025EPS','2025','今年EPS','本年EPS','114年EPS','114EPS','2025年EPS','2025EPS(估)','114年EPS(估)','預估114年EPS','114年預估EPS']},
-    {key:'eps2026',label:'115年／2026 EPS',aliases:['26EPS','預26EPS','2026EPS','2026','明年EPS','預估26EPS','預估2026EPS','115年EPS','115EPS','2026年EPS','2026EPS(估)','115年EPS(估)','115EPS(估)','2026估EPS','預估EPS','預估115年EPS','115年預估EPS','2026預估EPS','2026年預估EPS']},
+    {key:'eps2026',label:'115年／2026 EPS',aliases:['26EPS','預26EPS','2026EPS','2026','明年EPS','預估26EPS','預估2026EPS','預估2026 EPS','預估 2026 EPS','預估2026EPS(元)','預估2026EPS（元）','115年EPS','115EPS','2026年EPS','2026EPS(估)','115年EPS(估)','115EPS(估)','2026估EPS','預估EPS','預估115年EPS','115年預估EPS','2026預估EPS','2026年預估EPS','2026E EPS','2026E EPS(元)','2026E EPS（元）']},
     {key:'epsGrowth',label:'EPS成長率',aliases:['EPS成長率','成長率','預估成長率','YoY','YOY','EPSYoY']},
     {key:'targetPrice',label:'目標價',aliases:['最高目標價','最高目標價(元)','目標價','目標價(元)','TargetPrice','TP']},
     {key:'broker',label:'券商',aliases:['券商','發布券商','Broker']},
     {key:'reportDate',label:'報告日期',aliases:['報告日期','報告日','日期','ReportDate','report_date']},
     {key:'futures',label:'股期',aliases:['股期','期貨']}
   ];
-  function findDatabaseHeaderIndex(headers,aliases){
-    var normalizedAliases=aliases.map(normalizeImportHeader);for(var index=0;index<headers.length;index++)if(normalizedAliases.includes(headers[index]))return index;return-1;
+  function compactDatabaseHeader(value){
+    return normalizeImportHeader(value).replace(/[\uFEFF·•．。,.，、_\-－—–/:：;；%％$＄]/g,'').toUpperCase();
+  }
+  function findDatabaseHeaderIndex(headers,field){
+    var aliases=field.aliases||[],normalizedAliases=aliases.map(compactDatabaseHeader).filter(Boolean);
+    for(var index=0;index<headers.length;index++){
+      var header=compactDatabaseHeader(headers[index]);if(!header)continue;
+      if(normalizedAliases.includes(header))return index;
+    }
+    for(var index=0;index<headers.length;index++){
+      var header=compactDatabaseHeader(headers[index]);if(!header)continue;
+      if(normalizedAliases.some(function(alias){return alias.length>=4&&(header.includes(alias)||alias.includes(header));}))return index;
+      if(field.key==='eps2026'&&(/(?:2026|115年?)/.test(header)&&/(?:EPS|每股盈餘)/.test(header)))return index;
+      if(field.key==='eps2025'&&(/(?:2025|114年?)/.test(header)&&/(?:EPS|每股盈餘)/.test(header)))return index;
+      if(field.key==='code'&&/(?:股票|證券)?(?:代號|代碼|股號|CODE|STOCKID)/.test(header))return index;
+      if(field.key==='name'&&/(?:股名|股票名稱|公司名稱|證券名稱|STOCKNAME)/.test(header))return index;
+    }
+    return-1;
   }
   function getDatabaseImportSource(workbook){
-    var sheet=workbook&&workbook.Sheets&&workbook.Sheets[workbook.SheetNames&&workbook.SheetNames[0]];if(!sheet)return null;
-    var matrix=XLSX.utils.sheet_to_json(sheet,{header:1,defval:null,raw:true}),candidate={headerIndex:0,headerMap:{},matchedCount:-1};
-    for(var rowIndex=0;rowIndex<Math.min(matrix.length,25);rowIndex++){
-      var headers=(matrix[rowIndex]||[]).map(normalizeImportHeader),headerMap={},matchedCount=0;
-      DATABASE_IMPORT_FIELDS.forEach(function(field){headerMap[field.key]=findDatabaseHeaderIndex(headers,field.aliases);if(headerMap[field.key]>=0)matchedCount++;});
-      if(matchedCount>candidate.matchedCount)candidate={headerIndex:rowIndex,headerMap:headerMap,matchedCount:matchedCount};
-    }
-    var missingHeaders=DATABASE_IMPORT_FIELDS.filter(function(field){return field.required&&candidate.headerMap[field.key]<0;}).map(function(field){return field.label;});
-    return{sheet:sheet,matrix:matrix,headerIndex:candidate.headerIndex,headerMap:candidate.headerMap,missingHeaders:missingHeaders,rows:matrix.slice(candidate.headerIndex+1)};
+    if(!workbook||!workbook.Sheets||!Array.isArray(workbook.SheetNames)||!workbook.SheetNames.length)return null;
+    var best=null;
+    workbook.SheetNames.forEach(function(sheetName,sheetOrder){
+      var sheet=workbook.Sheets[sheetName];if(!sheet)return;
+      var matrix=XLSX.utils.sheet_to_json(sheet,{header:1,defval:null,raw:true});
+      for(var rowIndex=0;rowIndex<Math.min(matrix.length,35);rowIndex++){
+        var headers=(matrix[rowIndex]||[]).map(normalizeImportHeader),headerMap={},matchedCount=0,optionalCount=0;
+        DATABASE_IMPORT_FIELDS.forEach(function(field){
+          headerMap[field.key]=findDatabaseHeaderIndex(headers,field);
+          if(headerMap[field.key]>=0){matchedCount++;if(!field.required)optionalCount++;}
+        });
+        var requiredMatched=DATABASE_IMPORT_FIELDS.filter(function(field){return field.required&&headerMap[field.key]>=0;}).length;
+        var score=requiredMatched*100+matchedCount*10+optionalCount-rowIndex*0.01-sheetOrder*0.001;
+        if(!best||score>best.score)best={sheet:sheet,sheetName:sheetName,matrix:matrix,headerIndex:rowIndex,headerMap:headerMap,matchedCount:matchedCount,score:score,headers:headers};
+      }
+    });
+    if(!best)return null;
+    var missingHeaders=DATABASE_IMPORT_FIELDS.filter(function(field){return field.required&&best.headerMap[field.key]<0;}).map(function(field){return field.label;});
+    return{sheet:best.sheet,sheetName:best.sheetName,matrix:best.matrix,headerIndex:best.headerIndex,headerMap:best.headerMap,missingHeaders:missingHeaders,rows:best.matrix.slice(best.headerIndex+1),headers:best.headers};
   }
   function isImportedBlankMarker(value){return value==null||/^\s*(?:|[-—–]|N\/?A|NA|無)\s*$/i.test(String(value));}
   function normalizeImportedOptionalNumber(value,allowPercent){
@@ -4817,10 +4855,25 @@ const SESSION={
     });
     if(!validRows&&!invalidRows){invalidRows=1;rowErrors.push({rowNumber:'資料區',code:'—',name:'—',fields:['資料'],messages:['找不到可匯入的資料列']});}
     var module={key:'database',label:'EPS／目標價參考資料庫',entries:entries,newCount:entries.filter(function(entry){return!entry.isDuplicate;}).length,duplicateCount:entries.filter(function(entry){return entry.isDuplicate;}).length,invalidCount:invalidRows},preview=buildImportPreview('database','EPS／目標價資料庫匯入預覽',[module]);
-    preview.description=invalidRows?'發現 '+invalidRows+' 列欄位異常；異常資料不會匯入，其餘有效資料可繼續更新。':'已完成 EPS、目標價及相關欄位檢查。';preview.errors=rowErrors;preview.hasBlockingErrors=!validRows&&invalidRows===1&&rowErrors[0].rowNumber==='資料區';preview.sourceCount=validRows+invalidRows;preview.selectedCount=entries.length;return preview;
+    var detected2026=source.headerMap.eps2026>=0,sourceSheetText=source.sheetName?'工作表「'+source.sheetName+'」；':'';
+    preview.description=sourceSheetText+(detected2026?'已辨識「'+String(source.headers[source.headerMap.eps2026]||'預估2026EPS')+'」→ 26EPS。':'未找到 2026 EPS 欄位。')+(invalidRows?'另有 '+invalidRows+' 列欄位異常，異常資料不會匯入。':' EPS、目標價及相關欄位檢查完成。');
+    preview.errors=rowErrors;preview.hasBlockingErrors=!validRows&&invalidRows===1&&rowErrors[0].rowNumber==='資料區';preview.sourceCount=validRows+invalidRows;preview.selectedCount=entries.length;preview.details=entries.map(function(entry){return entry.item;});preview.detected2026=detected2026;preview.sourceSheetName=source.sheetName;return preview;
   }
 
-  function parseExcelUploadWorkbook(workbook){return parseBrokerReportWorkbook(workbook)||parseDatabaseWorkbook(workbook);}
+  function workbookLooksLikeEpsDatabase(workbook){
+    if(!workbook||!workbook.Sheets||!Array.isArray(workbook.SheetNames))return false;
+    return workbook.SheetNames.some(function(sheetName){
+      var sheet=workbook.Sheets[sheetName];if(!sheet)return false;
+      var matrix=XLSX.utils.sheet_to_json(sheet,{header:1,defval:null,raw:true});
+      return matrix.slice(0,35).some(function(row){
+        return (row||[]).some(function(value){var h=compactDatabaseHeader(value);return /(?:2025|2026|114年?|115年?).*(?:EPS|每股盈餘)|(?:EPS|每股盈餘).*(?:2025|2026|114年?|115年?)/.test(h);});
+      });
+    });
+  }
+  function parseExcelUploadWorkbook(workbook){
+    if(workbookLooksLikeEpsDatabase(workbook))return parseDatabaseWorkbook(workbook);
+    return parseBrokerReportWorkbook(workbook)||parseDatabaseWorkbook(workbook);
+  }
 
   function buildImportPreview(type,title,modules){
     return{type:type,title:title,modules:modules,newCount:modules.reduce(function(sum,module){return sum+module.newCount;},0),duplicateCount:modules.reduce(function(sum,module){return sum+module.duplicateCount;},0),invalidCount:modules.reduce(function(sum,module){return sum+module.invalidCount;},0)};
@@ -4851,6 +4904,10 @@ const SESSION={
     if(isBrokerReport&&preview.details&&preview.details.length){
       var visibleDetails=preview.details.slice(0,300),moreCount=Math.max(0,preview.details.length-visibleDetails.length);
       details.innerHTML='<div class="mb-2 flex flex-wrap items-center justify-between gap-2"><div class="text-xs sm:text-sm font-black text-purple-700 dark:text-purple-300"><i class="fa-solid fa-filter-circle-dollar mr-1.5"></i>擇優結果 '+preview.selectedCount+' 檔</div><div class="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">原始 '+preview.sourceCount+' 筆；排除同代號非擇優 '+preview.discardedCount+' 筆</div></div><div class="max-h-[38vh] overflow-auto rounded-xl border border-gray-200 dark:border-gray-700"><table class="w-full min-w-[560px] text-xs"><thead class="sticky top-0 bg-purple-50 dark:bg-gray-900 text-purple-700 dark:text-purple-300"><tr><th class="p-2 text-left">代號／股名</th><th class="p-2 text-center">日期</th><th class="p-2 text-right">目標價</th><th class="p-2 text-left">券商</th></tr></thead><tbody>'+visibleDetails.map(function(item){return'<tr class="border-t border-gray-200 dark:border-gray-700"><td class="p-2"><b>'+escapeHTML(item.code)+'</b>／'+escapeHTML(item.name)+'</td><td class="p-2 text-center whitespace-nowrap">'+escapeHTML(String(item.reportDate||'').replace(/-/g,'/'))+'</td><td class="p-2 text-right font-black text-red-600 dark:text-red-400">'+Number(item.targetPrice).toLocaleString('zh-TW',{maximumFractionDigits:2})+'</td><td class="p-2 font-bold">'+escapeHTML(item.broker)+'</td></tr>';}).join('')+'</tbody></table></div>'+(moreCount?'<div class="mt-2 text-[10px] text-gray-400 text-right">另有 '+moreCount+' 檔已擇優，確認後會一併更新。</div>':'');
+      details.classList.remove('hidden');
+    }else if(isDatabase&&preview.details&&preview.details.length){
+      var visibleDbDetails=preview.details.slice(0,300),dbMore=Math.max(0,preview.details.length-visibleDbDetails.length);
+      details.innerHTML='<div class="mb-2 flex flex-wrap items-center justify-between gap-2"><div class="text-xs sm:text-sm font-black text-blue-700 dark:text-blue-300"><i class="fa-solid fa-table-list mr-1.5"></i>資料庫辨識結果 '+preview.selectedCount+' 檔</div><div class="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">'+(preview.sourceSheetName?'工作表：'+escapeHTML(preview.sourceSheetName)+'；':'')+'26EPS 欄位：'+(preview.detected2026?'已辨識':'未辨識')+'</div></div><div class="max-h-[38vh] overflow-auto rounded-xl border border-gray-200 dark:border-gray-700"><table class="w-full min-w-[500px] text-xs"><thead class="sticky top-0 bg-blue-50 dark:bg-gray-900 text-blue-700 dark:text-blue-300"><tr><th class="p-2 text-left">代號／股名</th><th class="p-2 text-right">25EPS</th><th class="p-2 text-right">26EPS</th><th class="p-2 text-right">目標價</th></tr></thead><tbody>'+visibleDbDetails.map(function(item){return'<tr class="border-t border-gray-200 dark:border-gray-700"><td class="p-2"><b>'+escapeHTML(item.code)+'</b>／'+escapeHTML(item.name)+'</td><td class="p-2 text-right">'+escapeHTML(item.eps2025??'—')+'</td><td class="p-2 text-right font-black text-blue-600 dark:text-blue-300">'+escapeHTML(item.eps2026??'—')+'</td><td class="p-2 text-right">'+escapeHTML(item.targetPrice??'—')+'</td></tr>';}).join('')+'</tbody></table></div>'+(dbMore?'<div class="mt-2 text-[10px] text-gray-400 text-right">另有 '+dbMore+' 檔確認後會一併更新。</div>':'');
       details.classList.remove('hidden');
     }else{details.innerHTML='';details.classList.add('hidden');}
     var wrap=document.getElementById('import-duplicate-option-wrap');
