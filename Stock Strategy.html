@@ -498,7 +498,7 @@ html.dark body main :is(#module-journal,#module-favorites,#module-revenue,#modul
                 <button id="btn-global-search" type="button" class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/60 transition shadow-sm flex items-center justify-center" aria-label="全站快速查股" title="全站快速查股（Ctrl／⌘＋K）"><i class="fa-solid fa-magnifying-glass"></i></button>
                 <button id="btn-admin-mode" type="button" class="h-8 sm:h-9 px-2 sm:px-2.5 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors shadow-sm flex items-center justify-center" aria-label="進入管理者模式" title="管理者模式"><i class="fa-solid fa-lock text-sm"></i><span class="hidden 2xl:inline ml-1.5 text-xs font-medium">管理者</span></button>
                 <button type="button" id="theme-toggle" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-yellow-400 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors shadow-inner" aria-label="切換日間或夜間模式" title="日／夜模式"><i class="fa-solid fa-moon dark:hidden text-sm sm:text-base"></i><i class="fa-solid fa-sun hidden dark:block text-sm sm:text-base"></i></button>
-                <div class="relative shrink-0"><button id="btn-sync-modal" class="text-xs sm:text-sm bg-blue-600 hover:bg-blue-500 text-white px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm border border-transparent flex items-center font-medium active:scale-95"><i class="fa-solid fa-cloud-arrow-up sm:mr-1.5"></i><span class="hidden sm:inline">跨裝置同步</span></button><span id="sync-health-status" class="pointer-events-none absolute -right-0.5 -top-0.5 w-2.5 h-2.5 rounded-full bg-gray-400 ring-2 ring-white dark:ring-gray-800 transition-colors" role="status" aria-label="雲端尚未同步" title="雲端尚未同步"></span></div>
+                <div class="relative shrink-0"><button id="btn-sync-modal" class="text-xs sm:text-sm bg-blue-600 hover:bg-blue-500 text-white px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm border border-transparent flex items-center font-medium active:scale-95"><i class="fa-solid fa-cloud-arrow-up sm:mr-1.5"></i><span class="hidden sm:inline">跨裝置同步</span></button><span id="sync-health-status" class="pointer-events-none absolute -right-0.5 -top-0.5 w-2.5 h-2.5 rounded-full bg-gray-400 ring-2 ring-white dark:ring-gray-800 transition-colors" role="status" aria-label="雲端尚未同步" title="雲端尚未同步"></span></div><button id="btn-clear-local-residue" type="button" class="hidden sm:inline-flex text-xs sm:text-sm bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm border border-gray-200 dark:border-gray-700 items-center font-medium active:scale-95" title="清除本機搜尋、暫存與過期待同步資料，不刪除雲端正式資料"><i class="fa-solid fa-broom mr-1.5"></i><span>清本機殘留</span></button>
                 <button id="btn-db-upload" type="button" title="上傳參考資料庫或國內券商評估報告" onclick="document.getElementById('excel-upload').click()" class="hidden sm:flex text-xs sm:text-sm bg-purple-50 dark:bg-purple-900/40 hover:bg-purple-100 dark:hover:bg-purple-800/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-700/50 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm items-center font-medium active:scale-95"><i class="fa-solid fa-database sm:mr-1.5"></i><span class="hidden sm:inline">快速更新</span></button>
                 <input type="file" id="excel-upload" accept=".xlsx, .xls" class="hidden">
                 <button id="btn-import-backup" onclick="document.getElementById('backup-file').click()" class="hidden sm:flex text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm items-center active:scale-95"><i class="fa-solid fa-upload sm:mr-1.5"></i><span class="hidden sm:inline">匯入</span></button>
@@ -1483,7 +1483,7 @@ const ADMIN_SESSION_STORAGE_KEY='ryan_admin_session_v1';
 const XLSX_CDN_URL='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
 const getSyncPath=()=>DIRECT_SYNC_PATH;
 const isCloudMode=()=>true;
-let cloudSyncInterval=null, state={journals:[],plans:[],revenueRecords:[],reports:[],checklists:[],trash:[],tagSettings:null,epsData:{},codeToName:{},nameToCode:{},customMarketHolidays:[],copyCompareDuplicates:false,filters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,largeHolder14:false,tags:[],minScore:0,tagLogic:'OR',status:'all',quick:'all'},favFilters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,largeHolder14:false,tags:[],minScore:0,tagLogic:'OR',status:'all',quick:'all'},revenueFilters:{month:'',code:'',type:'all',revenuePattern:'none',revenueN:3,revenueCount:2,holderPattern:'none',holderN:3,holderCount:2,minMomentum:0},reportFilters:{start:'',end:'',code:''},sortConfig:{key:'createdAt',asc:false},favSortConfig:{key:'createdAt',asc:false},planSortConfig:{key:'createdAt',asc:false},revenueSortConfig:{key:'month',asc:false},reportSortConfig:{key:'date',asc:false},checklistSortConfig:{key:'createdAt',asc:false}};
+let cloudSyncInterval=null, state={journals:[],plans:[],revenueRecords:[],reports:[],checklists:[],trash:[],deletionTombstones:{},tagSettings:null,epsData:{},codeToName:{},nameToCode:{},customMarketHolidays:[],copyCompareDuplicates:false,filters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,largeHolder14:false,tags:[],minScore:0,tagLogic:'OR',status:'all',quick:'all'},favFilters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,largeHolder14:false,tags:[],minScore:0,tagLogic:'OR',status:'all',quick:'all'},revenueFilters:{month:'',code:'',type:'all',revenuePattern:'none',revenueN:3,revenueCount:2,holderPattern:'none',holderN:3,holderCount:2,minMomentum:0},reportFilters:{start:'',end:'',code:''},sortConfig:{key:'createdAt',asc:false},favSortConfig:{key:'createdAt',asc:false},planSortConfig:{key:'createdAt',asc:false},revenueSortConfig:{key:'month',asc:false},reportSortConfig:{key:'date',asc:false},checklistSortConfig:{key:'createdAt',asc:false}};
 const selectedIds={journal:new Set(),fav:new Set(),plan:new Set(),revenue:new Set(),report:new Set(),checklist:new Set()};
 
 const escapeHTML=str=>(!str&&str!==0)?'':String(str).replace(/[&<>'"]/g,tag=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[tag]||tag));
@@ -2089,6 +2089,50 @@ function saveLocalData(){
     catch(error){console.error('本機資料儲存失敗',error);if(Date.now()-lastLocalSaveErrorAt>15000){lastLocalSaveErrorAt=Date.now();showToast('本機儲存空間不足，請先匯出備份或清理瀏覽器空間','error');}return false;}
 }
 const readPendingCloudWrites=()=>{try{const value=JSON.parse(localStorage.getItem(PENDING_CLOUD_WRITES_KEY)||'[]');return Array.isArray(value)?value.filter(item=>item&&item.id&&item.path&&item.method):[];}catch(error){return[];}};
+
+const normalizeTombstoneMap=value=>{
+    if(!value||typeof value!=='object'||Array.isArray(value))return{};
+    const out={};
+    Object.entries(value).forEach(([key,raw])=>{
+        const ts=Number(raw?.deletedAt??raw);
+        if(key&&Number.isFinite(ts)&&ts>0)out[key]={deletedAt:ts};
+    });
+    return out;
+};
+const getTombstoneKey=(collection,id)=>`${String(collection||'').replace(/^publicJournals$/,'journals')}__${String(id||'')}`;
+const getTombstoneTime=(collection,id)=>Number(state.deletionTombstones?.[getTombstoneKey(collection,id)]?.deletedAt||0);
+const isCloudPathBlockedByTombstone=(path,queuedAt=0)=>{
+    const match=String(path||'').match(/^(journals|publicJournals|plans|revenueRecords|reports|checklists)\/(.+)$/);
+    if(!match)return false;
+    const deletedAt=getTombstoneTime(match[1],match[2]);
+    return deletedAt>0&&Number(queuedAt||0)<=deletedAt;
+};
+const prunePendingCloudWrites=()=>{
+    const queue=readPendingCloudWrites(),filtered=queue.filter(item=>!isCloudPathBlockedByTombstone(item.path,item.queuedAt));
+    if(filtered.length!==queue.length)savePendingCloudWrites(filtered);
+    return queue.length-filtered.length;
+};
+const recordDeletionTombstone=async(collection,id,deletedAt=Date.now())=>{
+    const key=getTombstoneKey(collection,id);
+    if(!state.deletionTombstones||typeof state.deletionTombstones!=='object')state.deletionTombstones={};
+    const current=Number(state.deletionTombstones[key]?.deletedAt||0);
+    if(deletedAt>current)state.deletionTombstones[key]={deletedAt};
+    prunePendingCloudWrites();
+    saveLocalData();
+    return putDataToCloud(`deletionTombstones/${encodeURIComponent(key)}`,state.deletionTombstones[key]);
+};
+const clearDeletionTombstone=async(collection,id)=>{
+    const key=getTombstoneKey(collection,id);
+    if(state.deletionTombstones&&Object.prototype.hasOwnProperty.call(state.deletionTombstones,key)){
+        delete state.deletionTombstones[key];
+        saveLocalData();
+    }
+    return deleteDataFromCloud(`deletionTombstones/${encodeURIComponent(key)}`);
+};
+const filterDeletedCloudRecords=(collection,value)=>{
+    return cloudCollection(value).filter(item=>item&&item.id&&!getTombstoneTime(collection,item.id));
+};
+
 const savePendingCloudWrites=items=>{try{localStorage.setItem(PENDING_CLOUD_WRITES_KEY,JSON.stringify(items));return true;}catch(error){console.error('待同步資料儲存失敗',error);return false;}};
 const queueCloudWrite=(path,options={})=>{
     const method=String(options.method||'PUT').toUpperCase(),record={id:`${Date.now()}_${Math.random().toString(36).slice(2,8)}`,path,method,body:options.body??null,queuedAt:Date.now()};
@@ -2112,6 +2156,7 @@ async function flushPendingCloudWrites(showError=false){
     window.updateCloudHealthUI?.('syncing');
     try{
         for(const item of queue.sort((a,b)=>(a.queuedAt||0)-(b.queuedAt||0))){
+            if(isCloudPathBlockedByTombstone(item.path,item.queuedAt)){savePendingCloudWrites(readPendingCloudWrites().filter(current=>current.id!==item.id));continue;}
             const options={method:item.method};if(item.body!==null){options.headers={'Content-Type':'application/json'};options.body=item.body;}
             const response=await fetch(`${DB_URL}/data/${getSyncPath()}/${item.path}.json`,options);if(!response.ok)throw new Error(`待同步資料寫入失敗 (${response.status})`);
             savePendingCloudWrites(readPendingCloudWrites().filter(current=>current.id!==item.id));
@@ -2120,13 +2165,13 @@ async function flushPendingCloudWrites(showError=false){
     }catch(error){console.error(error);window.updateCloudHealthUI?.('pending');if(showError)showToast('仍有資料等待同步，請稍後再試','error');return false;}
 }
 const cloudCollection=v=>Array.isArray(v)?v.filter(Boolean):(v&&typeof v==='object'?Object.values(v).filter(Boolean):[]);
-const cloudSnapshot=()=>({journals:Object.fromEntries(state.journals.map(x=>[x.id,x])),publicJournals:Object.fromEntries(state.journals.map(x=>[x.id,sanitizeJournalForViewer(x)])),plans:Object.fromEntries(state.plans.map(x=>[x.id,x])),revenueRecords:Object.fromEntries(state.revenueRecords.map(x=>[x.id,x])),reports:Object.fromEntries(state.reports.map(x=>[x.id,x])),checklists:Object.fromEntries(state.checklists.map(x=>[x.id,x])),trash:Object.fromEntries((state.trash||[]).map(x=>[x.id,x])),tagSettings:state.tagSettings||null,epsData:state.epsData||{},customMarketHolidaySettings:{dates:[...(state.customMarketHolidays||[])],updatedAt:Date.now()}});
+const cloudSnapshot=()=>({journals:Object.fromEntries(state.journals.map(x=>[x.id,x])),publicJournals:Object.fromEntries(state.journals.map(x=>[x.id,sanitizeJournalForViewer(x)])),plans:Object.fromEntries(state.plans.map(x=>[x.id,x])),revenueRecords:Object.fromEntries(state.revenueRecords.map(x=>[x.id,x])),reports:Object.fromEntries(state.reports.map(x=>[x.id,x])),checklists:Object.fromEntries(state.checklists.map(x=>[x.id,x])),trash:Object.fromEntries((state.trash||[]).map(x=>[x.id,x])),deletionTombstones:state.deletionTombstones||{},tagSettings:state.tagSettings||null,epsData:state.epsData||{},customMarketHolidaySettings:{dates:[...(state.customMarketHolidays||[])],updatedAt:Date.now()}});
 const sanitizeCloudJournalPayload=value=>{
     if(Array.isArray(value))return value.map(item=>item?sanitizeJournalForViewer(item):item);
     if(value&&typeof value==='object')return Object.fromEntries(Object.entries(value).map(([id,item])=>[id,item?sanitizeJournalForViewer(item):item]));
     return value;
 };
-const PUBLIC_CLOUD_PATHS={journals:'publicJournals',revenueRecords:'revenueRecords',reports:'reports',checklists:'checklists',tagSettings:'tagSettings',epsData:'epsData',customMarketHolidaySettings:'customMarketHolidaySettings'};
+const PUBLIC_CLOUD_PATHS={journals:'publicJournals',revenueRecords:'revenueRecords',reports:'reports',checklists:'checklists',deletionTombstones:'deletionTombstones',tagSettings:'tagSettings',epsData:'epsData',customMarketHolidaySettings:'customMarketHolidaySettings'};
 const cloudReadCache=new Map();let conditionalCloudReadSupported=true;
 const hashCloudText=text=>{let hash=2166136261;for(let index=0;index<text.length;index++){hash^=text.charCodeAt(index);hash=Math.imul(hash,16777619);}return(hash>>>0).toString(36);};
 const getCloudReadURL=path=>`${DB_URL}/data/${getSyncPath()}${path?`/${path}`:''}.json`;
@@ -2154,7 +2199,7 @@ const fetchCloudPayload=async adminAccess=>{
     return{data:payload,notModified:entries.every(([,resource])=>resource.notModified),signature:`viewer|${entries.map(([key,resource])=>`${key}:${resource.signature}`).join('|')}`};
 };
 const hasCollectionRecords=value=>Array.isArray(value)?value.some(Boolean):!!(value&&typeof value==='object'&&Object.keys(value).length);
-const hasSyncPayload=data=>!!(data&&(hasCollectionRecords(data.journals)||hasCollectionRecords(data.plans)||hasCollectionRecords(data.revenueRecords)||hasCollectionRecords(data.reports)||hasCollectionRecords(data.checklists)||hasCollectionRecords(data.trash)||hasCollectionRecords(data.epsData)||hasCollectionRecords(data.tagSettings?.categories)||hasCollectionRecords(data.customMarketHolidaySettings?.dates)));
+const hasSyncPayload=data=>!!(data&&(hasCollectionRecords(data.journals)||hasCollectionRecords(data.plans)||hasCollectionRecords(data.revenueRecords)||hasCollectionRecords(data.reports)||hasCollectionRecords(data.checklists)||hasCollectionRecords(data.trash)||hasCollectionRecords(data.deletionTombstones)||hasCollectionRecords(data.epsData)||hasCollectionRecords(data.tagSettings?.categories)||hasCollectionRecords(data.customMarketHolidaySettings?.dates)));
 const hasLocalSyncData=()=>hasSyncPayload(cloudSnapshot());
 async function migrateLegacyCloudData(){
     if(!hasStoredAdminAccess()||!LEGACY_SYNC_KEY||LEGACY_SYNC_KEY===DIRECT_SYNC_PATH)return false;
@@ -2179,9 +2224,11 @@ async function performCloudLoad(showError,forceApply,adminAccess){
         if(!forceApply&&(cloudResult.notModified||signature===lastAppliedCloudSignature)){markCloudSyncSuccess();return true;}
         const hasRemoteData=adminAccess?d!=null:Object.values(d||{}).some(value=>value!=null);
         if(hasRemoteData){
-            state.journals=cloudCollection(d.journals).map(item=>adminAccess?item:sanitizeJournalForViewer(item));
+            state.deletionTombstones=normalizeTombstoneMap(d.deletionTombstones||state.deletionTombstones);
+            prunePendingCloudWrites();
+            state.journals=filterDeletedCloudRecords('journals',d.journals).map(item=>adminAccess?item:sanitizeJournalForViewer(item));
             const migratedStrategyTags=normalizeStrategyTags(state.journals),migratedJournalLifecycle=state.journals.reduce((changed,item)=>normalizeJournalLifecycle(item)||changed,false);
-            state.plans=adminAccess?cloudCollection(d.plans):[];state.revenueRecords=cloudCollection(d.revenueRecords);const normalizedCloudReports=normalizeReportRecords(cloudCollection(d.reports));state.reports=normalizedCloudReports.records;state.checklists=cloudCollection(d.checklists);state.trash=adminAccess?cloudCollection(d.trash):[];if(d.tagSettings)state.tagSettings=d.tagSettings;state.epsData=d.epsData||{};
+            state.plans=adminAccess?filterDeletedCloudRecords('plans',d.plans):[];state.revenueRecords=filterDeletedCloudRecords('revenueRecords',d.revenueRecords);const normalizedCloudReports=normalizeReportRecords(filterDeletedCloudRecords('reports',d.reports));state.reports=normalizedCloudReports.records;state.checklists=filterDeletedCloudRecords('checklists',d.checklists);state.trash=adminAccess?cloudCollection(d.trash):[];if(d.tagSettings)state.tagSettings=d.tagSettings;state.epsData=d.epsData||{};
             state.customMarketHolidays=d.customMarketHolidaySettings?normalizeCustomMarketHolidays(cloudCollection(d.customMarketHolidaySettings.dates)):[];
             rebuildStockLookup();
             const migratedManagedTags=window.ensureOptimizationState?.();window.syncCustomTagSettings?.();window.renderTrashManager?.();
@@ -2225,6 +2272,9 @@ function startCloudSync(){
 function stopCloudSync(){if(cloudSyncInterval){clearInterval(cloudSyncInterval);cloudSyncInterval=null;}}
 async function cloudWrite(p,options){
     if(!isCloudMode())return true;
+    if(isCloudPathBlockedByTombstone(p,Date.now())&&String(options?.method||'PUT').toUpperCase()!=='DELETE'){
+        console.warn('已阻擋被刪除資料重新寫回：',p);return false;
+    }
     if(navigator.onLine===false){queueCloudWrite(p,options);showToast('目前離線，資料已保留並等待同步','error');return false;}
     try{const r=await fetch(`${DB_URL}/data/${getSyncPath()}/${p}.json`,options);if(!r.ok)throw new Error(`雲端寫入失敗 (${r.status})`);markCloudSyncSuccess();return true;}
     catch(e){console.error(e);queueCloudWrite(p,options);showToast('本機已儲存，恢復連線後會自動同步','error');return false;}
@@ -2257,6 +2307,9 @@ function loadLocalData(){
     if(!Array.isArray(state.journals))state.journals=[];if(!Array.isArray(state.plans))state.plans=[];if(!state.epsData||typeof state.epsData!=='object'||Array.isArray(state.epsData))state.epsData={};
     const migratedStrategyTags=normalizeStrategyTags(state.journals),migratedJournalLifecycle=state.journals.reduce((changed,item)=>normalizeJournalLifecycle(item)||changed,false);
     if(!state.revenueRecords)state.revenueRecords=[]; if(!state.reports)state.reports=[]; if(!state.checklists)state.checklists=[]; if(!Array.isArray(state.trash))state.trash=[];
+    state.deletionTombstones=normalizeTombstoneMap(state.deletionTombstones);
+    state.journals=filterDeletedCloudRecords('journals',state.journals);state.plans=filterDeletedCloudRecords('plans',state.plans);state.revenueRecords=filterDeletedCloudRecords('revenueRecords',state.revenueRecords);state.reports=filterDeletedCloudRecords('reports',state.reports);state.checklists=filterDeletedCloudRecords('checklists',state.checklists);
+    prunePendingCloudWrites();
     const normalizedLocalReports=normalizeReportRecords(state.reports);state.reports=normalizedLocalReports.records;
     const normalizedMarketHolidays=normalizeCustomMarketHolidays(state.customMarketHolidays),migratedMarketHolidays=JSON.stringify(normalizedMarketHolidays)!==JSON.stringify(state.customMarketHolidays||[]);state.customMarketHolidays=normalizedMarketHolidays;
     resetSessionFiltersToDefaults(false);
@@ -3447,6 +3500,25 @@ document.addEventListener('DOMContentLoaded',async()=>{
     };
     updateSyncStatusUI('ready');
     document.getElementById('btn-sync-modal')?.addEventListener('click',()=>performDirectCloudSync(true));
+
+    const clearLocalResidue=()=>{
+        openConfirmModal('只會清除這台設備的搜尋條件、暫存與待同步舊佇列，不會刪除雲端正式資料。確定清除？',async()=>{
+            try{
+                savePendingCloudWrites([]);
+                ['global-search-input'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+                resetSessionFiltersToDefaults(true);clearTransientSearchFields();
+                localStorage.removeItem(LAST_CLOUD_SYNC_KEY);
+                cloudReadCache.clear();lastAppliedCloudSignature='';
+                saveLocalData();
+                processAndRenderJournals();renderFavorites();renderRevenueRecords();renderReports();
+                window.updateCloudHealthUI?.('ready');
+                showToast('本機殘留已清除，正在重新讀取雲端最新資料');
+                await loadFromCloud(true,true);
+            }catch(error){console.error(error);showToast('清除本機殘留時發生錯誤','error');}
+        });
+    };
+    document.getElementById('btn-clear-local-residue')?.addEventListener('click',clearLocalResidue);
+
     window.addEventListener('offline',()=>{updateSyncStatusUI('error');window.updateCloudHealthUI?.('offline');});
     window.addEventListener('online',()=>performDirectCloudSync(false));
     // --- 跨裝置同步功能綁定結束 ---
@@ -4463,9 +4535,14 @@ const SESSION={
     saveLocalData();renderAffectedModules(type);window.renderTrashManager();
     var tasks=[];
     entries.forEach(function(entry){
+      var tombstoneKey=getTombstoneKey(config.cloud,entry.originalId);
+      if(!state.deletionTombstones||typeof state.deletionTombstones!=='object')state.deletionTombstones={};
+      state.deletionTombstones[tombstoneKey]={deletedAt:entry.deletedAt};
       tasks.push(putDataToCloud('trash/'+entry.id,entry));
+      tasks.push(putDataToCloud('deletionTombstones/'+encodeURIComponent(tombstoneKey),state.deletionTombstones[tombstoneKey]));
       tasks.push(deleteDataFromCloud(config.cloud+'/'+entry.originalId));
     });
+    prunePendingCloudWrites();saveLocalData();
     await Promise.allSettled(tasks);
     showToast('已移至垃圾桶，可隨時復原');
   }
@@ -4509,7 +4586,7 @@ const SESSION={
     collection.push(restored);state[config.stateKey]=collection;
     state.trash=state.trash.filter(function(item){return String(item.id)!==String(trashId);});
     saveLocalData();renderAffectedModules(entry.type);window.renderTrashManager();
-    await Promise.allSettled([putDataToCloud(config.cloud+'/'+entry.originalId,restored),deleteDataFromCloud('trash/'+entry.id)]);
+    await Promise.allSettled([clearDeletionTombstone(config.cloud,entry.originalId),putDataToCloud(config.cloud+'/'+entry.originalId,restored),deleteDataFromCloud('trash/'+entry.id)]);
     showToast('資料已復原');
   }
 
