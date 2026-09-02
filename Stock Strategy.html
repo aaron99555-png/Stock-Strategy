@@ -175,6 +175,17 @@ body.viewer-mode .admin-only{display:none!important}
 }
 </style>
 
+
+<style>
+.analyst-total-panel .rank-grid{align-items:start}
+.analyst-total-panel #rankArea{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.analyst-total-panel .rank-table{min-width:900px}
+.analyst-total-panel .rank-grid>div:last-child .rank-table{min-width:0}
+@media(max-width:700px){
+  .analyst-total-panel .rank-grid{grid-template-columns:1fr!important}
+}
+</style>
+
 </head>
 <body class="viewer-mode">
 <div class="app">
@@ -256,7 +267,7 @@ body.viewer-mode .admin-only{display:none!important}
   </div>
 
   <div class="panel analyst-total-panel">
-    <div class="panel-head"><h2>分析師總績效</h2><div class="smallnote">依各分析師全部持倉與已結算交易彙總</div></div>
+    <div class="panel-head"><h2>分析師總績效</h2><div class="smallnote">固定顯示｜管理者可直接切換至該分析師資料進行修改</div></div>
     <div class="panel-body rank-grid">
       <div id="rankArea"></div>
       <div>
@@ -538,8 +549,74 @@ function renderStats(){
 function filtered(){const q=search.value.trim().toLowerCase(),st=statusFilter.value,rf=riskFilter.value,af=analystFilter.value,sort=sortBy.value;let a=trades.filter(t=>(st==='all'||t.status===st)&&(rf==='all'||getRiskState(t)===rf)&&(af==='all'||t.analyst===af)&&holdRangeMatch(t)&&(!q||[t.analyst,t.code,t.name,t.note,t.stopLoss,t.takeProfit].join(' ').toLowerCase().includes(q)));a.sort((x,y)=>{const X=getCalc(x),Y=getCalc(y);if(sort==='returnDesc')return Y.ret-X.ret;if(sort==='returnAsc')return X.ret-Y.ret;if(sort==='profitDesc')return Y.profit-X.profit;return String(y.entryDate).localeCompare(String(x.entryDate))});return a;}
 function renderTable(){const a=filtered();if(!a.length){tableArea.innerHTML='<div class="empty">目前沒有符合條件的交易紀錄</div>';return}tableArea.innerHTML=`<table class="table"><thead><tr><th>分析師</th><th>股票</th><th>狀態</th><th>風險</th><th>進場日期</th><th>進場價(收盤價)</th><th>停損</th><th>停利</th><th>目前／出場價</th><th class="mobile-hide">張數</th><th class="mobile-hide">價差</th><th>績效</th><th>損益金額</th><th class="mobile-hide">出場日期</th><th class="mobile-hide">行情更新</th><th>備註</th>${isAdmin()?'<th>操作</th>':''}</tr></thead><tbody>${a.map(rowHTML).join('')}</tbody></table>`}
 function rowHTML(t){const c=getCalc(t),diff=c.price-Number(t.entryPrice),cl=c.profit>0?'positive':c.profit<0?'negative':'neutral',risk=getRiskState(t);const ops=isAdmin()?`<td><div class="row-actions"><button type="button" class="iconbtn" data-action="edit" data-id="${esc(t.id)}">修改</button>${t.status==='open'?`<button type="button" class="iconbtn" data-action="price" data-id="${esc(t.id)}">更新價</button><button type="button" class="iconbtn exit" data-action="exit" data-id="${esc(t.id)}">結算</button>`:''}<button type="button" class="iconbtn delete" data-action="delete" data-id="${esc(t.id)}">刪除</button></div></td>`:'';const rowClass=risk==='stop'?'row-stop':risk==='target'?'row-target':(risk==='near-stop'||risk==='near-target')?'row-alert':'';return `<tr class="${rowClass}"><td><b>${esc(t.analyst)}</b></td><td><span class="symbol">${esc(t.code)}</span><span class="name">${esc(t.name)}</span></td><td><span class="pill ${t.status}">${t.status==='open'?'持有中':'已結算'}</span></td><td><span class="risk ${risk}">${riskLabel(risk)}</span></td><td>${esc(t.entryDate)}</td><td class="num">${fmt2(t.entryPrice)}</td><td class="num negative">${Number(t.stopLoss)>0?fmt2(t.stopLoss):'—'}</td><td class="num positive">${Number(t.takeProfit)>0?fmt2(t.takeProfit):'—'}</td><td class="num">${fmt2(c.price)}</td><td class="num mobile-hide">${fmt2(t.lots)}</td><td class="num ${cl} mobile-hide">${diff>=0?'+':''}${fmt2(diff)}</td><td class="num ${cl}">${pct(c.ret)}</td><td class="num ${cl}">${money(c.profit)}</td><td class="mobile-hide">${t.exitDate||'—'}</td><td class="mobile-hide">${formatUpdateDate(t.priceUpdatedAt||t.updatedAt)}</td><td title="${esc(t.note||t.exitNote)}">${esc((t.note||t.exitNote||'—').slice(0,18))}</td>${ops}</tr>`}
-function renderRank(){const base=analystScopedTrades(),map={};base.forEach(t=>{const c=getCalc(t);if(!map[t.analyst])map[t.analyst]={name:t.analyst,n:0,open:0,closed:0,wins:0,cost:0,profit:0};const a=map[t.analyst];a.n++;a.cost+=c.cost;a.profit+=c.profit;if(t.status==='open')a.open++;else{a.closed++;if(c.profit>0)a.wins++}});let arr=Object.values(map).map(a=>({...a,ret:a.cost?a.profit/a.cost*100:0,winRate:a.closed?a.wins/a.closed*100:0})).sort((a,b)=>b.ret-a.ret);if(!arr.length){rankArea.innerHTML='<div class="empty">新增交易後會顯示分析師排行</div>';summaryArea.innerHTML='';return}const max=Math.max(...arr.map(a=>Math.abs(a.ret)),1);rankArea.innerHTML=`<table class="rank-table"><thead><tr><th>排名</th><th>分析師</th><th>交易</th><th>報酬率</th><th>總損益</th><th>績效</th></tr></thead><tbody>${arr.map((a,i)=>`<tr><td>${i+1}</td><td><b>${esc(a.name)}</b></td><td>${a.n} 筆</td><td class="${a.ret>=0?'positive':'negative'}"><b>${pct(a.ret)}</b></td><td class="${a.profit>=0?'positive':'negative'}">${money(a.profit)}</td><td><div class="barbox"><div class="bar" style="width:${Math.min(100,Math.abs(a.ret)/max*100)}%"></div></div></td></tr>`).join('')}</tbody></table>`;
- const best=arr[0],closed=base.filter(t=>t.status==='closed'),closedProfit=closed.reduce((s,t)=>s+getCalc(t).profit,0),openProfit=base.filter(t=>t.status==='open').reduce((s,t)=>s+getCalc(t).profit,0);summaryArea.innerHTML=`<tr><td>目前績效最佳分析師</td><td><b>${esc(best.name)}</b> ${pct(best.ret)}</td></tr><tr><td>已實現損益</td><td class="${closedProfit>=0?'positive':'negative'}"><b>${money(closedProfit)}</b></td></tr><tr><td>未實現損益</td><td class="${openProfit>=0?'positive':'negative'}"><b>${money(openProfit)}</b></td></tr><tr><td>${document.getElementById('analystFilter').value==='all'?'分析師人數':'目前篩選'}</td><td>${document.getElementById('analystFilter').value==='all'?arr.length:esc(document.getElementById('analystFilter').value)}</td></tr>`}
+function editAnalystRecords(name){
+ if(!requireAdmin())return;
+ const filter=document.getElementById('analystFilter');
+ if(filter)filter.value=name;
+ syncAnalystTabs();
+ render();
+ const table=document.getElementById('tableArea');
+ if(table)table.scrollIntoView({behavior:'smooth',block:'start'});
+ toast(`已切換到 ${name}，可直接修改下方交易資料`);
+}
+function renderRank(){
+ const rankHost=document.getElementById('rankArea');
+ const summaryHost=document.getElementById('summaryArea');
+ if(!rankHost||!summaryHost)return;
+
+ const names=['王榮旭','張貽程','金玉峰雷老闆'];
+ const base=trades.filter(t=>holdRangeMatch(t));
+
+ let arr=names.map(name=>{
+   const list=base.filter(t=>t.analyst===name);
+   let n=0,open=0,closed=0,wins=0,cost=0,profit=0,realized=0,unrealized=0;
+   list.forEach(t=>{
+     const c=getCalc(t);
+     n++; cost+=c.cost; profit+=c.profit;
+     if(t.status==='open'){open++;unrealized+=c.profit;}
+     else{closed++;realized+=c.profit;if(c.profit>0)wins++;}
+   });
+   return {
+     name,n,open,closed,cost,profit,realized,unrealized,
+     ret:cost?profit/cost*100:0,
+     winRate:closed?wins/closed*100:0
+   };
+ }).sort((a,b)=>b.profit-a.profit);
+
+ rankHost.innerHTML=`<table class="rank-table">
+   <thead><tr>
+     <th>排名</th><th>分析師</th><th>交易</th><th>持有</th><th>已結算</th>
+     <th>報酬率</th><th>總損益</th><th>已實現</th><th>未實現</th><th>勝率</th>
+     ${isAdmin()?'<th>操作</th>':''}
+   </tr></thead>
+   <tbody>${arr.map((a,i)=>`<tr>
+     <td>${i+1}</td>
+     <td><b>${esc(a.name)}</b></td>
+     <td>${a.n} 筆</td>
+     <td>${a.open}</td>
+     <td>${a.closed}</td>
+     <td class="${a.ret>0?'positive':a.ret<0?'negative':'neutral'}"><b>${pct(a.ret)}</b></td>
+     <td class="${a.profit>0?'positive':a.profit<0?'negative':'neutral'}"><b>${money(a.profit)}</b></td>
+     <td class="${a.realized>0?'positive':a.realized<0?'negative':'neutral'}">${money(a.realized)}</td>
+     <td class="${a.unrealized>0?'positive':a.unrealized<0?'negative':'neutral'}">${money(a.unrealized)}</td>
+     <td>${fmt2(a.winRate)}%</td>
+     ${isAdmin()?`<td><button type="button" class="iconbtn" onclick="editAnalystRecords('${a.name}')">修改資料</button></td>`:''}
+   </tr>`).join('')}</tbody>
+ </table>`;
+
+ const best=arr[0];
+ const totalProfit=arr.reduce((s,a)=>s+a.profit,0);
+ const realized=arr.reduce((s,a)=>s+a.realized,0);
+ const unrealized=arr.reduce((s,a)=>s+a.unrealized,0);
+ const totalTrades=arr.reduce((s,a)=>s+a.n,0);
+
+ summaryHost.innerHTML=`
+   <tr><td>目前績效最佳分析師</td><td><b>${esc(best.name)}</b> ${money(best.profit)}</td></tr>
+   <tr><td>總交易筆數</td><td><b>${totalTrades}</b></td></tr>
+   <tr><td>總損益</td><td class="${totalProfit>0?'positive':totalProfit<0?'negative':'neutral'}"><b>${money(totalProfit)}</b></td></tr>
+   <tr><td>已實現損益</td><td class="${realized>0?'positive':realized<0?'negative':'neutral'}"><b>${money(realized)}</b></td></tr>
+   <tr><td>未實現損益</td><td class="${unrealized>0?'positive':unrealized<0?'negative':'neutral'}"><b>${money(unrealized)}</b></td></tr>`;
+}
 function openEdit(id){if(!requireAdmin())return;activeId=id;const t=trades.find(x=>String(x.id)===String(id));if(!t)return;eAnalyst.value=t.analyst||'王榮旭';eName.value=t.name||'';eDate.value=t.entryDate||'';eEntry.value=t.entryPrice||'';eStop.value=t.stopLoss||'';eTarget.value=t.takeProfit||'';eLots.value=t.lots||1;eNote.value=t.note||'';editModal.classList.add('show')}
 function saveEdit(){if(!requireAdmin())return;const t=trades.find(x=>String(x.id)===String(activeId));if(!t)return;const entry=Number(eEntry.value),lots=Number(eLots.value);if(!eDate.value||!entry||entry<=0||!lots||lots<=0){toast('請確認進場日期、進場價與張數');return;}t.analyst=eAnalyst.value;t.name=eName.value.trim();t.entryDate=eDate.value;t.entryPrice=entry;t.stopLoss=Number(eStop.value||0);t.takeProfit=Number(eTarget.value||0);t.lots=lots;t.note=eNote.value.trim();t.updatedAt=new Date().toISOString();closeModal('editModal');markDataUpdate();save();toast('交易資料已更新')}
 async function refreshSinglePrice(id){
