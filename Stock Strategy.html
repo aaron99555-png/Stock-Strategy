@@ -159,6 +159,22 @@ body.viewer-mode .admin-only{display:none!important}
 }
 </style>
 
+
+<style>
+/* 分析師總績效固定顯示 */
+.analyst-total-panel{
+  display:block !important;
+  visibility:visible !important;
+  opacity:1 !important;
+}
+.analyst-total-panel .panel-body,
+.analyst-total-panel #rankArea,
+.analyst-total-panel #summaryArea{
+  display:revert !important;
+  visibility:visible !important;
+}
+</style>
+
 </head>
 <body class="viewer-mode">
 <div class="app">
@@ -239,7 +255,7 @@ body.viewer-mode .admin-only{display:none!important}
     <div class="panel-body" style="padding-bottom:0"><div class="analyst-tabs"><button class="analyst-tab active" data-analyst="all" onclick="setAnalystFilter('all')">全部分析師</button><button class="analyst-tab" data-analyst="王榮旭" onclick="setAnalystFilter('王榮旭')">王榮旭</button><button class="analyst-tab" data-analyst="張貽程" onclick="setAnalystFilter('張貽程')">張貽程</button><button class="analyst-tab" data-analyst="金玉峰雷老闆" onclick="setAnalystFilter('金玉峰雷老闆')">金玉峰雷老闆</button></div><div id="analystCards" class="analyst-cards"></div></div><div class="table-wrap" id="tableArea"></div>
   </div>
 
-  <div class="panel">
+  <div class="panel analyst-total-panel">
     <div class="panel-head"><h2>分析師總績效</h2><div class="smallnote">依各分析師全部持倉與已結算交易彙總</div></div>
     <div class="panel-body rank-grid">
       <div id="rankArea"></div>
@@ -303,6 +319,13 @@ const today=()=>{
  const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');
  return `${y}-${m}-${day}`;
 };
+function initDefaultHoldRange(){
+ const from=document.getElementById('holdFrom');
+ const to=document.getElementById('holdTo');
+ if(from && !from.value) from.value='2026-09-01';
+ if(to && !to.value) to.value=today();
+}
+
 function markDataUpdate(){dataUpdatedAt=Date.now();localStorage.setItem(KEY+'_dataUpdatedAt',String(dataUpdatedAt));}
 function markMarketUpdate(){marketUpdatedAt=Date.now();localStorage.setItem(KEY+'_marketUpdatedAt',String(marketUpdatedAt));}
 const defaultDateInput=document.getElementById('fDate');if(defaultDateInput)defaultDateInput.value=today();
@@ -718,6 +741,7 @@ document.getElementById('tableArea')?.addEventListener('click',e=>{
 });
 ['priceModal','exitModal','adminModal','editModal'].forEach(id=>document.getElementById(id)?.addEventListener('click',e=>{if(e.target.id===id)closeModal(id)}));
 try{applyAdminMode();}catch(e){console.error('applyAdminMode failed',e);}
+try{initDefaultHoldRange();}catch(e){console.error('default hold range failed',e);}
 try{render();}catch(e){console.error('initial render failed',e);}
 initFirebaseSync().catch(e=>console.error('Firebase init failed',e));
 try{startAutoPriceRefresh();}catch(e){console.error('auto price refresh failed',e);}
