@@ -1410,6 +1410,100 @@ body{
   }
 }
 
+
+/* v70：進場／出場清單文字格式統一 */
+.today-entry-card .today-entry-item,
+.today-exit-card .today-entry-item{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.today-entry-card .today-entry-stock,
+.today-exit-card .today-entry-stock{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  min-width:0;
+}
+.today-entry-card .today-entry-stock .stock-link,
+.today-exit-card .today-entry-stock .stock-link{
+  flex:0 0 auto;
+}
+.today-entry-card .today-entry-stock span,
+.today-exit-card .today-entry-stock span{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.today-entry-card .today-entry-meta,
+.today-exit-card .today-entry-meta{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+  font-size:13px;
+}
+.today-entry-card .today-analyst,
+.today-exit-card .today-analyst{
+  font-weight:800;
+}
+.today-entry-card .today-price,
+.today-exit-card .today-price{
+  font-weight:700;
+}
+
+
+/* v71：進出場空白提示、回到今天、重新整理清除篩選 */
+.today-empty-message{
+  width:100%;
+  min-height:48px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:10px 8px;
+  box-sizing:border-box;
+  font-size:13px !important;
+  line-height:1.4 !important;
+  font-weight:600 !important;
+  opacity:.72;
+  text-align:center;
+}
+.date-query-box{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.date-today-btn{
+  height:34px !important;
+  min-height:34px !important;
+  padding:0 9px !important;
+  white-space:nowrap;
+  font-size:11px !important;
+}
+@media(max-width:700px){
+  .date-card-title{
+    align-items:flex-start !important;
+  }
+  .date-query-box{
+    flex-wrap:wrap;
+    justify-content:flex-end;
+    max-width:148px;
+  }
+  .date-picker-box{
+    width:128px !important;
+  }
+  .date-today-btn{
+    width:128px !important;
+    height:32px !important;
+    min-height:32px !important;
+  }
+  .today-empty-message{
+    min-height:46px;
+    font-size:12px !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -1471,6 +1565,7 @@ body{
         <h2 id="entryCardTitle">今日進場股票</h2>
         <div class="date-query-box">
           <input id="entryQueryDate" class="date-picker-box" type="date" aria-label="查詢進場日期">
+          <button id="entryTodayBtn" class="mini ghost date-today-btn" type="button">回到今天</button>
         </div>
       </div>
       <div id="todayEntries" class="today-entry-list"></div>
@@ -1481,6 +1576,7 @@ body{
         <h2 id="exitCardTitle">今日出場股票</h2>
         <div class="date-query-box">
           <input id="exitQueryDate" class="date-picker-box" type="date" aria-label="查詢出場日期">
+          <button id="exitTodayBtn" class="mini ghost date-today-btn" type="button">回到今天</button>
         </div>
       </div>
       <div id="todayExits" class="today-entry-list"></div>
@@ -1690,21 +1786,18 @@ function filteredEntries(){
 function updateRankRangeStatus(){
   const el=$('#rankRangeStatus');
   if(!el)return;
-  const month=$('#fMonth')?.value||'';
   const from=$('#fFrom')?.value||'';
   const to=$('#fTo')?.value||'';
-  let text='全部期間';
 
-  if(month){
-    const [y,m]=month.split('-');
-    text=`${y}/${Number(m)}`;
-  }else if(from && to){
+  let text='全部期間';
+  if(from && to){
     text=`${from.replaceAll('-','/')}～${to.replaceAll('-','/')}`;
   }else if(from){
     text=`${from.replaceAll('-','/')} 起`;
   }else if(to){
     text=`截至 ${to.replaceAll('-','/')}`;
   }
+
   el.textContent=`統計區間：${text}`;
 }
 
@@ -1736,18 +1829,18 @@ function renderTodayExits(){
     .sort((a,b)=>String(a[1].analyst||'').localeCompare(String(b[1].analyst||''),'zh-Hant'));
 
   if(!rows.length){
-    list.innerHTML=`<div class="empty">${shortMD(d)} 尚無出場股票</div>`;
+    list.innerHTML=`<div class="today-empty-message">${shortMD(d)} 尚無出場股票</div>`;
     return;
   }
 
   list.innerHTML=rows.map(([id,tr])=>`
     <div class="today-entry-item">
-      <div class="today-entry-main">
+      <div class="today-entry-stock">
         <a class="stock-link" href="${yahooStockUrl(tr.symbol)}" target="_blank" rel="noopener noreferrer"><b>${esc(tr.symbol||'')}</b></a>
         <span>${esc(tr.stockName||'')}</span>
       </div>
       <div class="today-entry-meta">
-        <span>${esc(tr.analyst||'')}</span>
+        <span class="today-analyst">${esc(tr.analyst||'—')}</span>
         <span class="today-price">出場價 <b>${fmt(tr.exitPrice)}</b></span>
         ${isMainAdmin()?`<button class="mini danger today-delete-btn" data-del="${id}" title="刪除此筆">刪除</button>`:''}
       </div>
@@ -1819,7 +1912,7 @@ function renderTodayEntries(){
     .sort((a,b)=>(a[1].analyst||'').localeCompare(b[1].analyst||'','zh-Hant'));
 
   if(!rows.length){
-    el.innerHTML=`<div class="today-entry-empty">${shortMD(d)} 尚無進場股票</div>`;
+    el.innerHTML=`<div class="today-empty-message">${shortMD(d)} 尚無進場股票</div>`;
     return;
   }
 
@@ -2751,11 +2844,25 @@ $('#importDataFile')?.addEventListener('change',async e=>{
 
 
 
+
+function resetFiltersToDefault(){
+  const ids=['fAnalyst','fMonth','fFrom','fTo','fStatus','fKeyword'];
+  ids.forEach(id=>{
+    const el=$('#'+id);
+    if(!el)return;
+    el.value='';
+  });
+  if(typeof performanceSort!=='undefined'){
+    performanceSort={key:'entryDate',dir:'desc'};
+  }
+  updateRankRangeStatus();
+}
+
 function initDateQueryPickers(){
   const entry=$('#entryQueryDate');
   const exit=$('#exitQueryDate');
-  if(entry && !entry.value)entry.value=today();
-  if(exit && !exit.value)exit.value=today();
+  if(entry)entry.value=today();
+  if(exit)exit.value=today();
 
   [entry,exit,$('#fFrom'),$('#fTo')].forEach(input=>{
     if(!input)return;
@@ -2766,8 +2873,30 @@ function initDateQueryPickers(){
 
   entry?.addEventListener('change',renderTodayEntries);
   exit?.addEventListener('change',renderTodayExits);
+
+  $('#entryTodayBtn')?.addEventListener('click',()=>{
+    if(entry)entry.value=today();
+    renderTodayEntries();
+  });
+  $('#exitTodayBtn')?.addEventListener('click',()=>{
+    if(exit)exit.value=today();
+    renderTodayExits();
+  });
 }
+
+try{
+  ['analystFilters','performanceFilters','filterState','analystPerformanceFilters'].forEach(k=>localStorage.removeItem(k));
+}catch(e){}
+resetFiltersToDefault();
 initDateQueryPickers();
+
+['fFrom','fTo'].forEach(id=>{
+  const el=$('#'+id);
+  if(!el)return;
+  el.addEventListener('change',updateRankRangeStatus);
+  el.addEventListener('input',updateRankRangeStatus);
+});
+
 
 onValue(
   tradesRef,
