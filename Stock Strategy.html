@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="127">
+<meta name="app-version" content="129">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -602,8 +602,8 @@ html.dark body main :is(#module-journal,#module-favorites,#module-revenue,#modul
             <div class="p-2 sm:p-3 lg:grid lg:grid-cols-[minmax(250px,0.78fr)_minmax(0,2.22fr)] lg:gap-2.5 lg:items-stretch">
                 <div id="war-room-stats" class="grid grid-cols-3 gap-1.5 mb-2 lg:mb-0 content-start"></div>
                 <div class="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-                    <div class="px-2 py-1.5 bg-gray-50 dark:bg-gray-900 flex items-center justify-between"><span class="text-[11px] font-black text-gray-700 dark:text-gray-200"><i class="fa-solid fa-ranking-star text-amber-500 mr-1"></i>強度排行 TOP 6</span><span class="text-[9px] text-gray-400">點股票查看</span></div>
-                    <div id="war-room-ranking" class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-1 p-1 bg-white dark:bg-gray-800"></div>
+                    <div class="px-2 py-1.5 bg-gray-50 dark:bg-gray-900 flex items-center justify-between"><span class="text-[11px] font-black text-gray-700 dark:text-gray-200"><i class="fa-solid fa-ranking-star text-amber-500 mr-1"></i>強度排行 TOP 10</span><span class="text-[9px] text-gray-400">點股票查看</span></div>
+                    <div id="war-room-ranking" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1 p-1 bg-white dark:bg-gray-800"></div>
                 </div>
             </div>
         </section>
@@ -1938,7 +1938,7 @@ const renderWarRoom=()=>{
     const codes=[...new Set([...(state.journals||[]).map(x=>String(x.code||'')),...(state.revenueRecords||[]).map(x=>String(x.code||'')),...(state.reports||[]).map(x=>String(x.code||''))].filter(Boolean))],rows=codes.map(code=>({code,name:state.codeToName?.[code]||(state.journals||[]).find(j=>String(j.code)===code)?.name||(state.revenueRecords||[]).find(r=>String(r.code)===code)?.name||'',...getStockStrengthMetrics(code,ref)})).sort((a,b)=>b.score-a.score||b.recent14-a.recent14);
     const report30=codes.filter(code=>(state.reports||[]).some(r=>String(r.code)===code&&(()=>{const d=dayDiffISO(resolveReportRecordDate(r),ref);return d!==null&&d>=0&&d<30;})())).length,todayNew=(state.journals||[]).filter(j=>j.date===ref).length,cards=[['最強分數',rows[0]?`${rows[0].score}`:'—','text-red-600 dark:text-red-300'],['今日新訊號',todayNew,'text-blue-600 dark:text-blue-300'],['訊號加速',rows.filter(x=>x.accelerating).length,'text-rose-600 dark:text-rose-300'],['30日法人',report30,'text-indigo-600 dark:text-indigo-300'],['千張連增≥2週',rows.filter(x=>x.momentum.holderStreak>=2).length,'text-violet-600 dark:text-violet-300'],['轉弱／中斷',rows.filter(x=>x.lifecycle==='轉弱'||x.momentum.holderInterrupted).length,'text-gray-600 dark:text-gray-300']];
     stats.innerHTML=cards.map(([label,value,color])=>`<div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-2 py-2 text-center"><div class="text-[10px] text-gray-400">${label}</div><div class="mt-0.5 text-base sm:text-lg font-black ${color}">${value}</div></div>`).join('');
-    ranking.innerHTML=rows.length?rows.slice(0,6).map((x,index)=>`<button type="button" data-war-room-code="${escapeHTML(x.code)}" class="text-left rounded-md border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 hover:border-blue-300 dark:hover:border-blue-700 px-1.5 py-1 transition min-w-0"><div class="flex items-center justify-between gap-1"><span class="font-black text-[10px] sm:text-[11px] leading-tight text-gray-800 dark:text-gray-100 truncate">${index+1}. ${escapeHTML(x.code)} ${escapeHTML(x.name)}</span><span class="text-[9px] sm:text-[10px] leading-none font-black flex-shrink-0 ${x.score>=85?'text-red-600 dark:text-red-300':x.score>=70?'text-orange-600 dark:text-orange-300':'text-blue-600 dark:text-blue-300'}">${x.grade} ${x.score}</span></div><div class="mt-0.5 flex flex-wrap gap-x-1 gap-y-0 text-[8px] sm:text-[9px] leading-tight"><span class="text-violet-600 dark:text-violet-300 font-bold">${x.icon}${x.lifecycle}</span><span class="text-gray-500 dark:text-gray-400">14日${x.recent14}次</span>${x.accelerating?'<span class="text-rose-600 dark:text-rose-300 font-bold">↗加速</span>':''}${x.momentum.resonance?'<span class="text-orange-600 dark:text-orange-300 font-bold">🔥共振</span>':''}</div></button>`).join(''):'<div class="col-span-full text-center text-[10px] text-gray-400 py-2">目前沒有可計算的股票資料</div>';
+    ranking.innerHTML=rows.length?rows.slice(0,10).map((x,index)=>`<button type="button" data-war-room-code="${escapeHTML(x.code)}" class="text-left rounded-md border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 hover:border-blue-300 dark:hover:border-blue-700 px-1.5 py-1 transition min-w-0"><div class="flex items-center justify-between gap-1"><span class="font-black text-[10px] sm:text-[11px] leading-tight text-gray-800 dark:text-gray-100 truncate">${index+1}. ${escapeHTML(x.code)} ${escapeHTML(x.name)}</span><span class="text-[9px] sm:text-[10px] leading-none font-black flex-shrink-0 ${x.score>=85?'text-red-600 dark:text-red-300':x.score>=70?'text-orange-600 dark:text-orange-300':'text-blue-600 dark:text-blue-300'}">${x.grade} ${x.score}</span></div><div class="mt-0.5 flex flex-wrap gap-x-1 gap-y-0 text-[8px] sm:text-[9px] leading-tight"><span class="text-violet-600 dark:text-violet-300 font-bold">${x.icon}${x.lifecycle}</span><span class="text-gray-500 dark:text-gray-400">14日${x.recent14}次</span>${x.accelerating?'<span class="text-rose-600 dark:text-rose-300 font-bold">↗加速</span>':''}${x.momentum.resonance?'<span class="text-orange-600 dark:text-orange-300 font-bold">🔥共振</span>':''}</div></button>`).join(''):'<div class="col-span-full text-center text-[10px] text-gray-400 py-2">目前沒有可計算的股票資料</div>';
 };
 
 const renderMomentumBadges=(code,referenceDate=getToday())=>{const m=getMomentumMetrics(code,referenceDate),badges=[];if(m.resonance)badges.push('<span class="inline-flex rounded-md bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300 px-1.5 py-0.5 text-[10px] font-black">🔥共振</span>');if(m.revenueStreak)badges.push(`<span class="inline-flex rounded-md bg-pink-100 dark:bg-pink-900/40 text-pink-700 dark:text-pink-300 px-1.5 py-0.5 text-[10px] font-black">營收↑${m.revenueStreak}月</span>`);if(m.holderStreak)badges.push(`<span class="inline-flex rounded-md bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 px-1.5 py-0.5 text-[10px] font-black">千張大戶↑${m.holderStreak}週</span>`);if(m.firstRevenue||m.firstHolder)badges.push('<span class="inline-flex rounded-md bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 px-1.5 py-0.5 text-[10px] font-black">NEW</span>');if(m.holderInterrupted)badges.push('<span class="inline-flex rounded-md bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-1.5 py-0.5 text-[10px] font-black">動能中斷</span>');badges.push(`<span class="inline-flex rounded-md ${m.score>=80?'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300':m.score>=60?'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300':'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300'} px-1.5 py-0.5 text-[10px] font-black">${m.score}分</span>`);return badges.join(' ');};
@@ -2058,7 +2058,7 @@ const bindDatalistAutoUpdate=()=>{
                     contains.push([item.name,item.code]);
                 }
             }
-            const matches=prefix.concat(contains).slice(0,6);
+            const matches=prefix.concat(contains).slice(0,10);
             list.innerHTML=matches.map(([key,other])=>`<option value="${escapeHTML(key)}">${escapeHTML(other)}</option>`).join('');
         },320);
     });
@@ -2501,7 +2501,7 @@ const renderJournalDashboard=data=>{
     const cards=[['目前顯示',rows.length,'text-blue-600 dark:text-blue-300'],['新訊號',statusCount('新訊號'),'text-sky-600 dark:text-sky-300'],['觀察中',statusCount('觀察中'),'text-amber-600 dark:text-amber-300'],['已進場',statusCount('已進場'),'text-red-600 dark:text-red-300'],['多重訊號',resonance,'text-violet-600 dark:text-violet-300'],['逾期未處理',overdue,overdue?'text-orange-600 dark:text-orange-300':'text-gray-500 dark:text-gray-300'],['尚未複盤',pending,pending?'text-gray-700 dark:text-gray-100':'text-gray-500 dark:text-gray-300'],['資料異常',issueCount,issueCount?'text-red-600 dark:text-red-300':'text-gray-500 dark:text-gray-300'],['複盤勝率',reviewed.length?`${winRate}%`:'—','text-emerald-600 dark:text-emerald-300']];
     root.innerHTML=cards.map(([label,value,color])=>`<div class="rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-1 py-0.5 text-center shadow-sm min-h-[36px] flex flex-col items-center justify-center"><div class="text-[8px] sm:text-[9px] leading-none text-gray-400 dark:text-gray-500 whitespace-nowrap">${label}</div><div class="mt-0.5 text-xs sm:text-sm leading-none font-black ${color}">${value}</div></div>`).join('');
     if(!performanceRoot)return;const groups=new Map();reviewed.forEach(item=>(item.tags?.length?item.tags:['未分類']).forEach(tag=>{if(!groups.has(tag))groups.set(tag,{tag,total:0,wins:0,returns:[]});const group=groups.get(tag);group.total++;if(item.review.outcome==='成功')group.wins++;const result=getJournalReturn(item);if(result!==null)group.returns.push(result);}));
-    const ranking=[...groups.values()].sort((a,b)=>b.total-a.total||b.wins/b.total-a.wins/a.total).slice(0,6);if(!ranking.length){performanceRoot.classList.add('hidden');performanceRoot.innerHTML='';return;}
+    const ranking=[...groups.values()].sort((a,b)=>b.total-a.total||b.wins/b.total-a.wins/a.total).slice(0,10);if(!ranking.length){performanceRoot.classList.add('hidden');performanceRoot.innerHTML='';return;}
     performanceRoot.classList.remove('hidden');performanceRoot.innerHTML=`<div class="flex items-center justify-between gap-2 mb-2"><span class="text-xs font-black text-emerald-700 dark:text-emerald-300"><i class="fa-solid fa-chart-column mr-1.5"></i>策略複盤績效</span><span class="text-[10px] text-gray-400">僅統計已判定成功／失敗</span></div><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1.5">${ranking.map(group=>{const rate=Math.round(group.wins/group.total*100),average=group.returns.length?group.returns.reduce((sum,value)=>sum+value,0)/group.returns.length:null;return`<div class="rounded-lg bg-white dark:bg-gray-900 border border-emerald-100 dark:border-emerald-900/70 px-2.5 py-2 text-xs"><div class="font-bold text-gray-700 dark:text-gray-200 truncate">${escapeHTML(group.tag)}</div><div class="mt-1 flex justify-between text-[10px] text-gray-500 dark:text-gray-400"><span>樣本 ${group.total}</span><span class="font-black text-emerald-600 dark:text-emerald-300">勝率 ${rate}%</span><span>${average===null?'無報酬':`均報 ${average>=0?'+':''}${average.toFixed(1)}%`}</span></div></div>`;}).join('')}</div>`;
 };
 
@@ -2949,7 +2949,6 @@ document.getElementById('btn-copy-revenue')?.addEventListener('click',e=>{
     let rows=applyRevenueMomentumFilters(state.revenueRecords.map(r=>({...r,type:normalizeMomentumRecordType(r)})));
     if(!rows.length)return showToast('目前沒有可複製的營收籌碼動能資料','error');
 
-    // v127：依股票彙整，先顯示「代號 股名」，後面才列創高月份與千張大戶日期。
     const grouped=new Map();
     rows.forEach(r=>{
         const code=String(r.code||'').trim(),name=String(r.name||'').trim(),key=code||name;
@@ -2965,17 +2964,33 @@ document.getElementById('btn-copy-revenue')?.addEventListener('click',e=>{
             if(m&&!g.revenue.includes(m))g.revenue.push(m);
         }
     });
-    const lines=[...grouped.values()]
-      .sort((a,b)=>String(a.code).localeCompare(String(b.code),'zh-Hant',{numeric:true}))
-      .map(g=>{
-          g.revenue.sort((a,b)=>b.localeCompare(a));
-          g.holder.sort((a,b)=>b.localeCompare(a));
-          const parts=[];
-          if(g.revenue.length)parts.push(`創高月份：${g.revenue.join('、')}`);
-          if(g.holder.length)parts.push(`千張大戶：${g.holder.join('、')}`);
-          return `${g.code}${g.name?' '+g.name:''}${parts.length?'｜'+parts.join('｜'):''}`;
-      });
-    executeCopy(lines.join('\\n'));
+
+    const stocks=[...grouped.values()].sort((a,b)=>String(a.code).localeCompare(String(b.code),'zh-Hant',{numeric:true}));
+    const revenueStocks=stocks.filter(g=>g.revenue.length);
+    const holderStocks=stocks.filter(g=>g.holder.length);
+    const duplicateCodes=new Set(stocks.filter(g=>g.revenue.length&&g.holder.length).map(g=>g.code));
+
+    const fmtMonth=v=>String(v||'').replace('-', '/');
+    const fmtDate=v=>String(v||'').replace(/-/g,'/');
+    const stockLine=(g,type)=>{
+        const values=type==='revenue'
+          ? g.revenue.sort((a,b)=>b.localeCompare(a)).map(fmtMonth)
+          : g.holder.sort((a,b)=>b.localeCompare(a)).map(fmtDate);
+        return `${g.code}${g.name?' '+g.name:''}${duplicateCodes.has(g.code)?' 🔁':''}${values.length?'｜'+values.join('、'):''}`;
+    };
+
+    const sections=[];
+    if(revenueStocks.length){
+        sections.push(`💰 [營收創高] (共 ${revenueStocks.length} 檔)\n${revenueStocks.map(g=>stockLine(g,'revenue')).join('\n')}`);
+    }
+    if(holderStocks.length){
+        sections.push(`📊 [千張大戶] (共 ${holderStocks.length} 檔)\n${holderStocks.map(g=>stockLine(g,'holder')).join('\n')}`);
+    }
+
+    const today=(typeof getToday==='function'?getToday():new Date().toISOString().slice(0,10)).replace(/-/g,'/');
+    const header=`| ${today} 多重篩選漏斗 |`;
+    const footer=`\n\n-------------------\n⚠️ 停損是紀律，停利是藝術。\n⚠️ 位階決定勝率，部位決定存活。\n⚠️ 趨勢-族群-題材-位階-動能-風控`;
+    executeCopy(`${header}\n\n${sections.join('\n\n')}${footer}`);
 });
 
 const handleReportFilterChange = debounce(() => { state.reportFilters.start = document.getElementById('filter-rep-start').value; state.reportFilters.end = document.getElementById('filter-rep-end').value; state.reportFilters.code = document.getElementById('filter-rep-code').value.trim(); renderReports(); }, 450);
