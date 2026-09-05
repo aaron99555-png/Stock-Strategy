@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="128">
+<meta name="app-version" content="131">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -1052,6 +1052,11 @@ html.dark body main :is(#module-journal,#module-favorites,#module-revenue,#modul
                 </div>
                 <div class="flex items-center justify-end gap-1.5 sm:gap-2 w-full lg:w-auto border-t lg:border-t-0 border-gray-200 dark:border-gray-700 pt-3 lg:pt-0">
                     <button type="button" id="btn-clear-revenue-filters" class="text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-red-600 text-gray-700 dark:text-gray-300 hover:text-white border border-gray-300 dark:border-gray-600 hover:border-red-500 px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center whitespace-nowrap mr-2"><i class="fa-solid fa-eraser sm:mr-1.5"></i><span class="hidden sm:inline">清除篩選</span></button>
+                    <select id="revenue-copy-mode" class="text-xs font-medium bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 px-2.5 py-1.5 sm:py-2 rounded-lg shadow-sm focus:ring-2 focus:ring-pink-400">
+    <option value="all">全部複製</option>
+    <option value="revenue">只複製營收創高</option>
+    <option value="holder">只複製千張大戶</option>
+</select>
                     <button type="button" id="btn-copy-revenue" class="text-xs font-medium bg-pink-50 dark:bg-pink-900/40 hover:bg-pink-600 border border-pink-200 dark:border-pink-700/50 text-pink-700 dark:text-pink-200 px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center active:scale-95"><i class="fa-solid fa-copy mr-1.5"></i>複製清單</button>
                 </div>
             </div>
@@ -2949,6 +2954,7 @@ document.getElementById('btn-copy-revenue')?.addEventListener('click',e=>{
     let rows=applyRevenueMomentumFilters(state.revenueRecords.map(r=>({...r,type:normalizeMomentumRecordType(r)})));
     if(!rows.length)return showToast('目前沒有可複製的營收籌碼動能資料','error');
 
+    const copyMode=document.getElementById('revenue-copy-mode')?.value||'all';
     const grouped=new Map();
     rows.forEach(r=>{
         const code=String(r.code||'').trim(),name=String(r.name||'').trim(),key=code||name;
@@ -2965,22 +2971,36 @@ document.getElementById('btn-copy-revenue')?.addEventListener('click',e=>{
         }
     });
 
-    const list=[...grouped.values()]
-      .sort((a,b)=>String(a.code).localeCompare(String(b.code),'zh-Hant',{numeric:true}))
-      .map(g=>{
-          g.revenue.sort((a,b)=>b.localeCompare(a));
-          g.holder.sort((a,b)=>b.localeCompare(a));
-          const parts=[];
-          if(g.revenue.length)parts.push(`營收創高：${g.revenue.map(v=>String(v).replace('-', '/')).join('、')}`);
-          if(g.holder.length)parts.push(`千張大戶：${g.holder.map(v=>String(v).replace(/-/g,'/')).join('、')}`);
-          return `${g.code}${g.name?' '+g.name:''}${parts.length?'｜'+parts.join('｜'):''}`;
-      })
-      .filter(Boolean);
+    const stocks=[...grouped.values()].sort((a,b)=>String(a.code).localeCompare(String(b.code),'zh-Hant',{numeric:true}));
+    const revenueStocks=stocks.filter(g=>g.revenue.length);
+    const holderStocks=stocks.filter(g=>g.holder.length);
+    const duplicateCodes=new Set(stocks.filter(g=>g.revenue.length&&g.holder.length).map(g=>g.code));
+
+    const fmtMonth=v=>String(v||'').replace('-', '/');
+    const fmtDate=v=>String(v||'').replace(/-/g,'/');
+    const stockLine=(g,type)=>{
+        const values=type==='revenue'
+          ? g.revenue.sort((a,b)=>b.localeCompare(a)).map(fmtMonth)
+          : g.holder.sort((a,b)=>b.localeCompare(a)).map(fmtDate);
+        return `${g.code}${g.name?' '+g.name:''}${duplicateCodes.has(g.code)?' 🔁':''}${values.length?'｜'+values.join('、'):''}`;
+    };
+
+    const sections=[];
+    const rf=state.revenueFilters||{};
+    const revenueStreakN=rf.revenuePattern==='consecutive'?Math.max(1,Number(rf.revenueN)||1):1;
+    const holderStreakN=rf.holderPattern==='consecutive'?Math.max(1,Number(rf.holderN)||1):1;
+    if((copyMode==='all'||copyMode==='revenue')&&revenueStocks.length){
+        sections.push(`💰 [營收創高] 連續${revenueStreakN}個月 (共 ${revenueStocks.length} 檔)\n${revenueStocks.map(g=>stockLine(g,'revenue')).join('\n')}`);
+    }
+    if((copyMode==='all'||copyMode==='holder')&&holderStocks.length){
+        sections.push(`📊 [千張大戶] 連續${holderStreakN}週 (共 ${holderStocks.length} 檔)\n${holderStocks.map(g=>stockLine(g,'holder')).join('\n')}`);
+    }
+    if(!sections.length)return showToast('目前選擇的類型沒有可複製資料','error');
 
     const today=(typeof getToday==='function'?getToday():new Date().toISOString().slice(0,10)).replace(/-/g,'/');
-    const header=`|${today} 多重篩選漏斗|`;
-    const footer=`\n\n-------------------\n\n⚠️ 停損是紀律，停利是藝術。\n\n⚠️ 位階決定勝率，部位決定存活。\n\n⚠️ 趨勢-族群-題材-位階-動能-風控`;
-    executeCopy(`${header}\n\n${list.join('\n')}${footer}`);
+    const header=`| ${today} 多重篩選漏斗 |`;
+    const footer=`\n\n-------------------\n⚠️ 停損是紀律，停利是藝術。\n⚠️ 位階決定勝率，部位決定存活。\n⚠️ 趨勢-族群-題材-位階-動能-風控`;
+    executeCopy(`${header}\n\n${sections.join('\n\n')}${footer}`);
 });
 
 const handleReportFilterChange = debounce(() => { state.reportFilters.start = document.getElementById('filter-rep-start').value; state.reportFilters.end = document.getElementById('filter-rep-end').value; state.reportFilters.code = document.getElementById('filter-rep-code').value.trim(); renderReports(); }, 450);
