@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="126">
+<meta name="app-version" content="127">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -2944,7 +2944,39 @@ document.getElementById('filter-revenue-code')?.addEventListener('input', handle
 document.getElementById('btn-clear-revenue-filters')?.addEventListener('click', () => { state.revenueFilters={month:'',code:'',type:'all',revenuePattern:'none',revenueN:3,revenueCount:2,holderPattern:'none',holderN:3,holderCount:2,minMomentum:0};[['filter-revenue-month',''],['filter-revenue-code',''],['filter-revenue-type','all'],['filter-revenue-pattern','none'],['filter-revenue-pattern-n','3'],['filter-revenue-pattern-count','2'],['filter-holder-pattern','none'],['filter-holder-pattern-n','3'],['filter-holder-pattern-count','2'],['filter-momentum-score','0']].forEach(([id,value])=>{const el=document.getElementById(id);if(el)el.value=value;});syncRevenuePatternUI();renderRevenueRecords();showToast('已清除篩選'); });
 syncRevenuePatternUI();
 
-document.getElementById('btn-copy-revenue')?.addEventListener('click',e=>{e.preventDefault();let rows=applyRevenueMomentumFilters(state.revenueRecords.map(r=>({...r,type:normalizeMomentumRecordType(r)})));rows.sort((a,b)=>getMomentumRecordDate(b).localeCompare(getMomentumRecordDate(a)));if(!rows.length)return showToast('目前沒有可複製的營收籌碼動能資料','error');const content=['【營收籌碼動能】',...rows.map(r=>`${normalizeMomentumRecordType(r)==='largeHolder'?'千張大戶增加':'營收創高'}｜${getMomentumRecordDate(r).replace(/-/g,'/')}｜${r.code} ${r.name}${r.notes?'｜'+r.notes:''}`)].join('\n');executeCopy(content);});
+document.getElementById('btn-copy-revenue')?.addEventListener('click',e=>{
+    e.preventDefault();
+    let rows=applyRevenueMomentumFilters(state.revenueRecords.map(r=>({...r,type:normalizeMomentumRecordType(r)})));
+    if(!rows.length)return showToast('目前沒有可複製的營收籌碼動能資料','error');
+
+    // v127：依股票彙整，先顯示「代號 股名」，後面才列創高月份與千張大戶日期。
+    const grouped=new Map();
+    rows.forEach(r=>{
+        const code=String(r.code||'').trim(),name=String(r.name||'').trim(),key=code||name;
+        if(!key)return;
+        if(!grouped.has(key))grouped.set(key,{code,name,revenue:[],holder:[]});
+        const g=grouped.get(key),type=normalizeMomentumRecordType(r);
+        if(!g.name&&name)g.name=name;
+        if(type==='largeHolder'){
+            const d=String(r.date||'').trim();
+            if(d&&!g.holder.includes(d))g.holder.push(d);
+        }else{
+            const m=String(r.month||'').trim();
+            if(m&&!g.revenue.includes(m))g.revenue.push(m);
+        }
+    });
+    const lines=[...grouped.values()]
+      .sort((a,b)=>String(a.code).localeCompare(String(b.code),'zh-Hant',{numeric:true}))
+      .map(g=>{
+          g.revenue.sort((a,b)=>b.localeCompare(a));
+          g.holder.sort((a,b)=>b.localeCompare(a));
+          const parts=[];
+          if(g.revenue.length)parts.push(`創高月份：${g.revenue.join('、')}`);
+          if(g.holder.length)parts.push(`千張大戶：${g.holder.join('、')}`);
+          return `${g.code}${g.name?' '+g.name:''}${parts.length?'｜'+parts.join('｜'):''}`;
+      });
+    executeCopy(lines.join('\\n'));
+});
 
 const handleReportFilterChange = debounce(() => { state.reportFilters.start = document.getElementById('filter-rep-start').value; state.reportFilters.end = document.getElementById('filter-rep-end').value; state.reportFilters.code = document.getElementById('filter-rep-code').value.trim(); renderReports(); }, 450);
 document.getElementById('filter-rep-start')?.addEventListener('change', handleReportFilterChange);
