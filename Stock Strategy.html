@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="129">
+<meta name="app-version" content="128">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -2965,32 +2965,22 @@ document.getElementById('btn-copy-revenue')?.addEventListener('click',e=>{
         }
     });
 
-    const stocks=[...grouped.values()].sort((a,b)=>String(a.code).localeCompare(String(b.code),'zh-Hant',{numeric:true}));
-    const revenueStocks=stocks.filter(g=>g.revenue.length);
-    const holderStocks=stocks.filter(g=>g.holder.length);
-    const duplicateCodes=new Set(stocks.filter(g=>g.revenue.length&&g.holder.length).map(g=>g.code));
-
-    const fmtMonth=v=>String(v||'').replace('-', '/');
-    const fmtDate=v=>String(v||'').replace(/-/g,'/');
-    const stockLine=(g,type)=>{
-        const values=type==='revenue'
-          ? g.revenue.sort((a,b)=>b.localeCompare(a)).map(fmtMonth)
-          : g.holder.sort((a,b)=>b.localeCompare(a)).map(fmtDate);
-        return `${g.code}${g.name?' '+g.name:''}${duplicateCodes.has(g.code)?' 🔁':''}${values.length?'｜'+values.join('、'):''}`;
-    };
-
-    const sections=[];
-    if(revenueStocks.length){
-        sections.push(`💰 [營收創高] (共 ${revenueStocks.length} 檔)\n${revenueStocks.map(g=>stockLine(g,'revenue')).join('\n')}`);
-    }
-    if(holderStocks.length){
-        sections.push(`📊 [千張大戶] (共 ${holderStocks.length} 檔)\n${holderStocks.map(g=>stockLine(g,'holder')).join('\n')}`);
-    }
+    const list=[...grouped.values()]
+      .sort((a,b)=>String(a.code).localeCompare(String(b.code),'zh-Hant',{numeric:true}))
+      .map(g=>{
+          g.revenue.sort((a,b)=>b.localeCompare(a));
+          g.holder.sort((a,b)=>b.localeCompare(a));
+          const parts=[];
+          if(g.revenue.length)parts.push(`營收創高：${g.revenue.map(v=>String(v).replace('-', '/')).join('、')}`);
+          if(g.holder.length)parts.push(`千張大戶：${g.holder.map(v=>String(v).replace(/-/g,'/')).join('、')}`);
+          return `${g.code}${g.name?' '+g.name:''}${parts.length?'｜'+parts.join('｜'):''}`;
+      })
+      .filter(Boolean);
 
     const today=(typeof getToday==='function'?getToday():new Date().toISOString().slice(0,10)).replace(/-/g,'/');
-    const header=`| ${today} 多重篩選漏斗 |`;
-    const footer=`\n\n-------------------\n⚠️ 停損是紀律，停利是藝術。\n⚠️ 位階決定勝率，部位決定存活。\n⚠️ 趨勢-族群-題材-位階-動能-風控`;
-    executeCopy(`${header}\n\n${sections.join('\n\n')}${footer}`);
+    const header=`|${today} 多重篩選漏斗|`;
+    const footer=`\n\n-------------------\n\n⚠️ 停損是紀律，停利是藝術。\n\n⚠️ 位階決定勝率，部位決定存活。\n\n⚠️ 趨勢-族群-題材-位階-動能-風控`;
+    executeCopy(`${header}\n\n${list.join('\n')}${footer}`);
 });
 
 const handleReportFilterChange = debounce(() => { state.reportFilters.start = document.getElementById('filter-rep-start').value; state.reportFilters.end = document.getElementById('filter-rep-end').value; state.reportFilters.code = document.getElementById('filter-rep-code').value.trim(); renderReports(); }, 450);
