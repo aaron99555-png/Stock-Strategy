@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="131">
+<meta name="app-version" content="132">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -2246,6 +2246,10 @@ const clearDeletionTombstone=async(collection,id)=>{
 const filterDeletedCloudRecords=(collection,value)=>{
     return cloudCollection(value).filter(item=>item&&item.id&&!getTombstoneTime(collection,item.id));
 };
+// v132：營收／千張大戶採逐筆「新者優先」合併，避免雲端舊快照覆蓋剛新增的本機資料。
+const getRecordUpdatedAt=record=>{const value=Number(record?.updatedAt||record?.createdAt||0);return Number.isFinite(value)?value:0;};
+const mergeRevenueRecordsNewest=(localValue,cloudValue)=>{const local=filterDeletedCloudRecords('revenueRecords',localValue),remote=filterDeletedCloudRecords('revenueRecords',cloudValue),merged=new Map();remote.forEach(item=>{if(item?.id)merged.set(String(item.id),item);});local.forEach(item=>{if(!item?.id)return;const id=String(item.id),current=merged.get(id);if(!current||getRecordUpdatedAt(item)>=getRecordUpdatedAt(current))merged.set(id,item);});return [...merged.values()].filter(item=>item?.id&&!getTombstoneTime('revenueRecords',item.id));};
+const revenueRecordsNeedCloudRepair=(merged,cloudValue)=>{const remote=filterDeletedCloudRecords('revenueRecords',cloudValue);if(merged.length!==remote.length)return true;const remoteMap=new Map(remote.map(item=>[String(item.id),item]));return merged.some(item=>{const cloudItem=remoteMap.get(String(item.id));return !cloudItem||getRecordUpdatedAt(item)>getRecordUpdatedAt(cloudItem);});};
 
 const savePendingCloudWrites=items=>{try{localStorage.setItem(PENDING_CLOUD_WRITES_KEY,JSON.stringify(items));return true;}catch(error){console.error('待同步資料儲存失敗',error);return false;}};
 const queueCloudWrite=(path,options={})=>{
@@ -2342,7 +2346,7 @@ async function performCloudLoad(showError,forceApply,adminAccess){
             prunePendingCloudWrites();
             state.journals=filterDeletedCloudRecords('journals',d.journals).map(item=>adminAccess?item:sanitizeJournalForViewer(item));
             const migratedStrategyTags=normalizeStrategyTags(state.journals),migratedJournalLifecycle=state.journals.reduce((changed,item)=>normalizeJournalLifecycle(item)||changed,false);
-            state.plans=adminAccess?filterDeletedCloudRecords('plans',d.plans):[];state.revenueRecords=filterDeletedCloudRecords('revenueRecords',d.revenueRecords);const normalizedCloudReports=normalizeReportRecords(filterDeletedCloudRecords('reports',d.reports));state.reports=normalizedCloudReports.records;state.checklists=filterDeletedCloudRecords('checklists',d.checklists);state.trash=adminAccess?cloudCollection(d.trash):[];if(d.tagSettings)state.tagSettings=d.tagSettings;state.epsData=d.epsData||{};
+            state.plans=adminAccess?filterDeletedCloudRecords('plans',d.plans):[];const mergedRevenueRecords=mergeRevenueRecordsNewest(state.revenueRecords,d.revenueRecords),repairRevenueCloud=adminAccess&&revenueRecordsNeedCloudRepair(mergedRevenueRecords,d.revenueRecords);state.revenueRecords=mergedRevenueRecords;const normalizedCloudReports=normalizeReportRecords(filterDeletedCloudRecords('reports',d.reports));state.reports=normalizedCloudReports.records;state.checklists=filterDeletedCloudRecords('checklists',d.checklists);state.trash=adminAccess?cloudCollection(d.trash):[];if(d.tagSettings)state.tagSettings=d.tagSettings;state.epsData=d.epsData||{};
             state.customMarketHolidays=d.customMarketHolidaySettings?normalizeCustomMarketHolidays(cloudCollection(d.customMarketHolidaySettings.dates)):[];
             rebuildStockLookup();
             const migratedManagedTags=window.ensureOptimizationState?.();window.syncCustomTagSettings?.();window.renderTrashManager?.();
@@ -2350,6 +2354,7 @@ async function performCloudLoad(showError,forceApply,adminAccess){
                 if(migratedStrategyTags||migratedJournalLifecycle)await putDataToCloud('journals',Object.fromEntries(state.journals.map(x=>[x.id,x])));
                 else if(d.publicJournals===undefined&&state.journals.length)await putDataToCloud('publicJournals',Object.fromEntries(state.journals.map(x=>[x.id,sanitizeJournalForViewer(x)])));
                 if(normalizedCloudReports.changed)await putDataToCloud('reports',Object.fromEntries(state.reports.map(x=>[x.id,x])));
+                if(repairRevenueCloud)await putDataToCloud('revenueRecords',Object.fromEntries(state.revenueRecords.map(x=>[x.id,x])));
                 if((!d.tagSettings||migratedManagedTags)&&state.tagSettings)await putDataToCloud('tagSettings',state.tagSettings);
                 if(d.trash===undefined&&state.trash?.length)await putDataToCloud('trash',Object.fromEntries(state.trash.map(x=>[x.id,x])));
             }
@@ -3095,6 +3100,8 @@ document.getElementById('revenue-form')?.addEventListener('submit',async e=>{
     let mn=nt;if(eIdx!==-1){const o=state.revenueRecords[eIdx].notes||'';if(nt&&o&&o!==nt&&!o.includes(nt))mn=o+'；'+nt;else if(!nt)mn=o;}
     const old=eIdx!==-1?state.revenueRecords[eIdx]:null,p={id:dId,type,month:type==='revenue'?m:'',date:type==='largeHolder'?d:'',code:c,name:n,notes:mn,createdAt:old?.createdAt||Date.now(),updatedAt:Date.now()};
     if(eIdx!==-1)state.revenueRecords[eIdx]=p;else state.revenueRecords.push(p);
+    // v132：先立即落地本機；後續 Firebase 寫入或舊 ID 清理即使較慢，也不會讓剛輸入的千張大戶遺失。
+    saveLocalData();
     // v125：只有舊 ID 真的不同時才刪除舊雲端紀錄，避免 undefined / 同 ID 的多餘刪除。
     if(old?.id&&old.id!==dId){
         await recordDeletionTombstone('revenueRecords',old.id);
@@ -3109,7 +3116,7 @@ document.getElementById('revenue-form')?.addEventListener('submit',async e=>{
         [['filter-revenue-month',''],['filter-revenue-code',''],['filter-revenue-type','revenue'],['filter-revenue-pattern','none'],['filter-holder-pattern','none'],['filter-momentum-score','0']].forEach(([id,value])=>{const el=document.getElementById(id);if(el)el.value=value;});
     }
     syncRevenuePatternUI();
-    saveLocalData();renderRevenueRecords();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();await putDataToCloud(`revenueRecords/${dId}`,p);showToast(type==='largeHolder'?'千張大戶持股增加已儲存並顯示':'營收創高已儲存並顯示');
+    saveLocalData();renderRevenueRecords();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();const cloudSaved=await putDataToCloud(`revenueRecords/${dId}`,p);showToast(type==='largeHolder'?(cloudSaved?'千張大戶已儲存並同步雲端':'千張大戶已儲存在本機，待網路恢復自動同步'):(cloudSaved?'營收創高已儲存並同步雲端':'營收創高已儲存在本機，待網路恢復自動同步'));
     e.target.reset();document.getElementById('r-type').value=type;if(type==='revenue')document.getElementById('r-month').value=m;else document.getElementById('r-date').value=d;syncMomentumFormType();setTimeout(()=>document.getElementById('r-code').focus(),15);
 });
 document.getElementById('revenue-table-body')?.addEventListener('click',async e=>{const b=e.target.closest('[data-action]');if(!b)return;const a=b.dataset.action,id=b.dataset.id;if(a==='edit-notes'){const r=state.revenueRecords.find(x=>x.id===id);if(!r)return;window.openPromptModal("修改備註說明",r.notes||"",async nn=>{if(nn!==null){r.notes=nn.trim();r.updatedAt=Date.now();saveLocalData();renderRevenueRecords();await putDataToCloud(`revenueRecords/${id}`,r);showToast("修改成功");}});}else if(a==='delete-revenue'){window.openConfirmModal('確定刪除？',async()=>{state.revenueRecords=state.revenueRecords.filter(x=>x.id!==id);saveLocalData();renderRevenueRecords();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();await recordDeletionTombstone('revenueRecords',id);await deleteDataFromCloud(`revenueRecords/${id}`);showToast('已刪除');});}});
