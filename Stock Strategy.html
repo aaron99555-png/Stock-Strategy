@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="133">
+<meta name="app-version" content="132">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -2024,33 +2024,8 @@ const bindAutoFill=(cId,nId,cb=null,strict=false)=>{
     codeInput.addEventListener('compositionend',()=>{isComposingCode=false;scheduleCodeLookup();});
     codeInput.addEventListener('input',scheduleCodeLookup);
     codeInput.addEventListener('change',()=>{cancelCodeLookup();if(/^\d{4,}$/.test(codeInput.value.trim()))syncFromCode(false,true);});
-    codeInput.addEventListener('blur',()=>{
-        cancelCodeLookup();
-        const raw=codeInput.value.trim();
-        // v133：策略日誌若已開始輸入代號但未滿 4 碼，不允許焦點跳走。
-        if(cId==='j-code'&&/^\d{1,3}$/.test(raw)){
-            setStockPairValidity(codeInput,nameInput,'股票代號至少需輸入 4 碼');
-            setTimeout(()=>{codeInput.focus();codeInput.setSelectionRange?.(raw.length,raw.length);},0);
-            return;
-        }
-        if(/^\d{4,}$/.test(raw))syncFromCode(false,true);
-    });
-    codeInput.addEventListener('keydown',e=>{
-        const raw=codeInput.value.trim();
-        if(cId==='j-code'&&(e.key==='Enter'||e.key==='Tab')&&/^\d{1,3}$/.test(raw)){
-            e.preventDefault();
-            cancelCodeLookup();
-            setStockPairValidity(codeInput,nameInput,'股票代號至少需輸入 4 碼');
-            showToast('股票代號未滿 4 碼，請輸入完整代號','error');
-            codeInput.focus();
-            return;
-        }
-        if(e.key==='Enter'){
-            e.preventDefault();
-            cancelCodeLookup();
-            if(/^\d{4,}$/.test(raw))syncFromCode(true,true);
-        }
-    });
+    codeInput.addEventListener('blur',()=>{cancelCodeLookup();if(/^\d{4,}$/.test(codeInput.value.trim()))syncFromCode(false,true);});
+    codeInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();cancelCodeLookup();if(/^\d{4,}$/.test(codeInput.value.trim()))syncFromCode(true,true);}});
     // 股名搜尋也改成延後處理，避免中文輸入法組字時一直同步。
     let nameLookupTimer=null,isComposingName=false;
     const scheduleNameLookup=()=>{
@@ -2410,7 +2385,7 @@ function loadFromCloud(showError=true,forceApply=false){
 }
 function startCloudSync(){
     if(cloudSyncInterval)clearInterval(cloudSyncInterval);
-    const intervalMs=hasStoredAdminAccess()?60000:120000; // v133：管理者 60 秒、一般使用者 120 秒，降低自動更新干擾
+    const intervalMs=hasStoredAdminAccess()?30000:60000;
     cloudSyncInterval=isCloudMode()?setInterval(()=>{if(document.visibilityState==='visible')loadFromCloud(false);},intervalMs):null;
 }
 function stopCloudSync(){if(cloudSyncInterval){clearInterval(cloudSyncInterval);cloudSyncInterval=null;}}
