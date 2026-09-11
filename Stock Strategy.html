@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="138">
+<meta name="app-version" content="139">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -2618,7 +2618,7 @@ const renderTableRows=(data,tbId,emId,isFav=false)=>{
     em.classList.add('hidden'); let rh='';
     data.forEach(i=>{
         const ei=i.ei||getEpsInfo(i.code,i),sc=i.score!==undefined?i.score:getScore(i.tags,ei);
-        const tagHtml=(i.tags||[]).map(t=>{const isNewHorse=isHorseTagNewEntry(i,t);return`<span class="inline-block text-[11px] font-bold px-2 py-0.5 rounded-md mr-1 mb-1 border shadow-sm transition ${canRemoveTags?'cursor-pointer hover:opacity-80':'cursor-default'} ${getTagStyle(t)}"${canRemoveTags?` data-action="remove-tag" data-id="${i.id}" data-tag="${escapeHTML(t)}" title="點擊移除標籤"`:` title="${isNewHorse?'前一個月內未出現相同馬標籤｜新進榜':'策略標籤'}"`}>${escapeHTML(t)}${isNewHorse?' <span class="ml-1 inline-flex items-center rounded bg-rose-600 text-white px-1 py-0.5 text-[9px] font-black align-middle">🆕 新進榜</span>':''}${canRemoveTags?' ✕':''}</span>`;}).join('');
+        const tagHtml=(i.tags||[]).map(t=>{const isNewHorse=isHorseTagNewEntry(i,t);return`<span class="inline-block text-[11px] font-bold px-2 py-0.5 rounded-md mr-1 mb-1 border shadow-sm transition ${canRemoveTags?'cursor-pointer hover:opacity-80':'cursor-default'} ${getTagStyle(t)}"${canRemoveTags?` data-action="remove-tag" data-id="${i.id}" data-tag="${escapeHTML(t)}" title="點擊移除標籤"`:` title="${isNewHorse?'前一個月內未出現相同馬標籤｜🆕新進榜':'策略標籤'}"`}>${escapeHTML(t)}${isNewHorse?' <span class="ml-1 inline-flex items-center rounded bg-rose-600 text-white px-1 py-0.5 text-[9px] font-black align-middle">🆕 新進榜</span>':''}${canRemoveTags?' ✕':''}</span>`;}).join('');
         let fl=i.isFavorite===true?1:(parseInt(i.isFavorite)||0),fc='text-gray-400 dark:text-gray-500 hover:text-yellow-500',fi='<i class="fa-solid fa-star pointer-events-none"></i>',ft='加入追蹤';
         if(fl===1){fc='text-yellow-500';ft='一星追蹤';}else if(fl===2){fc='text-orange-500';fi='<i class="fa-solid fa-star pointer-events-none"></i><span class="ml-1 text-[10px] font-bold pointer-events-none">2</span>';ft='二次追蹤';}else if(fl===3){fc='text-red-500';fi='<i class="fa-solid fa-star pointer-events-none"></i><span class="ml-1 text-[10px] font-bold pointer-events-none">3</span>';ft='三次追蹤';}
         const fd=i.date?i.date.replace(/-/g,'/'):'',rbh=getRevenueMonthsHtml(i.code,i.date||getToday()),hr=state.reports.some(r=>String(r.code||'').trim()===String(i.code||'').trim()),rb=hr?renderReportIndicator():'',futuresBadge=ei.futures?'<span class="shrink-0 bg-sky-600 text-white text-[9px] px-1 rounded ml-1">期</span>':'',resonance=getJournalResonance(i),resonanceBadge=resonance.isMultiple?`<span class="inline-flex items-center rounded-md bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-200 px-1.5 py-0.5 text-[10px] font-black mr-1 mb-1" title="共振來源：${escapeHTML(resonance.sources.join('、'))}"><i class="fa-solid fa-bolt mr-1"></i>${escapeHTML(resonance.sources.join('＋'))}</span>`:'',th=renderStockStrengthBadges(i.code,i.date||getToday())+resonanceBadge+tagHtml,statusBadge=getJournalStatusBadge(i.status),overdueBadge=isJournalOverdue(i)?`<span class="inline-flex items-center rounded-md bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-200 px-1.5 py-0.5 text-[10px] font-black ml-1"><i class="fa-solid fa-clock mr-1"></i>逾期 ${journalTradingAge(i.date)} 日</span>`:'',returnValue=getJournalReturn(i),reviewBadge=i.review?.reviewDate?`<div class="mt-1 text-[10px] font-bold ${returnValue===null?'text-gray-500 dark:text-gray-400':returnValue>=0?'tw-red':'tw-green'}">複盤 ${escapeHTML(i.review.outcome||'未判定')}${returnValue===null?'':`｜${returnValue>=0?'+':''}${returnValue.toFixed(1)}%`}</div>`:'',dataIssues=getJournalDataIssues(i),issueBadge=dataIssues.length?`<div class="mt-1 inline-flex items-center rounded-md bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-200 px-1.5 py-0.5 text-[10px] font-black" title="${escapeHTML(dataIssues.join('；'))}"><i class="fa-solid fa-triangle-exclamation mr-1"></i>異常 ${dataIssues.length} 項</div>`:'',notesHtml=`<div class="mb-1">${statusBadge}${overdueBadge}</div>${reviewBadge}${issueBadge}<div class="mt-1">${escapeHTML(i.notes||'')}</div>`;
@@ -2809,7 +2809,7 @@ const getHorseNewEntryTagsForCodeDate=(code,date)=>{
     });
 };
 const isHorseNewEntryJournal=journal=>Boolean(journal?._horseNewEntry)||getHorseNewEntryTags(journal).length>0;
-const getCopyJournalName=journal=>`${journal?.name||''}${isHorseNewEntryJournal(journal)?'-新進榜':''}`;
+const getCopyJournalName=journal=>`${journal?.name||''}${isHorseNewEntryJournal(journal)?'-🆕新進榜':''}`;
 
 const normalizeStreakTagFilterMode=mode=>mode==='include'||mode==='exclude'?mode:'all';
 const getSelectedStreakTags=()=>Array.from(document.querySelectorAll('.streak-tag-cb:checked')).map(input=>normalizeStrategyTagName(input.value)).filter(Boolean);
@@ -3009,10 +3009,10 @@ const buildJournalStreakCopyText=analysis=>{
     const modeText=analysis.mode==='window'?`${analysis.minDays} 日內至少出現 ${analysis.minOccurrences} 次`:`至少連續 ${analysis.minDays} 個交易日`,tagText=analysis.tagFilterMode==='all'?'':`｜${analysis.tagFilterMode==='include'?'包含':'排除'}策略：${analysis.selectedTags.join('、')}`,horseText=analysis.horseMode==='excludeStock'?'整檔排除赤兔馬、千里馬':analysis.horseMode==='ignoreTags'?'只忽略赤兔馬、千里馬標籤':'不排除赤兔馬、千里馬';
     const lines=[`【策略訊號雷達】`,`基準日：${analysis.baseDate||analysis.requestedBase}｜${modeText}｜${horseText}｜週末、休市日不計${analysis.customHolidays.length?`｜自訂休市 ${analysis.customHolidays.length} 日`:''}${tagText}${analysis.heatFilter!=='all'?`｜熱度：${analysis.heatFilter}`:''}${analysis.minStrength?`｜強度至少 ${analysis.minStrength} 分`:''}`,`共 ${analysis.results.length} 檔`,''];
     analysis.results.forEach(item=>{
-        lines.push(`${item.code} ${item.name}${item.isHorseNewEntry?'-新進榜':''}｜${analysis.mode==='window'?`${analysis.minDays} 日內出現 ${item.occurrences} 次`:`連續 ${item.streak} 日`}｜強度 ${item.score} 分｜${item.heat}`);
+        lines.push(`${item.code} ${item.name}${item.isHorseNewEntry?'-🆕新進榜':''}｜${analysis.mode==='window'?`${analysis.minDays} 日內出現 ${item.occurrences} 次`:`連續 ${item.streak} 日`}｜強度 ${item.score} 分｜${item.heat}`);
         if(item.commonTags.length)lines.push(`共同策略：${item.commonTags.join('、')}`);
         if(item.tagCounts.length)lines.push(`策略頻率：${item.tagCounts.map(entry=>`${entry.tag}×${entry.count}`).join('、')}`);
-        item.days.forEach(day=>{const newTags=new Set(getHorseNewEntryTagsForCodeDate(item.code,day.date));lines.push(`- ${day.date.replace(/-/g,'/')}：${day.tags.length?day.tags.map(tag=>`${tag}${newTags.has(normalizeStrategyTagName(tag))?'(新進榜)':''}`).join('、'):'無策略標籤'}`);});
+        item.days.forEach(day=>{const newTags=new Set(getHorseNewEntryTagsForCodeDate(item.code,day.date));lines.push(`- ${day.date.replace(/-/g,'/')}：${day.tags.length?day.tags.map(tag=>`${tag}${newTags.has(normalizeStrategyTagName(tag))?'(🆕新進榜)':''}`).join('、'):'無策略標籤'}`);});
         lines.push('');
     });
     return lines.join('\n').trim();
