@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="139">
+<meta name="app-version" content="140">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -798,6 +798,7 @@ html.dark body main :is(#module-journal,#module-favorites,#module-revenue,#modul
                     <button class="flex-shrink-0 btn-copy-base bg-sky-50 dark:bg-sky-900/40 hover:bg-sky-600 border-sky-200 dark:border-sky-700/50 text-sky-700 dark:text-sky-200 btn-copy" data-mode="futures_score">股期分數</button>
                     <button class="flex-shrink-0 btn-copy-base bg-orange-50 dark:bg-orange-900/40 hover:bg-orange-600 border-orange-200 dark:border-orange-700/50 text-orange-700 dark:text-orange-200 btn-copy" data-mode="chip">籌碼集中</button>
                     <button class="flex-shrink-0 btn-copy-base bg-green-50 dark:bg-green-900/40 hover:bg-green-600 border-green-200 dark:border-green-700/50 text-green-700 dark:text-green-200 btn-copy" data-mode="eps">EPS</button>
+                    <button class="flex-shrink-0 btn-copy-base bg-amber-50 dark:bg-amber-900/40 hover:bg-amber-600 border-amber-200 dark:border-amber-700/50 text-amber-700 dark:text-amber-200 btn-copy" data-mode="horses" title="複製赤兔馬與千里馬，前一個月未出現同標籤者標示 🆕">🐎🏇 兩匹馬</button>
                     <button class="flex-shrink-0 btn-copy-base bg-rose-50 dark:bg-rose-900/40 hover:bg-rose-600 border-rose-200 dark:border-rose-700/50 text-rose-700 dark:text-rose-200 btn-copy" data-mode="feifan">非凡重點</button>
                     </div>
                     <span id="journal-stock-count" class="copy-stock-count inline-flex items-center gap-1.5 rounded-full bg-blue-50 dark:bg-blue-900/35 border border-blue-200 dark:border-blue-800/70 px-3 py-1.5 text-xs sm:text-sm font-bold text-blue-600 dark:text-blue-300 shadow-sm whitespace-nowrap"><i class="fa-solid fa-chart-simple"></i>目前顯示 0 檔股票</span>
@@ -1366,6 +1367,7 @@ html.dark body main :is(#module-journal,#module-favorites,#module-revenue,#modul
                     <button class="flex-shrink-0 btn-copy-base bg-sky-50 dark:bg-sky-900/40 hover:bg-sky-600 border-sky-200 dark:border-sky-700/50 text-sky-700 dark:text-sky-200 btn-copy" data-mode="futures_score">股期分數</button>
                     <button class="flex-shrink-0 btn-copy-base bg-orange-50 dark:bg-orange-900/40 hover:bg-orange-600 border-orange-200 dark:border-orange-700/50 text-orange-700 dark:text-orange-200 btn-copy" data-mode="chip">籌碼集中</button>
                     <button class="flex-shrink-0 btn-copy-base bg-green-50 dark:bg-green-900/40 hover:bg-green-600 border-green-200 dark:border-green-700/50 text-green-700 dark:text-green-200 btn-copy" data-mode="eps">EPS</button>
+                    <button class="flex-shrink-0 btn-copy-base bg-amber-50 dark:bg-amber-900/40 hover:bg-amber-600 border-amber-200 dark:border-amber-700/50 text-amber-700 dark:text-amber-200 btn-copy" data-mode="horses" title="複製赤兔馬與千里馬，前一個月未出現同標籤者標示 🆕">🐎🏇 兩匹馬</button>
                     <button class="flex-shrink-0 btn-copy-base bg-rose-50 dark:bg-rose-900/40 hover:bg-rose-600 border-rose-200 dark:border-rose-700/50 text-rose-700 dark:text-rose-200 btn-copy" data-mode="feifan">非凡重點</button>
                     </div>
                     <span id="fav-stock-count" class="copy-stock-count inline-flex items-center gap-1.5 rounded-full bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-800/70 px-3 py-1.5 text-xs sm:text-sm font-bold text-yellow-600 dark:text-yellow-300 shadow-sm whitespace-nowrap"><i class="fa-solid fa-chart-simple"></i>目前顯示 0 檔股票</span>
@@ -3695,7 +3697,25 @@ document.querySelectorAll('.copy-compare-duplicates').forEach(cb=>cb.addEventLis
 const executeCopy=async t=>{if(navigator.clipboard&&window.isSecureContext){try{const ok=await window.copyTextOptimized(t);if(ok)return showToast('複製成功');}catch(e){console.warn('剪貼簿 API 無法使用，改用相容模式',e);}}fallbackCopy(t);};
 const fallbackCopy=t=>{const x=document.createElement("textarea");x.value=t;x.style.position="fixed";document.body.appendChild(x);x.focus();x.select();try{document.execCommand('copy');showToast('複製成功');}catch(e){showToast('複製失敗','error');}document.body.removeChild(x);};
 
-document.querySelectorAll('.btn-copy').forEach(b=>{b.addEventListener('click',e=>{const m=e.currentTarget.dataset.mode,at=document.querySelector('.tab-content.active').id,iF=at==='module-favorites',cf=iF?state.favFilters:state.filters,lt=iF?'fav':'journal';let d=getFilteredAndSortedData(state.journals,cf,iF?state.favSortConfig:state.sortConfig);if(iF)d=d.filter(j=>j.isFavorite);let ds=cf.start===cf.end?(cf.start?cf.start.replace(/-/g,'/'):'全區間'):`${cf.start.replace(/-/g,'/')}~${cf.end.replace(/-/g,'/')}`,ts=cf.tags.length>0?` [標籤條件: ${cf.tags.join(cf.tagLogic==='AND'?' 且 ':' 或 ')}]`:'';if(m==='selected'){let ci=selectedIds[lt];if(ci.size===0)return showToast('請先勾選','error');d=d.filter(j=>ci.has(j.id));d.sort((a,b)=>{const dt=new Date(a.date)-new Date(b.date);return dt!==0?dt:(a.createdAt||0)-(b.createdAt||0);});let tx=`| ${ds} 多重篩選漏斗${ts} |\n\n`;d.forEach(j=>tx+=`${j.code} ${getCopyJournalName(j)}\n`);executeCopy(tx.trim()+copyFootnote);return;}if(m==='feifan'){const seen=new Set(),ff=d.filter(j=>j.tags&&j.tags.includes('非凡重點')).filter(j=>{const code=String(j.code||'').trim();if(!code||seen.has(code))return false;seen.add(code);return true;});if(ff.length===0)return showToast('無非凡重點標的','error');let tx=`| ${ds} 非凡重點 (共 ${ff.length} 檔) |\n\n`;ff.forEach(j=>tx+=`${j.code} ${getCopyJournalName(j)}\n`);executeCopy(tx.trim()+copyFootnote);return;}if(d.length===0)return showToast('清單為空','error');let tx=`| ${ds} 多重篩選漏斗${ts} |\n\n`;if(m==='strategy'){const sm={};d.forEach(j=>{if(j.tags)j.tags.forEach(t=>{if(!NON_STRATEGY_COPY_TAGS.has(t)&&(cf.tags.length===0||cf.tags.includes(t))){if(!sm[t])sm[t]=[];sm[t].push(j);}});});const duplicateCodes=state.copyCompareDuplicates?getDuplicateStrategyCodes(sm):new Set(),tagIcons=buildCopyTagIconMap(Object.keys(sm));const ord=cf.tags.length?[...cf.tags]:TAG_CATEGORIES.flatMap(c=>c.tags);Object.keys(sm).sort((a,b)=>{const iA=ord.indexOf(a),iB=ord.indexOf(b);if(iA!==-1&&iB!==-1)return iA-iB;if(iA!==-1)return -1;if(iB!==-1)return 1;return a.localeCompare(b);}).forEach(s=>{tx+=`${tagIcons.get(s)||'🏷️'} [${s}] (共 ${sm[s].length} 檔)\n`;sm[s].forEach(a=>tx+=`${a.code} ${getCopyJournalName(a)}${duplicateCodes.has(String(a.code||'').trim())?' 🔁':''}\n`);tx+='\n';});}else if(m==='score'){
+document.querySelectorAll('.btn-copy').forEach(b=>{b.addEventListener('click',e=>{const m=e.currentTarget.dataset.mode,at=document.querySelector('.tab-content.active').id,iF=at==='module-favorites',cf=iF?state.favFilters:state.filters,lt=iF?'fav':'journal';let d=getFilteredAndSortedData(state.journals,cf,iF?state.favSortConfig:state.sortConfig);if(iF)d=d.filter(j=>j.isFavorite);let ds=cf.start===cf.end?(cf.start?cf.start.replace(/-/g,'/'):'全區間'):`${cf.start.replace(/-/g,'/')}~${cf.end.replace(/-/g,'/')}`,ts=cf.tags.length>0?` [標籤條件: ${cf.tags.join(cf.tagLogic==='AND'?' 且 ':' 或 ')}]`:'';if(m==='selected'){let ci=selectedIds[lt];if(ci.size===0)return showToast('請先勾選','error');d=d.filter(j=>ci.has(j.id));d.sort((a,b)=>{const dt=new Date(a.date)-new Date(b.date);return dt!==0?dt:(a.createdAt||0)-(b.createdAt||0);});let tx=`| ${ds} 多重篩選漏斗${ts} |\n\n`;d.forEach(j=>tx+=`${j.code} ${getCopyJournalName(j)}\n`);executeCopy(tx.trim()+copyFootnote);return;}if(m==='horses'){
+    const horseTags=['赤兔馬','千里馬'],horseIcons={'赤兔馬':'🐎','千里馬':'🏇'},sections=[];
+    horseTags.forEach(tag=>{
+        const byCode=new Map();
+        d.filter(j=>journalHasStrategyTag(j,tag)).forEach(j=>{
+            const code=String(j.code||'').trim();if(!code)return;
+            const current=byCode.get(code);
+            // 同一股票在目前篩選區間若有多筆，採日期最新的一筆作為「這次」判斷基準。
+            if(!current||String(j.date||'')>String(current.date||'')||(String(j.date||'')===String(current.date||'')&&Number(j.createdAt||0)>Number(current.createdAt||0)))byCode.set(code,j);
+        });
+        const items=[...byCode.values()].sort((a,b)=>String(a.code||'').localeCompare(String(b.code||''),'zh-Hant',{numeric:true}));
+        if(!items.length)return;
+        const lines=items.map(j=>`${j.code} ${j.name||''}${isHorseTagNewEntry(j,tag)?' 🆕':''}`);
+        sections.push(`${horseIcons[tag]} [${tag}] (共 ${items.length} 檔)\n${lines.join('\n')}`);
+    });
+    if(!sections.length)return showToast('目前篩選結果沒有赤兔馬或千里馬','error');
+    const tx=`| ${ds} 兩匹馬 |\n\n${sections.join('\n\n')}`;
+    executeCopy(tx.trim()+copyFootnote);return;
+}if(m==='feifan'){const seen=new Set(),ff=d.filter(j=>j.tags&&j.tags.includes('非凡重點')).filter(j=>{const code=String(j.code||'').trim();if(!code||seen.has(code))return false;seen.add(code);return true;});if(ff.length===0)return showToast('無非凡重點標的','error');let tx=`| ${ds} 非凡重點 (共 ${ff.length} 檔) |\n\n`;ff.forEach(j=>tx+=`${j.code} ${getCopyJournalName(j)}\n`);executeCopy(tx.trim()+copyFootnote);return;}if(d.length===0)return showToast('清單為空','error');let tx=`| ${ds} 多重篩選漏斗${ts} |\n\n`;if(m==='strategy'){const sm={};d.forEach(j=>{if(j.tags)j.tags.forEach(t=>{if(!NON_STRATEGY_COPY_TAGS.has(t)&&(cf.tags.length===0||cf.tags.includes(t))){if(!sm[t])sm[t]=[];sm[t].push(j);}});});const duplicateCodes=state.copyCompareDuplicates?getDuplicateStrategyCodes(sm):new Set(),tagIcons=buildCopyTagIconMap(Object.keys(sm));const ord=cf.tags.length?[...cf.tags]:TAG_CATEGORIES.flatMap(c=>c.tags);Object.keys(sm).sort((a,b)=>{const iA=ord.indexOf(a),iB=ord.indexOf(b);if(iA!==-1&&iB!==-1)return iA-iB;if(iA!==-1)return -1;if(iB!==-1)return 1;return a.localeCompare(b);}).forEach(s=>{tx+=`${tagIcons.get(s)||'🏷️'} [${s}] (共 ${sm[s].length} 檔)\n`;sm[s].forEach(a=>tx+=`${a.code} ${getCopyJournalName(a)}${duplicateCodes.has(String(a.code||'').trim())?' 🔁':''}\n`);tx+='\n';});}else if(m==='score'){
     // --- 這裡合併分數 ---
     const scoreMap = {};
     d.forEach(j => {
