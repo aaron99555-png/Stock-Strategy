@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="146">
+<meta name="app-version" content="147">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -797,6 +797,27 @@ html:not(.dark) #theme-toggle:hover{
 }
 </style>
 
+
+<style id="date-range-fast-v147">
+.date-range-fast{max-width:100%;white-space:nowrap}
+.date-shift-btn{
+  width:26px;height:28px;flex:0 0 26px;
+  display:inline-flex;align-items:center;justify-content:center;
+  border-radius:7px;
+  color:#7b746c;
+  background:rgba(120,110,98,.07);
+  transition:background-color .15s ease,color .15s ease,transform .12s ease;
+}
+.date-shift-btn:hover{background:rgba(37,99,235,.10);color:#2563eb}
+.date-shift-btn:active{transform:scale(.92)}
+.dark .date-shift-btn{color:#aeb7c4;background:rgba(148,163,184,.10)}
+.dark .date-shift-btn:hover{color:#7dd3fc;background:rgba(14,165,233,.16)}
+@media(max-width:639px){
+  .date-shift-btn{width:24px;height:28px;flex-basis:24px}
+  .date-range-fast input[type="date"]{width:72px!important;font-size:11px!important}
+}
+</style>
+
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen flex flex-col antialiased">
 <nav class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-50 transition-colors duration-300">
@@ -964,11 +985,13 @@ html:not(.dark) #theme-toggle:hover{
         <div class="card-panel border-t-4 border-t-blue-500 flex flex-col h-full min-h-[500px]">
             <div class="p-4 border-b border-gray-200 dark:border-gray-700/50 bg-gray-50/80 dark:bg-gray-800/80 rounded-t-xl">
                 <div class="filter-toolbar flex flex-wrap items-center gap-2 sm:gap-3 w-full">
-                    <div class="flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 max-w-[180px] sm:max-w-none h-[38px] sm:h-auto box-border">
-                        <span class="text-xs text-gray-500 dark:text-gray-400 px-1 sm:px-2 hidden sm:inline"><i class="fa-solid fa-filter mr-1"></i>區間</span>
+                    <div class="date-range-fast flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 h-[38px] sm:h-auto box-border" data-date-range="journal">
+                        <button type="button" class="date-shift-btn" data-range-shift="-1" data-range-scope="journal" title="區間往前一天" aria-label="區間往前一天"><i class="fa-solid fa-chevron-left"></i></button>
+                        <span class="text-xs text-gray-500 dark:text-gray-400 px-1 sm:px-2 hidden lg:inline"><i class="fa-solid fa-filter mr-1"></i>區間</span>
                         <input type="date" id="filter-start" class="filter-start bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-0.5 sm:px-1 w-[75px] sm:w-auto text-center h-full box-border m-0">
                         <span class="text-gray-400 mx-0.5 sm:mx-1">-</span>
                         <input type="date" id="filter-end" class="filter-end bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-0.5 sm:px-1 w-[75px] sm:w-auto text-center h-full box-border m-0">
+                        <button type="button" class="date-shift-btn" data-range-shift="1" data-range-scope="journal" title="區間往後一天" aria-label="區間往後一天"><i class="fa-solid fa-chevron-right"></i></button>
                     </div>
                     <div class="flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 h-[38px] sm:h-auto box-border">
                         <i class="fa-solid fa-search text-gray-400 text-[10px] sm:text-xs ml-1 sm:ml-2"></i>
@@ -1369,11 +1392,13 @@ html:not(.dark) #theme-toggle:hover{
             </div>
             <div data-mobile-toolbar="report" class="p-4 border-b border-gray-200 dark:border-gray-700/50 bg-gray-50/80 dark:bg-gray-800/80 flex flex-col lg:flex-row items-start lg:items-center gap-4 w-full justify-between">
                 <div class="flex flex-wrap items-center gap-2 sm:gap-3 w-full lg:w-auto">
-                    <div class="flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 max-w-[180px] sm:max-w-none h-[38px] sm:h-auto box-border">
-                        <span class="text-xs text-gray-500 dark:text-gray-400 px-1 sm:px-2 hidden sm:inline"><i class="fa-solid fa-filter mr-1"></i>區間</span>
+                    <div class="date-range-fast flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 h-[38px] sm:h-auto box-border" data-date-range="report">
+                        <button type="button" class="date-shift-btn" data-range-shift="-1" data-range-scope="report" title="區間往前一天" aria-label="區間往前一天"><i class="fa-solid fa-chevron-left"></i></button>
+                        <span class="text-xs text-gray-500 dark:text-gray-400 px-1 sm:px-2 hidden lg:inline"><i class="fa-solid fa-filter mr-1"></i>區間</span>
                         <input type="date" id="filter-rep-start" class="bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-0.5 sm:px-1 w-[75px] sm:w-auto text-center h-full box-border m-0">
                         <span class="text-gray-400 mx-0.5 sm:mx-1">-</span>
                         <input type="date" id="filter-rep-end" class="bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-0.5 sm:px-1 w-[75px] sm:w-auto text-center h-full box-border m-0">
+                        <button type="button" class="date-shift-btn" data-range-shift="1" data-range-scope="report" title="區間往後一天" aria-label="區間往後一天"><i class="fa-solid fa-chevron-right"></i></button>
                     </div>
                     <div class="flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 h-[38px] sm:h-auto box-border">
                         <i class="fa-solid fa-search text-gray-400 text-[10px] sm:text-xs ml-1 sm:ml-2"></i>
@@ -1537,11 +1562,13 @@ html:not(.dark) #theme-toggle:hover{
             </div>
             <div class="p-4 border-b border-gray-200 dark:border-gray-700/50 bg-gray-50/80 dark:bg-gray-800/80 w-full">
                 <div class="filter-toolbar flex flex-wrap items-center gap-2 sm:gap-3 w-full">
-                    <div class="flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 max-w-[180px] sm:max-w-none h-[38px] sm:h-auto box-border">
-                        <span class="text-xs text-gray-500 dark:text-gray-400 px-1 sm:px-2 hidden sm:inline"><i class="fa-solid fa-filter mr-1"></i>區間</span>
+                    <div class="date-range-fast flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 h-[38px] sm:h-auto box-border" data-date-range="fav">
+                        <button type="button" class="date-shift-btn" data-range-shift="-1" data-range-scope="fav" title="區間往前一天" aria-label="區間往前一天"><i class="fa-solid fa-chevron-left"></i></button>
+                        <span class="text-xs text-gray-500 dark:text-gray-400 px-1 sm:px-2 hidden lg:inline"><i class="fa-solid fa-filter mr-1"></i>區間</span>
                         <input type="date" id="filter-start-fav" class="filter-start bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-0.5 sm:px-1 w-[75px] sm:w-auto text-center h-full box-border m-0">
                         <span class="text-gray-400 mx-0.5 sm:mx-1">-</span>
                         <input type="date" id="filter-end-fav" class="filter-end bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-0.5 sm:px-1 w-[75px] sm:w-auto text-center h-full box-border m-0">
+                        <button type="button" class="date-shift-btn" data-range-shift="1" data-range-scope="fav" title="區間往後一天" aria-label="區間往後一天"><i class="fa-solid fa-chevron-right"></i></button>
                     </div>
                     <div class="flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 h-[38px] sm:h-auto box-border">
                         <i class="fa-solid fa-search text-gray-400 text-[10px] sm:text-xs ml-1 sm:ml-2"></i>
@@ -3449,6 +3476,42 @@ const handleReportFilterChange = debounce(() => { state.reportFilters.start = do
 document.getElementById('filter-rep-start')?.addEventListener('change', handleReportFilterChange);
 document.getElementById('filter-rep-end')?.addEventListener('change', handleReportFilterChange);
 document.getElementById('filter-rep-code')?.addEventListener('input', handleReportFilterChange);
+
+// v147：日期區間可用左右箭頭整段往前／往後一天。
+const shiftISODate=(value,days)=>{
+    const base=value?new Date(`${value}T12:00:00`):new Date(`${getToday()}T12:00:00`);
+    if(Number.isNaN(base.getTime()))return getToday();
+    base.setDate(base.getDate()+days);
+    return `${base.getFullYear()}-${String(base.getMonth()+1).padStart(2,'0')}-${String(base.getDate()).padStart(2,'0')}`;
+};
+const shiftDateRange=(scope,days)=>{
+    const configs={
+        journal:{start:'filter-start',end:'filter-end',type:'journal'},
+        fav:{start:'filter-start-fav',end:'filter-end-fav',type:'journal'},
+        report:{start:'filter-rep-start',end:'filter-rep-end',type:'report'}
+    };
+    const cfg=configs[scope];if(!cfg)return;
+    const s=document.getElementById(cfg.start),e=document.getElementById(cfg.end);if(!s||!e)return;
+    const today=getToday(),rawS=s.value||e.value||today,rawE=e.value||s.value||today;
+    const nextS=shiftISODate(rawS,days),nextE=shiftISODate(rawE,days);
+    s.value=nextS;e.value=nextE;
+    if(cfg.type==='journal'){
+        // 維持目前日誌／追蹤清單日期同步的既有行為。
+        state.filters.start=nextS;state.filters.end=nextE;
+        state.favFilters.start=nextS;state.favFilters.end=nextE;
+        document.querySelectorAll('.filter-start').forEach(el=>el.value=nextS);
+        document.querySelectorAll('.filter-end').forEach(el=>el.value=nextE);
+        processAndRenderJournals();renderFavorites();
+    }else{
+        state.reportFilters.start=nextS;state.reportFilters.end=nextE;
+        renderReports();
+    }
+};
+document.addEventListener('click',event=>{
+    const btn=event.target.closest('.date-shift-btn');if(!btn)return;
+    event.preventDefault();
+    shiftDateRange(btn.dataset.rangeScope,Number(btn.dataset.rangeShift)||0);
+});
 document.getElementById('btn-clear-rep-filters')?.addEventListener('click', () => { state.reportFilters = { start: '', end: '', code: '' }; document.getElementById('filter-rep-start').value = ''; document.getElementById('filter-rep-end').value = ''; document.getElementById('filter-rep-code').value = ''; renderReports(); showToast('已顯示全部法人報告'); });
 
 document.getElementById('journal-form')?.addEventListener('submit', async e => {
