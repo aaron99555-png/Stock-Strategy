@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="144">
+<meta name="app-version" content="145">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -117,6 +117,15 @@ html.dark .stock-code-invalid { border-color:#f87171 !important; box-shadow:0 0 
     grid-column:1/-1!important;
     padding-top:.15rem!important;
   }
+}
+
+
+/* v145：今日作戰室統計卡片窄寬修正 */
+.workbench-stat-icon{width:26px;height:26px;border-radius:8px}
+@media (max-width:900px){
+  #journal-war-room .workbench-stat-card{padding:.55rem .55rem!important}
+  #journal-war-room .workbench-stat-card .workbench-stat-icon{width:24px;height:24px}
+  #journal-war-room .workbench-stat-card .text-lg{font-size:1.25rem!important}
 }
 
 </style>
@@ -564,6 +573,14 @@ html.dark body main :is(#module-journal,#module-favorites,#module-revenue,#modul
 .filter-chip button:hover{opacity:1;background:rgba(255,255,255,.55)}
 .dark .filter-chip button:hover{background:rgba(15,23,42,.45)}
 .active-filter-strip:empty{display:none}
+#journal-war-room #war-room-stats{
+  grid-template-columns:repeat(auto-fit,minmax(108px,1fr))!important;
+  align-items:stretch;
+}
+#journal-war-room #war-room-stats>div{min-width:0}
+@media(min-width:1024px){
+  #journal-war-room #war-room-stats{grid-template-columns:repeat(5,minmax(0,1fr))!important}
+}
 @media(max-width:639px){
   #journal-war-room #war-room-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}
   #journal-war-room #war-room-stats>div:last-child:nth-child(odd){grid-column:1/-1}
@@ -2205,7 +2222,7 @@ const renderWarRoom=()=>{
       {label:'營收創高',value:revenueCount,icon:'fa-chart-line',box:'bg-pink-50 dark:bg-pink-900/20',iconCls:'bg-pink-100 dark:bg-pink-900/50 text-pink-600 dark:text-pink-300',valueCls:'text-pink-600 dark:text-pink-300'},
       {label:'近14日千張',value:holderRecentCount,icon:'fa-users',box:'bg-violet-50 dark:bg-violet-900/20',iconCls:'bg-violet-100 dark:bg-violet-900/50 text-violet-600 dark:text-violet-300',valueCls:'text-violet-600 dark:text-violet-300'}
     ];
-    stats.innerHTML=cards.map(c=>`<div class="workbench-stat-card rounded-xl border border-gray-200 dark:border-gray-700 ${c.box} px-2.5 py-2.5"><div class="flex items-center gap-2"><span class="workbench-stat-icon ${c.iconCls}"><i class="fa-solid ${c.icon}"></i></span><div class="min-w-0"><div class="text-[9px] sm:text-[10px] font-bold text-gray-500 dark:text-gray-400 whitespace-nowrap">${c.label}</div><div class="mt-0.5 text-lg sm:text-xl leading-none font-black ${c.valueCls}">${c.value}</div></div></div></div>`).join('');
+    stats.innerHTML=cards.map(c=>`<div class="workbench-stat-card rounded-xl border border-gray-200 dark:border-gray-700 ${c.box} px-2 py-2 sm:px-2.5 sm:py-2.5"><div class="flex items-center gap-1.5 sm:gap-2"><span class="workbench-stat-icon ${c.iconCls}"><i class="fa-solid ${c.icon}"></i></span><div class="min-w-0 flex-1"><div class="text-[10px] leading-tight font-bold text-gray-500 dark:text-gray-400 break-words">${c.label}</div><div class="mt-0.5 text-lg sm:text-xl leading-none font-black ${c.valueCls}">${c.value}</div></div></div></div>`).join('');
     const medals=['🥇','🥈','🥉'];
     ranking.innerHTML=rows.length?rows.slice(0,10).map((x,index)=>{
         const top=index<3,medal=medals[index]||`${index+1}`;
