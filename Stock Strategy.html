@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <!-- GLOBAL OPTIMIZATION: UX / mobile / accessibility / clipboard fallback -->
-<html lang="zh-TW" class="dark viewer-mode">
+<html lang="zh-TW" class="viewer-mode">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="140">
+<meta name="app-version" content="141">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -12,6 +12,17 @@ try{
         document.documentElement.classList.add('admin-mode');
     }
 }catch(error){}
+</script>
+<script id="theme-bootstrap">
+try{
+    if(window.localStorage.getItem('ryan_theme')==='dark'){
+        document.documentElement.classList.add('dark');
+    }else{
+        document.documentElement.classList.remove('dark');
+    }
+}catch(error){
+    document.documentElement.classList.remove('dark');
+}
 </script>
 <script id="mobile-view-bootstrap">
 try{
@@ -235,8 +246,8 @@ input[type="date"]::-webkit-calendar-picker-indicator, input[type="month"]::-web
 }
 </style>
 
-<meta name="theme-color" content="#0f172a">
-<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#f5efe3">
+<meta name="color-scheme" content="light dark">
 <style id="global-optimization">
 /* ===== Global UX optimization layer ===== */
 html { scroll-behavior: smooth; }
@@ -564,6 +575,155 @@ html.dark body main :is(#module-journal,#module-favorites,#module-revenue,#modul
   .active-filter-strip::-webkit-scrollbar{display:none}
 }
 </style>
+
+<style id="milk-light-theme-v141">
+/* v141 柔和牛奶淺色系：僅作用於淺色模式，深色模式完整保留 */
+html:not(.dark) {
+  --milk-bg:#f5efe3;
+  --milk-bg-soft:#faf6ed;
+  --milk-panel:#fffdf8;
+  --milk-panel-2:#fbf5e9;
+  --milk-border:#e7dccb;
+  --milk-border-strong:#d9cbb6;
+  --milk-text:#403b35;
+  --milk-muted:#756c61;
+  --milk-hover:#f3eadc;
+  --milk-shadow:rgba(105,88,65,.10);
+  background:#f5efe3;
+  color-scheme:light;
+}
+html:not(.dark) body {
+  background:
+    radial-gradient(circle at 12% -8%, rgba(255,255,255,.88), transparent 32rem),
+    linear-gradient(180deg,#f8f3e9 0%,#f3ecdf 100%) !important;
+  color:var(--milk-text) !important;
+}
+html:not(.dark) header,
+html:not(.dark) nav,
+html:not(.dark) .mobile-module-nav {
+  background-color:rgba(255,253,248,.96) !important;
+  border-color:var(--milk-border) !important;
+  box-shadow:0 5px 20px var(--milk-shadow) !important;
+}
+html:not(.dark) .card-panel,
+html:not(.dark) .bg-white {
+  background-color:var(--milk-panel) !important;
+}
+html:not(.dark) .bg-gray-50 {
+  background-color:var(--milk-bg-soft) !important;
+}
+html:not(.dark) .bg-gray-100 {
+  background-color:var(--milk-bg) !important;
+}
+html:not(.dark) .bg-gray-200 {
+  background-color:#eee4d5 !important;
+}
+html:not(.dark) .hover\:bg-gray-50:hover,
+html:not(.dark) .hover\:bg-gray-100:hover,
+html:not(.dark) .hover\:bg-gray-200:hover {
+  background-color:var(--milk-hover) !important;
+}
+html:not(.dark) .border-gray-100,
+html:not(.dark) .border-gray-200,
+html:not(.dark) .border-gray-300 {
+  border-color:var(--milk-border) !important;
+}
+html:not(.dark) .divide-gray-100 > :not([hidden]) ~ :not([hidden]),
+html:not(.dark) .divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
+  border-color:var(--milk-border) !important;
+}
+html:not(.dark) .text-gray-900,
+html:not(.dark) .text-gray-800,
+html:not(.dark) .text-gray-700 {
+  color:var(--milk-text) !important;
+}
+html:not(.dark) .text-gray-600,
+html:not(.dark) .text-gray-500 {
+  color:var(--milk-muted) !important;
+}
+html:not(.dark) input:not([type="checkbox"]):not([type="radio"]),
+html:not(.dark) select,
+html:not(.dark) textarea,
+html:not(.dark) .input-base {
+  background-color:#fffaf1 !important;
+  border-color:var(--milk-border-strong) !important;
+  color:var(--milk-text) !important;
+  box-shadow:inset 0 1px 2px rgba(105,88,65,.045);
+}
+html:not(.dark) input::placeholder,
+html:not(.dark) textarea::placeholder {
+  color:#a39889 !important;
+}
+html:not(.dark) table {
+  --mobile-table-panel:#fffdf8;
+  --mobile-table-shell:#f3ecdf;
+  --mobile-table-header:#eee4d5;
+  --mobile-table-row:#fffdf8;
+  --mobile-table-hover:#faf3e8;
+  --mobile-table-text:#403b35;
+  --mobile-table-muted:#756c61;
+}
+html:not(.dark) thead,
+html:not(.dark) thead tr,
+html:not(.dark) thead th {
+  background-color:#f1e8d9 !important;
+  border-color:var(--milk-border) !important;
+}
+html:not(.dark) tbody tr,
+html:not(.dark) tbody td {
+  border-color:#eee4d6 !important;
+}
+html:not(.dark) tbody tr:nth-child(even) td {
+  background-color:rgba(250,246,237,.54);
+}
+html:not(.dark) tbody tr:hover td {
+  background-color:#faf1e4 !important;
+}
+html:not(.dark) .shadow,
+html:not(.dark) .shadow-sm,
+html:not(.dark) .shadow-md,
+html:not(.dark) .shadow-lg,
+html:not(.dark) .shadow-xl {
+  --tw-shadow-color:var(--milk-shadow) !important;
+}
+html:not(.dark) #theme-toggle {
+  background:#f1e7d8 !important;
+  color:#7a674f !important;
+}
+html:not(.dark) #theme-toggle:hover {
+  background:#eadbc7 !important;
+}
+html:not(.dark) .copy-section,
+html:not(.dark) #batch-bar-journal,
+html:not(.dark) #journal-war-room {
+  border-color:var(--milk-border) !important;
+}
+/* 工作台與彈窗也套用溫和奶白底 */
+html:not(.dark) [role="dialog"],
+html:not(.dark) .modal-content,
+html:not(.dark) #confirm-modal > div,
+html:not(.dark) #prompt-modal > div {
+  background-color:var(--milk-panel) !important;
+}
+/* 手機卡片不再回到冷白／冷灰 */
+@media (max-width:640px){
+  html:not(.dark) {
+    --mobile-table-panel:#fffdf8;
+    --mobile-table-shell:#f3ecdf;
+    --mobile-table-header:#eee4d5;
+    --mobile-table-row:#fffdf8;
+    --mobile-table-hover:#faf1e4;
+    --mobile-table-text:#403b35;
+    --mobile-table-muted:#756c61;
+  }
+  html:not(.dark).mobile-view-card table.mobile-card-table tbody tr {
+    background:#fffdf8 !important;
+    border-color:var(--milk-border) !important;
+    box-shadow:0 4px 14px rgba(105,88,65,.08) !important;
+  }
+}
+</style>
+
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen flex flex-col antialiased">
 <nav class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-50 transition-colors duration-300">
@@ -3888,7 +4048,7 @@ const handleTableSorting=(e,mp,sk,fn)=>{const th=e.currentTarget,k=th.dataset.so
 
 // ======================= 啟動區 ======================= //
 document.addEventListener('DOMContentLoaded',async()=>{
-    const ht=document.documentElement,sv=localStorage.getItem('ryan_theme')||'dark';if(sv==='light')ht.classList.remove('dark');else ht.classList.add('dark');
+    const ht=document.documentElement,sv=localStorage.getItem('ryan_theme')||'light';if(sv==='dark')ht.classList.add('dark');else ht.classList.remove('dark');
     document.getElementById('theme-toggle')?.addEventListener('click',()=>{ht.classList.toggle('dark');localStorage.setItem('ryan_theme',ht.classList.contains('dark')?'dark':'light');});
     
     // --- 跨裝置同步功能綁定 ---
