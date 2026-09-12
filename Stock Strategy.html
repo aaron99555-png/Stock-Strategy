@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="161">
+<meta name="app-version" content="162">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -1123,7 +1123,7 @@ html:not(.dark) #theme-toggle:hover{
                     <span class="text-xs text-blue-600 dark:text-blue-300 mr-1 flex items-center font-bold flex-shrink-0"><i class="fa-solid fa-copy mr-1.5"></i>複製功能</span>
                     <label class="flex-shrink-0 flex items-center gap-1.5 bg-purple-50 dark:bg-purple-900/40 border border-purple-200 dark:border-purple-700/50 text-purple-700 dark:text-purple-200 rounded-lg px-2.5 py-1.5 text-xs font-medium" title="所有策略相關複製功能都會自動以 🔁 標示跨策略重複股票">
                         <input type="checkbox" class="copy-compare-duplicates rounded border-purple-300 dark:border-purple-600 accent-purple-600 w-3.5 h-3.5" checked disabled>
-                        <span>重複自動標示 🔁</span>
+                        <span>重複自動標示 🔁②③</span>
                     </label>
                     <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="selected">獨選</button>
                     <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="strategy">策略</button>
@@ -1708,7 +1708,7 @@ html:not(.dark) #theme-toggle:hover{
                     <span class="text-xs text-blue-600 dark:text-blue-300 mr-1 flex items-center font-bold flex-shrink-0"><i class="fa-solid fa-copy mr-1.5"></i>複製功能</span>
                     <label class="flex-shrink-0 flex items-center gap-1.5 cursor-pointer bg-purple-50 dark:bg-purple-900/40 border border-purple-200 dark:border-purple-700/50 text-purple-700 dark:text-purple-200 rounded-lg px-2.5 py-1.5 text-xs font-medium" title="按策略複製時，以 🔁 標示出現在不同策略的重複股票">
                         <input type="checkbox" class="copy-compare-duplicates rounded border-purple-300 dark:border-purple-600 accent-purple-600 w-3.5 h-3.5">
-                        <span>重複自動標示 🔁</span>
+                        <span>重複自動標示 🔁②③</span>
                     </label>
                     <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="selected">獨選</button>
                     <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="strategy">策略</button>
@@ -3442,7 +3442,7 @@ const buildJournalStreakCopyText=analysis=>{
     const lines=[`【策略訊號雷達】`,`基準日：${analysis.baseDate||analysis.requestedBase}｜${modeText}｜${horseText}｜週末、休市日不計${analysis.customHolidays.length?`｜自訂休市 ${analysis.customHolidays.length} 日`:''}${tagText}${analysis.heatFilter!=='all'?`｜熱度：${analysis.heatFilter}`:''}${analysis.minStrength?`｜強度至少 ${analysis.minStrength} 分`:''}`,`共 ${analysis.results.length} 檔`,''];
     analysis.results.forEach(item=>{
         const radarStrategyCount=new Set((item.tagCounts||[]).map(entry=>normalizeStrategyTagName(entry.tag)).filter(Boolean)).size;
-        const radarCopyName=`${item.name}${item.isHorseNewEntry?' 🆕':''}${radarStrategyCount>1?' 🔁':''}`;
+        const radarCopyName=`${item.name}${item.isHorseNewEntry?' 🆕':''}${radarStrategyCount>1?` 🔁${getDuplicateCountBadge(radarStrategyCount)}`:''}`;
         lines.push(`${item.code} ${radarCopyName}｜${analysis.mode==='window'?`${analysis.minDays} 日內出現 ${item.occurrences} 次`:`連續 ${item.streak} 日`}｜強度 ${item.score} 分｜${item.heat}`);
         if(item.commonTags.length)lines.push(`共同策略：${item.commonTags.join('、')}`);
         if(item.tagCounts.length)lines.push(`策略頻率：${item.tagCounts.map(entry=>`${entry.tag}×${entry.count}`).join('、')}`);
@@ -3622,7 +3622,7 @@ document.getElementById('btn-copy-revenue')?.addEventListener('click',e=>{
         const values=type==='revenue'
           ? g.revenue.sort((a,b)=>b.localeCompare(a)).map(fmtMonth)
           : g.holder.sort((a,b)=>b.localeCompare(a)).map(fmtDate);
-        return `${g.code}${g.name?' '+g.name:''}${duplicateCodes.has(g.code)?' 🔁':''}${values.length?'｜'+values.join('、'):''}`;
+        return `${g.code}${g.name?' '+g.name:''}${duplicateCodes.has(g.code)?' 🔁②':''}${values.length?'｜'+values.join('、'):''}`;
     };
 
     const sections=[];
@@ -4248,7 +4248,9 @@ const getDuplicateStrategyCodes=strategyMap=>{
             codeTags.get(code).add(tag);
         });
     });
-    return new Set(Array.from(codeTags.entries()).filter(([,tags])=>tags.size>1).map(([code])=>code));
+    return new Map(Array.from(codeTags.entries())
+        .filter(([,tags])=>tags.size>1)
+        .map(([code,tags])=>[code,tags.size]));
 };
 // v142：所有策略相關複製功能統一判斷「跨策略重複股票」。
 const getDuplicateStrategyCodesFromJournals=(items,allowedTags=[])=>{
@@ -4264,8 +4266,18 @@ const getDuplicateStrategyCodesFromJournals=(items,allowedTags=[])=>{
     });
     return getDuplicateStrategyCodes(strategyMap);
 };
-const appendDuplicateMark=(journal,duplicateCodes)=>duplicateCodes?.has(String(journal?.code||'').trim())?' 🔁':'';
-// v153：所有策略相關複製統一使用此格式，避免個別模式漏掉 🆕 / 🔁。
+const DUPLICATE_COUNT_BADGES={2:'②',3:'③',4:'④',5:'⑤',6:'⑥',7:'⑦',8:'⑧',9:'⑨',10:'⑩',11:'⑪',12:'⑫',13:'⑬',14:'⑭',15:'⑮',16:'⑯',17:'⑰',18:'⑱',19:'⑲',20:'⑳'};
+const getDuplicateCountBadge=count=>{
+    const n=Math.max(0,Number(count)||0);
+    return DUPLICATE_COUNT_BADGES[n]||`(${n})`;
+};
+const appendDuplicateMark=(journal,duplicateCodes)=>{
+    const code=String(journal?.code||'').trim();
+    if(!duplicateCodes?.has(code))return '';
+    const count=duplicateCodes instanceof Map?Number(duplicateCodes.get(code)||0):2;
+    return ` 🔁${getDuplicateCountBadge(count)}`;
+};
+// v162：所有策略相關複製統一顯示「🔁＋重複策略數小標籤」。
 const getStrategyCopyStockName=(journal,duplicateCodes,horseTag='')=>{
     const name=String(journal?.name||'').trim();
     const isNew=horseTag?isHorseTagNewEntry(journal,horseTag):isHorseNewEntryJournal(journal);
@@ -6402,4 +6414,3 @@ const SESSION={
 
 </body>
 </html>
-    
