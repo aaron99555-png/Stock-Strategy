@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="162">
+<meta name="app-version" content="163">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -1931,7 +1931,7 @@ const ADMIN_SESSION_STORAGE_KEY='ryan_admin_session_v1';
 const XLSX_CDN_URL='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
 const getSyncPath=()=>DIRECT_SYNC_PATH;
 const isCloudMode=()=>true;
-let cloudSyncInterval=null, state={journals:[],plans:[],revenueRecords:[],reports:[],checklists:[],trash:[],deletionTombstones:{},tagSettings:null,epsData:{},codeToName:{},nameToCode:{},customMarketHolidays:[],copyCompareDuplicates:false,filters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,largeHolder14:false,tags:[],minScore:0,tagLogic:'AND',status:'all',quick:'all'},favFilters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,largeHolder14:false,tags:[],minScore:0,tagLogic:'AND',status:'all',quick:'all'},revenueFilters:{month:'',code:'',type:'all',revenuePattern:'none',revenueN:3,revenueCount:2,holderPattern:'none',holderN:3,holderCount:2,minMomentum:0},reportFilters:{start:'',end:'',code:''},sortConfig:{key:'createdAt',asc:false},favSortConfig:{key:'createdAt',asc:false},planSortConfig:{key:'createdAt',asc:false},revenueSortConfig:{key:'month',asc:false},reportSortConfig:{key:'date',asc:false},checklistSortConfig:{key:'createdAt',asc:false}};
+let cloudSyncInterval=null, state={journals:[],plans:[],revenueRecords:[],reports:[],checklists:[],trash:[],deletionTombstones:{},tagSettings:null,epsData:{},codeToName:{},nameToCode:{},customMarketHolidays:[],copyCompareDuplicates:false,filters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,largeHolder14:false,tags:[],minScore:0,tagLogic:'OR',status:'all',quick:'all'},favFilters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,largeHolder14:false,tags:[],minScore:0,tagLogic:'OR',status:'all',quick:'all'},revenueFilters:{month:'',code:'',type:'all',revenuePattern:'none',revenueN:3,revenueCount:2,holderPattern:'none',holderN:3,holderCount:2,minMomentum:0},reportFilters:{start:'',end:'',code:''},sortConfig:{key:'createdAt',asc:false},favSortConfig:{key:'createdAt',asc:false},planSortConfig:{key:'createdAt',asc:false},revenueSortConfig:{key:'month',asc:false},reportSortConfig:{key:'date',asc:false},checklistSortConfig:{key:'createdAt',asc:false}};
 const selectedIds={journal:new Set(),fav:new Set(),plan:new Set(),revenue:new Set(),report:new Set(),checklist:new Set()};
 
 const escapeHTML=str=>(!str&&str!==0)?'':String(str).replace(/[&<>'"]/g,tag=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[tag]||tag));
@@ -2317,6 +2317,8 @@ const formatNumColor=(val,isP=false)=>{if(val==null||val==='-'||val==='')return'
 const formatTargetPrice=val=>(val==null||val==='-'||val===''||isNaN(val))?'<span class="text-gray-400 dark:text-gray-500">-</span>':`<span class="font-bold text-yellow-600 dark:text-yellow-400">${escapeHTML(val)}</span>`;
 const getEpsInfo=(c,j)=>{const e=state.epsData[c]||{};return{eps2025:e.eps2025??j?.eps2025??null,eps2026:e.eps2026??j?.eps2026??null,epsGrowth:e.epsGrowth??j?.epsGrowth??null,futures:e.futures==='●'||j?.futures==='●',targetPrice:e.targetPrice??j?.targetPrice??null,broker:e.broker??j?.broker??null,reportDate:e.reportDate??j?.reportDate??null};};
 const NON_STRATEGY_COPY_TAGS=new Set(['特別追蹤','非凡重點','總編概念股']);
+const ANALYST_SECTION_TAGS=new Set(['黑卡會員','尊耀會員','頂峰會員']);
+const NON_SCORE_TAGS=new Set([...NON_STRATEGY_COPY_TAGS,...ANALYST_SECTION_TAGS]);
 const normalizeMomentumRecordType=record=>record?.type==='largeHolder'?'largeHolder':'revenue';
 // v158：策略日誌分數追加兩個基本面／籌碼加分條件。
 // 1) 以日誌日期為基準，近一個月內有營收創高 +1。
@@ -2335,7 +2337,7 @@ const hasRecentRevenueHigh=(code,referenceDate=getToday(),months=1)=>{
 };
 const getScore=(t,e,code='',referenceDate=getToday())=>{
     let s=0;
-    if(t)s=t.filter(x=>!NON_STRATEGY_COPY_TAGS.has(x)).length;
+    if(t)s=t.filter(x=>!NON_SCORE_TAGS.has(x)).length;
     const g=parseFloat(e?.epsGrowth),e26=parseFloat(e?.eps2026);
     if(!isNaN(g)&&g>0&&!isNaN(e26)&&e26>0)s+=1;
     if(code&&hasRecentRevenueHigh(code,referenceDate,1))s+=1;
@@ -2963,7 +2965,8 @@ function loadLocalData(){
     applyFilterLogicState(state.filters.tagLogic,'.logic-btn'); applyFilterLogicState(state.favFilters.tagLogic,'.logic-btn-fav');
 }
 
-function createDefaultJournalFilters(){const today=getToday();return{start:today,end:today,code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,largeHolder14:false,tags:[],minScore:0,tagLogic:'AND',status:'all',quick:'all'};}
+// v163：策略標籤篩選預設為「符合任一（OR）」。
+function createDefaultJournalFilters(){const today=getToday();return{start:today,end:today,code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,largeHolder14:false,tags:[],minScore:0,tagLogic:'OR',status:'all',quick:'all'};}
 function applyFilterLogicState(logic,selector){
     document.querySelectorAll(selector).forEach(button=>{
         const active=button.dataset.logic===(logic||'OR');
@@ -2988,7 +2991,7 @@ function resetSessionFiltersToDefaults(syncControls=false){
     const revenueMonth=document.getElementById('filter-revenue-month'),revenueCode=document.getElementById('filter-revenue-code');
     if(revenueMonth)revenueMonth.value='';if(revenueCode)revenueCode.value='';const revenueType=document.getElementById('filter-revenue-type');if(revenueType)revenueType.value='all';
     ['filter-rep-start','filter-rep-end','filter-rep-code'].forEach(id=>{const input=document.getElementById(id);if(input)input.value='';});
-    applyFilterLogicState('AND','.logic-btn');applyFilterLogicState('AND','.logic-btn-fav');renderFilterTags();
+    applyFilterLogicState('OR','.logic-btn');applyFilterLogicState('OR','.logic-btn-fav');renderFilterTags();
     resetStreakFiltersToDefaults({renderResults:false,notify:false});
     document.querySelectorAll('.has-active-filter').forEach(element=>element.classList.remove('has-active-filter'));
 }
@@ -3118,7 +3121,7 @@ const renderJournalActiveFilterChips=()=>{
     if(Number(f.minScore||0)>0)items.push(filterChipHtml(`策略分數 ≥ ${f.minScore}`,'minScore','amber'));
     if(f.status&&f.status!=='all')items.push(filterChipHtml(`狀態：${f.status}`,'status','slate'));
     if(f.quick&&f.quick!=='all')items.push(filterChipHtml(`快速：${f.quick}`,'quick','slate'));
-    (f.tags||[]).forEach(tag=>items.push(filterChipHtml(`${tag}${f.tags.length>1?` · ${f.tagLogic||'AND'}`:''}`,`tag:${tag}`,'violet')));
+    (f.tags||[]).forEach(tag=>items.push(filterChipHtml(`${tag}${f.tags.length>1?` · ${f.tagLogic||'OR'}`:''}`,`tag:${tag}`,'violet')));
     root.innerHTML=items.length?`<span class="text-[10px] font-black text-gray-400 flex-shrink-0"><i class="fa-solid fa-filter mr-1"></i>生效條件</span>${items.join('')}`:'';
 };
 const renderRevenueActiveFilterChips=()=>{
@@ -3554,7 +3557,7 @@ const filterFields=[{key:'start',cls:'filter-start',type:'value'},{key:'end',cls
 const handleFilterChange=debounce((f,el)=>{let v=el.type==='checkbox'?el.checked:el.value;if(f.isInt)v=parseInt(v)||0;if(f.type==='value'&&el.type==='text')v=v.trim();state.filters[f.key]=v;state.favFilters[f.key]=v;document.querySelectorAll(`.${f.cls}`).forEach(o=>{if(f.type==='checked')o.checked=v;else o.value=v;});processAndRenderJournals();renderFavorites();},450);
 filterFields.forEach(f=>{document.querySelectorAll(`.${f.cls}`).forEach(el=>{const evt=(f.type==='value'&&el.type==='text')?'input':'change';if(evt==='input'){el.addEventListener('input',e=>handleFilterChange(f,e.target));}else{el.addEventListener('change',e=>{let v=e.target.type==='checkbox'?e.target.checked:e.target.value;if(f.isInt)v=parseInt(v)||0;state.filters[f.key]=v;state.favFilters[f.key]=v;document.querySelectorAll(`.${f.cls}`).forEach(o=>{if(f.type==='checked')o.checked=v;else o.value=v;});processAndRenderJournals();renderFavorites();});}});});
 
-['btn-clear-filters','btn-clear-filters-fav'].forEach(bId=>{document.getElementById(bId)?.addEventListener('click',()=>{const t=getToday();state.filters=createDefaultJournalFilters();state.favFilters=createDefaultJournalFilters();document.querySelectorAll('.filter-start').forEach(el=>el.value=t);document.querySelectorAll('.filter-end').forEach(el=>el.value=t);document.querySelectorAll('.filter-code').forEach(el=>el.value='');document.querySelectorAll('.filter-futures, .filter-exclude-negative-growth, .filter-revenue-high, .filter-large-holder').forEach(el=>el.checked=false);document.querySelectorAll('.filter-score').forEach(el=>el.value="0");document.querySelectorAll('.filter-journal-status,.filter-journal-quick').forEach(el=>el.value='all');document.querySelectorAll('.filter-tag-cb').forEach(cb=>cb.checked=false);applyFilterLogicState('AND','.logic-btn');applyFilterLogicState('AND','.logic-btn-fav');renderFilterTags();processAndRenderJournals();renderFavorites();showToast('已清除篩選');});});
+['btn-clear-filters','btn-clear-filters-fav'].forEach(bId=>{document.getElementById(bId)?.addEventListener('click',()=>{const t=getToday();state.filters=createDefaultJournalFilters();state.favFilters=createDefaultJournalFilters();document.querySelectorAll('.filter-start').forEach(el=>el.value=t);document.querySelectorAll('.filter-end').forEach(el=>el.value=t);document.querySelectorAll('.filter-code').forEach(el=>el.value='');document.querySelectorAll('.filter-futures, .filter-exclude-negative-growth, .filter-revenue-high, .filter-large-holder').forEach(el=>el.checked=false);document.querySelectorAll('.filter-score').forEach(el=>el.value="0");document.querySelectorAll('.filter-journal-status,.filter-journal-quick').forEach(el=>el.value='all');document.querySelectorAll('.filter-tag-cb').forEach(cb=>cb.checked=false);applyFilterLogicState('OR','.logic-btn');applyFilterLogicState('OR','.logic-btn-fav');renderFilterTags();processAndRenderJournals();renderFavorites();showToast('已清除篩選');});});
 
 const syncRevenuePatternUI=()=>{const revenueMode=document.getElementById('filter-revenue-pattern')?.value||'none',holderMode=document.getElementById('filter-holder-pattern')?.value||'none';document.getElementById('filter-revenue-pattern-count-wrap')?.classList.toggle('hidden',revenueMode!=='window');document.getElementById('filter-holder-pattern-count-wrap')?.classList.toggle('hidden',holderMode!=='window');};
 const handleRevenueFilterChange = debounce(() => { const f=state.revenueFilters;f.month=document.getElementById('filter-revenue-month')?.value||'';f.code=document.getElementById('filter-revenue-code')?.value.trim()||'';f.type=document.getElementById('filter-revenue-type')?.value||'all';f.revenuePattern=document.getElementById('filter-revenue-pattern')?.value||'none';f.revenueN=Math.max(1,parseInt(document.getElementById('filter-revenue-pattern-n')?.value)||3);f.revenueCount=Math.max(1,parseInt(document.getElementById('filter-revenue-pattern-count')?.value)||2);f.holderPattern=document.getElementById('filter-holder-pattern')?.value||'none';f.holderN=Math.max(1,parseInt(document.getElementById('filter-holder-pattern-n')?.value)||3);f.holderCount=Math.max(1,parseInt(document.getElementById('filter-holder-pattern-count')?.value)||2);f.minMomentum=Math.max(0,parseInt(document.getElementById('filter-momentum-score')?.value)||0);syncRevenuePatternUI();renderRevenueRecords(); }, 420);
