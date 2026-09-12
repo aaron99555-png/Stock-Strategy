@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="154">
+<meta name="app-version" content="157">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -804,23 +804,29 @@ html:not(.dark) #theme-toggle:hover{
 </style>
 
 
-<style id="date-range-fast-v147">
-.date-range-fast{max-width:100%;white-space:nowrap}
+<style id="date-range-fast-v155">
+.date-range-fast{max-width:100%;white-space:nowrap;gap:.15rem}
+.date-field-shift{display:inline-flex;align-items:center;min-width:0;gap:.12rem}
 .date-shift-btn{
-  width:26px;height:28px;flex:0 0 26px;
+  width:24px;height:28px;flex:0 0 24px;
   display:inline-flex;align-items:center;justify-content:center;
-  border-radius:7px;
-  color:#7b746c;
-  background:rgba(120,110,98,.07);
+  border-radius:7px;color:#7b746c;background:rgba(120,110,98,.07);
   transition:background-color .15s ease,color .15s ease,transform .12s ease;
 }
 .date-shift-btn:hover{background:rgba(37,99,235,.10);color:#2563eb}
 .date-shift-btn:active{transform:scale(.92)}
 .dark .date-shift-btn{color:#aeb7c4;background:rgba(148,163,184,.10)}
 .dark .date-shift-btn:hover{color:#7dd3fc;background:rgba(14,165,233,.16)}
-@media(max-width:639px){
-  .date-shift-btn{width:24px;height:28px;flex-basis:24px}
-  .date-range-fast input[type="date"]{width:72px!important;font-size:11px!important}
+.date-range-separator{font-size:12px;font-weight:700}
+@media(max-width:767px){
+  .date-range-fast{width:100%;justify-content:center;flex-wrap:wrap;row-gap:.3rem}
+  .date-field-shift{flex:1 1 145px;justify-content:center}
+  .date-field-shift input[type="date"]{width:92px!important;min-width:0!important;font-size:11px!important}
+  .date-range-separator{margin:0 .1rem!important}
+}
+@media(max-width:420px){
+  .date-field-shift{flex-basis:100%}
+  .date-range-separator{display:none}
 }
 </style>
 
@@ -829,6 +835,52 @@ html:not(.dark) #theme-toggle:hover{
 #journal-reference-mode-wrap{transition:border-color .15s ease,background-color .15s ease,box-shadow .15s ease}
 @media(max-width:639px){
   #journal-reference-mode-wrap{width:100%;justify-content:center}
+}
+</style>
+
+
+<style id="journal-form-compact-v156">
+/* v156：新增條件區塊縮緊留白，勾選框位置更貼近輸入列 */
+#journal-form{margin-top:0!important}
+#journal-form .grid{margin-top:0!important}
+#journal-reference-mode-wrap{
+  min-height:32px;
+  box-shadow:none;
+}
+#journal-reference-mode-wrap .fa-eye{opacity:.85}
+#journal-form input[type="date"],
+#journal-form input[type="text"],
+#journal-form select,
+#journal-form textarea,
+#journal-form button[type="submit"]{
+  min-height:42px;
+}
+@media (min-width:768px){
+  #journal-form .grid.grid-cols-12 > div{margin-top:0!important}
+}
+@media (max-width:639px){
+  #journal-form{gap:.6rem!important}
+  #journal-reference-mode-wrap{
+    width:auto;
+    justify-content:flex-end;
+    padding:.4rem .65rem;
+  }
+}
+</style>
+
+
+<style id="revenue-new-row-v157">
+@keyframes revenueNewRowFlash{
+  0%,100%{box-shadow:inset 0 0 0 0 rgba(124,58,237,0);background-color:inherit}
+  18%,72%{box-shadow:inset 4px 0 0 rgba(124,58,237,.85);background-color:rgba(237,233,254,.88)}
+}
+.revenue-new-row td{animation:revenueNewRowFlash 2.4s ease both}
+.dark .revenue-new-row td{
+  animation-name:revenueNewRowFlashDark;
+}
+@keyframes revenueNewRowFlashDark{
+  0%,100%{box-shadow:inset 0 0 0 0 rgba(167,139,250,0);background-color:inherit}
+  18%,72%{box-shadow:inset 4px 0 0 rgba(167,139,250,.95);background-color:rgba(76,29,149,.28)}
 }
 </style>
 
@@ -918,14 +970,14 @@ html:not(.dark) #theme-toggle:hover{
                     </div>
                 </div>
                 <div id="journal-form-wrapper" class="hidden overflow-hidden transition-all duration-300">
-                    <form id="journal-form" class="flex flex-col gap-4 pt-1" action="javascript:void(0);">
-                        <div class="flex justify-end">
+                    <form id="journal-form" class="flex flex-col gap-2 pt-0.5" action="javascript:void(0);">
+                        <div class="flex justify-end -mb-0.5">
                             <label id="journal-reference-mode-wrap" class="inline-flex items-center gap-2 rounded-lg border border-amber-200 dark:border-amber-800/70 bg-amber-50/70 dark:bg-amber-900/20 px-2.5 py-1.5 text-[11px] sm:text-xs font-bold text-amber-700 dark:text-amber-300 cursor-pointer select-none" title="勾選後只顯示股票參考資料，不會新增到策略日誌">
                                 <input type="checkbox" id="journal-reference-only" class="w-4 h-4 rounded border-amber-300 dark:border-amber-700 accent-amber-600">
-                                <span><i class="fa-solid fa-eye mr-1"></i>只看參考資料，不加入清單</span>
+                                <span><i class="fa-solid fa-eye mr-1"></i>不加入清單</span>
                             </label>
                         </div>
-                        <div class="grid grid-cols-12 gap-1.5 sm:gap-4 items-end">
+                        <div class="grid grid-cols-12 gap-1.5 sm:gap-3 items-end">
                             <div class="col-span-4 md:col-span-2"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">日期</label><input type="date" id="j-date" required class="input-base text-center sm:text-left"></div>
                             <div class="col-span-4 md:col-span-2"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">代號</label><input type="text" id="j-code" required placeholder="如: 2330" class="input-base text-center sm:text-left" autocomplete="off" spellcheck="false" enterkeyhint="next"></div>
                             <div class="col-span-4 md:col-span-2"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">股名</label><input type="text" id="j-name" list="stock-names-list" required placeholder="自動帶入" class="input-base text-center sm:text-left" autocomplete="off" enterkeyhint="next"></div>
@@ -1006,12 +1058,18 @@ html:not(.dark) #theme-toggle:hover{
             <div class="p-4 border-b border-gray-200 dark:border-gray-700/50 bg-gray-50/80 dark:bg-gray-800/80 rounded-t-xl">
                 <div class="filter-toolbar flex flex-wrap items-center gap-2 sm:gap-3 w-full">
                     <div class="date-range-fast flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 h-[38px] sm:h-auto box-border" data-date-range="journal">
-                        <button type="button" class="date-shift-btn" data-range-shift="-1" data-range-scope="journal" title="區間往前一天" aria-label="區間往前一天"><i class="fa-solid fa-chevron-left"></i></button>
-                        <span class="text-xs text-gray-500 dark:text-gray-400 px-1 sm:px-2 hidden lg:inline"><i class="fa-solid fa-filter mr-1"></i>區間</span>
-                        <input type="date" id="filter-start" class="filter-start bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-0.5 sm:px-1 w-[75px] sm:w-auto text-center h-full box-border m-0">
-                        <span class="text-gray-400 mx-0.5 sm:mx-1">-</span>
-                        <input type="date" id="filter-end" class="filter-end bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-0.5 sm:px-1 w-[75px] sm:w-auto text-center h-full box-border m-0">
-                        <button type="button" class="date-shift-btn" data-range-shift="1" data-range-scope="journal" title="區間往後一天" aria-label="區間往後一天"><i class="fa-solid fa-chevron-right"></i></button>
+                        <span class="text-xs text-gray-500 dark:text-gray-400 px-1 sm:px-2 hidden xl:inline"><i class="fa-solid fa-filter mr-1"></i>區間</span>
+                        <div class="date-field-shift">
+                            <button type="button" class="date-shift-btn" data-date-field="start" data-range-shift="-1" data-range-scope="journal" title="起始日往前一天"><i class="fa-solid fa-chevron-left"></i></button>
+                            <input type="date" id="filter-start" class="filter-start bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-0.5 sm:px-1 w-[75px] sm:w-auto text-center h-full box-border m-0">
+                            <button type="button" class="date-shift-btn" data-date-field="start" data-range-shift="1" data-range-scope="journal" title="起始日往後一天"><i class="fa-solid fa-chevron-right"></i></button>
+                        </div>
+                        <span class="date-range-separator text-gray-400 mx-1">～</span>
+                        <div class="date-field-shift">
+                            <button type="button" class="date-shift-btn" data-date-field="end" data-range-shift="-1" data-range-scope="journal" title="結束日往前一天"><i class="fa-solid fa-chevron-left"></i></button>
+                            <input type="date" id="filter-end" class="filter-end bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-0.5 sm:px-1 w-[75px] sm:w-auto text-center h-full box-border m-0">
+                            <button type="button" class="date-shift-btn" data-date-field="end" data-range-shift="1" data-range-scope="journal" title="結束日往後一天"><i class="fa-solid fa-chevron-right"></i></button>
+                        </div>
                     </div>
                     <div class="flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 h-[38px] sm:h-auto box-border">
                         <i class="fa-solid fa-search text-gray-400 text-[10px] sm:text-xs ml-1 sm:ml-2"></i>
@@ -1413,12 +1471,18 @@ html:not(.dark) #theme-toggle:hover{
             <div data-mobile-toolbar="report" class="p-4 border-b border-gray-200 dark:border-gray-700/50 bg-gray-50/80 dark:bg-gray-800/80 flex flex-col lg:flex-row items-start lg:items-center gap-4 w-full justify-between">
                 <div class="flex flex-wrap items-center gap-2 sm:gap-3 w-full lg:w-auto">
                     <div class="date-range-fast flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 h-[38px] sm:h-auto box-border" data-date-range="report">
-                        <button type="button" class="date-shift-btn" data-range-shift="-1" data-range-scope="report" title="區間往前一天" aria-label="區間往前一天"><i class="fa-solid fa-chevron-left"></i></button>
-                        <span class="text-xs text-gray-500 dark:text-gray-400 px-1 sm:px-2 hidden lg:inline"><i class="fa-solid fa-filter mr-1"></i>區間</span>
-                        <input type="date" id="filter-rep-start" class="bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-0.5 sm:px-1 w-[75px] sm:w-auto text-center h-full box-border m-0">
-                        <span class="text-gray-400 mx-0.5 sm:mx-1">-</span>
-                        <input type="date" id="filter-rep-end" class="bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-0.5 sm:px-1 w-[75px] sm:w-auto text-center h-full box-border m-0">
-                        <button type="button" class="date-shift-btn" data-range-shift="1" data-range-scope="report" title="區間往後一天" aria-label="區間往後一天"><i class="fa-solid fa-chevron-right"></i></button>
+                        <span class="text-xs text-gray-500 dark:text-gray-400 px-1 sm:px-2 hidden xl:inline"><i class="fa-solid fa-filter mr-1"></i>區間</span>
+                        <div class="date-field-shift">
+                            <button type="button" class="date-shift-btn" data-date-field="start" data-range-shift="-1" data-range-scope="report" title="起始日往前一天"><i class="fa-solid fa-chevron-left"></i></button>
+                            <input type="date" id="filter-rep-start" class="bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-0.5 sm:px-1 w-[75px] sm:w-auto text-center h-full box-border m-0">
+                            <button type="button" class="date-shift-btn" data-date-field="start" data-range-shift="1" data-range-scope="report" title="起始日往後一天"><i class="fa-solid fa-chevron-right"></i></button>
+                        </div>
+                        <span class="date-range-separator text-gray-400 mx-1">～</span>
+                        <div class="date-field-shift">
+                            <button type="button" class="date-shift-btn" data-date-field="end" data-range-shift="-1" data-range-scope="report" title="結束日往前一天"><i class="fa-solid fa-chevron-left"></i></button>
+                            <input type="date" id="filter-rep-end" class="bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-0.5 sm:px-1 w-[75px] sm:w-auto text-center h-full box-border m-0">
+                            <button type="button" class="date-shift-btn" data-date-field="end" data-range-shift="1" data-range-scope="report" title="結束日往後一天"><i class="fa-solid fa-chevron-right"></i></button>
+                        </div>
                     </div>
                     <div class="flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 h-[38px] sm:h-auto box-border">
                         <i class="fa-solid fa-search text-gray-400 text-[10px] sm:text-xs ml-1 sm:ml-2"></i>
@@ -1583,12 +1647,18 @@ html:not(.dark) #theme-toggle:hover{
             <div class="p-4 border-b border-gray-200 dark:border-gray-700/50 bg-gray-50/80 dark:bg-gray-800/80 w-full">
                 <div class="filter-toolbar flex flex-wrap items-center gap-2 sm:gap-3 w-full">
                     <div class="date-range-fast flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 h-[38px] sm:h-auto box-border" data-date-range="fav">
-                        <button type="button" class="date-shift-btn" data-range-shift="-1" data-range-scope="fav" title="區間往前一天" aria-label="區間往前一天"><i class="fa-solid fa-chevron-left"></i></button>
-                        <span class="text-xs text-gray-500 dark:text-gray-400 px-1 sm:px-2 hidden lg:inline"><i class="fa-solid fa-filter mr-1"></i>區間</span>
-                        <input type="date" id="filter-start-fav" class="filter-start bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-0.5 sm:px-1 w-[75px] sm:w-auto text-center h-full box-border m-0">
-                        <span class="text-gray-400 mx-0.5 sm:mx-1">-</span>
-                        <input type="date" id="filter-end-fav" class="filter-end bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-0.5 sm:px-1 w-[75px] sm:w-auto text-center h-full box-border m-0">
-                        <button type="button" class="date-shift-btn" data-range-shift="1" data-range-scope="fav" title="區間往後一天" aria-label="區間往後一天"><i class="fa-solid fa-chevron-right"></i></button>
+                        <span class="text-xs text-gray-500 dark:text-gray-400 px-1 sm:px-2 hidden xl:inline"><i class="fa-solid fa-filter mr-1"></i>區間</span>
+                        <div class="date-field-shift">
+                            <button type="button" class="date-shift-btn" data-date-field="start" data-range-shift="-1" data-range-scope="fav" title="起始日往前一天"><i class="fa-solid fa-chevron-left"></i></button>
+                            <input type="date" id="filter-start-fav" class="filter-start bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-0.5 sm:px-1 w-[75px] sm:w-auto text-center h-full box-border m-0">
+                            <button type="button" class="date-shift-btn" data-date-field="start" data-range-shift="1" data-range-scope="fav" title="起始日往後一天"><i class="fa-solid fa-chevron-right"></i></button>
+                        </div>
+                        <span class="date-range-separator text-gray-400 mx-1">～</span>
+                        <div class="date-field-shift">
+                            <button type="button" class="date-shift-btn" data-date-field="end" data-range-shift="-1" data-range-scope="fav" title="結束日往前一天"><i class="fa-solid fa-chevron-left"></i></button>
+                            <input type="date" id="filter-end-fav" class="filter-end bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-0.5 sm:px-1 w-[75px] sm:w-auto text-center h-full box-border m-0">
+                            <button type="button" class="date-shift-btn" data-date-field="end" data-range-shift="1" data-range-scope="fav" title="結束日往後一天"><i class="fa-solid fa-chevron-right"></i></button>
+                        </div>
                     </div>
                     <div class="flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 h-[38px] sm:h-auto box-border">
                         <i class="fa-solid fa-search text-gray-400 text-[10px] sm:text-xs ml-1 sm:ml-2"></i>
@@ -3545,41 +3615,46 @@ document.getElementById('filter-rep-start')?.addEventListener('change', handleRe
 document.getElementById('filter-rep-end')?.addEventListener('change', handleReportFilterChange);
 document.getElementById('filter-rep-code')?.addEventListener('input', handleReportFilterChange);
 
-// v147：日期區間可用左右箭頭整段往前／往後一天。
+// v155：日期區間的起始日／結束日可各自用左右箭頭獨立調整。
 const shiftISODate=(value,days)=>{
     const base=value?new Date(`${value}T12:00:00`):new Date(`${getToday()}T12:00:00`);
     if(Number.isNaN(base.getTime()))return getToday();
     base.setDate(base.getDate()+days);
     return `${base.getFullYear()}-${String(base.getMonth()+1).padStart(2,'0')}-${String(base.getDate()).padStart(2,'0')}`;
 };
-const shiftDateRange=(scope,days)=>{
+const shiftDateField=(scope,field,days)=>{
     const configs={
         journal:{start:'filter-start',end:'filter-end',type:'journal'},
-        fav:{start:'filter-start-fav',end:'filter-end-fav',type:'journal'},
+        fav:{start:'filter-start-fav',end:'filter-end-fav',type:'fav'},
         report:{start:'filter-rep-start',end:'filter-rep-end',type:'report'}
     };
     const cfg=configs[scope];if(!cfg)return;
-    const s=document.getElementById(cfg.start),e=document.getElementById(cfg.end);if(!s||!e)return;
-    const today=getToday(),rawS=s.value||e.value||today,rawE=e.value||s.value||today;
-    const nextS=shiftISODate(rawS,days),nextE=shiftISODate(rawE,days);
-    s.value=nextS;e.value=nextE;
+    const id=field==='end'?cfg.end:cfg.start;
+    const el=document.getElementById(id);if(!el)return;
+    const next=shiftISODate(el.value||getToday(),days);
+    el.value=next;
+
     if(cfg.type==='journal'){
-        // 維持目前日誌／追蹤清單日期同步的既有行為。
-        state.filters.start=nextS;state.filters.end=nextE;
-        state.favFilters.start=nextS;state.favFilters.end=nextE;
-        document.querySelectorAll('.filter-start').forEach(el=>el.value=nextS);
-        document.querySelectorAll('.filter-end').forEach(el=>el.value=nextE);
+        state.filters[field]=next;
+        state.favFilters[field]=next;
+        document.querySelectorAll(field==='start'?'.filter-start':'.filter-end').forEach(input=>input.value=next);
+        processAndRenderJournals();renderFavorites();
+    }else if(cfg.type==='fav'){
+        state.favFilters[field]=next;
+        state.filters[field]=next;
+        document.querySelectorAll(field==='start'?'.filter-start':'.filter-end').forEach(input=>input.value=next);
         processAndRenderJournals();renderFavorites();
     }else{
-        state.reportFilters.start=nextS;state.reportFilters.end=nextE;
+        state.reportFilters[field]=next;
         renderReports();
     }
 };
 document.addEventListener('click',event=>{
     const btn=event.target.closest('.date-shift-btn');if(!btn)return;
     event.preventDefault();
-    shiftDateRange(btn.dataset.rangeScope,Number(btn.dataset.rangeShift)||0);
+    shiftDateField(btn.dataset.rangeScope,btn.dataset.dateField,Number(btn.dataset.rangeShift)||0);
 });
+
 document.getElementById('btn-clear-rep-filters')?.addEventListener('click', () => { state.reportFilters = { start: '', end: '', code: '' }; document.getElementById('filter-rep-start').value = ''; document.getElementById('filter-rep-end').value = ''; document.getElementById('filter-rep-code').value = ''; renderReports(); showToast('已顯示全部法人報告'); });
 
 
@@ -3709,6 +3784,52 @@ setDefaultRevenueMonth();
 document.getElementById('r-type')?.addEventListener('change',()=>{
     if((document.getElementById('r-type')?.value||'revenue')==='revenue')setDefaultRevenueMonth();
 });
+
+// v157：新增營收／千張大戶後，強制還原會遮住新資料的篩選，確保剛新增資料立即可見。
+let lastAddedRevenueRecordId='';
+const showNewRevenueRecordImmediately=(type,id)=>{
+    const normalizedType=type==='largeHolder'?'largeHolder':'revenue';
+    state.revenueFilters={
+        month:'',
+        code:'',
+        type:normalizedType,
+        revenuePattern:'none',
+        revenueN:3,
+        revenueCount:2,
+        holderPattern:'none',
+        holderN:3,
+        holderCount:2,
+        minMomentum:0
+    };
+    const values={
+        'filter-revenue-month':'',
+        'filter-revenue-code':'',
+        'filter-revenue-type':normalizedType,
+        'filter-revenue-pattern':'none',
+        'filter-revenue-pattern-n':'3',
+        'filter-revenue-pattern-count':'2',
+        'filter-holder-pattern':'none',
+        'filter-holder-pattern-n':'3',
+        'filter-holder-pattern-count':'2',
+        'filter-momentum-score':'0'
+    };
+    Object.entries(values).forEach(([id,value])=>{
+        const el=document.getElementById(id);
+        if(el)el.value=value;
+    });
+    lastAddedRevenueRecordId=id||'';
+    syncRevenuePatternUI();
+    renderRevenueRecords();
+    requestAnimationFrame(()=>{
+        const row=[...document.querySelectorAll('#revenue-table-body [data-revenue-id]')]
+            .find(el=>el.dataset.revenueId===String(id||''));
+        if(row){
+            row.scrollIntoView({behavior:'smooth',block:'center',inline:'nearest'});
+            row.classList.add('revenue-new-row');
+            setTimeout(()=>row.classList.remove('revenue-new-row'),2600);
+        }
+    });
+};
 document.getElementById('revenue-form')?.addEventListener('submit',async e=>{
     e.preventDefault();
     const type=document.getElementById('r-type')?.value==='largeHolder'?'largeHolder':'revenue',stock=validateStockFormPair('r-code','r-name');
@@ -3727,20 +3848,21 @@ document.getElementById('revenue-form')?.addEventListener('submit',async e=>{
         await recordDeletionTombstone('revenueRecords',old.id);
         await deleteDataFromCloud(`revenueRecords/${old.id}`);
     }
-    // 新增後自動顯示剛建立的資料，避免被先前的月份／週期／動能分數篩選藏起來。
-    if(type==='largeHolder'){
-        state.revenueFilters={...(state.revenueFilters||{}),month:'',code:'',type:'largeHolder',revenuePattern:'none',holderPattern:'none',minMomentum:0};
-        [['filter-revenue-month',''],['filter-revenue-code',''],['filter-revenue-type','largeHolder'],['filter-revenue-pattern','none'],['filter-holder-pattern','none'],['filter-momentum-score','0']].forEach(([id,value])=>{const el=document.getElementById(id);if(el)el.value=value;});
-    }else{
-        state.revenueFilters={...(state.revenueFilters||{}),month:'',code:'',type:'revenue',revenuePattern:'none',holderPattern:'none',minMomentum:0};
-        [['filter-revenue-month',''],['filter-revenue-code',''],['filter-revenue-type','revenue'],['filter-revenue-pattern','none'],['filter-holder-pattern','none'],['filter-momentum-score','0']].forEach(([id,value])=>{const el=document.getElementById(id);if(el)el.value=value;});
+    // 新增後立即切換到對應類型並清除所有會遮住新資料的進階篩選。
+    showNewRevenueRecordImmediately(type,dId);
+    saveLocalData();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();
+    const cloudSaved=await putDataToCloud(`revenueRecords/${dId}`,p);
+    // 寫入雲端後再確認本機紀錄仍存在；若同步時序造成遺失則立即補回。
+    if(!state.revenueRecords.some(item=>String(item.id)===String(dId))){
+        state.revenueRecords.push(p);
+        saveLocalData();
     }
-    syncRevenuePatternUI();
-    saveLocalData();renderRevenueRecords();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();const cloudSaved=await putDataToCloud(`revenueRecords/${dId}`,p);showToast(type==='largeHolder'?(cloudSaved?'千張大戶已儲存並同步雲端':'千張大戶已儲存在本機，待網路恢復自動同步'):(cloudSaved?'營收創高已儲存並同步雲端':'營收創高已儲存在本機，待網路恢復自動同步'));
+    showNewRevenueRecordImmediately(type,dId);
+    showToast(type==='largeHolder'?(cloudSaved?'千張大戶已儲存，已顯示在清單':'千張大戶已儲存在本機並顯示，待網路恢復自動同步'):(cloudSaved?'營收創高已儲存，已顯示在清單':'營收創高已儲存在本機並顯示，待網路恢復自動同步'));
     e.target.reset();setDefaultRevenueMonth();document.getElementById('r-type').value=type;if(type==='revenue')document.getElementById('r-month').value=m;else document.getElementById('r-date').value=d;syncMomentumFormType();setTimeout(()=>document.getElementById('r-code').focus(),15);
 });
 document.getElementById('revenue-table-body')?.addEventListener('click',async e=>{const b=e.target.closest('[data-action]');if(!b)return;const a=b.dataset.action,id=b.dataset.id;if(a==='edit-notes'){const r=state.revenueRecords.find(x=>x.id===id);if(!r)return;window.openPromptModal("修改備註說明",r.notes||"",async nn=>{if(nn!==null){r.notes=nn.trim();r.updatedAt=Date.now();saveLocalData();renderRevenueRecords();await putDataToCloud(`revenueRecords/${id}`,r);showToast("修改成功");}});}else if(a==='delete-revenue'){window.openConfirmModal('確定刪除？',async()=>{state.revenueRecords=state.revenueRecords.filter(x=>x.id!==id);saveLocalData();renderRevenueRecords();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();await recordDeletionTombstone('revenueRecords',id);await deleteDataFromCloud(`revenueRecords/${id}`);showToast('已刪除');});}});
-function renderRevenueRecords(){renderRevenueActiveFilterChips();renderRevenueMomentumDashboard();const tb=document.getElementById('revenue-table-body'),em=document.getElementById('revenue-empty');if(!tb||!em)return;let fr=applyRevenueMomentumFilters(state.revenueRecords.map(r=>({...r,type:normalizeMomentumRecordType(r)})));if(fr.length===0){setHTMLIfChanged(tb,'');em.classList.remove('hidden');updateBatchUI('revenue');return;}em.classList.add('hidden');const sr=[...fr].sort((a,b)=>{let vA,vB;switch(state.revenueSortConfig.key){case'month':vA=getMomentumRecordDate(a);vB=getMomentumRecordDate(b);break;case'type':vA=a.type;vB=b.type;break;case'code':vA=a.code;vB=b.code;break;case'eps2025':vA=getEpsInfo(a.code,{}).eps2025??-9999;vB=getEpsInfo(b.code,{}).eps2025??-9999;break;case'eps2026':vA=getEpsInfo(a.code,{}).eps2026??-9999;vB=getEpsInfo(b.code,{}).eps2026??-9999;break;case'epsGrowth':vA=getEpsInfo(a.code,{}).epsGrowth??-9999;vB=getEpsInfo(b.code,{}).epsGrowth??-9999;break;case'targetPrice':vA=getEpsInfo(a.code,{}).targetPrice??-9999;vB=getEpsInfo(b.code,{}).targetPrice??-9999;break;case'momentumScore':vA=getMomentumMetrics(a.code).score;vB=getMomentumMetrics(b.code).score;break;case'notes':vA=a.notes||'';vB=b.notes||'';break;default:vA=a.createdAt||0;vB=b.createdAt||0;break;}if(vA===vB)return(b.createdAt||0)-(a.createdAt||0);return state.revenueSortConfig.asc?(vA>vB?1:-1):(vA>vB?-1:1);});let rh='';sr.forEach(r=>{const isLarge=r.type==='largeHolder',period=isLarge?String(r.date||'').replace(/-/g,'/'):String(r.month||'').replace(/-/g,'/'),p=String(r.month||'').split('-'),tc=isLarge?'text-violet-600 dark:text-violet-400':MONTH_TEXT_COLORS[((parseInt(p[1],10)||1)-1)%12],typeBadge=isLarge?'<span class="inline-flex items-center rounded-md bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-200 px-2 py-1 text-[10px] font-black"><i class="fa-solid fa-users mr-1"></i>千張大戶增加</span>':'<span class="inline-flex items-center rounded-md bg-pink-100 dark:bg-pink-900/40 text-pink-700 dark:text-pink-200 px-2 py-1 text-[10px] font-black"><i class="fa-solid fa-chart-line mr-1"></i>營收創高</span>',ei=getEpsInfo(r.code,{});rh+=`<tr class="table-row-hover border-b border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-sm"><td class="table-sticky-bg py-3 px-2 sm:px-3 text-center sticky left-0 z-20"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${r.id}" data-type="revenue" ${selectedIds['revenue'].has(r.id)?'checked':''}></td><td class="py-3 px-3 sm:px-4 font-bold ${tc}">${escapeHTML(period)}</td><td class="py-3 px-3 sm:px-4">${typeBadge}</td><td class="py-3 px-3 sm:px-4"><span class="font-medium mr-2">${escapeHTML(r.code)}</span><span class="text-gray-600 dark:text-gray-300">${escapeHTML(r.name)}</span></td><td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2025)}</td><td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2026)}</td><td class="py-3 px-3 sm:px-4 text-right">${formatNumColor(ei.epsGrowth,true)}</td><td class="py-3 px-3 sm:px-4 text-right">${formatTargetPrice(ei.targetPrice)}</td><td class="py-3 px-3 sm:px-4 whitespace-normal min-w-[180px]"><div class="flex flex-wrap gap-1">${renderMomentumBadges(r.code)}</div></td><td class="py-3 px-3 sm:px-4 text-gray-600 dark:text-gray-300 w-full">${escapeHTML(r.notes||'')}</td><td class="py-3 px-3 sm:px-4 text-center whitespace-nowrap"><button class="mr-1 text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" data-action="edit-notes" data-id="${r.id}"><i class="fa-solid fa-comment-dots pointer-events-none"></i></button><button class="text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" data-action="delete-revenue" data-id="${r.id}"><i class="fa-solid fa-trash pointer-events-none"></i></button></td></tr>`;});setHTMLIfChanged(tb,rh);updateBatchUI('revenue');}
+function renderRevenueRecords(){renderRevenueActiveFilterChips();renderRevenueMomentumDashboard();const tb=document.getElementById('revenue-table-body'),em=document.getElementById('revenue-empty');if(!tb||!em)return;let fr=applyRevenueMomentumFilters(state.revenueRecords.map(r=>({...r,type:normalizeMomentumRecordType(r)})));if(fr.length===0){setHTMLIfChanged(tb,'');em.classList.remove('hidden');updateBatchUI('revenue');return;}em.classList.add('hidden');const sr=[...fr].sort((a,b)=>{let vA,vB;switch(state.revenueSortConfig.key){case'month':vA=getMomentumRecordDate(a);vB=getMomentumRecordDate(b);break;case'type':vA=a.type;vB=b.type;break;case'code':vA=a.code;vB=b.code;break;case'eps2025':vA=getEpsInfo(a.code,{}).eps2025??-9999;vB=getEpsInfo(b.code,{}).eps2025??-9999;break;case'eps2026':vA=getEpsInfo(a.code,{}).eps2026??-9999;vB=getEpsInfo(b.code,{}).eps2026??-9999;break;case'epsGrowth':vA=getEpsInfo(a.code,{}).epsGrowth??-9999;vB=getEpsInfo(b.code,{}).epsGrowth??-9999;break;case'targetPrice':vA=getEpsInfo(a.code,{}).targetPrice??-9999;vB=getEpsInfo(b.code,{}).targetPrice??-9999;break;case'momentumScore':vA=getMomentumMetrics(a.code).score;vB=getMomentumMetrics(b.code).score;break;case'notes':vA=a.notes||'';vB=b.notes||'';break;default:vA=a.createdAt||0;vB=b.createdAt||0;break;}if(vA===vB)return(b.createdAt||0)-(a.createdAt||0);return state.revenueSortConfig.asc?(vA>vB?1:-1):(vA>vB?-1:1);});let rh='';sr.forEach(r=>{const isLarge=r.type==='largeHolder',period=isLarge?String(r.date||'').replace(/-/g,'/'):String(r.month||'').replace(/-/g,'/'),p=String(r.month||'').split('-'),tc=isLarge?'text-violet-600 dark:text-violet-400':MONTH_TEXT_COLORS[((parseInt(p[1],10)||1)-1)%12],typeBadge=isLarge?'<span class="inline-flex items-center rounded-md bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-200 px-2 py-1 text-[10px] font-black"><i class="fa-solid fa-users mr-1"></i>千張大戶增加</span>':'<span class="inline-flex items-center rounded-md bg-pink-100 dark:bg-pink-900/40 text-pink-700 dark:text-pink-200 px-2 py-1 text-[10px] font-black"><i class="fa-solid fa-chart-line mr-1"></i>營收創高</span>',ei=getEpsInfo(r.code,{});rh+=`<tr data-revenue-id="${escapeHTML(r.id)}" class="table-row-hover border-b border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-sm ${String(r.id)===String(lastAddedRevenueRecordId)?'revenue-new-row':''}"><td class="table-sticky-bg py-3 px-2 sm:px-3 text-center sticky left-0 z-20"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${r.id}" data-type="revenue" ${selectedIds['revenue'].has(r.id)?'checked':''}></td><td class="py-3 px-3 sm:px-4 font-bold ${tc}">${escapeHTML(period)}</td><td class="py-3 px-3 sm:px-4">${typeBadge}</td><td class="py-3 px-3 sm:px-4"><span class="font-medium mr-2">${escapeHTML(r.code)}</span><span class="text-gray-600 dark:text-gray-300">${escapeHTML(r.name)}</span></td><td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2025)}</td><td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2026)}</td><td class="py-3 px-3 sm:px-4 text-right">${formatNumColor(ei.epsGrowth,true)}</td><td class="py-3 px-3 sm:px-4 text-right">${formatTargetPrice(ei.targetPrice)}</td><td class="py-3 px-3 sm:px-4 whitespace-normal min-w-[180px]"><div class="flex flex-wrap gap-1">${renderMomentumBadges(r.code)}</div></td><td class="py-3 px-3 sm:px-4 text-gray-600 dark:text-gray-300 w-full">${escapeHTML(r.notes||'')}</td><td class="py-3 px-3 sm:px-4 text-center whitespace-nowrap"><button class="mr-1 text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" data-action="edit-notes" data-id="${r.id}"><i class="fa-solid fa-comment-dots pointer-events-none"></i></button><button class="text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110" data-action="delete-revenue" data-id="${r.id}"><i class="fa-solid fa-trash pointer-events-none"></i></button></td></tr>`;});setHTMLIfChanged(tb,rh);updateBatchUI('revenue');}
 
 const pE=document.getElementById('p-entry'),pS=document.getElementById('p-stop');
 const updatePlanRiskPreview=()=>{const root=document.getElementById('plan-risk-preview'),entry=parseFloat(document.getElementById('p-entry')?.value),stop=parseFloat(document.getElementById('p-stop')?.value),target=parseFloat(document.getElementById('p-target')?.value),qty=Math.max(0.01,parseFloat(document.getElementById('p-qty')?.value)||1);if(!root)return;if(!Number.isFinite(entry)||!Number.isFinite(stop)){root.className='col-span-12 rounded-xl border border-green-200 dark:border-green-800/70 bg-green-50/70 dark:bg-green-900/15 px-3 py-2.5 text-xs text-gray-500 dark:text-gray-300';root.innerHTML='<i class="fa-solid fa-scale-balanced mr-1.5 text-green-600 dark:text-green-400"></i>輸入進場價、停損與停利後，自動計算風險報酬。';return;}const risk=entry-stop;if(risk<=0){root.className='col-span-12 rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20 px-3 py-2.5 text-xs font-bold text-amber-600 dark:text-amber-300';root.innerHTML='<i class="fa-solid fa-triangle-exclamation mr-1.5"></i>停損價需低於進場價。';return;}const shares=qty*1000,maxLoss=risk*shares,reward=Number.isFinite(target)?target-entry:NaN,ratio=Number.isFinite(reward)&&reward>0?reward/risk:NaN;root.className='col-span-12 rounded-xl border border-green-200 dark:border-green-800/70 bg-green-50/70 dark:bg-green-900/15 px-3 py-2.5 text-xs text-gray-600 dark:text-gray-200';root.innerHTML=`<div class="flex flex-wrap gap-x-5 gap-y-1"><span><b class="text-green-700 dark:text-green-300">預估最大風險</b> $${Math.round(maxLoss).toLocaleString('zh-TW')}</span><span><b class="text-blue-700 dark:text-blue-300">風險幅度</b> ${((risk/entry)*100).toFixed(2)}%</span><span><b class="text-red-600 dark:text-red-300">風險報酬比</b> ${Number.isFinite(ratio)?`1：${ratio.toFixed(2)}`:'請輸入有效停利價'}</span></div>`;};
