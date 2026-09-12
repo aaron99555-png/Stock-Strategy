@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="148">
+<meta name="app-version" content="150">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -574,16 +574,24 @@ html.dark body main :is(#module-journal,#module-favorites,#module-revenue,#modul
 .dark .filter-chip button:hover{background:rgba(15,23,42,.45)}
 .active-filter-strip:empty{display:none}
 #journal-war-room #war-room-stats{
-  grid-template-columns:repeat(auto-fit,minmax(108px,1fr))!important;
   align-items:stretch;
+  gap:.55rem!important;
 }
 #journal-war-room #war-room-stats>div{min-width:0}
+@media (max-width:479px){
+  #journal-war-room #war-room-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  #journal-war-room #war-room-stats>.workbench-stat-card:last-child:nth-child(odd){grid-column:1/-1}
+}
+@media (min-width:480px) and (max-width:1023px){
+  /* 5 張卡改成 3+2 排法，避免一整排太擠又浪費空間 */
+  #journal-war-room #war-room-stats{grid-template-columns:repeat(6,minmax(0,1fr))!important}
+  #journal-war-room #war-room-stats>.workbench-stat-card:nth-child(-n+3){grid-column:span 2 / span 2}
+  #journal-war-room #war-room-stats>.workbench-stat-card:nth-child(n+4){grid-column:span 3 / span 3}
+}
 @media(min-width:1024px){
   #journal-war-room #war-room-stats{grid-template-columns:repeat(5,minmax(0,1fr))!important}
 }
 @media(max-width:639px){
-  #journal-war-room #war-room-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}
-  #journal-war-room #war-room-stats>div:last-child:nth-child(odd){grid-column:1/-1}
   #war-room-ranking{grid-template-columns:repeat(2,minmax(0,1fr))!important}
   .war-rank-card.rank-top3{min-height:66px}
   #revenue-momentum-dashboard{grid-template-columns:1fr!important}
@@ -818,6 +826,14 @@ html:not(.dark) #theme-toggle:hover{
 }
 </style>
 
+
+<style id="journal-reference-mode-v150">
+#journal-reference-mode-wrap{transition:border-color .15s ease,background-color .15s ease,box-shadow .15s ease}
+@media(max-width:639px){
+  #journal-reference-mode-wrap{width:100%;justify-content:center}
+}
+</style>
+
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen flex flex-col antialiased">
 <nav class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-50 transition-colors duration-300">
@@ -905,13 +921,19 @@ html:not(.dark) #theme-toggle:hover{
                 </div>
                 <div id="journal-form-wrapper" class="hidden overflow-hidden transition-all duration-300">
                     <form id="journal-form" class="flex flex-col gap-4 pt-1" action="javascript:void(0);">
+                        <div class="flex justify-end">
+                            <label id="journal-reference-mode-wrap" class="inline-flex items-center gap-2 rounded-lg border border-amber-200 dark:border-amber-800/70 bg-amber-50/70 dark:bg-amber-900/20 px-2.5 py-1.5 text-[11px] sm:text-xs font-bold text-amber-700 dark:text-amber-300 cursor-pointer select-none" title="勾選後只顯示股票參考資料，不會新增到策略日誌">
+                                <input type="checkbox" id="journal-reference-only" class="w-4 h-4 rounded border-amber-300 dark:border-amber-700 accent-amber-600">
+                                <span><i class="fa-solid fa-eye mr-1"></i>只看參考資料，不加入清單</span>
+                            </label>
+                        </div>
                         <div class="grid grid-cols-12 gap-1.5 sm:gap-4 items-end">
                             <div class="col-span-4 md:col-span-2"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">日期</label><input type="date" id="j-date" required class="input-base text-center sm:text-left"></div>
                             <div class="col-span-4 md:col-span-2"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">代號</label><input type="text" id="j-code" required placeholder="如: 2330" class="input-base text-center sm:text-left" autocomplete="off" spellcheck="false" enterkeyhint="next"></div>
                             <div class="col-span-4 md:col-span-2"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">股名</label><input type="text" id="j-name" list="stock-names-list" required placeholder="自動帶入" class="input-base text-center sm:text-left" autocomplete="off" enterkeyhint="next"></div>
                             <div class="col-span-4 md:col-span-2"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">訊號狀態</label><select id="j-status" class="input-base text-center text-xs sm:text-sm"><option value="新訊號">新訊號</option><option value="觀察中">觀察中</option><option value="已進場">已進場</option><option value="已失效">已失效</option><option value="已結案">已結案</option></select></div>
                             <div class="col-span-5 md:col-span-3"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">備註紀錄</label><input type="text" id="j-notes" placeholder="輸入內容..." class="input-base text-xs sm:text-sm" autocomplete="off" enterkeyhint="send"></div>
-                            <div class="col-span-3 md:col-span-1"><button type="submit" id="btn-journal-submit" class="w-full h-[42px] bg-blue-600 hover:bg-blue-500 text-white text-base sm:text-sm font-bold rounded-lg transition shadow-md active:scale-95">加入</button></div>
+                            <div class="col-span-3 md:col-span-1"><button type="submit" id="btn-journal-submit" class="w-full h-[42px] bg-blue-600 hover:bg-blue-500 text-white text-base sm:text-sm font-bold rounded-lg transition shadow-md active:scale-95"><i id="btn-journal-submit-icon" class="fa-solid fa-plus mr-1"></i><span id="btn-journal-submit-text">加入</span></button></div>
                             <div id="j-preview" class="col-span-12 bg-blue-50 dark:bg-sky-900/40 p-3 rounded-lg border border-blue-200 dark:border-sky-700/50 hidden flex-wrap items-center gap-x-4 gap-y-2 shadow-inner mt-1 text-sm"></div>
                         </div>
                         <div class="bg-gray-50 dark:bg-gray-900/40 px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700/50 flex flex-col shadow-inner">
@@ -2249,7 +2271,7 @@ const renderWarRoom=()=>{
       {label:'營收創高',value:revenueCount,icon:'fa-chart-line',box:'bg-pink-50 dark:bg-pink-900/20',iconCls:'bg-pink-100 dark:bg-pink-900/50 text-pink-600 dark:text-pink-300',valueCls:'text-pink-600 dark:text-pink-300'},
       {label:'近14日千張',value:holderRecentCount,icon:'fa-users',box:'bg-violet-50 dark:bg-violet-900/20',iconCls:'bg-violet-100 dark:bg-violet-900/50 text-violet-600 dark:text-violet-300',valueCls:'text-violet-600 dark:text-violet-300'}
     ];
-    stats.innerHTML=cards.map(c=>`<div class="workbench-stat-card rounded-xl border border-gray-200 dark:border-gray-700 ${c.box} px-2 py-2 sm:px-2.5 sm:py-2.5"><div class="flex items-center gap-1.5 sm:gap-2"><span class="workbench-stat-icon ${c.iconCls}"><i class="fa-solid ${c.icon}"></i></span><div class="min-w-0 flex-1"><div class="text-[10px] leading-tight font-bold text-gray-500 dark:text-gray-400 break-words">${c.label}</div><div class="mt-0.5 text-lg sm:text-xl leading-none font-black ${c.valueCls}">${c.value}</div></div></div></div>`).join('');
+    stats.innerHTML=cards.map(c=>`<div class="workbench-stat-card rounded-xl border border-gray-200 dark:border-gray-700 ${c.box} px-2 py-2 sm:px-2.5 sm:py-2.5"><div class="flex items-center gap-1.5 sm:gap-2"><span class="workbench-stat-icon shrink-0 ${c.iconCls}"><i class="fa-solid ${c.icon}"></i></span><div class="min-w-0 flex-1"><div class="text-[10px] sm:text-[11px] leading-tight font-bold text-gray-500 dark:text-gray-400 break-words">${c.label}</div><div class="mt-0.5 text-xl sm:text-2xl leading-none font-black ${c.valueCls}">${c.value}</div></div></div></div>`).join('');
     const medals=['🥇','🥈','🥉'];
     ranking.innerHTML=rows.length?rows.slice(0,10).map((x,index)=>{
         const top=index<3,medal=medals[index]||`${index+1}`;
@@ -3514,6 +3536,32 @@ document.addEventListener('click',event=>{
 });
 document.getElementById('btn-clear-rep-filters')?.addEventListener('click', () => { state.reportFilters = { start: '', end: '', code: '' }; document.getElementById('filter-rep-start').value = ''; document.getElementById('filter-rep-end').value = ''; document.getElementById('filter-rep-code').value = ''; renderReports(); showToast('已顯示全部法人報告'); });
 
+
+// v150：新增條件可切換「只看參考資料」模式；此模式不寫入日誌／Firebase。
+const isJournalReferenceOnly=()=>Boolean(document.getElementById('journal-reference-only')?.checked);
+const syncJournalReferenceMode=()=>{
+    const enabled=isJournalReferenceOnly();
+    const btn=document.getElementById('btn-journal-submit');
+    const textEl=document.getElementById('btn-journal-submit-text');
+    const icon=document.getElementById('btn-journal-submit-icon');
+    const wrap=document.getElementById('journal-reference-mode-wrap');
+    if(textEl)textEl.textContent=enabled?'查參考':'加入';
+    if(icon){
+        icon.className=enabled?'fa-solid fa-magnifying-glass mr-1':'fa-solid fa-plus mr-1';
+    }
+    if(btn){
+        btn.classList.toggle('bg-amber-600',enabled);
+        btn.classList.toggle('hover:bg-amber-500',enabled);
+        btn.classList.toggle('bg-blue-600',!enabled);
+        btn.classList.toggle('hover:bg-blue-500',!enabled);
+    }
+    wrap?.classList.toggle('ring-2',enabled);
+    wrap?.classList.toggle('ring-amber-300',enabled);
+    wrap?.classList.toggle('dark:ring-amber-700',enabled);
+};
+document.getElementById('journal-reference-only')?.addEventListener('change',syncJournalReferenceMode);
+syncJournalReferenceMode();
+
 document.getElementById('journal-form')?.addEventListener('submit', async e => {
     e.preventDefault();
     const d = document.getElementById('j-date').value;
@@ -3521,6 +3569,18 @@ document.getElementById('journal-form')?.addEventListener('submit', async e => {
     if (!stock) return;
     const c = stock.code;
     const n = stock.name;
+
+    // 參考模式：只更新／顯示參考資料，不建立、不修改任何策略日誌。
+    if(isJournalReferenceOnly()){
+        updatePreview(c,'j-preview','blue');
+        if(state.epsData?.[c]){
+            showToast('參考模式：已顯示參考資料，不會加入清單');
+        }else{
+            showToast('參考模式：此股票目前沒有 EPS／目標價參考資料','error');
+        }
+        return;
+    }
+
     const nt = document.getElementById('j-notes').value.trim();
     const status = normalizeJournalStatus(document.getElementById('j-status').value);
     if (!d) return showToast('請選擇日期', 'error');
