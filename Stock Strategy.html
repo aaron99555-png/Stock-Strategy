@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="159">
+<meta name="app-version" content="160">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -1087,9 +1087,9 @@ html:not(.dark) #theme-toggle:hover{
                         <input type="checkbox" id="filter-revenue-high" class="filter-revenue-high rounded border-gray-300 dark:border-gray-600 text-pink-500 focus:ring-pink-500 w-3.5 h-3.5 sm:w-4 sm:h-4">
                         <span class="text-xs sm:text-sm text-pink-600 dark:text-pink-400 font-medium whitespace-nowrap">營收創高</span>
                     </label>
-                    <label class="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white dark:bg-gray-900/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-700/50 transition hover:bg-gray-50 dark:hover:bg-gray-800">
-                        <input type="checkbox" id="filter-large-holder" class="filter-large-holder rounded border-gray-300 dark:border-gray-600 text-violet-500 focus:ring-violet-500 w-3.5 h-3.5 sm:w-4 sm:h-4">
-                        <span class="text-xs sm:text-sm text-violet-600 dark:text-violet-400 font-medium whitespace-nowrap">近千張大戶增</span>
+                    <label title="不限制天數：只要日誌日期以前最近一次有千張大戶增加紀錄即符合" class="flex items-center gap-1.5 cursor-pointer">
+                            <input type="checkbox" id="filter-large-holder" class="filter-large-holder rounded border-gray-300 dark:border-gray-600 text-violet-500 focus:ring-violet-500 w-3.5 h-3.5 sm:w-4 sm:h-4">
+                        <span class="text-xs sm:text-sm text-violet-600 dark:text-violet-400 font-medium whitespace-nowrap">最近千張大戶增</span>
                     </label>
                     <select id="filter-score" class="filter-score bg-white dark:bg-gray-900/50 text-gray-900 dark:text-white text-base sm:text-sm border border-gray-300 dark:border-gray-700/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 focus:ring-2 focus:ring-blue-500 outline-none transition hover:bg-gray-50 dark:hover:bg-gray-800">
                         <option value="0">分數不限</option><option value="1">1分(含)以上</option><option value="2">2分(含)以上</option><option value="3">3分(含)以上</option><option value="4">4分(含)以上</option>
@@ -1678,7 +1678,7 @@ html:not(.dark) #theme-toggle:hover{
                     </label>
                     <label class="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white dark:bg-gray-900/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-700/50 transition hover:bg-gray-50 dark:hover:bg-gray-800">
                         <input type="checkbox" id="filter-large-holder-fav" class="filter-large-holder rounded border-gray-300 dark:border-gray-600 text-violet-500 focus:ring-violet-500 w-3.5 h-3.5 sm:w-4 sm:h-4">
-                        <span class="text-xs sm:text-sm text-violet-600 dark:text-violet-400 font-medium whitespace-nowrap">近千張大戶增</span>
+                        <span class="text-xs sm:text-sm text-violet-600 dark:text-violet-400 font-medium whitespace-nowrap">最近千張大戶增</span>
                     </label>
                     <select id="filter-score-fav" class="filter-score bg-white dark:bg-gray-900/50 text-gray-900 dark:text-white text-base sm:text-sm border border-gray-300 dark:border-gray-700/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 focus:ring-2 focus:ring-blue-500 outline-none transition hover:bg-gray-50 dark:hover:bg-gray-800">
                         <option value="0">分數不限</option><option value="1">1分(含)以上</option><option value="2">2分(含)以上</option><option value="3">3分(含)以上</option><option value="4">4分(含)以上</option>
@@ -2434,6 +2434,15 @@ const renderRevenueMomentumDashboard=()=>{
 };
 const dayDiffISO=(fromDate,toDate)=>{const a=new Date(`${fromDate}T00:00:00`),b=new Date(`${toDate}T00:00:00`);if(Number.isNaN(a.getTime())||Number.isNaN(b.getTime()))return null;return Math.round((b-a)/86400000);};
 const hasRecentLargeHolderIncrease=(code,referenceDate=getToday(),days=14)=>state.revenueRecords.some(record=>{if(String(record.code)!==String(code)||normalizeMomentumRecordType(record)!=='largeHolder'||!record.date)return false;const diff=dayDiffISO(record.date,referenceDate);return diff!==null&&diff>=0&&diff<days;});
+// v160：策略日誌的「千張大戶增加」篩選，不再限制 14 天。
+// 只要該股票在日誌基準日以前曾有千張大戶增加紀錄，最近一次有出現就算符合。
+const hasLatestLargeHolderIncrease=(code,referenceDate=getToday())=>{
+    const ref=String(referenceDate||getToday());
+    return (state.revenueRecords||[]).some(record=>{
+        if(String(record.code||'')!==String(code)||normalizeMomentumRecordType(record)!=='largeHolder'||!record.date)return false;
+        return String(record.date)<=ref;
+    });
+};
 const getRevenueMonthsHtml=(c,referenceDate=getToday())=>{const r=state.revenueRecords.filter(x=>String(x.code)===String(c));if(r.length===0)return'<span class="text-gray-300 dark:text-gray-600 text-xs">-</span>';r.sort((a,b)=>getMomentumRecordDate(b).localeCompare(getMomentumRecordDate(a)));return r.map(x=>{if(normalizeMomentumRecordType(x)==='largeHolder'){const recent=hasRecentLargeHolderIncrease(c,referenceDate,14)&&dayDiffISO(x.date,referenceDate)>=0&&dayDiffISO(x.date,referenceDate)<14;return`<span class="inline-flex items-center bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 border-violet-200 dark:border-violet-800 text-[10px] font-bold px-1.5 py-0.5 rounded mr-1 mb-1 border shadow-sm ${recent?'ring-1 ring-violet-400':''}" title="千張大戶持股增加：${escapeHTML(x.date||'')}${recent?'（此日誌基準近14天）':''}"><i class="fa-solid fa-users mr-1"></i>千張大戶↑ ${escapeHTML((x.date||'').slice(5).replace('-','/'))}</span>`;}const p=String(x.month||'').split('-'),m=parseInt(p[1],10)||1;return`<span class="inline-block ${MONTH_BG_COLORS[(m-1)%12]} text-[10px] font-bold px-1.5 py-0.5 rounded mr-1 mb-1 border shadow-sm" title="營收創高：${escapeHTML(x.month||'')}">${escapeHTML((p[0]||'').substring(2)+'/'+(p[1]||''))}</span>`;}).join('')+`<span class="inline-flex flex-wrap gap-1 ml-1">${renderMomentumBadges(c,referenceDate)}</span>`;};
 const renderReportIndicator=()=>'<span title="有法人報告" aria-label="有法人報告" class="inline-flex shrink-0 w-5 h-5 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300 text-[10px]"><i class="fa-solid fa-file-lines"></i></span>';
 
@@ -3001,7 +3010,7 @@ const getFilteredAndSortedData=(dl,cf,cs)=>{
         if(start&&j.date<start)return false; if(end&&j.date>end)return false;
         if(code){const query=String(code).toLocaleLowerCase(),matched=[j.code,j.name,j.notes,...(j.tags||[])].some(value=>String(value||'').toLocaleLowerCase().includes(query));if(!matched)return false;}
         if(futuresOnly&&!j.ei.futures)return false; if(excludeNegativeGrowth&&j.ei.epsGrowth!==null&&j.ei.epsGrowth<0)return false;
-        if(revenueHigh&&!state.revenueRecords.some(r=>String(r.code)===String(j.code)&&normalizeMomentumRecordType(r)==='revenue'))return false; if(largeHolder14&&!hasRecentLargeHolderIncrease(j.code,j.date,14))return false;
+        if(revenueHigh&&!state.revenueRecords.some(r=>String(r.code)===String(j.code)&&normalizeMomentumRecordType(r)==='revenue'))return false; if(largeHolder14&&!hasLatestLargeHolderIncrease(j.code,j.date))return false;
         if(minScore>0&&j.score<minScore)return false;
         if(status!=='all'&&normalizeJournalStatus(j.status)!==status)return false;
         if(quick==='today'&&j.date!==getToday())return false;
@@ -3104,7 +3113,7 @@ const renderJournalActiveFilterChips=()=>{
     if(f.futuresOnly)items.push(filterChipHtml('僅含股期','futuresOnly','blue'));
     if(f.excludeNegativeGrowth)items.push(filterChipHtml('排除負成長','excludeNegativeGrowth','emerald'));
     if(f.revenueHigh)items.push(filterChipHtml('營收創高','revenueHigh','pink'));
-    if(f.largeHolder14)items.push(filterChipHtml('近14日千張大戶增','largeHolder14','violet'));
+    if(f.largeHolder14)items.push(filterChipHtml('最近一次千張大戶增','largeHolder14','violet'));
     if(Number(f.minScore||0)>0)items.push(filterChipHtml(`策略分數 ≥ ${f.minScore}`,'minScore','amber'));
     if(f.status&&f.status!=='all')items.push(filterChipHtml(`狀態：${f.status}`,'status','slate'));
     if(f.quick&&f.quick!=='all')items.push(filterChipHtml(`快速：${f.quick}`,'quick','slate'));
