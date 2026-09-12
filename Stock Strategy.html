@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="160">
+<meta name="app-version" content="161">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -2069,7 +2069,8 @@ const TAG_CATEGORIES = [
     {title: "📊 基本面佳", theme: "blue", tags: ["多頭營收創高", "赤兔馬", "千里馬"]},
     {title: "🔥 動能與型態", theme: "amber", tags: ["一陽指", "金包銀", "披荊斬棘", "破繭而出", "月來越好", "季不可失", "守株待兔", "缺口", "阿婆散步", "多排破上關"]},
     {title: "💰 量價與籌碼", theme: "purple", tags: ["量價齊揚", "高成交值", "法人加持", "1日籌碼集中度", "5日籌碼集中", "20日籌碼集中"]},
-    {title: "📈 技術指標", theme: "teal", tags: ["OBV突破", "MACD突破", "KD金叉"]}
+    {title: "📈 技術指標", theme: "teal", tags: ["OBV突破", "MACD突破", "KD金叉"]},
+    {title: "🎯 分析師專區｜漁夫林睿閎投資週報", theme: "purple", tags: ["黑卡會員", "尊耀會員", "頂峰會員"]}
 ];
 
 const STRATEGY_TAG_ALIASES={'一條根':'一陽指','跳空缺口':'缺口','1日籌碼集中':'1日籌碼集中度','小碎步':'阿婆散步','阿甘步伐':'阿婆散步','總編認同':'總編概念股'};
@@ -4219,7 +4220,7 @@ const orderTagsForCopy=(tags,selectedTags=[])=>{
     return list.sort((a,b)=>(order.get(a)??Number.MAX_SAFE_INTEGER)-(order.get(b)??Number.MAX_SAFE_INTEGER));
 };
 const COPY_TAG_ICONS={
-    '多頭營收創高':'📈','赤兔馬':'🐎','千里馬':'🏇','一陽指':'☝️','金包銀':'🥇','披荊斬棘':'⚔️','破繭而出':'🦋','月來越好':'🌙','季不可失':'🗓️','守株待兔':'🐇','缺口':'🚀','阿婆散步':'👣','多排破上關':'🧱',
+    '多頭營收創高':'📈','赤兔馬':'🐎','千里馬':'🏇','黑卡會員':'🖤','尊耀會員':'👑','頂峰會員':'🏔️','一陽指':'☝️','金包銀':'🥇','披荊斬棘':'⚔️','破繭而出':'🦋','月來越好':'🌙','季不可失':'🗓️','守株待兔':'🐇','缺口':'🚀','阿婆散步':'👣','多排破上關':'🧱',
     '量價齊揚':'📊','高成交值':'💰','法人加持':'🏦','1日籌碼集中度':'1️⃣','5日籌碼集中':'5️⃣','20日籌碼集中':'2️⃣0️⃣','OBV突破':'🌊','MACD突破':'〽️','KD金叉':'✨','大腸包小腸':'🌭'
 };
 const COPY_TAG_ICON_POOL=['🔹','🔸','🔺','🔻','🟠','🟡','🟢','🔵','🟣','⚪','⚫','💠','🔷','🔶','▪️','▫️','♦️','♣️','♠️','♥️','🧩','🧭','🪄','🪙','🛡️','⚡','🔥','🌟','🎯','📌'];
@@ -5360,6 +5361,24 @@ const SESSION={
         normalizedCategories.push({title:String(category.title||('分類 '+(index+1))),theme:theme,tags:tags});
       });
       if(!normalizedCategories.length)normalizedCategories=clone(DEFAULT_TAG_CATEGORIES);
+
+      // v161：既有使用者也自動補上「分析師專區｜漁夫林睿閎投資週報」與三個會員標籤。
+      var analystCategoryTitle='🎯 分析師專區｜漁夫林睿閎投資週報';
+      var analystTags=['黑卡會員','尊耀會員','頂峰會員'];
+      var analystCategory=normalizedCategories.find(function(category){return String(category.title||'')===analystCategoryTitle;});
+      if(!analystCategory){
+        analystCategory={title:analystCategoryTitle,theme:'purple',tags:[]};
+        normalizedCategories.push(analystCategory);
+        changed=true;
+      }
+      analystTags.forEach(function(tag){
+        if(!seen.has(tag)){
+          analystCategory.tags.push(tag);
+          seen.add(tag);
+          changed=true;
+        }
+      });
+
       var nextMeta={};
       normalizedCategories.forEach(function(category){
         category.tags.forEach(function(tag){
@@ -6383,3 +6402,4 @@ const SESSION={
 
 </body>
 </html>
+    
