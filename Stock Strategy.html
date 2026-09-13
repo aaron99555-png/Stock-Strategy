@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="165">
+<meta name="app-version" content="166">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -907,6 +907,156 @@ html:not(.dark) #theme-toggle:hover{
 }
 </style>
 
+
+<style id="war-room-layout-v166">
+/* v166：今日作戰室改為上下兩層，避免統計卡與排行在桌機被擠窄。 */
+#journal-war-room{overflow:hidden}
+#journal-war-room .war-room-body{display:block!important}
+#journal-war-room #war-room-stats{
+  display:grid!important;
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  gap:.55rem!important;
+  margin-bottom:.65rem!important;
+}
+#journal-war-room .workbench-stat-card{
+  min-width:0!important;
+  min-height:64px!important;
+  padding:.65rem .8rem!important;
+  overflow:visible!important;
+}
+#journal-war-room .workbench-stat-inner{
+  display:flex;
+  align-items:center;
+  gap:.65rem;
+  min-width:0;
+  height:100%;
+}
+#journal-war-room .workbench-stat-icon{
+  width:32px!important;
+  height:32px!important;
+  border-radius:10px!important;
+  flex:0 0 32px!important;
+}
+#journal-war-room .workbench-stat-copy{
+  min-width:0;
+  flex:1 1 auto;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:.65rem;
+}
+#journal-war-room .workbench-stat-label{
+  min-width:0;
+  font-size:11px;
+  line-height:1.25;
+  font-weight:800;
+  white-space:normal;
+  word-break:keep-all;
+}
+#journal-war-room .workbench-stat-value{
+  flex:0 0 auto;
+  font-size:24px;
+  line-height:1;
+  font-weight:900;
+  text-align:right;
+}
+
+#journal-war-room .war-room-ranking-panel{width:100%}
+#journal-war-room #war-room-ranking{
+  display:grid!important;
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  gap:.5rem!important;
+  align-items:stretch;
+}
+#journal-war-room .war-rank-card{
+  min-width:0!important;
+  min-height:74px!important;
+  padding:.6rem .65rem!important;
+  overflow:hidden!important;
+}
+#journal-war-room .war-rank-card.rank-top3{min-height:74px!important}
+#journal-war-room .war-rank-main{
+  display:flex;
+  align-items:flex-start;
+  gap:.45rem;
+  width:100%;
+  min-width:0;
+}
+#journal-war-room .war-rank-content{
+  min-width:0;
+  flex:1 1 auto;
+}
+#journal-war-room .war-rank-head{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:start;
+  gap:.4rem;
+  min-width:0;
+}
+#journal-war-room .war-rank-name{
+  min-width:0;
+  font-size:11px;
+  line-height:1.3;
+  white-space:normal!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+  word-break:keep-all;
+}
+#journal-war-room .war-rank-score{
+  flex:0 0 auto;
+  min-width:24px;
+  text-align:right;
+  font-size:12px;
+  line-height:1.25;
+  font-weight:900;
+}
+#journal-war-room .war-rank-tags{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:.25rem;
+  margin-top:.4rem;
+  min-height:20px;
+  font-size:9px;
+  line-height:1.2;
+}
+#journal-war-room .war-rank-pill{
+  display:inline-flex;
+  align-items:center;
+  min-height:18px;
+  padding:.15rem .38rem;
+  white-space:nowrap;
+}
+#journal-war-room .war-rank-flag{
+  display:inline-flex;
+  align-items:center;
+  min-height:18px;
+  white-space:nowrap;
+  padding:0 .1rem;
+}
+
+@media (max-width:1199px){
+  #journal-war-room #war-room-stats{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+  #journal-war-room #war-room-ranking{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+}
+@media (max-width:767px){
+  #journal-war-room #war-room-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  #journal-war-room #war-room-stats>.workbench-stat-card:last-child:nth-child(odd){grid-column:1/-1}
+  #journal-war-room #war-room-ranking{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  #journal-war-room .workbench-stat-card{min-height:58px!important;padding:.55rem .65rem!important}
+  #journal-war-room .workbench-stat-icon{width:28px!important;height:28px!important;flex-basis:28px!important}
+  #journal-war-room .workbench-stat-copy{gap:.4rem}
+  #journal-war-room .workbench-stat-label{font-size:10px}
+  #journal-war-room .workbench-stat-value{font-size:21px}
+  #journal-war-room .war-rank-card{min-height:70px!important;padding:.55rem!important}
+}
+@media (max-width:430px){
+  #journal-war-room #war-room-ranking{grid-template-columns:1fr!important}
+  #journal-war-room .war-rank-name{font-size:12px}
+  #journal-war-room .war-rank-score{font-size:13px}
+}
+</style>
+
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen flex flex-col antialiased">
 <nav class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-50 transition-colors duration-300">
@@ -972,11 +1122,11 @@ html:not(.dark) #theme-toggle:hover{
                     <span id="war-room-date" class="text-[11px] font-bold text-gray-500 dark:text-gray-400"></span>
                 </div>
             </div>
-            <div class="p-2 sm:p-3 lg:grid lg:grid-cols-[minmax(250px,0.78fr)_minmax(0,2.22fr)] lg:gap-2.5 lg:items-stretch">
-                <div id="war-room-stats" class="grid grid-cols-2 sm:grid-cols-5 gap-1.5 mb-2 lg:mb-0 content-start"></div>
-                <div class="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <div class="war-room-body p-2 sm:p-3">
+                <div id="war-room-stats" class="grid gap-2 mb-2.5"></div>
+                <div class="war-room-ranking-panel rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
                     <div class="px-2 py-1.5 bg-gray-50 dark:bg-gray-900 flex items-center justify-between"><span class="text-[11px] font-black text-gray-700 dark:text-gray-200"><i class="fa-solid fa-ranking-star text-amber-500 mr-1"></i>強度排行 TOP 10</span><span class="text-[9px] text-gray-400">點股票查看</span></div>
-                    <div id="war-room-ranking" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1.5 p-1.5 bg-white dark:bg-gray-800"></div>
+                    <div id="war-room-ranking" class="grid gap-2 p-2 bg-white dark:bg-gray-800"></div>
                 </div>
             </div>
         </section>
@@ -2447,12 +2597,12 @@ const renderWarRoom=()=>{
       {label:'營收創高',value:revenueCount,icon:'fa-chart-line',box:'bg-pink-50 dark:bg-pink-900/20',iconCls:'bg-pink-100 dark:bg-pink-900/50 text-pink-600 dark:text-pink-300',valueCls:'text-pink-600 dark:text-pink-300'},
       {label:'近14日千張',value:holderRecentCount,icon:'fa-users',box:'bg-violet-50 dark:bg-violet-900/20',iconCls:'bg-violet-100 dark:bg-violet-900/50 text-violet-600 dark:text-violet-300',valueCls:'text-violet-600 dark:text-violet-300'}
     ];
-    stats.innerHTML=cards.map(c=>`<div class="workbench-stat-card rounded-xl border border-gray-200 dark:border-gray-700 ${c.box} px-2 py-2"><div class="flex items-center gap-2 h-full"><span class="workbench-stat-icon shrink-0 ${c.iconCls}"><i class="fa-solid ${c.icon}"></i></span><div class="min-w-0 flex-1"><div class="text-[10px] sm:text-[11px] leading-tight font-bold text-gray-500 dark:text-gray-400 break-words">${c.label}</div></div><div class="text-right"><div class="text-xl sm:text-2xl leading-none font-black ${c.valueCls}">${c.value}</div></div></div></div>`).join('');
+    stats.innerHTML=cards.map(c=>`<div class="workbench-stat-card rounded-xl border border-gray-200 dark:border-gray-700 ${c.box}"><div class="workbench-stat-inner"><span class="workbench-stat-icon ${c.iconCls}"><i class="fa-solid ${c.icon}"></i></span><div class="workbench-stat-copy"><div class="workbench-stat-label text-gray-500 dark:text-gray-400">${c.label}</div><div class="workbench-stat-value ${c.valueCls}">${c.value}</div></div></div></div>`).join('');
     const medals=['🥇','🥈','🥉'];
     ranking.innerHTML=rows.length?rows.slice(0,10).map((x,index)=>{
         const top=index<3,medal=medals[index]||`${index+1}`;
         const rankBg=index===0?'bg-amber-50/80 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800':index===1?'bg-slate-50 dark:bg-slate-800/70 border-slate-300 dark:border-slate-600':index===2?'bg-orange-50/70 dark:bg-orange-900/15 border-orange-200 dark:border-orange-800':'bg-gray-50 dark:bg-gray-900/50 border-gray-200 dark:border-gray-700';
-        return `<button type="button" data-war-room-code="${escapeHTML(x.code)}" class="war-rank-card ${top?'rank-top3 ':''}text-left rounded-xl border ${rankBg} hover:border-blue-300 dark:hover:border-blue-700 px-2 py-2 min-w-0"><div class="flex items-start gap-1.5"><span class="war-rank-medal ${top?'bg-white/80 dark:bg-gray-900/60 shadow-sm':'bg-gray-200/70 dark:bg-gray-700 text-gray-600 dark:text-gray-200 font-black text-[9px]'}">${medal}</span><div class="min-w-0 flex-1"><div class="flex items-start justify-between gap-1"><span class="font-black text-[11px] sm:text-xs leading-tight text-gray-900 dark:text-white truncate">${escapeHTML(x.code)} ${escapeHTML(x.name)}</span><span class="text-[10px] sm:text-[11px] font-black flex-shrink-0 ${x.score>=85?'text-red-600 dark:text-red-300':x.score>=70?'text-orange-600 dark:text-orange-300':'text-blue-600 dark:text-blue-300'}">${x.score}</span></div><div class="mt-1 flex flex-wrap items-center gap-1 text-[9px] leading-tight"><span class="rounded-full bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 px-1.5 py-0.5 font-bold">${x.icon}${x.lifecycle}</span><span class="rounded-full bg-white/70 dark:bg-gray-800 text-gray-500 dark:text-gray-400 px-1.5 py-0.5">${x.grade}級</span>${x.accelerating?'<span class="text-rose-600 dark:text-rose-300 font-bold">↗加速</span>':''}${x.momentum.resonance?'<span class="text-orange-600 dark:text-orange-300 font-bold">🔥共振</span>':''}</div></div></div></button>`;
+        return `<button type="button" data-war-room-code="${escapeHTML(x.code)}" class="war-rank-card ${top?'rank-top3 ':''}text-left rounded-xl border ${rankBg} hover:border-blue-300 dark:hover:border-blue-700 min-w-0"><div class="war-rank-main"><span class="war-rank-medal ${top?'bg-white/80 dark:bg-gray-900/60 shadow-sm':'bg-gray-200/70 dark:bg-gray-700 text-gray-600 dark:text-gray-200 font-black text-[9px]'}">${medal}</span><div class="war-rank-content"><div class="war-rank-head"><span class="war-rank-name font-black text-gray-900 dark:text-white">${escapeHTML(x.code)} ${escapeHTML(x.name)}</span><span class="war-rank-score ${x.score>=85?'text-red-600 dark:text-red-300':x.score>=70?'text-orange-600 dark:text-orange-300':'text-blue-600 dark:text-blue-300'}">${x.score}</span></div><div class="war-rank-tags"><span class="war-rank-pill rounded-full bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 font-bold">${x.icon}${x.lifecycle}</span><span class="war-rank-pill rounded-full bg-white/70 dark:bg-gray-800 text-gray-500 dark:text-gray-400">${x.grade}級</span>${x.accelerating?'<span class="war-rank-flag text-rose-600 dark:text-rose-300 font-bold">↗加速</span>':''}${x.momentum.resonance?'<span class="war-rank-flag text-orange-600 dark:text-orange-300 font-bold">🔥共振</span>':''}</div></div></div></button>`;
     }).join(''):'<div class="col-span-full text-center text-[10px] text-gray-400 py-4">目前沒有可計算的股票資料</div>';
 };
 
