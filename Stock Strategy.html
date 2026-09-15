@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="168">
+<meta name="app-version" content="170">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -1058,47 +1058,47 @@ html:not(.dark) #theme-toggle:hover{
 </style>
 
 
-<style id="jellystock-module-v168">
-#module-jellystock .jellystock-frame-wrap{
-  position:relative;
-  width:100%;
-  min-height:720px;
-  height:calc(100vh - 180px);
-  height:calc(100dvh - 180px);
-  overflow:hidden;
-}
-#jellystock-frame{
-  display:block;
-  width:100%;
-  height:100%;
-  min-height:720px;
-  border:0;
-  background:#fff;
-}
-#jellystock-loading{
-  position:absolute;
-  inset:0;
-  z-index:2;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:.75rem;
-  background:rgba(255,255,255,.94);
-  transition:opacity .2s ease,visibility .2s ease;
-}
+<style id="jellystock-module-v169">
+#module-jellystock .jellystock-frame-wrap{position:relative;width:100%;min-height:720px;height:calc(100dvh - 180px);overflow:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+#jellystock-frame{display:block;width:100%;height:100%;min-height:720px;border:0;background:#fff;touch-action:auto}
+#jellystock-loading{position:absolute;inset:0;z-index:2;display:flex;align-items:center;justify-content:center;gap:.75rem;background:rgba(255,255,255,.94);transition:opacity .2s ease,visibility .2s ease}
 .dark #jellystock-loading{background:rgba(3,7,18,.94)}
 #jellystock-loading.is-hidden{opacity:0;visibility:hidden;pointer-events:none}
-@media(max-width:767px){
-  #module-jellystock .jellystock-frame-wrap{
-    min-height:620px;
-    height:calc(100dvh - 170px);
-  }
-  #jellystock-frame{min-height:620px}
+.jellystock-mobile-fullscreen-btn{display:none}
+@media(max-width:1023px){
+  #module-jellystock{margin-left:-.25rem;margin-right:-.25rem}
+  #module-jellystock #jellystock-card{border-radius:12px!important;margin:0!important}
+  #module-jellystock #jellystock-toolbar{padding:.55rem .65rem!important;gap:.5rem!important}
+  #module-jellystock #jellystock-toolbar h2{font-size:.92rem!important}
+  #module-jellystock #jellystock-toolbar p{display:none}
+  #module-jellystock #jellystock-toolbar .flex.flex-wrap{gap:.35rem!important}
+  #module-jellystock #jellystock-toolbar button,#module-jellystock #jellystock-toolbar a{height:34px!important;padding-left:.65rem!important;padding-right:.65rem!important;font-size:10px!important}
+  #module-jellystock .jellystock-frame-wrap{min-height:650px;height:calc(100dvh - 145px)}
+  #jellystock-frame{min-height:650px}
+  #jellystock-note{padding:.35rem .6rem!important;font-size:9px!important;line-height:1.25}
+  .jellystock-mobile-fullscreen-btn{display:inline-flex!important;align-items:center}
+  body.jellystock-fullscreen-open{overflow:hidden!important}
+  body.jellystock-fullscreen-open #module-jellystock{position:fixed!important;inset:0!important;z-index:99999!important;display:block!important;margin:0!important;padding:0!important;background:#fff;overflow:hidden!important}
+  body.dark.jellystock-fullscreen-open #module-jellystock{background:#020617}
+  body.jellystock-fullscreen-open #jellystock-card{position:absolute!important;inset:0!important;display:flex!important;flex-direction:column!important;border:0!important;border-radius:0!important;box-shadow:none!important;margin:0!important}
+  body.jellystock-fullscreen-open #jellystock-toolbar{flex:0 0 auto;padding:max(.45rem,env(safe-area-inset-top)) .55rem .45rem!important;border-radius:0!important}
+  body.jellystock-fullscreen-open #jellystock-toolbar p{display:none!important}
+  body.jellystock-fullscreen-open .jellystock-frame-wrap{flex:1 1 auto!important;height:auto!important;min-height:0!important}
+  body.jellystock-fullscreen-open #jellystock-frame{height:100%!important;min-height:0!important}
+  body.jellystock-fullscreen-open #jellystock-note{display:none!important}
+  body.jellystock-fullscreen-open #jellystock-mobile-fullscreen-btn{background:#dc2626!important;border-color:#dc2626!important}
 }
-@media(min-width:1024px) and (max-width:1399px){
-  nav .nav-btn{padding-left:.55rem!important;padding-right:.55rem!important;font-size:11px!important}
-  nav .nav-btn i{margin-right:.35rem!important}
+@media(max-width:480px){
+  #module-jellystock #jellystock-toolbar{flex-direction:column!important;align-items:stretch!important}
+  #module-jellystock #jellystock-toolbar>div:last-child{width:100%;justify-content:flex-start}
+  #module-jellystock #jellystock-toolbar button,#module-jellystock #jellystock-toolbar a{flex:1 1 auto;justify-content:center}
+  body.jellystock-fullscreen-open #jellystock-toolbar{flex-direction:row!important;align-items:center!important;justify-content:space-between!important;gap:.35rem!important}
+  body.jellystock-fullscreen-open #jellystock-toolbar>div:first-child{min-width:0;flex:1 1 auto}
+  body.jellystock-fullscreen-open #jellystock-toolbar>div:last-child{width:auto!important;flex:0 0 auto;flex-wrap:nowrap!important}
+  body.jellystock-fullscreen-open #jellystock-toolbar a{display:none!important}
+  body.jellystock-fullscreen-open #jellystock-toolbar button{flex:0 0 auto!important}
 }
+@media(min-width:1024px) and (max-width:1399px){nav .nav-btn{padding-left:.55rem!important;padding-right:.55rem!important;font-size:11px!important}nav .nav-btn i{margin-right:.35rem!important}}
 </style>
 
 </head>
@@ -1986,8 +1986,8 @@ html:not(.dark) #theme-toggle:hover{
 
     <!-- JellyStock 法人百大 -->
     <div id="module-jellystock" class="tab-content">
-        <section class="card-panel overflow-hidden border-t-4 border-cyan-500">
-            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-cyan-50 via-sky-50 to-blue-50 dark:from-cyan-950/30 dark:via-sky-950/20 dark:to-blue-950/20 px-3 py-3 sm:px-4">
+        <section id="jellystock-card" class="card-panel overflow-hidden border-t-4 border-cyan-500">
+            <div id="jellystock-toolbar" class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-cyan-50 via-sky-50 to-blue-50 dark:from-cyan-950/30 dark:via-sky-950/20 dark:to-blue-950/20 px-3 py-3 sm:px-4">
                 <div class="min-w-0">
                     <h2 class="flex items-center gap-2 font-black text-cyan-700 dark:text-cyan-300 text-base sm:text-lg">
                         <span class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-cyan-100 dark:bg-cyan-900/50"><i class="fa-solid fa-ranking-star"></i></span>
@@ -1996,6 +1996,7 @@ html:not(.dark) #theme-toggle:hover{
                     <p class="mt-1 text-[11px] sm:text-xs text-gray-500 dark:text-gray-400">內嵌 JellyStock「上市三大法人買賣超前100」，可直接在本系統查看。</p>
                 </div>
                 <div class="flex flex-wrap items-center gap-2">
+                    <button type="button" id="jellystock-mobile-fullscreen-btn" class="jellystock-mobile-fullscreen-btn h-9 px-3 rounded-lg border border-cyan-300 dark:border-cyan-700 bg-cyan-600 text-white text-xs font-black hover:bg-cyan-700 transition active:scale-95"><i class="fa-solid fa-expand mr-1.5"></i><span>全螢幕</span></button>
                     <button type="button" id="jellystock-reload-btn" class="h-9 px-3 rounded-lg border border-cyan-200 dark:border-cyan-800 bg-white dark:bg-gray-800 text-cyan-700 dark:text-cyan-300 text-xs font-black hover:bg-cyan-50 dark:hover:bg-cyan-900/30 transition active:scale-95">
                         <i class="fa-solid fa-rotate-right mr-1.5"></i>重新整理
                     </button>
@@ -2022,7 +2023,7 @@ html:not(.dark) #theme-toggle:hover{
                     allow="clipboard-read; clipboard-write"
                 ></iframe>
             </div>
-            <div class="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 px-3 py-2 text-[10px] sm:text-[11px] text-gray-500 dark:text-gray-400">
+            <div id="jellystock-note" class="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 px-3 py-2 text-[10px] sm:text-[11px] text-gray-500 dark:text-gray-400">
                 <i class="fa-solid fa-circle-info mr-1"></i>若原站禁止被其他網站內嵌，瀏覽器可能顯示空白或阻擋訊息；可使用右上角「另開原站」。
             </div>
         </section>
@@ -2731,7 +2732,7 @@ const renderReportIndicator=()=>'<span title="有法人報告" aria-label="有�
 const updatePreview=(c,tId='j-preview',col='blue')=>{
     const p=document.getElementById(tId);if(!c||!state.epsData[c]){if(p)p.classList.add('hidden');return;}
     const d=state.epsData[c],sn=state.codeToName[c]||d.name||'';
-    if(p){p.classList.remove('hidden');p.innerHTML=`<span class="text-${col}-600 dark:text-${col}-400 font-bold flex items-center flex-shrink-0"><i class="fa-solid fa-link mr-1.5"></i>參考資料 <span class="ml-2 px-2 py-0.5 bg-${col}-100 dark:bg-${col}-900/60 text-${col}-800 dark:text-${col}-200 rounded-md text-xs tracking-wider border border-${col}-200 dark:border-${col}-700/50 shadow-sm">${escapeHTML(c)} ${escapeHTML(sn)}</span><button type="button" data-copy-preview-code="${escapeHTML(c)}" class="ml-3 text-[11px] bg-${col}-600 hover:bg-${col}-500 text-white px-2 py-1 rounded shadow-sm transition active:scale-95 flex items-center"><i class="fa-solid fa-copy mr-1"></i>複製</button></span><div class="flex flex-wrap items-center gap-3 text-xs sm:text-sm ml-2 text-gray-700 dark:text-gray-300"><span><span class="text-gray-400 text-[10px] sm:text-xs mr-1">25 EPS:</span>${formatNumColor(d.eps2025)}</span><span><span class="text-gray-400 text-[10px] sm:text-xs mr-1">預26 EPS:</span>${formatNumColor(d.eps2026)}</span><span><span class="text-gray-400 text-[10px] sm:text-xs mr-1">EPS成長率:</span>${d.epsGrowth!=null?formatNumColor(d.epsGrowth,true):'-'}</span><span><span class="text-gray-400 text-[10px] sm:text-xs mr-1">法人最高目標價:</span>${d.targetPrice?`<span class="text-yellow-600 dark:text-yellow-400 font-bold">${escapeHTML(d.targetPrice)}</span>`:'-'}</span><span><span class="text-gray-400 text-[10px] sm:text-xs mr-1">券商:</span>${d.broker?`<span class="text-purple-600 dark:text-purple-400 font-bold">${escapeHTML(d.broker)}</span>`:'-'}</span><span><span class="text-gray-400 text-[10px] sm:text-xs mr-1">報告日期:</span>${d.reportDate?`<span class="text-cyan-600 dark:text-cyan-400 font-bold">${escapeHTML(d.reportDate)}</span>`:'-'}</span>${d.futures==='●'?'<span class="bg-sky-600 text-white text-[10px] px-1.5 py-0.5 rounded ml-1">期</span>':''}</div>`;}
+    if(p){p.classList.remove('hidden');p.innerHTML=`<span class="text-${col}-600 dark:text-${col}-400 font-bold flex items-center flex-shrink-0"><i class="fa-solid fa-link mr-1.5"></i>參考資料 <span class="ml-2 px-2 py-0.5 bg-${col}-100 dark:bg-${col}-900/60 text-${col}-800 dark:text-${col}-200 rounded-md text-xs tracking-wider border border-${col}-200 dark:border-${col}-700/50 shadow-sm cursor-pointer hover:ring-2 hover:ring-${col}-300 dark:hover:ring-${col}-700 transition"${getYahooStockAttributes(c)}>${escapeHTML(c)} ${escapeHTML(sn)} <i class="fa-solid fa-arrow-up-right-from-square ml-1 text-[9px] opacity-70 pointer-events-none"></i></span><button type="button" data-copy-preview-code="${escapeHTML(c)}" class="ml-3 text-[11px] bg-${col}-600 hover:bg-${col}-500 text-white px-2 py-1 rounded shadow-sm transition active:scale-95 flex items-center"><i class="fa-solid fa-copy mr-1"></i>複製</button></span><div class="flex flex-wrap items-center gap-3 text-xs sm:text-sm ml-2 text-gray-700 dark:text-gray-300"><span><span class="text-gray-400 text-[10px] sm:text-xs mr-1">25 EPS:</span>${formatNumColor(d.eps2025)}</span><span><span class="text-gray-400 text-[10px] sm:text-xs mr-1">預26 EPS:</span>${formatNumColor(d.eps2026)}</span><span><span class="text-gray-400 text-[10px] sm:text-xs mr-1">EPS成長率:</span>${d.epsGrowth!=null?formatNumColor(d.epsGrowth,true):'-'}</span><span><span class="text-gray-400 text-[10px] sm:text-xs mr-1">法人最高目標價:</span>${d.targetPrice?`<span class="text-yellow-600 dark:text-yellow-400 font-bold">${escapeHTML(d.targetPrice)}</span>`:'-'}</span><span><span class="text-gray-400 text-[10px] sm:text-xs mr-1">券商:</span>${d.broker?`<span class="text-purple-600 dark:text-purple-400 font-bold">${escapeHTML(d.broker)}</span>`:'-'}</span><span><span class="text-gray-400 text-[10px] sm:text-xs mr-1">報告日期:</span>${d.reportDate?`<span class="text-cyan-600 dark:text-cyan-400 font-bold">${escapeHTML(d.reportDate)}</span>`:'-'}</span>${d.futures==='●'?'<span class="bg-sky-600 text-white text-[10px] px-1.5 py-0.5 rounded ml-1">期</span>':''}</div>`;}
 };
 
 window.copyPreviewData=c=>{const d=state.epsData[c];if(!d)return;const sn=state.codeToName[c]||d.name||'';let t=`【${c} ${sn}】參考資料\n25 EPS: ${d.eps2025??'-'}\n預26 EPS: ${d.eps2026??'-'}\nEPS成長率: ${d.epsGrowth!=null?(d.epsGrowth*100).toFixed(2)+'%':'-'}\n法人最高目標價: ${d.targetPrice??'-'}\n券商: ${d.broker??'-'}\n報告日期: ${d.reportDate??'-'}\n`;if(d.futures==='●')t+=`*含股期`;executeCopy(t.trim());};
@@ -4921,6 +4922,16 @@ document.addEventListener('DOMContentLoaded',async()=>{
         if(frame?.src&&frame.src!=='about:blank')document.getElementById('jellystock-loading')?.classList.add('is-hidden');
     });
     document.getElementById('jellystock-reload-btn')?.addEventListener('click',()=>ensureJellyStockLoaded(true));
+    const setJellyStockMobileFullscreen=enabled=>{
+        const btn=document.getElementById('jellystock-mobile-fullscreen-btn');
+        const open=Boolean(enabled)&&window.matchMedia('(max-width:1023px)').matches;
+        document.body.classList.toggle('jellystock-fullscreen-open',open);
+        if(btn){btn.setAttribute('aria-pressed',open?'true':'false');btn.innerHTML=open?'<i class="fa-solid fa-compress mr-1.5"></i><span>退出</span>':'<i class="fa-solid fa-expand mr-1.5"></i><span>全螢幕</span>';}
+    };
+    document.getElementById('jellystock-mobile-fullscreen-btn')?.addEventListener('click',()=>setJellyStockMobileFullscreen(!document.body.classList.contains('jellystock-fullscreen-open')));
+    document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.body.classList.contains('jellystock-fullscreen-open'))setJellyStockMobileFullscreen(false);});
+    window.addEventListener('resize',()=>{if(window.innerWidth>1023&&document.body.classList.contains('jellystock-fullscreen-open'))setJellyStockMobileFullscreen(false);});
+
 
     // 初始化導航列按鈕事件 (修正"按下去沒反應"的關鍵區塊)
     document.querySelectorAll('.nav-btn, .nav-btn-mobile').forEach(btn=>{
@@ -4928,7 +4939,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
             const t=e.currentTarget.dataset.target,col=e.currentTarget.dataset.color||'blue';
             document.querySelectorAll('.nav-btn').forEach(b=>{b.className='nav-btn';if(b.dataset.target===t)b.classList.add(`active-${col}`);});
             document.querySelectorAll('.nav-btn-mobile').forEach(b=>{b.className='nav-btn-mobile';if(b.dataset.target===t)b.classList.add(`active-${col}`);});
-            document.querySelectorAll('.tab-content').forEach(c=>c.classList.toggle('active',c.id===t));
+            if(t!=='module-jellystock'&&document.body.classList.contains('jellystock-fullscreen-open'))setJellyStockMobileFullscreen(false); document.querySelectorAll('.tab-content').forEach(c=>c.classList.toggle('active',c.id===t));
             if(t==='module-favorites')renderFavorites(); if(t==='module-journal')processAndRenderJournals(); if(t==='module-overview')renderStockOverview(); if(t==='module-revenue')renderRevenueRecords(); if(t==='module-report')renderReports(); if(t==='module-jellystock')ensureJellyStockLoaded(); if(t==='module-checklist'){ renderChecklists(); renderChkCheckboxGrid(); }
         });
     });
