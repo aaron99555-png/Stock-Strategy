@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="167">
+<meta name="app-version" content="168">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -334,7 +334,7 @@ button { touch-action: manipulation; }
   .dark .mobile-module-nav .nav-btn-mobile[data-target="module-report"].active-indigo { color:#fff !important; background:#4f46e5 !important; border-color:#818cf8 !important; }
   .dark .mobile-module-nav .nav-btn-mobile[data-target="module-calculator"].active-purple { color:#fff !important; background:#9333ea !important; border-color:#c084fc !important; }
   .dark .mobile-module-nav #mobile-more-nav-btn.is-active { color:#fff !important; background:#ea580c !important; border-color:#fb923c !important; }
-  .mobile-module-nav .nav-btn-mobile:is([data-target="module-checklist"],[data-target="module-revenue"],[data-target="module-plan"],[data-target="module-favorites"]) { display:none !important; }
+  .mobile-module-nav .nav-btn-mobile:is([data-target="module-checklist"],[data-target="module-revenue"],[data-target="module-plan"],[data-target="module-favorites"],[data-target="module-jellystock"]) { display:none !important; }
   .mobile-app-actions { display:flex; align-items:center; gap:.5rem; padding:.55rem .65rem; border-bottom:1px solid #e5e7eb; background:rgba(248,250,252,.92); overflow-x:auto; }
   .dark .mobile-app-actions { border-bottom-color:#374151; background:rgba(17,24,39,.9); }
   .mobile-app-action-btn { flex:1 0 auto; min-height:40px; border:1px solid #dbeafe; border-radius:.7rem; background:#eff6ff; color:#2563eb; font-size:12px; font-weight:900; }
@@ -1057,6 +1057,50 @@ html:not(.dark) #theme-toggle:hover{
 }
 </style>
 
+
+<style id="jellystock-module-v168">
+#module-jellystock .jellystock-frame-wrap{
+  position:relative;
+  width:100%;
+  min-height:720px;
+  height:calc(100vh - 180px);
+  height:calc(100dvh - 180px);
+  overflow:hidden;
+}
+#jellystock-frame{
+  display:block;
+  width:100%;
+  height:100%;
+  min-height:720px;
+  border:0;
+  background:#fff;
+}
+#jellystock-loading{
+  position:absolute;
+  inset:0;
+  z-index:2;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:.75rem;
+  background:rgba(255,255,255,.94);
+  transition:opacity .2s ease,visibility .2s ease;
+}
+.dark #jellystock-loading{background:rgba(3,7,18,.94)}
+#jellystock-loading.is-hidden{opacity:0;visibility:hidden;pointer-events:none}
+@media(max-width:767px){
+  #module-jellystock .jellystock-frame-wrap{
+    min-height:620px;
+    height:calc(100dvh - 170px);
+  }
+  #jellystock-frame{min-height:620px}
+}
+@media(min-width:1024px) and (max-width:1399px){
+  nav .nav-btn{padding-left:.55rem!important;padding-right:.55rem!important;font-size:11px!important}
+  nav .nav-btn i{margin-right:.35rem!important}
+}
+</style>
+
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen flex flex-col antialiased">
 <nav class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-50 transition-colors duration-300">
@@ -1071,6 +1115,7 @@ html:not(.dark) #theme-toggle:hover{
                 <button class="nav-btn" data-target="module-overview" data-color="blue"><i class="fa-solid fa-magnifying-glass-chart mr-1.5 sm:mr-2"></i>個股總覽</button>
                 <button class="nav-btn" data-target="module-checklist" data-color="cyan"><i class="fa-solid fa-clipboard-check mr-1.5 sm:mr-2"></i>進場查核</button>
                 <button class="nav-btn" data-target="module-report" data-color="indigo"><i class="fa-solid fa-file-lines mr-1.5 sm:mr-2"></i>法人報告</button>
+                <button class="nav-btn" data-target="module-jellystock" data-color="cyan" title="JellyStock 上市三大法人買賣超前100"><i class="fa-solid fa-ranking-star mr-1.5 sm:mr-2"></i>法人百大</button>
                 <button class="nav-btn" data-target="module-calculator" data-color="purple"><i class="fa-solid fa-calculator mr-1.5 sm:mr-2"></i>支撐壓力</button>
                 <button class="nav-btn" data-target="module-revenue" data-color="pink"><i class="fa-solid fa-money-bill-trend-up mr-1.5 sm:mr-2"></i>營收籌碼動能</button>
                 <button class="nav-btn" data-target="module-plan" data-color="green"><i class="fa-solid fa-chess-knight mr-1.5 sm:mr-2"></i>交易規劃</button>
@@ -1095,6 +1140,7 @@ html:not(.dark) #theme-toggle:hover{
     <button class="nav-btn-mobile active-blue" data-target="module-journal" data-color="blue" aria-label="策略日誌"><i class="fa-solid fa-book-journal-whills"></i><span>日誌</span></button>
     <button class="nav-btn-mobile" data-target="module-overview" data-color="blue" aria-label="個股總覽"><i class="fa-solid fa-magnifying-glass-chart"></i><span>總覽</span></button>
     <button class="nav-btn-mobile" data-target="module-report" data-color="indigo" aria-label="法人報告"><i class="fa-solid fa-file-lines"></i><span>報告</span></button>
+    <button class="nav-btn-mobile" data-target="module-jellystock" data-color="cyan" aria-label="法人百大"><i class="fa-solid fa-ranking-star"></i><span>百大</span></button>
     <button class="nav-btn-mobile" data-target="module-calculator" data-color="purple" aria-label="支撐壓力"><i class="fa-solid fa-calculator"></i><span>支撐</span></button>
     <button type="button" id="mobile-more-nav-btn" class="mobile-more-nav-btn sm:hidden" aria-label="開啟更多功能" aria-expanded="false"><i class="fa-solid fa-table-cells-large"></i><span>更多</span></button>
     <button class="nav-btn-mobile" data-target="module-checklist" data-color="cyan">查核</button>
@@ -1937,6 +1983,51 @@ html:not(.dark) #theme-toggle:hover{
             </div>
         </div>
     </div>
+
+    <!-- JellyStock 法人百大 -->
+    <div id="module-jellystock" class="tab-content">
+        <section class="card-panel overflow-hidden border-t-4 border-cyan-500">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-cyan-50 via-sky-50 to-blue-50 dark:from-cyan-950/30 dark:via-sky-950/20 dark:to-blue-950/20 px-3 py-3 sm:px-4">
+                <div class="min-w-0">
+                    <h2 class="flex items-center gap-2 font-black text-cyan-700 dark:text-cyan-300 text-base sm:text-lg">
+                        <span class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-cyan-100 dark:bg-cyan-900/50"><i class="fa-solid fa-ranking-star"></i></span>
+                        法人買賣超 TOP 100
+                    </h2>
+                    <p class="mt-1 text-[11px] sm:text-xs text-gray-500 dark:text-gray-400">內嵌 JellyStock「上市三大法人買賣超前100」，可直接在本系統查看。</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                    <button type="button" id="jellystock-reload-btn" class="h-9 px-3 rounded-lg border border-cyan-200 dark:border-cyan-800 bg-white dark:bg-gray-800 text-cyan-700 dark:text-cyan-300 text-xs font-black hover:bg-cyan-50 dark:hover:bg-cyan-900/30 transition active:scale-95">
+                        <i class="fa-solid fa-rotate-right mr-1.5"></i>重新整理
+                    </button>
+                    <a href="https://jellystockdata.com/stock_site/tools/twse_top100.html" target="_blank" rel="noopener noreferrer" class="h-9 px-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-xs font-black inline-flex items-center hover:bg-gray-200 dark:hover:bg-gray-700 transition active:scale-95">
+                        <i class="fa-solid fa-up-right-from-square mr-1.5"></i>另開原站
+                    </a>
+                </div>
+            </div>
+            <div class="jellystock-frame-wrap bg-white dark:bg-gray-950">
+                <div id="jellystock-loading" class="jellystock-loading">
+                    <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-cyan-100 dark:bg-cyan-900/40 text-cyan-600 dark:text-cyan-300"><i class="fa-solid fa-spinner fa-spin"></i></span>
+                    <div>
+                        <div class="font-black text-gray-700 dark:text-gray-200">正在載入 JellyStock…</div>
+                        <div class="mt-1 text-[11px] text-gray-400">第一次開啟時才會載入外部頁面。</div>
+                    </div>
+                </div>
+                <iframe
+                    id="jellystock-frame"
+                    title="JellyStock 上市三大法人買賣超前100"
+                    src="about:blank"
+                    data-src="https://jellystockdata.com/stock_site/tools/twse_top100.html"
+                    loading="lazy"
+                    referrerpolicy="strict-origin-when-cross-origin"
+                    allow="clipboard-read; clipboard-write"
+                ></iframe>
+            </div>
+            <div class="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 px-3 py-2 text-[10px] sm:text-[11px] text-gray-500 dark:text-gray-400">
+                <i class="fa-solid fa-circle-info mr-1"></i>若原站禁止被其他網站內嵌，瀏覽器可能顯示空白或阻擋訊息；可使用右上角「另開原站」。
+            </div>
+        </section>
+    </div>
+
 </main>
 
 <!-- 互動彈窗 -->
@@ -2082,6 +2173,7 @@ html:not(.dark) #theme-toggle:hover{
             <button type="button" data-mobile-more-target="module-revenue" class="min-h-[70px] rounded-xl border border-pink-200 dark:border-pink-900 bg-pink-50 dark:bg-pink-950/35 px-3 text-left text-pink-700 dark:text-pink-300"><i class="fa-solid fa-money-bill-trend-up mr-2"></i><span class="font-black">營收籌碼動能</span></button>
             <button type="button" data-mobile-more-target="module-plan" class="min-h-[70px] rounded-xl border border-emerald-200 dark:border-emerald-900 bg-emerald-50 dark:bg-emerald-950/35 px-3 text-left text-emerald-700 dark:text-emerald-300"><i class="fa-solid fa-chess-knight mr-2"></i><span class="font-black">交易規劃</span></button>
             <button type="button" data-mobile-more-target="module-favorites" class="min-h-[70px] rounded-xl border border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950/35 px-3 text-left text-amber-700 dark:text-amber-300"><i class="fa-solid fa-star mr-2"></i><span class="font-black">追蹤清單</span></button>
+            <button type="button" data-mobile-more-target="module-jellystock" class="min-h-[70px] rounded-xl border border-cyan-200 dark:border-cyan-900 bg-cyan-50 dark:bg-cyan-950/35 px-3 text-left text-cyan-700 dark:text-cyan-300"><i class="fa-solid fa-ranking-star mr-2"></i><span class="font-black">法人百大</span><span class="block mt-1 text-[10px] font-medium opacity-75">JellyStock</span></button>
         </div>
         <div class="border-t border-gray-100 dark:border-gray-800 pt-3">
             <button type="button" id="btn-mobile-admin-entry" class="w-full min-h-[48px] rounded-xl border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-sm font-black inline-flex items-center justify-center gap-2 shadow-sm active:scale-95" aria-label="進入管理者模式"><i class="fa-solid fa-lock" data-mobile-admin-icon></i><span data-mobile-admin-label>管理者登入</span></button>
@@ -4809,6 +4901,27 @@ document.addEventListener('DOMContentLoaded',async()=>{
     window.addEventListener('online',()=>performDirectCloudSync(false));
     // --- 跨裝置同步功能綁定結束 ---
 
+    const JELLYSTOCK_URL='https://jellystockdata.com/stock_site/tools/twse_top100.html';
+    const ensureJellyStockLoaded=(force=false)=>{
+        const frame=document.getElementById('jellystock-frame'),loading=document.getElementById('jellystock-loading');
+        if(!frame)return;
+        const loaded=frame.dataset.loaded==='1';
+        if(loaded&&!force)return;
+        loading?.classList.remove('is-hidden');
+        frame.dataset.loaded='1';
+        if(force){
+            frame.src='about:blank';
+            requestAnimationFrame(()=>setTimeout(()=>{frame.src=JELLYSTOCK_URL;},40));
+        }else{
+            frame.src=frame.dataset.src||JELLYSTOCK_URL;
+        }
+    };
+    document.getElementById('jellystock-frame')?.addEventListener('load',()=>{
+        const frame=document.getElementById('jellystock-frame');
+        if(frame?.src&&frame.src!=='about:blank')document.getElementById('jellystock-loading')?.classList.add('is-hidden');
+    });
+    document.getElementById('jellystock-reload-btn')?.addEventListener('click',()=>ensureJellyStockLoaded(true));
+
     // 初始化導航列按鈕事件 (修正"按下去沒反應"的關鍵區塊)
     document.querySelectorAll('.nav-btn, .nav-btn-mobile').forEach(btn=>{
         btn.addEventListener('click',(e)=>{
@@ -4816,7 +4929,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
             document.querySelectorAll('.nav-btn').forEach(b=>{b.className='nav-btn';if(b.dataset.target===t)b.classList.add(`active-${col}`);});
             document.querySelectorAll('.nav-btn-mobile').forEach(b=>{b.className='nav-btn-mobile';if(b.dataset.target===t)b.classList.add(`active-${col}`);});
             document.querySelectorAll('.tab-content').forEach(c=>c.classList.toggle('active',c.id===t));
-            if(t==='module-favorites')renderFavorites(); if(t==='module-journal')processAndRenderJournals(); if(t==='module-overview')renderStockOverview(); if(t==='module-revenue')renderRevenueRecords(); if(t==='module-report')renderReports(); if(t==='module-checklist'){ renderChecklists(); renderChkCheckboxGrid(); }
+            if(t==='module-favorites')renderFavorites(); if(t==='module-journal')processAndRenderJournals(); if(t==='module-overview')renderStockOverview(); if(t==='module-revenue')renderRevenueRecords(); if(t==='module-report')renderReports(); if(t==='module-jellystock')ensureJellyStockLoaded(); if(t==='module-checklist'){ renderChecklists(); renderChkCheckboxGrid(); }
         });
     });
 
@@ -5088,7 +5201,7 @@ setChkDirection('long');
     document.querySelector(`.nav-btn[data-target="${target}"]`)?.click();window.scrollTo({top:0,behavior:'smooth'});
   }
 
-  const mobileMoreModules=new Set(['module-checklist','module-revenue','module-plan','module-favorites']);
+  const mobileMoreModules=new Set(['module-checklist','module-revenue','module-plan','module-favorites','module-jellystock']);
   const mobileFabConfig={
     'module-journal':{label:'新增條件',focusId:'j-code',scrollSelector:'#journal-add-section',admin:true},
     'module-checklist':{label:'新增查核',focusId:'chk-code',scrollSelector:'#module-checklist .card-panel:first-child'},
