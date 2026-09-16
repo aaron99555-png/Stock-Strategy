@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="178">
+<meta name="app-version" content="180">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -1099,6 +1099,89 @@ html:not(.dark) #theme-toggle:hover{
   body.jellystock-fullscreen-open #jellystock-toolbar button{flex:0 0 auto!important}
 }
 @media(min-width:1024px) and (max-width:1399px){nav .nav-btn{padding-left:.55rem!important;padding-right:.55rem!important;font-size:11px!important}nav .nav-btn i{margin-right:.35rem!important}}
+</style>
+
+
+<style id="top-nav-fix-v180">
+/* v180：修正頂部模組導覽按鈕文字被遮住、過度擠壓的問題 */
+@media (min-width: 768px){
+  .desktop-nav-scroll,
+  .top-nav-scroll,
+  nav .nav-scroll-wrap{
+    overflow-x:auto;
+    overflow-y:visible !important;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:thin;
+  }
+
+  nav .nav-btn{
+    min-height:94px !important;
+    height:auto !important;
+    padding:12px 10px 14px !important;
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:flex-start !important;
+    gap:6px !important;
+    line-height:1.2 !important;
+    overflow:visible !important;
+    white-space:normal !important;
+    vertical-align:top;
+  }
+
+  nav .nav-btn i{
+    display:block !important;
+    margin:0 !important;
+    font-size:16px !important;
+    line-height:1 !important;
+    flex:0 0 auto;
+  }
+
+  nav .nav-btn span,
+  nav .nav-btn .label,
+  nav .nav-btn .nav-label{
+    display:block !important;
+    white-space:normal !important;
+    word-break:keep-all !important;
+    overflow:visible !important;
+    text-overflow:clip !important;
+    line-height:1.25 !important;
+    text-align:center !important;
+  }
+
+  /* 若按鈕內沒有 span，直接讓文字容器可顯示完整 */
+  nav .nav-btn{
+    writing-mode:horizontal-tb !important;
+  }
+}
+
+/* 1024px 左右最容易被擠壓，這裡稍微縮字但放寬高度 */
+@media (min-width: 768px) and (max-width: 1279px){
+  nav .nav-btn{
+    min-width:72px !important;
+    padding-left:8px !important;
+    padding-right:8px !important;
+    font-size:11px !important;
+  }
+}
+
+/* 大桌機可再舒服一點 */
+@media (min-width: 1280px){
+  nav .nav-btn{
+    min-width:76px !important;
+    font-size:12px !important;
+  }
+}
+
+/* 若頁面有 logo + nav 同列，避免整列高度裁切 */
+header, .top-header, .app-header{
+  overflow:visible !important;
+}
+
+/* 常見容器也一併放開裁切 */
+nav, .top-nav, .desktop-nav, .module-nav{
+  overflow:visible !important;
+}
 </style>
 
 </head>
@@ -3449,11 +3532,12 @@ const isJournalTradingDate=(dateString,customHolidays=state.customMarketHolidays
     const holidaySet=customHolidays instanceof Set?customHolidays:new Set(normalizeCustomMarketHolidays(customHolidays));
     return weekday!==0&&weekday!==6&&!holidaySet.has(dateString);
 };
+// v179：策略訊號雷達「基準日」固定預設為當日。
+// 若當日沒有資料，執行比對時仍沿用原本邏輯自動往前尋找最近有效紀錄日。
 const initStreakBaseDate=()=>{
-    const input=document.getElementById('streak-base-date');if(!input||input.value)return;
-    const holidays=new Set(normalizeCustomMarketHolidays(state.customMarketHolidays));
-    const latest=[...new Set((state.journals||[]).map(item=>item.date).filter(date=>isJournalTradingDate(date,holidays)))].sort().reverse()[0];
-    input.value=latest||getToday();
+    const input=document.getElementById('streak-base-date');
+    if(!input||input.value)return;
+    input.value=getToday();
 };
 const STREAK_PANEL_STORAGE_KEY='ryan_streak_panel_collapsed',STREAK_PANEL_PIN_KEY='ryan_streak_panel_pinned_v1';
 let streakPanelPinned=false;
@@ -5058,7 +5142,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
     
     const tD=getToday();
     if(!state.filters.start&&!state.filters.end){state.filters.start=tD;state.filters.end=tD;}
-    document.getElementById('filter-start').value=state.filters.start||''; document.getElementById('filter-end').value=state.filters.end||''; document.getElementById('filter-start-fav').value=state.favFilters.start||''; document.getElementById('filter-end-fav').value=state.favFilters.end||''; document.getElementById('r-month').value=getCurrentMonth(); document.getElementById('rep-date').value=tD; document.getElementById('p-date').value=tD; document.getElementById('chk-date').value=tD; document.getElementById('filter-rep-start').value=state.reportFilters.start||''; document.getElementById('filter-rep-end').value=state.reportFilters.end||''; document.getElementById('filter-rep-code').value=state.reportFilters.code||''; document.getElementById('j-date').value=tD;
+    document.getElementById('filter-start').value=state.filters.start||''; document.getElementById('filter-end').value=state.filters.end||''; document.getElementById('filter-start-fav').value=state.favFilters.start||''; document.getElementById('filter-end-fav').value=state.favFilters.end||''; document.getElementById('r-month').value=getPreviousMonthValue(); document.getElementById('rep-date').value=tD; document.getElementById('p-date').value=tD; document.getElementById('chk-date').value=tD; document.getElementById('filter-rep-start').value=state.reportFilters.start||''; document.getElementById('filter-rep-end').value=state.reportFilters.end||''; document.getElementById('filter-rep-code').value=state.reportFilters.code||''; document.getElementById('j-date').value=tD;
     document.getElementById('filter-futures').checked=!!state.filters.futuresOnly;document.getElementById('filter-exclude-negative-growth').checked=!!state.filters.excludeNegativeGrowth;document.getElementById('filter-revenue-high').checked=!!state.filters.revenueHigh;document.getElementById('filter-large-holder').checked=!!state.filters.largeHolder14;document.getElementById('filter-high-turnover-revenue').checked=!!state.filters.highTurnoverRevenue;document.getElementById('filter-score').value=String(state.filters.minScore||0);
     document.getElementById('filter-journal-status').value=state.filters.status||'all';document.getElementById('filter-journal-quick').value=state.filters.quick||'all';
     document.getElementById('filter-futures-fav').checked=!!state.favFilters.futuresOnly;document.getElementById('filter-exclude-negative-growth-fav').checked=!!state.favFilters.excludeNegativeGrowth;document.getElementById('filter-revenue-high-fav').checked=!!state.favFilters.revenueHigh;document.getElementById('filter-large-holder-fav').checked=!!state.favFilters.largeHolder14;document.getElementById('filter-high-turnover-revenue-fav').checked=!!state.favFilters.highTurnoverRevenue;document.getElementById('filter-score-fav').value=String(state.favFilters.minScore||0);
@@ -5399,6 +5483,33 @@ setChkDirection('long');
   }
 
   document.addEventListener('DOMContentLoaded',()=>{
+    // v180：修正頂部導覽按鈕純文字內容易被裁切，統一包成 label span 以便換行排版。
+    document.querySelectorAll('nav .nav-btn').forEach(btn=>{
+        const hasElementLabel = btn.querySelector('span,.label,.nav-label');
+        if(!hasElementLabel){
+            const icon = btn.querySelector('i');
+            const textNodes = [...btn.childNodes].filter(n=>n.nodeType===3 && n.textContent.trim());
+            if(textNodes.length){
+                const label = document.createElement('span');
+                label.className = 'nav-label';
+                label.textContent = textNodes.map(n=>n.textContent.trim()).join(' ');
+                textNodes.forEach(n=>n.remove());
+                btn.appendChild(label);
+            }else if(icon){
+                const raw = btn.textContent.replace(icon.textContent||'','').trim();
+                if(raw){
+                    btn.innerHTML = '';
+                    btn.appendChild(icon);
+                    const label = document.createElement('span');
+                    label.className = 'nav-label';
+                    label.textContent = raw;
+                    btn.appendChild(label);
+                }
+            }
+        }
+    });
+
+
     ensureMobileActionBars();
     initMobileCardTables();
     updateMobileViewControls();
