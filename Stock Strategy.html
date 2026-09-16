@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="170">
+<meta name="app-version" content="171">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -2348,7 +2348,7 @@ const TAG_CATEGORIES = [
     {title: "🌟 特別關注", theme: "rose", tags: ["特別追蹤", "非凡重點", "總編概念股"]},
     {title: "📊 基本面佳", theme: "blue", tags: ["多頭營收創高", "赤兔馬", "千里馬"]},
     {title: "🔥 動能與型態", theme: "amber", tags: ["一陽指", "金包銀", "披荊斬棘", "破繭而出", "月來越好", "季不可失", "守株待兔", "缺口", "阿婆散步", "多排破上關"]},
-    {title: "💰 量價與籌碼", theme: "purple", tags: ["量價齊揚", "高成交值", "法人加持", "1日籌碼集中度", "5日籌碼集中", "20日籌碼集中"]},
+    {title: "💰 量價與籌碼", theme: "purple", tags: ["量價齊揚", "高成交值", "法人加持", "外資+投信", "外資+自營", "投信+自營", "三法聯手", "1日籌碼集中度", "5日籌碼集中", "20日籌碼集中"]},
     {title: "📈 技術指標", theme: "teal", tags: ["OBV突破", "MACD突破", "KD金叉"]},
     {title: "🎯 分析師專區｜漁夫林睿閎投資週報", theme: "purple", tags: ["黑卡會員", "尊耀會員", "頂峰會員"]}
 ];
@@ -5729,6 +5729,23 @@ const SESSION={
       analystTags.forEach(function(tag){
         if(!seen.has(tag)){
           analystCategory.tags.push(tag);
+          seen.add(tag);
+          changed=true;
+        }
+      });
+
+      // v171：既有使用者自動補上「量價與籌碼」的法人聯手標籤。
+      var chipCategoryTitle='💰 量價與籌碼';
+      var chipAllianceTags=['外資+投信','外資+自營','投信+自營','三法聯手'];
+      var chipCategory=normalizedCategories.find(function(category){return String(category.title||'')===chipCategoryTitle;});
+      if(!chipCategory){
+        chipCategory={title:chipCategoryTitle,theme:'purple',tags:[]};
+        normalizedCategories.push(chipCategory);
+        changed=true;
+      }
+      chipAllianceTags.forEach(function(tag){
+        if(!seen.has(tag)){
+          chipCategory.tags.push(tag);
           seen.add(tag);
           changed=true;
         }
