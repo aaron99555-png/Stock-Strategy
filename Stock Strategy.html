@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="177">
+<meta name="app-version" content="178">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -2602,6 +2602,15 @@ const getEpsInfo=(c,j)=>{const e=state.epsData[c]||{};return{eps2025:e.eps2025??
 const NON_STRATEGY_COPY_TAGS=new Set(['特別追蹤','非凡重點','總編概念股']);
 const ANALYST_SECTION_TAGS=new Set(['黑卡會員','尊耀會員','頂峰會員']);
 const NON_SCORE_TAGS=new Set([...NON_STRATEGY_COPY_TAGS,...ANALYST_SECTION_TAGS]);
+// v178：法人聯手標籤採互斥加分。
+// 三法聯手 +2 且優先；若沒有三法聯手，另外三種法人雙聯手不論同時出現幾個，最多只 +1。
+const INSTITUTION_PAIR_SCORE_TAGS=new Set(['外資+投信','外資+自營','投信+自營']);
+const INSTITUTION_TRIPLE_SCORE_TAG='三法聯手';
+const getInstitutionAllianceScore=tags=>{
+    const normalized=Array.from(tags||[]).map(tag=>normalizeStrategyTagName(tag));
+    if(normalized.includes(INSTITUTION_TRIPLE_SCORE_TAG))return 2;
+    return normalized.some(tag=>INSTITUTION_PAIR_SCORE_TAGS.has(tag))?1:0;
+};
 const normalizeMomentumRecordType=record=>{const type=String(record?.type||'');if(type==='largeHolder')return 'largeHolder';if(type==='highTurnoverRevenue')return 'highTurnoverRevenue';return 'revenue';};
 const getMomentumTypeLabel=type=>type==='largeHolder'?'千張大戶增加':type==='highTurnoverRevenue'?'高成交值高營收':'營收創高';
 // v158：策略日誌分數追加兩個基本面／籌碼加分條件。
@@ -2621,7 +2630,14 @@ const hasRecentRevenueHigh=(code,referenceDate=getToday(),months=1)=>{
 };
 const getScore=(t,e,code='',referenceDate=getToday())=>{
     let s=0;
-    if(t)s=t.filter(x=>!NON_SCORE_TAGS.has(x)).length;
+    const scoreTags=Array.from(t||[]).map(tag=>normalizeStrategyTagName(tag));
+    // 一般策略標籤維持每個 +1，但法人聯手 4 個標籤交由下方互斥規則處理，避免重複計分。
+    s+=scoreTags.filter(tag=>
+        !NON_SCORE_TAGS.has(tag)&&
+        tag!==INSTITUTION_TRIPLE_SCORE_TAG&&
+        !INSTITUTION_PAIR_SCORE_TAGS.has(tag)
+    ).length;
+    s+=getInstitutionAllianceScore(scoreTags);
     const g=parseFloat(e?.epsGrowth),e26=parseFloat(e?.eps2026);
     if(!isNaN(g)&&g>0&&!isNaN(e26)&&e26>0)s+=1;
     if(code&&hasRecentRevenueHigh(code,referenceDate,1))s+=1;
