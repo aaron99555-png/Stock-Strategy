@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="176">
+<meta name="app-version" content="177">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -4705,9 +4705,8 @@ document.querySelectorAll('.btn-copy').forEach(b=>{b.addEventListener('click',e=
 
         const removalComparison=getTwoHorseRemovalComparison(d,cf,iF);
         if(removalComparison.removed.length){
-            const dateLabel=removalComparison.dates.map(date=>date.replace(/-/g,'/')).join('、');
             const removalLines=removalComparison.removed.map(item=>`${item.code} ${item.name||''} -剔除${item.horseTags?.length?`（${item.horseTags.join('、')}）`:''}`.trim());
-            sections.push(`✂️ [剔除｜本次未出現${removalComparison.baseDate?` ${removalComparison.baseDate.replace(/-/g,'/')}`:''}${dateLabel?`｜前2次 ${dateLabel}`:''}] (共 ${removalComparison.removed.length} 檔)\n${removalLines.join('\n')}`);
+            sections.push(`✂️ [剔除] (共 ${removalComparison.removed.length} 檔)\n${removalLines.join('\n')}`);
         }
         if(!sections.length)return showToast('目前與前2次皆沒有赤兔馬或千里馬資料','error');
         const tx=`| ${ds} 兩匹馬 |\n\n${sections.join('\n\n')}`;
