@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="175">
+<meta name="app-version" content="176">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -1355,7 +1355,7 @@ html:not(.dark) #theme-toggle:hover{
                     <button class="flex-shrink-0 btn-copy-base bg-sky-50 dark:bg-sky-900/40 hover:bg-sky-600 border-sky-200 dark:border-sky-700/50 text-sky-700 dark:text-sky-200 btn-copy" data-mode="futures_score">股期分數</button>
                     <button class="flex-shrink-0 btn-copy-base bg-orange-50 dark:bg-orange-900/40 hover:bg-orange-600 border-orange-200 dark:border-orange-700/50 text-orange-700 dark:text-orange-200 btn-copy" data-mode="chip">籌碼集中</button>
                     <button class="flex-shrink-0 btn-copy-base bg-green-50 dark:bg-green-900/40 hover:bg-green-600 border-green-200 dark:border-green-700/50 text-green-700 dark:text-green-200 btn-copy" data-mode="eps">EPS</button>
-                    <button class="flex-shrink-0 btn-copy-base bg-amber-50 dark:bg-amber-900/40 hover:bg-amber-600 border-amber-200 dark:border-amber-700/50 text-amber-700 dark:text-amber-200 btn-copy" data-mode="horses" title="複製赤兔馬與千里馬；🆕為新進榜，🔁為跨策略重複；比對本次實際兩匹馬名單；前2次任一次曾出現、但本次完全沒出現才標示 -剔除">🐎🏇 兩匹馬</button>
+                    <button class="flex-shrink-0 btn-copy-base bg-amber-50 dark:bg-amber-900/40 hover:bg-amber-600 border-amber-200 dark:border-amber-700/50 text-amber-700 dark:text-amber-200 btn-copy" data-mode="horses" title="複製赤兔馬與千里馬；🆕為新進榜，🔁為跨策略重複；比對本次實際兩匹馬名單；前2次任一次曾出現、但本次完全沒出現才標示 -剔除，並註明原屬赤兔馬／千里馬">🐎🏇 兩匹馬</button>
                     <button class="flex-shrink-0 btn-copy-base bg-rose-50 dark:bg-rose-900/40 hover:bg-rose-600 border-rose-200 dark:border-rose-700/50 text-rose-700 dark:text-rose-200 btn-copy" data-mode="feifan">非凡重點</button>
                     </div>
                     <span id="journal-stock-count" class="copy-stock-count inline-flex items-center gap-1.5 rounded-full bg-blue-50 dark:bg-blue-900/35 border border-blue-200 dark:border-blue-800/70 px-3 py-1.5 text-xs sm:text-sm font-bold text-blue-600 dark:text-blue-300 shadow-sm whitespace-nowrap"><i class="fa-solid fa-chart-simple"></i>目前顯示 0 檔股票</span>
@@ -1950,7 +1950,7 @@ html:not(.dark) #theme-toggle:hover{
                     <button class="flex-shrink-0 btn-copy-base bg-sky-50 dark:bg-sky-900/40 hover:bg-sky-600 border-sky-200 dark:border-sky-700/50 text-sky-700 dark:text-sky-200 btn-copy" data-mode="futures_score">股期分數</button>
                     <button class="flex-shrink-0 btn-copy-base bg-orange-50 dark:bg-orange-900/40 hover:bg-orange-600 border-orange-200 dark:border-orange-700/50 text-orange-700 dark:text-orange-200 btn-copy" data-mode="chip">籌碼集中</button>
                     <button class="flex-shrink-0 btn-copy-base bg-green-50 dark:bg-green-900/40 hover:bg-green-600 border-green-200 dark:border-green-700/50 text-green-700 dark:text-green-200 btn-copy" data-mode="eps">EPS</button>
-                    <button class="flex-shrink-0 btn-copy-base bg-amber-50 dark:bg-amber-900/40 hover:bg-amber-600 border-amber-200 dark:border-amber-700/50 text-amber-700 dark:text-amber-200 btn-copy" data-mode="horses" title="複製赤兔馬與千里馬；🆕為新進榜，🔁為跨策略重複；比對本次實際兩匹馬名單；前2次任一次曾出現、但本次完全沒出現才標示 -剔除">🐎🏇 兩匹馬</button>
+                    <button class="flex-shrink-0 btn-copy-base bg-amber-50 dark:bg-amber-900/40 hover:bg-amber-600 border-amber-200 dark:border-amber-700/50 text-amber-700 dark:text-amber-200 btn-copy" data-mode="horses" title="複製赤兔馬與千里馬；🆕為新進榜，🔁為跨策略重複；比對本次實際兩匹馬名單；前2次任一次曾出現、但本次完全沒出現才標示 -剔除，並註明原屬赤兔馬／千里馬">🐎🏇 兩匹馬</button>
                     <button class="flex-shrink-0 btn-copy-base bg-rose-50 dark:bg-rose-900/40 hover:bg-rose-600 border-rose-200 dark:border-rose-700/50 text-rose-700 dark:text-rose-200 btn-copy" data-mode="feifan">非凡重點</button>
                     </div>
                     <span id="fav-stock-count" class="copy-stock-count inline-flex items-center gap-1.5 rounded-full bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-800/70 px-3 py-1.5 text-xs sm:text-sm font-bold text-yellow-600 dark:text-yellow-300 shadow-sm whitespace-nowrap"><i class="fa-solid fa-chart-simple"></i>目前顯示 0 檔股票</span>
@@ -4607,10 +4607,8 @@ const getTwoHorseRemovalComparison=(currentItems,filterState,isFavorite=false)=>
     const horseTags=['赤兔馬','千里馬'];
     const hasHorse=journal=>horseTags.some(tag=>journalHasStrategyTag(journal,tag));
     const normalizeCode=journal=>String(journal?.code||'').trim();
+    const getHorseTags=journal=>horseTags.filter(tag=>journalHasStrategyTag(journal,tag));
 
-    // v175：先明確決定「本次」是哪一天。
-    // 若目前複製結果本身有兩匹馬資料，以其中最新日期為本次；
-    // 若本次完全沒有兩匹馬，才使用篩選結束日判斷「本次全數消失」。
     const visibleHorseDates=(currentItems||[])
         .filter(hasHorse)
         .map(j=>normalizeHorseJournalDate(j.date))
@@ -4621,8 +4619,6 @@ const getTwoHorseRemovalComparison=(currentItems,filterState,isFavorite=false)=>
     const baseDate=visibleHorseDates[visibleHorseDates.length-1]||filterEnd||filterStart||normalizeHorseJournalDate(getToday());
     if(!baseDate)return{baseDate:'',dates:[],removed:[]};
 
-    // 「本次名單」固定抓 baseDate 當天真正存在的赤兔馬＋千里馬，
-    // 不再受其他篩選條件干擾，避免目前有出現卻被誤標為剔除。
     const currentRows=(state.journals||[]).filter(j=>{
         if(normalizeHorseJournalDate(j.date)!==baseDate||!hasHorse(j))return false;
         if(isFavorite&&!j.isFavorite)return false;
@@ -4630,7 +4626,6 @@ const getTwoHorseRemovalComparison=(currentItems,filterState,isFavorite=false)=>
     });
     const currentCodes=new Set(currentRows.map(normalizeCode).filter(Boolean));
 
-    // 找 baseDate 前「最近兩個實際有兩匹馬資料的日期」。
     const priorDates=[...new Set((state.journals||[])
         .filter(j=>hasHorse(j)&&(!isFavorite||j.isFavorite))
         .map(j=>normalizeHorseJournalDate(j.date))
@@ -4646,20 +4641,29 @@ const getTwoHorseRemovalComparison=(currentItems,filterState,isFavorite=false)=>
             .forEach(j=>{
                 const code=normalizeCode(j);
                 if(!code)return;
+                const matchedHorseTags=getHorseTags(j);
                 const existing=previousByCode.get(code);
                 if(!existing){
-                    previousByCode.set(code,{code,name:String(j.name||'').trim(),lastDate:date});
-                }else if(!existing.name&&j.name){
-                    existing.name=String(j.name||'').trim();
+                    previousByCode.set(code,{
+                        code,
+                        name:String(j.name||'').trim(),
+                        lastDate:date,
+                        horseTags:new Set(matchedHorseTags)
+                    });
+                }else{
+                    if(!existing.name&&j.name)existing.name=String(j.name||'').trim();
+                    matchedHorseTags.forEach(tag=>existing.horseTags.add(tag));
                 }
             });
     });
 
-    // 只有「前兩次任一次曾出現」而「本次完全沒出現」的股票才列為剔除。
-    // 本次只要仍是赤兔馬或千里馬其中之一，就絕對不會被標剔除。
     const removed=[...previousByCode.values()]
         .filter(item=>item.code&&!currentCodes.has(item.code))
-        .map(item=>({...item,name:getCanonicalStockName(item.code,item.name)||item.name}))
+        .map(item=>({
+            ...item,
+            name:getCanonicalStockName(item.code,item.name)||item.name,
+            horseTags:[...item.horseTags]
+        }))
         .sort((a,b)=>String(a.code).localeCompare(String(b.code),'zh-Hant',{numeric:true}));
 
     return{baseDate,dates:priorDates,removed};
@@ -4702,7 +4706,7 @@ document.querySelectorAll('.btn-copy').forEach(b=>{b.addEventListener('click',e=
         const removalComparison=getTwoHorseRemovalComparison(d,cf,iF);
         if(removalComparison.removed.length){
             const dateLabel=removalComparison.dates.map(date=>date.replace(/-/g,'/')).join('、');
-            const removalLines=removalComparison.removed.map(item=>`${item.code} ${item.name||''} -剔除`.trim());
+            const removalLines=removalComparison.removed.map(item=>`${item.code} ${item.name||''} -剔除${item.horseTags?.length?`（${item.horseTags.join('、')}）`:''}`.trim());
             sections.push(`✂️ [剔除｜本次未出現${removalComparison.baseDate?` ${removalComparison.baseDate.replace(/-/g,'/')}`:''}${dateLabel?`｜前2次 ${dateLabel}`:''}] (共 ${removalComparison.removed.length} 檔)\n${removalLines.join('\n')}`);
         }
         if(!sections.length)return showToast('目前與前2次皆沒有赤兔馬或千里馬資料','error');
