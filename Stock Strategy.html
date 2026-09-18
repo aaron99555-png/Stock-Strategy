@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="184">
+<meta name="app-version" content="185">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -1405,11 +1405,11 @@ nav, .top-nav, .desktop-nav, .module-nav{
                         <input type="checkbox" id="filter-revenue-high" class="filter-revenue-high rounded border-gray-300 dark:border-gray-600 text-pink-500 focus:ring-pink-500 w-3.5 h-3.5 sm:w-4 sm:h-4">
                         <span class="text-xs sm:text-sm text-pink-600 dark:text-pink-400 font-medium whitespace-nowrap">營收創高</span>
                     </label>
-                    <label title="不限制天數：只要日誌日期以前最近一次有千張大戶增加紀錄即符合" class="flex items-center gap-1.5 cursor-pointer">
-                            <input type="checkbox" id="filter-large-holder" class="filter-large-holder rounded border-gray-300 dark:border-gray-600 text-violet-500 focus:ring-violet-500 w-3.5 h-3.5 sm:w-4 sm:h-4">
-                        <span class="text-xs sm:text-sm text-violet-600 dark:text-violet-400 font-medium whitespace-nowrap">最近千張大戶增</span>
+                    <label title="不限制天數：只要日誌日期以前最近一次有千張大戶增加紀錄即符合" class="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white dark:bg-gray-900/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-700/50 transition hover:bg-gray-50 dark:hover:bg-gray-800">
+                        <input type="checkbox" id="filter-large-holder" class="filter-large-holder rounded border-gray-300 dark:border-gray-600 text-violet-500 focus:ring-violet-500 w-3.5 h-3.5 sm:w-4 sm:h-4">
+                        <span class="text-xs sm:text-sm text-violet-600 dark:text-violet-400 font-medium whitespace-nowrap">千張大戶增</span>
                     </label>
-                    <label title="連結籌碼動能：日誌日期以前曾出現高成交值高營收即符合" class="flex items-center gap-1.5 cursor-pointer">
+                    <label title="連結籌碼動能：日誌日期以前曾出現高成交值高營收即符合" class="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white dark:bg-gray-900/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-700/50 transition hover:bg-gray-50 dark:hover:bg-gray-800">
                         <input type="checkbox" id="filter-high-turnover-revenue" class="filter-high-turnover-revenue rounded border-gray-300 dark:border-gray-600 text-amber-500 focus:ring-amber-500 w-3.5 h-3.5 sm:w-4 sm:h-4">
                         <span class="text-xs sm:text-sm text-amber-600 dark:text-amber-400 font-medium whitespace-nowrap">高成交值高營收</span>
                     </label>
@@ -2017,7 +2017,7 @@ nav, .top-nav, .desktop-nav, .module-nav{
                     </label>
                     <label class="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white dark:bg-gray-900/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-700/50 transition hover:bg-gray-50 dark:hover:bg-gray-800">
                         <input type="checkbox" id="filter-large-holder-fav" class="filter-large-holder rounded border-gray-300 dark:border-gray-600 text-violet-500 focus:ring-violet-500 w-3.5 h-3.5 sm:w-4 sm:h-4">
-                        <span class="text-xs sm:text-sm text-violet-600 dark:text-violet-400 font-medium whitespace-nowrap">最近千張大戶增</span>
+                        <span class="text-xs sm:text-sm text-violet-600 dark:text-violet-400 font-medium whitespace-nowrap">千張大戶增</span>
                     </label>
                     <label class="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white dark:bg-gray-900/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-700/50 transition hover:bg-gray-50 dark:hover:bg-gray-800" title="連結籌碼動能：日誌日期以前曾出現高成交值高營收即符合">
                         <input type="checkbox" id="filter-high-turnover-revenue-fav" class="filter-high-turnover-revenue rounded border-gray-300 dark:border-gray-600 text-amber-500 focus:ring-amber-500 w-3.5 h-3.5 sm:w-4 sm:h-4">
@@ -3536,7 +3536,7 @@ const renderJournalActiveFilterChips=()=>{
     if(f.futuresOnly)items.push(filterChipHtml('僅含股期','futuresOnly','blue'));
     if(f.excludeNegativeGrowth)items.push(filterChipHtml('排除負成長','excludeNegativeGrowth','emerald'));
     if(f.revenueHigh)items.push(filterChipHtml('營收創高','revenueHigh','pink'));
-    if(f.largeHolder14)items.push(filterChipHtml('最近一次千張大戶增','largeHolder14','violet'));if(f.highTurnoverRevenue)items.push(filterChipHtml('高成交值高營收','highTurnoverRevenue','amber'));
+    if(f.largeHolder14)items.push(filterChipHtml('千張大戶增','largeHolder14','violet'));if(f.highTurnoverRevenue)items.push(filterChipHtml('高成交值高營收','highTurnoverRevenue','amber'));
     if(Number(f.minScore||0)>0)items.push(filterChipHtml(`策略分數 ≥ ${f.minScore}`,'minScore','amber'));
     if(f.status&&f.status!=='all')items.push(filterChipHtml(`狀態：${f.status}`,'status','slate'));
     if(f.quick&&f.quick!=='all')items.push(filterChipHtml(`快速：${f.quick}`,'quick','slate'));
