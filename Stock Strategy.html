@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="189">
+<meta name="app-version" content="190">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -2839,11 +2839,22 @@ const getMomentumMetrics=(code,referenceDate=getToday())=>{
     momentumMetricsCache.set(cacheKey,result);
     return result;
 };
+// v190：強度排行納入法人籌碼聯手分數。
+// 規則沿用策略日誌：三法聯手 +2 優先；若無三法聯手，外資+投信／外資+自營／投信+自營最多只 +1。
+const getStrengthInstitutionChipScore=recentJournals=>{
+    const tags=(recentJournals||[]).flatMap(j=>Array.isArray(j.tags)?j.tags:[]).map(normalizeStrategyTagName);
+    if(tags.includes(INSTITUTION_TRIPLE_SCORE_TAG))return 2;
+    return tags.some(tag=>INSTITUTION_PAIR_SCORE_TAGS.has(tag))?1:0;
+};
+
 const getStockStrengthMetrics=(code,referenceDate=getToday())=>{
     const c=String(code||''),cacheKey=`${analysisCacheVersion}|${c}|${referenceDate}`;
     if(stockStrengthCache.has(cacheKey))return stockStrengthCache.get(cacheKey);
     const m=getMomentumMetrics(c,referenceDate),journals=(state.journals||[]).filter(j=>String(j.code)===c),recent14=journals.filter(j=>{const d=dayDiffISO(j.date,referenceDate);return d!==null&&d>=0&&d<14;}),recent7=recent14.filter(j=>dayDiffISO(j.date,referenceDate)<7),previous7=recent14.filter(j=>{const d=dayDiffISO(j.date,referenceDate);return d>=7&&d<14;}),uniqueTags=new Set(recent14.flatMap(j=>j.tags||[]).filter(t=>!NON_STRATEGY_COPY_TAGS.has(t))),eps=getEpsInfo(c,journals[0]||{});
-    const strategyScore=Math.min(20,recent14.length*4)+Math.min(10,uniqueTags.size*2),fundamentalScore=(m.hasReport?5:0)+((Number(eps.epsGrowth)>0)?10:0)+(Number(eps.targetPrice)>0?5:0),score=Math.min(100,Math.round(m.score*.5+strategyScore+fundamentalScore));
+    const strategyScore=Math.min(20,recent14.length*4)+Math.min(10,uniqueTags.size*2);
+    const fundamentalScore=(m.hasReport?5:0)+((Number(eps.epsGrowth)>0)?10:0)+(Number(eps.targetPrice)>0?5:0);
+    const institutionChipScore=getStrengthInstitutionChipScore(recent14);
+    const score=Math.min(100,Math.round(m.score*.5+strategyScore+fundamentalScore+institutionChipScore));
     const grade=score>=85?'S':score>=70?'A':score>=55?'B':'C',accelerating=recent7.length>previous7.length&&recent7.length>=2;
     let lifecycle='觀察',icon='⚪';
     if(m.holderInterrupted){lifecycle='轉弱';icon='⚠️';}
@@ -2852,11 +2863,11 @@ const getStockStrengthMetrics=(code,referenceDate=getToday())=>{
     else if(accelerating||recent14.length>=2||m.holderStreak>=2||m.revenueStreak>=2){lifecycle='升溫';icon='🔥';}
     else if(recent14.length===1||m.firstRevenue||m.firstHolder){lifecycle='萌芽';icon='🆕';}
     else if(journals.length&&recent14.length===0){lifecycle='降溫';icon='🟡';}
-    const result={score,grade,lifecycle,icon,accelerating,recent14:recent14.length,recent7:recent7.length,previous7:previous7.length,uniqueTags:uniqueTags.size,momentum:m,eps};
+    const result={score,grade,lifecycle,icon,accelerating,recent14:recent14.length,recent7:recent7.length,previous7:previous7.length,uniqueTags:uniqueTags.size,momentum:m,eps,institutionChipScore};
     stockStrengthCache.set(cacheKey,result);
     return result;
 };
-const renderStockStrengthBadges=(code,referenceDate=getToday())=>{const x=getStockStrengthMetrics(code,referenceDate),gradeClass=x.grade==='S'?'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300':x.grade==='A'?'bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300':x.grade==='B'?'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300':'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300';return`<span class="inline-flex rounded-md ${gradeClass} px-1.5 py-0.5 text-[10px] font-black mr-1 mb-1">${x.grade}級 ${x.score}</span><span class="inline-flex rounded-md bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 px-1.5 py-0.5 text-[10px] font-black mr-1 mb-1">${x.icon}${x.lifecycle}</span>${x.accelerating?'<span class="inline-flex rounded-md bg-rose-100 dark:bg-rose-900/40 text-rose-700 dark:text-rose-300 px-1.5 py-0.5 text-[10px] font-black mr-1 mb-1">↗訊號加速</span>':''}`;};
+const renderStockStrengthBadges=(code,referenceDate=getToday())=>{const x=getStockStrengthMetrics(code,referenceDate),gradeClass=x.grade==='S'?'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300':x.grade==='A'?'bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300':x.grade==='B'?'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300':'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300',chipBadge=x.institutionChipScore?`<span class="inline-flex rounded-md bg-cyan-100 dark:bg-cyan-900/40 text-cyan-700 dark:text-cyan-300 px-1.5 py-0.5 text-[10px] font-black mr-1 mb-1" title="法人聯手籌碼加分">籌碼 +${x.institutionChipScore}</span>`:'';return`<span class="inline-flex rounded-md ${gradeClass} px-1.5 py-0.5 text-[10px] font-black mr-1 mb-1">${x.grade}級 ${x.score}</span>${chipBadge}<span class="inline-flex rounded-md bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 px-1.5 py-0.5 text-[10px] font-black mr-1 mb-1">${x.icon}${x.lifecycle}</span>${x.accelerating?'<span class="inline-flex rounded-md bg-rose-100 dark:bg-rose-900/40 text-rose-700 dark:text-rose-300 px-1.5 py-0.5 text-[10px] font-black mr-1 mb-1">↗訊號加速</span>':''}`;};
 const renderWarRoom=()=>{
     const stats=document.getElementById('war-room-stats'),ranking=document.getElementById('war-room-ranking'),dateEl=document.getElementById('war-room-date');if(!stats||!ranking)return;
     const ref=getToday();if(dateEl)dateEl.textContent=`基準 ${ref.replace(/-/g,'/')}`;
