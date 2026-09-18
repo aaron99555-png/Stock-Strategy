@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="187">
+<meta name="app-version" content="188">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -1511,8 +1511,8 @@ nav, .top-nav, .desktop-nav, .module-nav{
                     <button class="flex-shrink-0 btn-copy-base bg-rose-50 dark:bg-rose-900/40 hover:bg-rose-600 border-rose-200 dark:border-rose-700/50 text-rose-700 dark:text-rose-200 btn-copy" data-mode="feifan">非凡重點</button>
                     </div>
                     <div class="flex items-center gap-2 flex-wrap">
-                        <button type="button" id="btn-update-journal-close-prices" class="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:text-gray-500 text-white px-3 py-1.5 text-xs sm:text-sm font-bold shadow-sm transition active:scale-95 disabled:cursor-wait" title="更新目前策略日誌清單內股票的最新收盤價"><i class="fa-solid fa-arrows-rotate"></i><span>更新收盤價</span></button>
-                        <span id="journal-close-price-status" class="hidden text-[10px] sm:text-xs text-gray-400 dark:text-gray-500 whitespace-nowrap"></span>
+                        <button type="button" id="btn-update-journal-close-prices" class="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:text-gray-500 text-white px-3 py-1.5 text-xs sm:text-sm font-bold shadow-sm transition active:scale-95 disabled:cursor-wait" title="只更新今天日期的策略日誌，收盤價會寫入該筆紀錄，歷史紀錄不再變動"><i class="fa-solid fa-arrows-rotate"></i><span>更新今日收盤價</span></button>
+                        <span id="journal-close-price-status" class="hidden text-[10px] sm:text-xs text-gray-400 dark:text-gray-500 whitespace-nowrap cursor-help" title="收盤價來源狀態"></span>
                         <span id="journal-stock-count" class="copy-stock-count inline-flex items-center gap-1.5 rounded-full bg-blue-50 dark:bg-blue-900/35 border border-blue-200 dark:border-blue-800/70 px-3 py-1.5 text-xs sm:text-sm font-bold text-blue-600 dark:text-blue-300 shadow-sm whitespace-nowrap"><i class="fa-solid fa-chart-simple"></i>目前顯示 0 檔股票</span>
                     </div>
                 </div>
@@ -3179,7 +3179,7 @@ document.addEventListener('click',event=>{const button=event.target.closest('[da
 let lastLocalSaveErrorAt=0;
 const getPersistableState=()=>{
     const persisted=hasStoredAdminAccess()?{...state}:{...state,journals:(state.journals||[]).map(sanitizeJournalForViewer),plans:[],trash:[]};
-    ['filters','favFilters','revenueFilters','reportFilters','journalFiltersDefaultTodayV1','reportFiltersDefaultAllV1','codeToName','nameToCode'].forEach(key=>delete persisted[key]);
+    ['filters','favFilters','revenueFilters','reportFilters','journalFiltersDefaultTodayV1','reportFiltersDefaultAllV1','codeToName','nameToCode','journalClosePrices'].forEach(key=>delete persisted[key]);
     return persisted;
 };
 function saveLocalData(){
@@ -3420,7 +3420,6 @@ function loadLocalData(){
     const normalizedLocalReports=normalizeReportRecords(state.reports);state.reports=normalizedLocalReports.records;
     const normalizedMarketHolidays=normalizeCustomMarketHolidays(state.customMarketHolidays),migratedMarketHolidays=JSON.stringify(normalizedMarketHolidays)!==JSON.stringify(state.customMarketHolidays||[]);state.customMarketHolidays=normalizedMarketHolidays;
     resetSessionFiltersToDefaults(false);
-    if(!state.journalClosePrices||typeof state.journalClosePrices!=='object'||Array.isArray(state.journalClosePrices))state.journalClosePrices={};
     if(state.copyCompareDuplicates===undefined)state.copyCompareDuplicates=true;
     if(state.copyMarkRevenueHigh===undefined)state.copyMarkRevenueHigh=true;
     if(state.copyMarkLargeHolder===undefined)state.copyMarkLargeHolder=true;
@@ -3493,7 +3492,7 @@ const getFilteredAndSortedData=(dl,cf,cs)=>{
         if(tags.length>0){if(tagLogic==='AND'){if(!tags.every(t=>j.tags&&j.tags.includes(t)))return false;}else{if(!tags.some(t=>j.tags&&j.tags.includes(t)))return false;}}
         return true;
     });
-    fd.sort((a,b)=>{let vA,vB;switch(key){case'date':vA=a.date;vB=b.date;break;case'code':vA=a.code;vB=b.code;break;case'name':vA=a.name;vB=b.name;break;case'closePrice':vA=Number(state.journalClosePrices?.[a.code]?.price??-9999);vB=Number(state.journalClosePrices?.[b.code]?.price??-9999);break;case'eps2025':vA=a.ei.eps2025??-9999;vB=b.ei.eps2025??-9999;break;case'eps2026':vA=a.ei.eps2026??-9999;vB=b.ei.eps2026??-9999;break;case'epsGrowth':vA=a.ei.epsGrowth??-9999;vB=b.ei.epsGrowth??-9999;break;case'score':vA=a.score;vB=b.score;break;case'targetPrice':vA=a.ei.targetPrice??-9999;vB=b.ei.targetPrice??-9999;break;case'revenueHigh':vA=(hasHighTurnoverRevenue(a.code,a.date)?4:0)+(state.revenueRecords.some(r=>String(r.code)===String(a.code)&&normalizeMomentumRecordType(r)==='revenue')?2:0)+(hasRecentLargeHolderIncrease(a.code,a.date,14)?1:0);vB=(hasHighTurnoverRevenue(b.code,b.date)?4:0)+(state.revenueRecords.some(r=>String(r.code)===String(b.code)&&normalizeMomentumRecordType(r)==='revenue')?2:0)+(hasRecentLargeHolderIncrease(b.code,b.date,14)?1:0);break;case'tags':vA=(a.tags||[]).join('、');vB=(b.tags||[]).join('、');break;case'notes':vA=a.notes||'';vB=b.notes||'';break;default:vA=a.createdAt||0;vB=b.createdAt||0;break;}if(vA===vB)return(a.createdAt||0)-(b.createdAt||0);return asc?(vA>vB?1:-1):(vA>vB?-1:1);});
+    fd.sort((a,b)=>{let vA,vB;switch(key){case'date':vA=a.date;vB=b.date;break;case'code':vA=a.code;vB=b.code;break;case'name':vA=a.name;vB=b.name;break;case'closePrice':vA=Number(a.closePrice??-9999);vB=Number(b.closePrice??-9999);break;case'eps2025':vA=a.ei.eps2025??-9999;vB=b.ei.eps2025??-9999;break;case'eps2026':vA=a.ei.eps2026??-9999;vB=b.ei.eps2026??-9999;break;case'epsGrowth':vA=a.ei.epsGrowth??-9999;vB=b.ei.epsGrowth??-9999;break;case'score':vA=a.score;vB=b.score;break;case'targetPrice':vA=a.ei.targetPrice??-9999;vB=b.ei.targetPrice??-9999;break;case'revenueHigh':vA=(hasHighTurnoverRevenue(a.code,a.date)?4:0)+(state.revenueRecords.some(r=>String(r.code)===String(a.code)&&normalizeMomentumRecordType(r)==='revenue')?2:0)+(hasRecentLargeHolderIncrease(a.code,a.date,14)?1:0);vB=(hasHighTurnoverRevenue(b.code,b.date)?4:0)+(state.revenueRecords.some(r=>String(r.code)===String(b.code)&&normalizeMomentumRecordType(r)==='revenue')?2:0)+(hasRecentLargeHolderIncrease(b.code,b.date,14)?1:0);break;case'tags':vA=(a.tags||[]).join('、');vB=(b.tags||[]).join('、');break;case'notes':vA=a.notes||'';vB=b.notes||'';break;default:vA=a.createdAt||0;vB=b.createdAt||0;break;}if(vA===vB)return(a.createdAt||0)-(b.createdAt||0);return asc?(vA>vB?1:-1):(vA>vB?-1:1);});
     return fd;
 };
 
@@ -3521,7 +3520,7 @@ const renderTableRows=(data,tbId,emId,isFav=false)=>{
         const tagHtml=(i.tags||[]).map(t=>{const normalizedTag=normalizeStrategyTagName(t),isNewHorse=horseNewTagSet.has(normalizedTag);return`<span class="inline-block text-[11px] font-bold px-2 py-0.5 rounded-md mr-1 mb-1 border shadow-sm transition ${canRemoveTags?'cursor-pointer hover:opacity-80':'cursor-default'} ${getTagStyle(t)}"${canRemoveTags?` data-action="remove-tag" data-id="${i.id}" data-tag="${escapeHTML(t)}" title="${isNewHorse?'🆕 新進榜｜點擊移除標籤':'點擊移除標籤'}"`:` title="${isNewHorse?'🆕 新進榜｜前一個月內未出現相同馬標籤':'策略標籤'}"`}>${escapeHTML(t)}${isNewHorse?' <span class="horse-new-badge ml-1" title="🆕 新進榜：同股往前一個月內未出現相同馬標籤">🆕</span>':''}${canRemoveTags?' ✕':''}</span>`;}).join('');
         let fl=i.isFavorite===true?1:(parseInt(i.isFavorite)||0),fc='text-gray-400 dark:text-gray-500 hover:text-yellow-500',fi='<i class="fa-solid fa-star pointer-events-none"></i>',ft='加入追蹤';
         if(fl===1){fc='text-yellow-500';ft='一星追蹤';}else if(fl===2){fc='text-orange-500';fi='<i class="fa-solid fa-star pointer-events-none"></i><span class="ml-1 text-[10px] font-bold pointer-events-none">2</span>';ft='二次追蹤';}else if(fl===3){fc='text-red-500';fi='<i class="fa-solid fa-star pointer-events-none"></i><span class="ml-1 text-[10px] font-bold pointer-events-none">3</span>';ft='三次追蹤';}
-        const fd=i.date?i.date.replace(/-/g,'/'):'',closePriceInfo=state.journalClosePrices?.[String(i.code||'').trim()]||null,closePriceValue=Number(closePriceInfo?.price),closePriceDate=String(closePriceInfo?.date||''),closePriceHtml=Number.isFinite(closePriceValue)&&closePriceValue>0?`<div class="font-black text-[13px] sm:text-sm text-gray-800 dark:text-gray-100 tabular-nums">${escapeHTML(formatMarketPrice(closePriceValue))}</div>${closePriceDate?`<div class="mt-0.5 text-[9px] text-gray-400 tabular-nums">${escapeHTML(closePriceDate.replace(/-/g,'/'))}</div>`:''}`:'<span class="text-gray-300 dark:text-gray-600">—</span>',rbh=getRevenueMonthsHtml(i.code,i.date||getToday()),hr=state.reports.some(r=>String(r.code||'').trim()===String(i.code||'').trim()),rb=hr?renderReportIndicator():'',futuresBadge=ei.futures?'<span class="shrink-0 bg-sky-600 text-white text-[9px] px-1 rounded ml-1">期</span>':'',resonance=getJournalResonance(i),resonanceBadge=resonance.isMultiple?`<span class="inline-flex items-center rounded-md bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-200 px-1.5 py-0.5 text-[10px] font-black mr-1 mb-1" title="共振來源：${escapeHTML(resonance.sources.join('、'))}"><i class="fa-solid fa-bolt mr-1"></i>${escapeHTML(resonance.sources.join('＋'))}</span>`:'',th=renderStockStrengthBadges(i.code,i.date||getToday())+resonanceBadge+tagHtml,statusBadge=getJournalStatusBadge(i.status),overdueBadge=isJournalOverdue(i)?`<span class="inline-flex items-center rounded-md bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-200 px-1.5 py-0.5 text-[10px] font-black ml-1"><i class="fa-solid fa-clock mr-1"></i>逾期 ${journalTradingAge(i.date)} 日</span>`:'',returnValue=getJournalReturn(i),reviewBadge=i.review?.reviewDate?`<div class="mt-1 text-[10px] font-bold ${returnValue===null?'text-gray-500 dark:text-gray-400':returnValue>=0?'tw-red':'tw-green'}">複盤 ${escapeHTML(i.review.outcome||'未判定')}${returnValue===null?'':`｜${returnValue>=0?'+':''}${returnValue.toFixed(1)}%`}</div>`:'',dataIssues=getJournalDataIssues(i),issueBadge=dataIssues.length?`<div class="mt-1 inline-flex items-center rounded-md bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-200 px-1.5 py-0.5 text-[10px] font-black" title="${escapeHTML(dataIssues.join('；'))}"><i class="fa-solid fa-triangle-exclamation mr-1"></i>異常 ${dataIssues.length} 項</div>`:'',notesHtml=`<div class="mb-1">${statusBadge}${overdueBadge}</div>${reviewBadge}${issueBadge}<div class="mt-1">${escapeHTML(i.notes||'')}</div>`;
+        const fd=i.date?i.date.replace(/-/g,'/'):'',closePriceValue=Number(i.closePrice),closePriceDate=String(i.closePriceDate||''),closePriceSource=String(i.closePriceSource||''),closePriceHtml=Number.isFinite(closePriceValue)&&closePriceValue>0?`<div class="font-black text-[13px] sm:text-sm text-gray-800 dark:text-gray-100 tabular-nums" title="${escapeHTML(closePriceSource?`來源：${closePriceSource}`:'')}">${escapeHTML(formatMarketPrice(closePriceValue))}</div>${closePriceDate?`<div class="mt-0.5 text-[9px] text-gray-400 tabular-nums">${escapeHTML(closePriceDate.replace(/-/g,'/'))}</div>`:''}`:'<span class="text-gray-300 dark:text-gray-600">—</span>',rbh=getRevenueMonthsHtml(i.code,i.date||getToday()),hr=state.reports.some(r=>String(r.code||'').trim()===String(i.code||'').trim()),rb=hr?renderReportIndicator():'',futuresBadge=ei.futures?'<span class="shrink-0 bg-sky-600 text-white text-[9px] px-1 rounded ml-1">期</span>':'',resonance=getJournalResonance(i),resonanceBadge=resonance.isMultiple?`<span class="inline-flex items-center rounded-md bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-200 px-1.5 py-0.5 text-[10px] font-black mr-1 mb-1" title="共振來源：${escapeHTML(resonance.sources.join('、'))}"><i class="fa-solid fa-bolt mr-1"></i>${escapeHTML(resonance.sources.join('＋'))}</span>`:'',th=renderStockStrengthBadges(i.code,i.date||getToday())+resonanceBadge+tagHtml,statusBadge=getJournalStatusBadge(i.status),overdueBadge=isJournalOverdue(i)?`<span class="inline-flex items-center rounded-md bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-200 px-1.5 py-0.5 text-[10px] font-black ml-1"><i class="fa-solid fa-clock mr-1"></i>逾期 ${journalTradingAge(i.date)} 日</span>`:'',returnValue=getJournalReturn(i),reviewBadge=i.review?.reviewDate?`<div class="mt-1 text-[10px] font-bold ${returnValue===null?'text-gray-500 dark:text-gray-400':returnValue>=0?'tw-red':'tw-green'}">複盤 ${escapeHTML(i.review.outcome||'未判定')}${returnValue===null?'':`｜${returnValue>=0?'+':''}${returnValue.toFixed(1)}%`}</div>`:'',dataIssues=getJournalDataIssues(i),issueBadge=dataIssues.length?`<div class="mt-1 inline-flex items-center rounded-md bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-200 px-1.5 py-0.5 text-[10px] font-black" title="${escapeHTML(dataIssues.join('；'))}"><i class="fa-solid fa-triangle-exclamation mr-1"></i>異常 ${dataIssues.length} 項</div>`:'',notesHtml=`<div class="mb-1">${statusBadge}${overdueBadge}</div>${reviewBadge}${issueBadge}<div class="mt-1">${escapeHTML(i.notes||'')}</div>`;
         rh+=`<tr class="table-row-hover transition border-b border-gray-200 dark:border-gray-700/50 text-gray-900 dark:text-white text-sm ${ei.futures?"bg-sky-50 dark:bg-sky-900 hover:bg-sky-100 dark:hover:bg-sky-800":"bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800"}"><td class="table-sticky-bg py-3 px-2 w-[40px] min-w-[40px] max-w-[40px] text-center sticky left-0 z-20 ${ei.futures?"!bg-sky-50 dark:!bg-sky-900":""}"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${i.id}" data-type="${lt}" ${selectedIds[lt].has(i.id)?'checked':''}></td><td class="table-sticky-bg py-3 px-1 sm:px-2 w-[85px] min-w-[85px] max-w-[85px] text-center sticky left-[40px] z-20 font-medium whitespace-nowrap text-xs sm:text-sm text-gray-600 dark:text-gray-400 ${ei.futures?"!bg-sky-50 dark:!bg-sky-900":""}">${escapeHTML(fd)}</td><td class="table-sticky-bg py-2 px-2 sm:px-3 w-[95px] min-w-[95px] max-w-[95px] sticky left-[125px] z-20 border-r border-gray-200 dark:border-gray-700/50 overflow-hidden ${ei.futures?"!bg-sky-50 dark:!bg-sky-900":""}"${getYahooStockAttributes(i.code)}><div class="text-[10px] sm:text-[11px] text-gray-500 dark:text-gray-400 mb-0.5 leading-none flex items-center">${escapeHTML(i.code)}${rb}</div><div class="font-bold text-[14px] sm:text-[15px] leading-tight tracking-wide text-gray-800 dark:text-gray-200 flex items-center min-w-0"><span class="truncate">${escapeHTML(i.name)}</span>${horseNewTags.length?'<span class="horse-new-badge ml-1 shrink-0" title="🆕 新進榜：同股往前一個月內未出現相同馬標籤">🆕</span>':''}${futuresBadge}</div></td>${!isFav?`<td class="journal-close-price-cell py-2 px-2 sm:px-3 text-right align-middle">${closePriceHtml}</td>`:''}<td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2025)}</td><td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2026)}</td><td class="py-3 px-3 sm:px-4 text-right">${formatNumColor(ei.epsGrowth,true)}</td><td class="py-3 px-3 sm:px-4 text-center font-bold">${sc}</td><td class="py-3 px-3 sm:px-4 text-right">${formatTargetPrice(ei.targetPrice)}</td><td class="py-2 px-3 whitespace-normal w-[100px] min-w-[100px] text-center">${rbh}</td><td class="py-2 px-3 align-top whitespace-normal min-w-[120px] sm:min-w-[140px] lg:w-[320px] lg:min-w-[320px] xl:w-[380px] xl:min-w-[380px] lg:max-w-[460px]">${th}</td>${!isFav?`<td class="py-3 px-3 align-top text-gray-600 dark:text-gray-300 max-w-[110px] sm:max-w-[180px] lg:w-[220px] lg:min-w-[220px] lg:max-w-[250px] whitespace-normal break-words text-xs leading-relaxed" title="${escapeHTML(i.notes||'')}">${notesHtml}</td>`:''}<td class="py-3 px-3 text-center whitespace-nowrap"><button class="mr-1 hover:scale-110 text-emerald-600 dark:text-emerald-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="review-journal" data-id="${i.id}" title="訊號狀態與複盤"><i class="fa-solid fa-clipboard-check pointer-events-none"></i></button><button class="mr-1 hover:scale-110 text-green-600 dark:text-green-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="add-plan" data-code="${escapeHTML(i.code)}" title="加入交易規劃"><i class="fa-solid fa-chess-knight pointer-events-none"></i></button><button class="mr-1 hover:scale-110 ${fc} bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="toggle-fav" data-id="${i.id}" title="${ft}">${fi}</button><button class="mr-1 hover:scale-110 text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="edit-notes" data-id="${i.id}" title="修改備註"><i class="fa-solid fa-comment-dots pointer-events-none"></i></button><button class="text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="delete-journal" data-id="${i.id}" title="刪除"><i class="fa-solid fa-trash pointer-events-none"></i></button></td></tr>`;
     });
     setHTMLIfChanged(tb,rh); updateBatchUI(lt);
@@ -3615,44 +3614,85 @@ const formatMarketPrice=value=>{
 const normalizeMarketClosePrice=value=>{
     if(value===null||value===undefined)return null;
     const normalized=String(value).replace(/,/g,'').trim();
-    if(!normalized||normalized==='-'||normalized==='--'||normalized==='—')return null;
+    if(!normalized||['-','--','—','X','－'].includes(normalized))return null;
     const n=Number(normalized);
     return Number.isFinite(n)&&n>0?n:null;
 };
-const rocMarketDateToISO=value=>{
-    const raw=String(value||'').trim().replace(/[^\d]/g,'');
-    if(raw.length===7){
-        const year=Number(raw.slice(0,3))+1911;
-        return `${year}-${raw.slice(3,5)}-${raw.slice(5,7)}`;
-    }
-    if(raw.length===8&&Number(raw.slice(0,4))>1900)return `${raw.slice(0,4)}-${raw.slice(4,6)}-${raw.slice(6,8)}`;
+const normalizeMarketDataDate=value=>{
+    const raw=String(value||'').trim();
+    if(!raw)return'';
+    let match=raw.match(/^(\d{3})[\/-]?(\d{2})[\/-]?(\d{2})$/);
+    if(match)return `${Number(match[1])+1911}-${match[2]}-${match[3]}`;
+    match=raw.match(/^(\d{4})[\/-]?(\d{2})[\/-]?(\d{2})$/);
+    if(match)return `${match[1]}-${match[2]}-${match[3]}`;
+    const digits=raw.replace(/\D/g,'');
+    if(digits.length===7)return `${Number(digits.slice(0,3))+1911}-${digits.slice(3,5)}-${digits.slice(5,7)}`;
+    if(digits.length===8&&Number(digits.slice(0,4))>1900)return `${digits.slice(0,4)}-${digits.slice(4,6)}-${digits.slice(6,8)}`;
     return'';
 };
-const fetchJsonWithTimeout=async(url,timeout=12000)=>{
+const fetchJsonWithTimeout=async(url,timeout=14000)=>{
     const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),timeout);
     try{
-        const response=await fetch(url,{cache:'no-store',signal:controller.signal,headers:{Accept:'application/json'}});
+        const response=await fetch(url,{
+            cache:'no-store',
+            signal:controller.signal,
+            headers:{Accept:'application/json,text/plain,*/*'}
+        });
         if(!response.ok)throw new Error(`HTTP ${response.status}`);
         return await response.json();
     }finally{clearTimeout(timer);}
 };
-const parseTwseCloseSnapshot=rows=>{
+
+const parseTwseOpenApiSnapshot=rows=>{
     const map=new Map();
     if(!Array.isArray(rows))return map;
     rows.forEach(row=>{
-        const code=String(row?.Code||'').trim(),price=normalizeMarketClosePrice(row?.ClosingPrice);
+        const code=String(row?.Code||'').trim();
+        const price=normalizeMarketClosePrice(row?.ClosingPrice);
         if(!code||price===null)return;
-        map.set(code,{price,date:rocMarketDateToISO(row?.Date),source:'TWSE'});
+        map.set(code,{price,date:normalizeMarketDataDate(row?.Date),source:'TWSE OpenAPI'});
     });
     return map;
 };
-const parseTpexCloseSnapshot=rows=>{
+const parseTwseRwdSnapshot=payload=>{
+    const map=new Map(),rows=Array.isArray(payload?.data)?payload.data:[];
+    const payloadDate=normalizeMarketDataDate(payload?.date);
+    rows.forEach(row=>{
+        if(!Array.isArray(row)||row.length<8)return;
+        const code=String(row[0]||'').trim(),price=normalizeMarketClosePrice(row[7]);
+        if(!code||price===null)return;
+        map.set(code,{price,date:payloadDate,source:'TWSE RWD'});
+    });
+    return map;
+};
+const parseTpexOpenApiSnapshot=rows=>{
     const map=new Map();
     if(!Array.isArray(rows))return map;
     rows.forEach(row=>{
-        const code=String(row?.SecuritiesCompanyCode||'').trim(),price=normalizeMarketClosePrice(row?.Close);
+        const code=String(row?.SecuritiesCompanyCode||'').trim();
+        const price=normalizeMarketClosePrice(row?.Close);
         if(!code||price===null)return;
-        map.set(code,{price,date:rocMarketDateToISO(row?.Date),source:'TPEx'});
+        map.set(code,{price,date:normalizeMarketDataDate(row?.Date),source:'TPEx OpenAPI'});
+    });
+    return map;
+};
+const getTpexLegacyRows=payload=>{
+    if(Array.isArray(payload?.aaData))return payload.aaData;
+    if(Array.isArray(payload?.data))return payload.data;
+    if(Array.isArray(payload?.tables)){
+        return payload.tables.flatMap(table=>Array.isArray(table?.data)?table.data:[]);
+    }
+    return[];
+};
+const parseTpexLegacySnapshot=payload=>{
+    const map=new Map(),rows=getTpexLegacyRows(payload);
+    const payloadDate=normalizeMarketDataDate(payload?.date||payload?.queryDate||payload?.reportDate);
+    rows.forEach(row=>{
+        if(!Array.isArray(row)||row.length<3)return;
+        const code=String(row[0]||'').replace(/<[^>]*>/g,'').trim();
+        const price=normalizeMarketClosePrice(String(row[2]??'').replace(/<[^>]*>/g,''));
+        if(!code||price===null)return;
+        map.set(code,{price,date:payloadDate,source:'TPEx 盤後行情'});
     });
     return map;
 };
@@ -3682,9 +3722,23 @@ const fetchYahooClosePrice=async code=>{
     }
     return null;
 };
+const fetchMisLastPrice=async code=>{
+    const normalized=normalizeYahooStockCode(code);
+    if(!normalized)return null;
+    const channels=`tse_${normalized}.tw|otc_${normalized}.tw`;
+    try{
+        const url=`https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=${encodeURIComponent(channels)}&json=1&delay=0&_=${Date.now()}`;
+        const data=await fetchJsonWithTimeout(url,9000);
+        const row=(data?.msgArray||[]).find(item=>String(item?.c||'').trim()===normalized&&['tse','otc'].includes(String(item?.ex||'').trim()));
+        if(!row)return null;
+        const price=normalizeMarketClosePrice(row?.z);
+        if(price===null)return null;
+        return{price,date:normalizeMarketDataDate(row?.d),source:'TWSE MIS'};
+    }catch(error){return null;}
+};
 const runWithConcurrency=async(items,limit,worker)=>{
     const results=new Array(items.length);let cursor=0;
-    const runners=Array.from({length:Math.min(limit,items.length)},async()=>{
+    const runners=Array.from({length:Math.min(Math.max(1,limit),items.length)},async()=>{
         while(cursor<items.length){
             const index=cursor++;
             try{results[index]=await worker(items[index],index);}catch(error){results[index]=null;}
@@ -3692,62 +3746,139 @@ const runWithConcurrency=async(items,limit,worker)=>{
     });
     await Promise.all(runners);return results;
 };
-const updateJournalClosePrices=async()=>{
-    const button=document.getElementById('btn-update-journal-close-prices'),status=document.getElementById('journal-close-price-status');
-    const visible=getFilteredAndSortedData(state.journals,state.filters,state.sortConfig);
-    const codes=[...new Set(visible.map(item=>String(item.code||'').trim()).filter(code=>code&&code!=='TX00'))];
-    if(!codes.length)return showToast('目前策略日誌沒有可更新的股票','error');
-    if(button?.disabled)return;
-    if(button){button.disabled=true;button.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i><span>更新中</span>';}
-    if(status){status.classList.remove('hidden');status.textContent=`正在更新 ${codes.length} 檔…`;}
-    const twseUrl='https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL';
-    const tpexUrl='https://www.tpex.org.tw/openapi/v1/tpex_mainboard_daily_close_quotes';
-    let twseMap=new Map(),tpexMap=new Map(),officialErrors=0;
-    const official=await Promise.allSettled([fetchJsonWithTimeout(twseUrl,15000),fetchJsonWithTimeout(tpexUrl,15000)]);
-    if(official[0].status==='fulfilled')twseMap=parseTwseCloseSnapshot(official[0].value);else officialErrors++;
-    if(official[1].status==='fulfilled')tpexMap=parseTpexCloseSnapshot(official[1].value);else officialErrors++;
-
-    const next={...(state.journalClosePrices||{})},missing=[];
-    let updated=0,twseCount=0,tpexCount=0,yahooCount=0;
-    codes.forEach(code=>{
-        const item=twseMap.get(code)||tpexMap.get(code);
-        if(item){
-            next[code]={...item,updatedAt:Date.now()};
-            updated++;
-            if(item.source==='TWSE')twseCount++;else tpexCount++;
-        }else missing.push(code);
-    });
-
-    if(missing.length){
-        if(status)status.textContent=`官方資料完成，備援查詢 ${missing.length} 檔…`;
-        const yahooResults=await runWithConcurrency(missing,4,code=>fetchYahooClosePrice(code));
-        yahooResults.forEach((item,index)=>{
+const fetchTodayClosePriceMap=async(codes,statusEl)=>{
+    const wanted=new Set(codes),result=new Map(),diagnostics=[];
+    const absorb=(map,label)=>{
+        let hit=0;
+        wanted.forEach(code=>{
+            if(result.has(code))return;
+            const item=map.get(code);
             if(!item)return;
-            next[missing[index]]={...item,updatedAt:Date.now()};
-            updated++;yahooCount++;
+            result.set(code,item);hit++;
         });
+        diagnostics.push(`${label}:${hit}`);
+    };
+    const today=getToday().replace(/-/g,'');
+
+    // 1. Official latest-day snapshots
+    const primary=await Promise.allSettled([
+        fetchJsonWithTimeout('https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL',15000),
+        fetchJsonWithTimeout('https://www.tpex.org.tw/openapi/v1/tpex_mainboard_daily_close_quotes',15000)
+    ]);
+    if(primary[0].status==='fulfilled')absorb(parseTwseOpenApiSnapshot(primary[0].value),'TWSE');
+    else diagnostics.push('TWSE:連線失敗');
+    if(primary[1].status==='fulfilled')absorb(parseTpexOpenApiSnapshot(primary[1].value),'TPEx');
+    else diagnostics.push('TPEx:連線失敗');
+
+    let missing=codes.filter(code=>!result.has(code));
+
+    // 2. Official website fallback endpoints
+    if(missing.length){
+        if(statusEl)statusEl.textContent=`官方 OpenAPI 完成，備援查詢 ${missing.length} 檔…`;
+        const fallback=await Promise.allSettled([
+            fetchJsonWithTimeout(`https://www.twse.com.tw/rwd/zh/afterTrading/STOCK_DAY_ALL?response=json&date=${today}`,15000),
+            fetchJsonWithTimeout('https://www.tpex.org.tw/www/zh-tw/afterTrading/dailyQuotes?response=json',15000)
+        ]);
+        if(fallback[0].status==='fulfilled')absorb(parseTwseRwdSnapshot(fallback[0].value),'TWSE備援');
+        else diagnostics.push('TWSE備援:失敗');
+        if(fallback[1].status==='fulfilled')absorb(parseTpexLegacySnapshot(fallback[1].value),'TPEx備援');
+        else diagnostics.push('TPEx備援:失敗');
     }
 
-    state.journalClosePrices=next;
-    saveLocalData();
-    processAndRenderJournals();
+    missing=codes.filter(code=>!result.has(code));
 
-    const failed=codes.length-updated,sourceParts=[];
-    if(twseCount)sourceParts.push(`上市 ${twseCount}`);
-    if(tpexCount)sourceParts.push(`上櫃 ${tpexCount}`);
-    if(yahooCount)sourceParts.push(`Yahoo備援 ${yahooCount}`);
+    // 3. Individual fallbacks. These can be blocked by browser CORS, so they are last resort only.
+    if(missing.length){
+        if(statusEl)statusEl.textContent=`盤後資料仍缺 ${missing.length} 檔，個股備援查詢中…`;
+        const individual=await runWithConcurrency(missing,3,async code=>{
+            const yahoo=await fetchYahooClosePrice(code);
+            if(yahoo)return yahoo;
+            return await fetchMisLastPrice(code);
+        });
+        individual.forEach((item,index)=>{
+            if(item)result.set(missing[index],item);
+        });
+        diagnostics.push(`個股備援:${individual.filter(Boolean).length}`);
+    }
+    return{map:result,diagnostics};
+};
+
+const updateJournalClosePrices=async()=>{
+    if(!window.isAdminMode||!window.isAdminMode())return showToast('更新收盤價僅限管理者使用','error');
+
+    const button=document.getElementById('btn-update-journal-close-prices');
+    const status=document.getElementById('journal-close-price-status');
+    if(button?.disabled)return;
+
+    const today=getToday();
+    const todayRows=(state.journals||[]).filter(item=>String(item?.date||'')===today);
+    const codes=[...new Set(todayRows.map(item=>String(item.code||'').trim()).filter(code=>code&&code!=='TX00'))];
+
+    if(!todayRows.length)return showToast(`今天 ${today.replace(/-/g,'/')} 尚無策略日誌紀錄`,'error');
+    if(!codes.length)return showToast('今天的策略日誌沒有可更新的股票','error');
+
+    if(button){
+        button.disabled=true;
+        button.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i><span>更新今日收盤價</span>';
+    }
     if(status){
         status.classList.remove('hidden');
-        status.textContent=`已更新 ${updated}/${codes.length} 檔${sourceParts.length?`｜${sourceParts.join('、')}`:''}`;
-        status.title=`更新時間 ${new Date().toLocaleString('zh-TW',{hour12:false})}`;
+        status.textContent=`只更新今日 ${codes.length} 檔…`;
     }
-    if(button){button.disabled=false;button.innerHTML='<i class="fa-solid fa-arrows-rotate"></i><span>更新收盤價</span>';}
-    if(updated===0){
-        showToast(officialErrors===2?'收盤價來源目前無法連線，請稍後再試':'目前沒有取得可用收盤價','error');
-    }else if(failed){
-        showToast(`收盤價更新完成 ${updated} 檔，${failed} 檔未取得`,'error');
-    }else{
-        showToast(`收盤價更新完成，共 ${updated} 檔`);
+
+    try{
+        const {map:priceMap,diagnostics}=await fetchTodayClosePriceMap(codes,status);
+        const changed=[],now=Date.now();
+
+        todayRows.forEach(item=>{
+            const code=String(item.code||'').trim(),quote=priceMap.get(code);
+            if(!quote)return;
+            item.closePrice=quote.price;
+            item.closePriceDate=quote.date||today;
+            item.closePriceSource=quote.source||'';
+            item.closePriceUpdatedAt=now;
+            item.updatedAt=now;
+            changed.push(item);
+        });
+
+        if(changed.length){
+            saveLocalData();
+            processAndRenderJournals();
+            if(document.getElementById('module-favorites')?.classList.contains('active'))renderFavorites();
+
+            // 收盤價直接寫入今天的每一筆 journal，跨裝置也能保留當天價位。
+            const patch=Object.fromEntries(changed.map(item=>[item.id,item]));
+            await patchDataToCloud('journals',patch);
+        }
+
+        const updatedCodes=new Set(changed.map(item=>String(item.code||'').trim())).size;
+        const failedCodes=codes.filter(code=>!priceMap.has(code));
+        if(status){
+            status.classList.remove('hidden');
+            status.textContent=`今日已更新 ${updatedCodes}/${codes.length} 檔`;
+            status.title=`${diagnostics.join('｜')}${failedCodes.length?`｜未取得：${failedCodes.join('、')}`:''}`;
+        }
+
+        if(!updatedCodes){
+            showToast('未取得今日股票收盤價；將滑鼠移到更新狀態可查看來源診斷','error');
+        }else if(failedCodes.length){
+            showToast(`已更新 ${updatedCodes} 檔，${failedCodes.length} 檔未取得：${failedCodes.join('、')}`,'error');
+        }else{
+            showToast(`今日收盤價更新完成，共 ${updatedCodes} 檔`);
+        }
+    }catch(error){
+        console.error('更新今日收盤價失敗',error);
+        if(status){
+            status.classList.remove('hidden');
+            status.textContent='更新失敗';
+            status.title=String(error?.message||error||'未知錯誤');
+        }
+        showToast(`更新收盤價失敗：${error?.message||'來源無法連線'}`,'error');
+    }finally{
+        if(button){
+            button.disabled=false;
+            button.innerHTML='<i class="fa-solid fa-arrows-rotate"></i><span>更新今日收盤價</span>';
+        }
     }
 };
 document.getElementById('btn-update-journal-close-prices')?.addEventListener('click',updateJournalClosePrices);
