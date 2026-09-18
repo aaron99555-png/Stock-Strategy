@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="195">
+<meta name="app-version" content="196">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -13,16 +13,9 @@ try{
     }
 }catch(error){}
 </script>
-<script id="theme-bootstrap">
-try{
-    if(window.localStorage.getItem('ryan_theme')==='dark'){
-        document.documentElement.classList.add('dark');
-    }else{
-        document.documentElement.classList.remove('dark');
-    }
-}catch(error){
-    document.documentElement.classList.remove('dark');
-}
+<script id="light-mode-bootstrap">
+try{window.localStorage.removeItem('ryan_theme');}catch(error){}
+document.documentElement.classList.remove('dark');
 </script>
 <script id="mobile-view-bootstrap">
 try{
@@ -300,10 +293,8 @@ button { touch-action: manipulation; }
   .header-brand { max-width:32% !important; }
   .header-actions { gap:0.2rem !important; }
   .header-actions #btn-admin-mode { display:none !important; }
-  .header-actions #theme-toggle,
-  html.viewer-mode .header-actions #theme-toggle { display:flex !important; visibility:visible !important; opacity:1 !important; pointer-events:auto !important; }
-  .header-actions :is(#btn-global-search,#theme-toggle,#btn-mobile-tools) { width:40px !important; height:40px !important; }
-  .header-actions :is(#btn-admin-mode,#btn-sync-modal) { min-width:40px; min-height:40px; }
+  .header-actions :is(#btn-global-search,#btn-mobile-tools) { width:40px !important; height:40px !important; }
+  .header-actions #btn-admin-mode { min-width:40px; min-height:40px; }
   #mobile-tools-menu { top:62px !important; }
   .mobile-module-nav { position:fixed; left:0; right:0; bottom:0; z-index:80; display:grid !important; grid-template-columns:repeat(5,minmax(0,1fr)); gap:.2rem !important; padding:0.3rem 0.4rem max(0.3rem,env(safe-area-inset-bottom)); border-top:1px solid #e5e7eb; border-bottom:0 !important; box-shadow:0 -6px 18px rgba(15,23,42,.12); overflow:visible !important; }
   .dark .mobile-module-nav { border-top-color:#374151; box-shadow:0 -6px 18px rgba(0,0,0,.32); }
@@ -776,13 +767,6 @@ html:not(.dark) .shadow-xl{
 }
 
 /* 主題切換鍵 */
-html:not(.dark) #theme-toggle{
-  background:#ece6dd!important;
-  color:#6d6258!important;
-}
-html:not(.dark) #theme-toggle:hover{
-  background:#e5ddd2!important;
-}
 
 /* 手機卡片 */
 @media(max-width:640px){
@@ -1259,8 +1243,6 @@ nav, .top-nav, .desktop-nav, .module-nav{
             <div class="header-actions flex items-center gap-1 sm:gap-2 flex-shrink-0 relative z-10">
                 <button id="btn-global-search" type="button" class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/60 transition shadow-sm flex items-center justify-center" aria-label="全站快速查股" title="全站快速查股（Ctrl／⌘＋K）"><i class="fa-solid fa-magnifying-glass"></i></button>
                 <button id="btn-admin-mode" type="button" class="h-8 sm:h-9 px-2 sm:px-2.5 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors shadow-sm flex items-center justify-center" aria-label="進入管理者模式" title="管理者模式"><i class="fa-solid fa-lock text-sm"></i><span class="hidden 2xl:inline ml-1.5 text-xs font-medium">管理者</span></button>
-                <button type="button" id="theme-toggle" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-yellow-400 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors shadow-inner" aria-label="切換日間或夜間模式" title="日／夜模式"><i class="fa-solid fa-moon dark:hidden text-sm sm:text-base"></i><i class="fa-solid fa-sun hidden dark:block text-sm sm:text-base"></i></button>
-                <div class="relative shrink-0"><button id="btn-sync-modal" class="text-xs sm:text-sm bg-blue-600 hover:bg-blue-500 text-white px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm border border-transparent flex items-center font-medium active:scale-95"><i class="fa-solid fa-cloud-arrow-up sm:mr-1.5"></i><span class="hidden sm:inline">跨裝置同步</span></button><span id="sync-health-status" class="pointer-events-none absolute -right-0.5 -top-0.5 w-2.5 h-2.5 rounded-full bg-gray-400 ring-2 ring-white dark:ring-gray-800 transition-colors" role="status" aria-label="雲端尚未同步" title="雲端尚未同步"></span></div><button id="btn-clear-local-residue" type="button" class="hidden sm:inline-flex text-xs sm:text-sm bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm border border-gray-200 dark:border-gray-700 items-center font-medium active:scale-95" title="清除本機搜尋、暫存與過期待同步資料，不刪除雲端正式資料"><i class="fa-solid fa-broom mr-1.5"></i><span>清本機殘留</span></button>
                 <button id="btn-db-upload" type="button" title="上傳參考資料庫或國內券商評估報告" onclick="document.getElementById('excel-upload').click()" class="hidden sm:flex text-xs sm:text-sm bg-purple-50 dark:bg-purple-900/40 hover:bg-purple-100 dark:hover:bg-purple-800/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-700/50 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm items-center font-medium active:scale-95"><i class="fa-solid fa-database sm:mr-1.5"></i><span class="hidden sm:inline">快速更新</span></button>
                 <input type="file" id="excel-upload" accept=".xlsx, .xls" class="hidden">
                 <button id="btn-import-backup" onclick="document.getElementById('backup-file').click()" class="hidden sm:flex text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm items-center active:scale-95"><i class="fa-solid fa-upload sm:mr-1.5"></i><span class="hidden sm:inline">匯入</span></button>
@@ -3309,16 +3291,8 @@ const queueCloudWrite=(path,options={})=>{
     const queue=readPendingCloudWrites().filter(item=>item.path!==path);queue.push(record);savePendingCloudWrites(queue);window.updateCloudHealthUI?.('pending');return queue.length;
 };
 window.updateCloudHealthUI=status=>{
-    const indicator=document.getElementById('sync-health-status'),button=document.getElementById('btn-sync-modal');if(!indicator)return;
-    const pending=readPendingCloudWrites().length,lastSync=Number(localStorage.getItem(LAST_CLOUD_SYNC_KEY)||0),offline=navigator.onLine===false;
-    let color='bg-gray-400',message='雲端尚未同步';
-    if(status==='syncing'){color='bg-blue-400';message='雲端同步中';}
-    else if(status==='error'){color='bg-red-500';message=pending?`${pending} 筆資料等待同步`:'雲端同步失敗';}
-    else if(offline){color='bg-red-500';message=pending?`目前離線，${pending} 筆資料等待同步`:'目前離線';}
-    else if(pending){color='bg-amber-400';message=`${pending} 筆資料等待同步`;}
-    else if(lastSync){color='bg-emerald-500';message=`上次同步：${new Date(lastSync).toLocaleString('zh-TW',{hour12:false})}`;}
-    indicator.classList.remove('bg-gray-400','bg-blue-400','bg-red-500','bg-amber-400','bg-emerald-500','animate-pulse');indicator.classList.add(color);if(status==='syncing')indicator.classList.add('animate-pulse');
-    indicator.title=message;indicator.setAttribute('aria-label',message);indicator.dataset.status=offline?'offline':(pending?'pending':(lastSync?'synced':'ready'));if(button)button.title=message;
+    // v196：保留背景同步機制，但不顯示同步按鈕或同步狀態。
+    return status;
 };
 const markCloudSyncSuccess=()=>{try{localStorage.setItem(LAST_CLOUD_SYNC_KEY,String(Date.now()));}catch(error){}window.updateCloudHealthUI?.('connected');};
 async function flushPendingCloudWrites(showError=false){
@@ -5601,61 +5575,26 @@ const handleTableSorting=(e,mp,sk,fn)=>{const th=e.currentTarget,k=th.dataset.so
 
 // ======================= 啟動區 ======================= //
 document.addEventListener('DOMContentLoaded',async()=>{
-    const ht=document.documentElement,sv=localStorage.getItem('ryan_theme')||'light';if(sv==='dark')ht.classList.add('dark');else ht.classList.remove('dark');
-    document.getElementById('theme-toggle')?.addEventListener('click',()=>{ht.classList.toggle('dark');localStorage.setItem('ryan_theme',ht.classList.contains('dark')?'dark':'light');});
+    const ht=document.documentElement;
+    ht.classList.remove('dark');
+    try{localStorage.removeItem('ryan_theme');}catch(error){}
     
-    // --- 跨裝置同步功能綁定 ---
+    // --- 跨裝置背景同步（無介面按鈕） ---
     let syncInProgress=false;
-    const updateSyncStatusUI = status => {
-        const syncBtn = document.getElementById('btn-sync-modal');
-        if (!syncBtn) return;
-        if(status==='syncing'){
-            syncBtn.innerHTML='<i class="fa-solid fa-arrows-rotate fa-spin sm:mr-1.5"></i><span class="hidden sm:inline">同步中</span>';
-            syncBtn.classList.remove('bg-blue-800','border-blue-400');
-        }else if(status==='connected'){
-            syncBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up sm:mr-1.5 text-green-300"></i><span class="hidden sm:inline">已同步</span>';
-            syncBtn.classList.add('bg-blue-800', 'border-blue-400');
-        } else {
-            syncBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up sm:mr-1.5"></i><span class="hidden sm:inline">立即同步</span>';
-            syncBtn.classList.remove('bg-blue-800', 'border-blue-400');
-        }
-        window.updateCloudHealthUI?.(status);
-    };
-    const performDirectCloudSync=async(showSuccess=true)=>{
+    const updateSyncStatusUI=status=>{window.updateCloudHealthUI?.(status);};
+    const performDirectCloudSync=async(showSuccess=false)=>{
         if(syncInProgress)return false;
-        const syncBtn=document.getElementById('btn-sync-modal');
-        syncInProgress=true;if(syncBtn)syncBtn.disabled=true;updateSyncStatusUI('syncing');
+        syncInProgress=true;updateSyncStatusUI('syncing');
         try{
             await migrateLegacyCloudData();
             const ok=await loadFromCloud(true);
             if(ok){startCloudSync();updateSyncStatusUI('connected');if(showSuccess)showToast('✅ 跨裝置雲端同步完成');return true;}
             updateSyncStatusUI('error');return false;
-        }finally{syncInProgress=false;if(syncBtn)syncBtn.disabled=false;}
+        }finally{syncInProgress=false;}
     };
-    updateSyncStatusUI('ready');
-    document.getElementById('btn-sync-modal')?.addEventListener('click',()=>performDirectCloudSync(true));
-
-    const clearLocalResidue=()=>{
-        openConfirmModal('只會清除這台設備的搜尋條件、暫存與待同步舊佇列，不會刪除雲端正式資料。確定清除？',async()=>{
-            try{
-                savePendingCloudWrites([]);
-                ['global-search-input'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-                resetSessionFiltersToDefaults(true);clearTransientSearchFields();
-                localStorage.removeItem(LAST_CLOUD_SYNC_KEY);
-                cloudReadCache.clear();lastAppliedCloudSignature='';
-                saveLocalData();
-                processAndRenderJournals();renderFavorites();renderRevenueRecords();renderReports();
-                window.updateCloudHealthUI?.('ready');
-                showToast('本機殘留已清除，正在重新讀取雲端最新資料');
-                await loadFromCloud(true,true);
-            }catch(error){console.error(error);showToast('清除本機殘留時發生錯誤','error');}
-        });
-    };
-    document.getElementById('btn-clear-local-residue')?.addEventListener('click',clearLocalResidue);
-
     window.addEventListener('offline',()=>{updateSyncStatusUI('error');window.updateCloudHealthUI?.('offline');});
     window.addEventListener('online',()=>performDirectCloudSync(false));
-    // --- 跨裝置同步功能綁定結束 ---
+    // --- 跨裝置背景同步結束 ---
 
     const JELLYSTOCK_URL='https://jellystockdata.com/stock_site/tools/twse_top100.html';
     const ensureJellyStockLoaded=(force=false)=>{
