@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="188">
+<meta name="app-version" content="189">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -3746,6 +3746,54 @@ const runWithConcurrency=async(items,limit,worker)=>{
     });
     await Promise.all(runners);return results;
 };
+
+const shiftIsoDate=(iso,days)=>{
+    const match=String(iso||'').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if(!match)return iso;
+    const date=new Date(Number(match[1]),Number(match[2])-1,Number(match[3]));
+    date.setDate(date.getDate()+Number(days||0));
+    return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+};
+
+// 單一 HTML 直接開啟時，部分官方行情網址可能被瀏覽器 CORS 擋下。
+// 這裡只針對公開行情資料提供無憑證的 CORS proxy 備援。
+const fetchPublicJsonWithCorsFallback=async(url,timeout=16000)=>{
+    try{
+        return await fetchJsonWithTimeout(url,timeout);
+    }catch(directError){
+        const proxyUrls=[
+            `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+            `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`
+        ];
+        let lastError=directError;
+        for(const proxyUrl of proxyUrls){
+            try{return await fetchJsonWithTimeout(proxyUrl,timeout);}
+            catch(error){lastError=error;}
+        }
+        throw lastError;
+    }
+};
+
+const fetchFinMindClosePrice=async(code,referenceDate=getToday())=>{
+    const normalized=normalizeYahooStockCode(code);
+    if(!normalized)return null;
+    const startDate=shiftIsoDate(referenceDate,-14);
+    const url=`https://api.finmindtrade.com/api/v4/data?dataset=TaiwanStockPrice&data_id=${encodeURIComponent(normalized)}&start_date=${encodeURIComponent(startDate)}&end_date=${encodeURIComponent(referenceDate)}`;
+    try{
+        const payload=await fetchPublicJsonWithCorsFallback(url,12000);
+        if(Number(payload?.status)!==200||!Array.isArray(payload?.data))return null;
+        const rows=payload.data
+            .filter(row=>String(row?.stock_id||'').trim()===normalized&&String(row?.date||'')<=referenceDate)
+            .sort((a,b)=>String(a.date||'').localeCompare(String(b.date||'')));
+        for(let i=rows.length-1;i>=0;i--){
+            const price=normalizeMarketClosePrice(rows[i]?.close);
+            if(price===null)continue;
+            return{price,date:String(rows[i]?.date||referenceDate),source:'FinMind'};
+        }
+    }catch(error){}
+    return null;
+};
+
 const fetchTodayClosePriceMap=async(codes,statusEl)=>{
     const wanted=new Set(codes),result=new Map(),diagnostics=[];
     const absorb=(map,label)=>{
@@ -3762,8 +3810,8 @@ const fetchTodayClosePriceMap=async(codes,statusEl)=>{
 
     // 1. Official latest-day snapshots
     const primary=await Promise.allSettled([
-        fetchJsonWithTimeout('https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL',15000),
-        fetchJsonWithTimeout('https://www.tpex.org.tw/openapi/v1/tpex_mainboard_daily_close_quotes',15000)
+        fetchPublicJsonWithCorsFallback('https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL',15000),
+        fetchPublicJsonWithCorsFallback('https://www.tpex.org.tw/openapi/v1/tpex_mainboard_daily_close_quotes',15000)
     ]);
     if(primary[0].status==='fulfilled')absorb(parseTwseOpenApiSnapshot(primary[0].value),'TWSE');
     else diagnostics.push('TWSE:連線失敗');
@@ -3776,8 +3824,8 @@ const fetchTodayClosePriceMap=async(codes,statusEl)=>{
     if(missing.length){
         if(statusEl)statusEl.textContent=`官方 OpenAPI 完成，備援查詢 ${missing.length} 檔…`;
         const fallback=await Promise.allSettled([
-            fetchJsonWithTimeout(`https://www.twse.com.tw/rwd/zh/afterTrading/STOCK_DAY_ALL?response=json&date=${today}`,15000),
-            fetchJsonWithTimeout('https://www.tpex.org.tw/www/zh-tw/afterTrading/dailyQuotes?response=json',15000)
+            fetchPublicJsonWithCorsFallback(`https://www.twse.com.tw/rwd/zh/afterTrading/STOCK_DAY_ALL?response=json&date=${today}`,15000),
+            fetchPublicJsonWithCorsFallback('https://www.tpex.org.tw/www/zh-tw/afterTrading/dailyQuotes?response=json',15000)
         ]);
         if(fallback[0].status==='fulfilled')absorb(parseTwseRwdSnapshot(fallback[0].value),'TWSE備援');
         else diagnostics.push('TWSE備援:失敗');
@@ -3787,9 +3835,21 @@ const fetchTodayClosePriceMap=async(codes,statusEl)=>{
 
     missing=codes.filter(code=>!result.has(code));
 
-    // 3. Individual fallbacks. These can be blocked by browser CORS, so they are last resort only.
+    // 3. FinMind 個股日線備援：直接依股票代號抓最近可取得的收盤價。
     if(missing.length){
-        if(statusEl)statusEl.textContent=`盤後資料仍缺 ${missing.length} 檔，個股備援查詢中…`;
+        if(statusEl)statusEl.textContent=`官方來源仍缺 ${missing.length} 檔，FinMind 備援查詢中…`;
+        const finmindResults=await runWithConcurrency(missing,4,code=>fetchFinMindClosePrice(code,getToday()));
+        finmindResults.forEach((item,index)=>{
+            if(item)result.set(missing[index],item);
+        });
+        diagnostics.push(`FinMind:${finmindResults.filter(Boolean).length}`);
+    }
+
+    missing=codes.filter(code=>!result.has(code));
+
+    // 4. Yahoo / MIS 最後備援。
+    if(missing.length){
+        if(statusEl)statusEl.textContent=`仍缺 ${missing.length} 檔，最後備援查詢中…`;
         const individual=await runWithConcurrency(missing,3,async code=>{
             const yahoo=await fetchYahooClosePrice(code);
             if(yahoo)return yahoo;
@@ -3798,7 +3858,7 @@ const fetchTodayClosePriceMap=async(codes,statusEl)=>{
         individual.forEach((item,index)=>{
             if(item)result.set(missing[index],item);
         });
-        diagnostics.push(`個股備援:${individual.filter(Boolean).length}`);
+        diagnostics.push(`Yahoo/MIS:${individual.filter(Boolean).length}`);
     }
     return{map:result,diagnostics};
 };
@@ -3860,7 +3920,12 @@ const updateJournalClosePrices=async()=>{
         }
 
         if(!updatedCodes){
-            showToast('未取得今日股票收盤價；將滑鼠移到更新狀態可查看來源診斷','error');
+            if(status){
+                status.classList.remove('hidden');
+                status.textContent='行情來源未取得資料';
+                status.title=`${diagnostics.join('｜')}${failedCodes.length?`｜未取得：${failedCodes.join('、')}`:''}`;
+            }
+            showToast(`今日 ${codes.length} 檔皆未取得收盤價，請查看更新狀態診斷`,'error');
         }else if(failedCodes.length){
             showToast(`已更新 ${updatedCodes} 檔，${failedCodes.length} 檔未取得：${failedCodes.join('、')}`,'error');
         }else{
