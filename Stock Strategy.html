@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="194">
+<meta name="app-version" content="195">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -4380,7 +4380,7 @@ function renderJournalStreaks(){
 const buildJournalStreakCopyText=analysis=>{
     const modeText=analysis.mode==='window'?`${analysis.minDays} 日內至少出現 ${analysis.minOccurrences} 次`:`至少連續 ${analysis.minDays} 個交易日`,tagText=analysis.tagFilterMode==='all'?'':`｜${analysis.tagFilterMode==='include'?'包含':'排除'}策略：${analysis.selectedTags.join('、')}`,dataText=analysis.dataFilterLabels?.length?`｜資料條件：${analysis.dataFilterLabels.join('、')}`:'',horseText=analysis.horseMode==='excludeStock'?'整檔排除赤兔馬、千里馬':analysis.horseMode==='ignoreTags'?'只忽略赤兔馬、千里馬標籤':'不排除赤兔馬、千里馬';
     const radarCopyDate=String(analysis.baseDate||analysis.requestedBase||getToday()).replace(/-/g,'/');
-    const lines=[`| ${radarCopyDate} 策略訊號雷達 |`,`基準日：${analysis.baseDate||analysis.requestedBase}｜${modeText}｜${horseText}｜週末、休市日不計${analysis.customHolidays.length?`｜自訂休市 ${analysis.customHolidays.length} 日`:''}${tagText}${dataText}${analysis.heatFilter!=='all'?`｜熱度：${analysis.heatFilter}`:''}${analysis.minStrength?`｜強度至少 ${analysis.minStrength} 分`:''}`,`共 ${analysis.results.length} 檔`,''];
+    const lines=[` | ${radarCopyDate} 策略訊號雷達 | `,`基準日：${analysis.baseDate||analysis.requestedBase}｜${modeText}｜${horseText}｜週末、休市日不計${analysis.customHolidays.length?`｜自訂休市 ${analysis.customHolidays.length} 日`:''}${tagText}${dataText}${analysis.heatFilter!=='all'?`｜熱度：${analysis.heatFilter}`:''}${analysis.minStrength?`｜強度至少 ${analysis.minStrength} 分`:''}`,`共 ${analysis.results.length} 檔`,''];
     analysis.results.forEach(item=>{
         const radarStrategyCount=new Set((item.tagCounts||[]).map(entry=>normalizeStrategyTagName(entry.tag)).filter(Boolean)).size;
         const radarCopyName=`${item.name}${item.isHorseNewEntry?' 🆕':''}${state.copyCompareDuplicates!==false&&radarStrategyCount>1?` 🔁${getDuplicateCountBadge(radarStrategyCount)}`:''}${getCopyMomentumMarks(item.code,analysis.baseDate||analysis.requestedBase||getToday())}`;
