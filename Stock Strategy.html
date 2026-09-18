@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="186">
+<meta name="app-version" content="187">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -1200,6 +1200,27 @@ nav, .top-nav, .desktop-nav, .module-nav{
 }
 </style>
 
+
+<style id="journal-close-price-v187">
+#module-journal .journal-close-price-col,
+#module-journal .journal-close-price-cell{
+    width:82px!important;
+    min-width:82px!important;
+    max-width:82px!important;
+}
+#module-journal .journal-close-price-cell{white-space:normal!important}
+@media(max-width:640px){
+    #module-journal .journal-close-price-col,
+    #module-journal .journal-close-price-cell{
+        width:72px!important;
+        min-width:72px!important;
+        max-width:72px!important;
+        padding-left:.35rem!important;
+        padding-right:.35rem!important;
+    }
+}
+</style>
+
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen flex flex-col antialiased">
 <nav class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-50 transition-colors duration-300">
@@ -1489,7 +1510,11 @@ nav, .top-nav, .desktop-nav, .module-nav{
                     <button class="flex-shrink-0 btn-copy-base bg-amber-50 dark:bg-amber-900/40 hover:bg-amber-600 border-amber-200 dark:border-amber-700/50 text-amber-700 dark:text-amber-200 btn-copy" data-mode="horses" title="複製赤兔馬與千里馬；🆕為新進榜，🔁為跨策略重複；比對本次實際精選馬廄名單；前2次任一次曾出現、但本次完全沒出現才標示 -剔除，並註明原屬赤兔馬／千里馬">🏇 精選馬廄</button>
                     <button class="flex-shrink-0 btn-copy-base bg-rose-50 dark:bg-rose-900/40 hover:bg-rose-600 border-rose-200 dark:border-rose-700/50 text-rose-700 dark:text-rose-200 btn-copy" data-mode="feifan">非凡重點</button>
                     </div>
-                    <span id="journal-stock-count" class="copy-stock-count inline-flex items-center gap-1.5 rounded-full bg-blue-50 dark:bg-blue-900/35 border border-blue-200 dark:border-blue-800/70 px-3 py-1.5 text-xs sm:text-sm font-bold text-blue-600 dark:text-blue-300 shadow-sm whitespace-nowrap"><i class="fa-solid fa-chart-simple"></i>目前顯示 0 檔股票</span>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <button type="button" id="btn-update-journal-close-prices" class="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:text-gray-500 text-white px-3 py-1.5 text-xs sm:text-sm font-bold shadow-sm transition active:scale-95 disabled:cursor-wait" title="更新目前策略日誌清單內股票的最新收盤價"><i class="fa-solid fa-arrows-rotate"></i><span>更新收盤價</span></button>
+                        <span id="journal-close-price-status" class="hidden text-[10px] sm:text-xs text-gray-400 dark:text-gray-500 whitespace-nowrap"></span>
+                        <span id="journal-stock-count" class="copy-stock-count inline-flex items-center gap-1.5 rounded-full bg-blue-50 dark:bg-blue-900/35 border border-blue-200 dark:border-blue-800/70 px-3 py-1.5 text-xs sm:text-sm font-bold text-blue-600 dark:text-blue-300 shadow-sm whitespace-nowrap"><i class="fa-solid fa-chart-simple"></i>目前顯示 0 檔股票</span>
+                    </div>
                 </div>
             </div>
             <div id="batch-bar-journal" class="hidden bg-red-50 dark:bg-red-900/20 border-b border-gray-200 dark:border-gray-700/50 p-2 sm:p-3 justify-between items-center gap-2 transition-all flex-wrap">
@@ -1509,6 +1534,7 @@ nav, .top-nav, .desktop-nav, .module-nav{
                             <th class="py-3 px-2 w-[40px] text-center sticky left-0 top-0 bg-gray-50 dark:bg-gray-900 z-40"><input type="checkbox" class="select-all-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" data-type="journal"></th>
                             <th class="py-3 px-1 sm:px-2 w-[55px] text-center sticky left-[40px] top-0 bg-gray-50 dark:bg-gray-900 z-40 sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-sort="date" data-module="journal">日期 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
                             <th class="py-3 px-2 sm:px-3 w-[95px] sticky left-[95px] top-0 bg-gray-50 dark:bg-gray-900 z-40 border-r border-gray-200 dark:border-gray-700 sortable cursor-pointer" data-sort="code" data-module="journal">代號/股名 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+                            <th class="journal-close-price-col py-3 px-2 sm:px-3 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-sort="closePrice" data-module="journal" title="最新可取得的盤後收盤價">收盤價 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
                             <th class="py-3 px-2 sm:px-3 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-sort="eps2025" data-module="journal">25 EPS <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
                             <th class="py-3 px-2 sm:px-3 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-sort="eps2026" data-module="journal">26 EPS <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
                             <th class="py-3 px-3 sm:px-4 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-sort="epsGrowth" data-module="journal">成長率 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
@@ -2353,7 +2379,7 @@ const ADMIN_SESSION_STORAGE_KEY='ryan_admin_session_v1';
 const XLSX_CDN_URL='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
 const getSyncPath=()=>DIRECT_SYNC_PATH;
 const isCloudMode=()=>true;
-let cloudSyncInterval=null, state={journals:[],plans:[],revenueRecords:[],reports:[],checklists:[],trash:[],deletionTombstones:{},tagSettings:null,epsData:{},codeToName:{},nameToCode:{},customMarketHolidays:[],copyCompareDuplicates:false,copyMarkRevenueHigh:true,copyMarkLargeHolder:true,filters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,largeHolder14:false,highTurnoverRevenue:false,tags:[],minScore:0,tagLogic:'OR',status:'all',quick:'all'},favFilters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,largeHolder14:false,highTurnoverRevenue:false,tags:[],minScore:0,tagLogic:'OR',status:'all',quick:'all'},revenueFilters:{month:'',code:'',type:'all',revenuePattern:'none',revenueN:3,revenueCount:2,holderPattern:'none',holderN:3,holderCount:2,minMomentum:0},reportFilters:{start:'',end:'',code:''},sortConfig:{key:'createdAt',asc:false},favSortConfig:{key:'createdAt',asc:false},planSortConfig:{key:'createdAt',asc:false},revenueSortConfig:{key:'month',asc:false},reportSortConfig:{key:'date',asc:false},checklistSortConfig:{key:'createdAt',asc:false}};
+let cloudSyncInterval=null, state={journals:[],plans:[],revenueRecords:[],reports:[],checklists:[],trash:[],deletionTombstones:{},tagSettings:null,epsData:{},codeToName:{},nameToCode:{},customMarketHolidays:[],journalClosePrices:{},copyCompareDuplicates:false,copyMarkRevenueHigh:true,copyMarkLargeHolder:true,filters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,largeHolder14:false,highTurnoverRevenue:false,tags:[],minScore:0,tagLogic:'OR',status:'all',quick:'all'},favFilters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,largeHolder14:false,highTurnoverRevenue:false,tags:[],minScore:0,tagLogic:'OR',status:'all',quick:'all'},revenueFilters:{month:'',code:'',type:'all',revenuePattern:'none',revenueN:3,revenueCount:2,holderPattern:'none',holderN:3,holderCount:2,minMomentum:0},reportFilters:{start:'',end:'',code:''},sortConfig:{key:'createdAt',asc:false},favSortConfig:{key:'createdAt',asc:false},planSortConfig:{key:'createdAt',asc:false},revenueSortConfig:{key:'month',asc:false},reportSortConfig:{key:'date',asc:false},checklistSortConfig:{key:'createdAt',asc:false}};
 const selectedIds={journal:new Set(),fav:new Set(),plan:new Set(),revenue:new Set(),report:new Set(),checklist:new Set()};
 
 const escapeHTML=str=>(!str&&str!==0)?'':String(str).replace(/[&<>'"]/g,tag=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[tag]||tag));
@@ -3394,6 +3420,7 @@ function loadLocalData(){
     const normalizedLocalReports=normalizeReportRecords(state.reports);state.reports=normalizedLocalReports.records;
     const normalizedMarketHolidays=normalizeCustomMarketHolidays(state.customMarketHolidays),migratedMarketHolidays=JSON.stringify(normalizedMarketHolidays)!==JSON.stringify(state.customMarketHolidays||[]);state.customMarketHolidays=normalizedMarketHolidays;
     resetSessionFiltersToDefaults(false);
+    if(!state.journalClosePrices||typeof state.journalClosePrices!=='object'||Array.isArray(state.journalClosePrices))state.journalClosePrices={};
     if(state.copyCompareDuplicates===undefined)state.copyCompareDuplicates=true;
     if(state.copyMarkRevenueHigh===undefined)state.copyMarkRevenueHigh=true;
     if(state.copyMarkLargeHolder===undefined)state.copyMarkLargeHolder=true;
@@ -3466,7 +3493,7 @@ const getFilteredAndSortedData=(dl,cf,cs)=>{
         if(tags.length>0){if(tagLogic==='AND'){if(!tags.every(t=>j.tags&&j.tags.includes(t)))return false;}else{if(!tags.some(t=>j.tags&&j.tags.includes(t)))return false;}}
         return true;
     });
-    fd.sort((a,b)=>{let vA,vB;switch(key){case'date':vA=a.date;vB=b.date;break;case'code':vA=a.code;vB=b.code;break;case'name':vA=a.name;vB=b.name;break;case'eps2025':vA=a.ei.eps2025??-9999;vB=b.ei.eps2025??-9999;break;case'eps2026':vA=a.ei.eps2026??-9999;vB=b.ei.eps2026??-9999;break;case'epsGrowth':vA=a.ei.epsGrowth??-9999;vB=b.ei.epsGrowth??-9999;break;case'score':vA=a.score;vB=b.score;break;case'targetPrice':vA=a.ei.targetPrice??-9999;vB=b.ei.targetPrice??-9999;break;case'revenueHigh':vA=(hasHighTurnoverRevenue(a.code,a.date)?4:0)+(state.revenueRecords.some(r=>String(r.code)===String(a.code)&&normalizeMomentumRecordType(r)==='revenue')?2:0)+(hasRecentLargeHolderIncrease(a.code,a.date,14)?1:0);vB=(hasHighTurnoverRevenue(b.code,b.date)?4:0)+(state.revenueRecords.some(r=>String(r.code)===String(b.code)&&normalizeMomentumRecordType(r)==='revenue')?2:0)+(hasRecentLargeHolderIncrease(b.code,b.date,14)?1:0);break;case'tags':vA=(a.tags||[]).join('、');vB=(b.tags||[]).join('、');break;case'notes':vA=a.notes||'';vB=b.notes||'';break;default:vA=a.createdAt||0;vB=b.createdAt||0;break;}if(vA===vB)return(a.createdAt||0)-(b.createdAt||0);return asc?(vA>vB?1:-1):(vA>vB?-1:1);});
+    fd.sort((a,b)=>{let vA,vB;switch(key){case'date':vA=a.date;vB=b.date;break;case'code':vA=a.code;vB=b.code;break;case'name':vA=a.name;vB=b.name;break;case'closePrice':vA=Number(state.journalClosePrices?.[a.code]?.price??-9999);vB=Number(state.journalClosePrices?.[b.code]?.price??-9999);break;case'eps2025':vA=a.ei.eps2025??-9999;vB=b.ei.eps2025??-9999;break;case'eps2026':vA=a.ei.eps2026??-9999;vB=b.ei.eps2026??-9999;break;case'epsGrowth':vA=a.ei.epsGrowth??-9999;vB=b.ei.epsGrowth??-9999;break;case'score':vA=a.score;vB=b.score;break;case'targetPrice':vA=a.ei.targetPrice??-9999;vB=b.ei.targetPrice??-9999;break;case'revenueHigh':vA=(hasHighTurnoverRevenue(a.code,a.date)?4:0)+(state.revenueRecords.some(r=>String(r.code)===String(a.code)&&normalizeMomentumRecordType(r)==='revenue')?2:0)+(hasRecentLargeHolderIncrease(a.code,a.date,14)?1:0);vB=(hasHighTurnoverRevenue(b.code,b.date)?4:0)+(state.revenueRecords.some(r=>String(r.code)===String(b.code)&&normalizeMomentumRecordType(r)==='revenue')?2:0)+(hasRecentLargeHolderIncrease(b.code,b.date,14)?1:0);break;case'tags':vA=(a.tags||[]).join('、');vB=(b.tags||[]).join('、');break;case'notes':vA=a.notes||'';vB=b.notes||'';break;default:vA=a.createdAt||0;vB=b.createdAt||0;break;}if(vA===vB)return(a.createdAt||0)-(b.createdAt||0);return asc?(vA>vB?1:-1):(vA>vB?-1:1);});
     return fd;
 };
 
@@ -3494,8 +3521,8 @@ const renderTableRows=(data,tbId,emId,isFav=false)=>{
         const tagHtml=(i.tags||[]).map(t=>{const normalizedTag=normalizeStrategyTagName(t),isNewHorse=horseNewTagSet.has(normalizedTag);return`<span class="inline-block text-[11px] font-bold px-2 py-0.5 rounded-md mr-1 mb-1 border shadow-sm transition ${canRemoveTags?'cursor-pointer hover:opacity-80':'cursor-default'} ${getTagStyle(t)}"${canRemoveTags?` data-action="remove-tag" data-id="${i.id}" data-tag="${escapeHTML(t)}" title="${isNewHorse?'🆕 新進榜｜點擊移除標籤':'點擊移除標籤'}"`:` title="${isNewHorse?'🆕 新進榜｜前一個月內未出現相同馬標籤':'策略標籤'}"`}>${escapeHTML(t)}${isNewHorse?' <span class="horse-new-badge ml-1" title="🆕 新進榜：同股往前一個月內未出現相同馬標籤">🆕</span>':''}${canRemoveTags?' ✕':''}</span>`;}).join('');
         let fl=i.isFavorite===true?1:(parseInt(i.isFavorite)||0),fc='text-gray-400 dark:text-gray-500 hover:text-yellow-500',fi='<i class="fa-solid fa-star pointer-events-none"></i>',ft='加入追蹤';
         if(fl===1){fc='text-yellow-500';ft='一星追蹤';}else if(fl===2){fc='text-orange-500';fi='<i class="fa-solid fa-star pointer-events-none"></i><span class="ml-1 text-[10px] font-bold pointer-events-none">2</span>';ft='二次追蹤';}else if(fl===3){fc='text-red-500';fi='<i class="fa-solid fa-star pointer-events-none"></i><span class="ml-1 text-[10px] font-bold pointer-events-none">3</span>';ft='三次追蹤';}
-        const fd=i.date?i.date.replace(/-/g,'/'):'',rbh=getRevenueMonthsHtml(i.code,i.date||getToday()),hr=state.reports.some(r=>String(r.code||'').trim()===String(i.code||'').trim()),rb=hr?renderReportIndicator():'',futuresBadge=ei.futures?'<span class="shrink-0 bg-sky-600 text-white text-[9px] px-1 rounded ml-1">期</span>':'',resonance=getJournalResonance(i),resonanceBadge=resonance.isMultiple?`<span class="inline-flex items-center rounded-md bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-200 px-1.5 py-0.5 text-[10px] font-black mr-1 mb-1" title="共振來源：${escapeHTML(resonance.sources.join('、'))}"><i class="fa-solid fa-bolt mr-1"></i>${escapeHTML(resonance.sources.join('＋'))}</span>`:'',th=renderStockStrengthBadges(i.code,i.date||getToday())+resonanceBadge+tagHtml,statusBadge=getJournalStatusBadge(i.status),overdueBadge=isJournalOverdue(i)?`<span class="inline-flex items-center rounded-md bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-200 px-1.5 py-0.5 text-[10px] font-black ml-1"><i class="fa-solid fa-clock mr-1"></i>逾期 ${journalTradingAge(i.date)} 日</span>`:'',returnValue=getJournalReturn(i),reviewBadge=i.review?.reviewDate?`<div class="mt-1 text-[10px] font-bold ${returnValue===null?'text-gray-500 dark:text-gray-400':returnValue>=0?'tw-red':'tw-green'}">複盤 ${escapeHTML(i.review.outcome||'未判定')}${returnValue===null?'':`｜${returnValue>=0?'+':''}${returnValue.toFixed(1)}%`}</div>`:'',dataIssues=getJournalDataIssues(i),issueBadge=dataIssues.length?`<div class="mt-1 inline-flex items-center rounded-md bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-200 px-1.5 py-0.5 text-[10px] font-black" title="${escapeHTML(dataIssues.join('；'))}"><i class="fa-solid fa-triangle-exclamation mr-1"></i>異常 ${dataIssues.length} 項</div>`:'',notesHtml=`<div class="mb-1">${statusBadge}${overdueBadge}</div>${reviewBadge}${issueBadge}<div class="mt-1">${escapeHTML(i.notes||'')}</div>`;
-        rh+=`<tr class="table-row-hover transition border-b border-gray-200 dark:border-gray-700/50 text-gray-900 dark:text-white text-sm ${ei.futures?"bg-sky-50 dark:bg-sky-900 hover:bg-sky-100 dark:hover:bg-sky-800":"bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800"}"><td class="table-sticky-bg py-3 px-2 w-[40px] min-w-[40px] max-w-[40px] text-center sticky left-0 z-20 ${ei.futures?"!bg-sky-50 dark:!bg-sky-900":""}"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${i.id}" data-type="${lt}" ${selectedIds[lt].has(i.id)?'checked':''}></td><td class="table-sticky-bg py-3 px-1 sm:px-2 w-[85px] min-w-[85px] max-w-[85px] text-center sticky left-[40px] z-20 font-medium whitespace-nowrap text-xs sm:text-sm text-gray-600 dark:text-gray-400 ${ei.futures?"!bg-sky-50 dark:!bg-sky-900":""}">${escapeHTML(fd)}</td><td class="table-sticky-bg py-2 px-2 sm:px-3 w-[95px] min-w-[95px] max-w-[95px] sticky left-[125px] z-20 border-r border-gray-200 dark:border-gray-700/50 overflow-hidden ${ei.futures?"!bg-sky-50 dark:!bg-sky-900":""}"${getYahooStockAttributes(i.code)}><div class="text-[10px] sm:text-[11px] text-gray-500 dark:text-gray-400 mb-0.5 leading-none flex items-center">${escapeHTML(i.code)}${rb}</div><div class="font-bold text-[14px] sm:text-[15px] leading-tight tracking-wide text-gray-800 dark:text-gray-200 flex items-center min-w-0"><span class="truncate">${escapeHTML(i.name)}</span>${horseNewTags.length?'<span class="horse-new-badge ml-1 shrink-0" title="🆕 新進榜：同股往前一個月內未出現相同馬標籤">🆕</span>':''}${futuresBadge}</div></td><td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2025)}</td><td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2026)}</td><td class="py-3 px-3 sm:px-4 text-right">${formatNumColor(ei.epsGrowth,true)}</td><td class="py-3 px-3 sm:px-4 text-center font-bold">${sc}</td><td class="py-3 px-3 sm:px-4 text-right">${formatTargetPrice(ei.targetPrice)}</td><td class="py-2 px-3 whitespace-normal w-[100px] min-w-[100px] text-center">${rbh}</td><td class="py-2 px-3 align-top whitespace-normal min-w-[120px] sm:min-w-[140px] lg:w-[320px] lg:min-w-[320px] xl:w-[380px] xl:min-w-[380px] lg:max-w-[460px]">${th}</td>${!isFav?`<td class="py-3 px-3 align-top text-gray-600 dark:text-gray-300 max-w-[110px] sm:max-w-[180px] lg:w-[220px] lg:min-w-[220px] lg:max-w-[250px] whitespace-normal break-words text-xs leading-relaxed" title="${escapeHTML(i.notes||'')}">${notesHtml}</td>`:''}<td class="py-3 px-3 text-center whitespace-nowrap"><button class="mr-1 hover:scale-110 text-emerald-600 dark:text-emerald-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="review-journal" data-id="${i.id}" title="訊號狀態與複盤"><i class="fa-solid fa-clipboard-check pointer-events-none"></i></button><button class="mr-1 hover:scale-110 text-green-600 dark:text-green-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="add-plan" data-code="${escapeHTML(i.code)}" title="加入交易規劃"><i class="fa-solid fa-chess-knight pointer-events-none"></i></button><button class="mr-1 hover:scale-110 ${fc} bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="toggle-fav" data-id="${i.id}" title="${ft}">${fi}</button><button class="mr-1 hover:scale-110 text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="edit-notes" data-id="${i.id}" title="修改備註"><i class="fa-solid fa-comment-dots pointer-events-none"></i></button><button class="text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="delete-journal" data-id="${i.id}" title="刪除"><i class="fa-solid fa-trash pointer-events-none"></i></button></td></tr>`;
+        const fd=i.date?i.date.replace(/-/g,'/'):'',closePriceInfo=state.journalClosePrices?.[String(i.code||'').trim()]||null,closePriceValue=Number(closePriceInfo?.price),closePriceDate=String(closePriceInfo?.date||''),closePriceHtml=Number.isFinite(closePriceValue)&&closePriceValue>0?`<div class="font-black text-[13px] sm:text-sm text-gray-800 dark:text-gray-100 tabular-nums">${escapeHTML(formatMarketPrice(closePriceValue))}</div>${closePriceDate?`<div class="mt-0.5 text-[9px] text-gray-400 tabular-nums">${escapeHTML(closePriceDate.replace(/-/g,'/'))}</div>`:''}`:'<span class="text-gray-300 dark:text-gray-600">—</span>',rbh=getRevenueMonthsHtml(i.code,i.date||getToday()),hr=state.reports.some(r=>String(r.code||'').trim()===String(i.code||'').trim()),rb=hr?renderReportIndicator():'',futuresBadge=ei.futures?'<span class="shrink-0 bg-sky-600 text-white text-[9px] px-1 rounded ml-1">期</span>':'',resonance=getJournalResonance(i),resonanceBadge=resonance.isMultiple?`<span class="inline-flex items-center rounded-md bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-200 px-1.5 py-0.5 text-[10px] font-black mr-1 mb-1" title="共振來源：${escapeHTML(resonance.sources.join('、'))}"><i class="fa-solid fa-bolt mr-1"></i>${escapeHTML(resonance.sources.join('＋'))}</span>`:'',th=renderStockStrengthBadges(i.code,i.date||getToday())+resonanceBadge+tagHtml,statusBadge=getJournalStatusBadge(i.status),overdueBadge=isJournalOverdue(i)?`<span class="inline-flex items-center rounded-md bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-200 px-1.5 py-0.5 text-[10px] font-black ml-1"><i class="fa-solid fa-clock mr-1"></i>逾期 ${journalTradingAge(i.date)} 日</span>`:'',returnValue=getJournalReturn(i),reviewBadge=i.review?.reviewDate?`<div class="mt-1 text-[10px] font-bold ${returnValue===null?'text-gray-500 dark:text-gray-400':returnValue>=0?'tw-red':'tw-green'}">複盤 ${escapeHTML(i.review.outcome||'未判定')}${returnValue===null?'':`｜${returnValue>=0?'+':''}${returnValue.toFixed(1)}%`}</div>`:'',dataIssues=getJournalDataIssues(i),issueBadge=dataIssues.length?`<div class="mt-1 inline-flex items-center rounded-md bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-200 px-1.5 py-0.5 text-[10px] font-black" title="${escapeHTML(dataIssues.join('；'))}"><i class="fa-solid fa-triangle-exclamation mr-1"></i>異常 ${dataIssues.length} 項</div>`:'',notesHtml=`<div class="mb-1">${statusBadge}${overdueBadge}</div>${reviewBadge}${issueBadge}<div class="mt-1">${escapeHTML(i.notes||'')}</div>`;
+        rh+=`<tr class="table-row-hover transition border-b border-gray-200 dark:border-gray-700/50 text-gray-900 dark:text-white text-sm ${ei.futures?"bg-sky-50 dark:bg-sky-900 hover:bg-sky-100 dark:hover:bg-sky-800":"bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800"}"><td class="table-sticky-bg py-3 px-2 w-[40px] min-w-[40px] max-w-[40px] text-center sticky left-0 z-20 ${ei.futures?"!bg-sky-50 dark:!bg-sky-900":""}"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${i.id}" data-type="${lt}" ${selectedIds[lt].has(i.id)?'checked':''}></td><td class="table-sticky-bg py-3 px-1 sm:px-2 w-[85px] min-w-[85px] max-w-[85px] text-center sticky left-[40px] z-20 font-medium whitespace-nowrap text-xs sm:text-sm text-gray-600 dark:text-gray-400 ${ei.futures?"!bg-sky-50 dark:!bg-sky-900":""}">${escapeHTML(fd)}</td><td class="table-sticky-bg py-2 px-2 sm:px-3 w-[95px] min-w-[95px] max-w-[95px] sticky left-[125px] z-20 border-r border-gray-200 dark:border-gray-700/50 overflow-hidden ${ei.futures?"!bg-sky-50 dark:!bg-sky-900":""}"${getYahooStockAttributes(i.code)}><div class="text-[10px] sm:text-[11px] text-gray-500 dark:text-gray-400 mb-0.5 leading-none flex items-center">${escapeHTML(i.code)}${rb}</div><div class="font-bold text-[14px] sm:text-[15px] leading-tight tracking-wide text-gray-800 dark:text-gray-200 flex items-center min-w-0"><span class="truncate">${escapeHTML(i.name)}</span>${horseNewTags.length?'<span class="horse-new-badge ml-1 shrink-0" title="🆕 新進榜：同股往前一個月內未出現相同馬標籤">🆕</span>':''}${futuresBadge}</div></td>${!isFav?`<td class="journal-close-price-cell py-2 px-2 sm:px-3 text-right align-middle">${closePriceHtml}</td>`:''}<td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2025)}</td><td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2026)}</td><td class="py-3 px-3 sm:px-4 text-right">${formatNumColor(ei.epsGrowth,true)}</td><td class="py-3 px-3 sm:px-4 text-center font-bold">${sc}</td><td class="py-3 px-3 sm:px-4 text-right">${formatTargetPrice(ei.targetPrice)}</td><td class="py-2 px-3 whitespace-normal w-[100px] min-w-[100px] text-center">${rbh}</td><td class="py-2 px-3 align-top whitespace-normal min-w-[120px] sm:min-w-[140px] lg:w-[320px] lg:min-w-[320px] xl:w-[380px] xl:min-w-[380px] lg:max-w-[460px]">${th}</td>${!isFav?`<td class="py-3 px-3 align-top text-gray-600 dark:text-gray-300 max-w-[110px] sm:max-w-[180px] lg:w-[220px] lg:min-w-[220px] lg:max-w-[250px] whitespace-normal break-words text-xs leading-relaxed" title="${escapeHTML(i.notes||'')}">${notesHtml}</td>`:''}<td class="py-3 px-3 text-center whitespace-nowrap"><button class="mr-1 hover:scale-110 text-emerald-600 dark:text-emerald-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="review-journal" data-id="${i.id}" title="訊號狀態與複盤"><i class="fa-solid fa-clipboard-check pointer-events-none"></i></button><button class="mr-1 hover:scale-110 text-green-600 dark:text-green-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="add-plan" data-code="${escapeHTML(i.code)}" title="加入交易規劃"><i class="fa-solid fa-chess-knight pointer-events-none"></i></button><button class="mr-1 hover:scale-110 ${fc} bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="toggle-fav" data-id="${i.id}" title="${ft}">${fi}</button><button class="mr-1 hover:scale-110 text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="edit-notes" data-id="${i.id}" title="修改備註"><i class="fa-solid fa-comment-dots pointer-events-none"></i></button><button class="text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="delete-journal" data-id="${i.id}" title="刪除"><i class="fa-solid fa-trash pointer-events-none"></i></button></td></tr>`;
     });
     setHTMLIfChanged(tb,rh); updateBatchUI(lt);
 };
@@ -3577,6 +3604,154 @@ const renderRevenueActiveFilterChips=()=>{
     if(f.holderPattern==='window')items.push(filterChipHtml(`千張 ${f.holderN||3} 週內 ≥ ${f.holderCount||2} 次`,'rev:holderPattern','violet'));
     root.innerHTML=items.length?`<span class="text-[10px] font-black text-gray-400 flex-shrink-0"><i class="fa-solid fa-filter mr-1"></i>生效條件</span>${items.join('')}`:'';
 };
+
+const formatMarketPrice=value=>{
+    const n=Number(value);
+    if(!Number.isFinite(n))return'—';
+    if(n>=1000)return n.toFixed(0);
+    if(n>=100)return n.toFixed(1).replace(/\.0$/,'');
+    return n.toFixed(2).replace(/0+$/,'').replace(/\.$/,'');
+};
+const normalizeMarketClosePrice=value=>{
+    if(value===null||value===undefined)return null;
+    const normalized=String(value).replace(/,/g,'').trim();
+    if(!normalized||normalized==='-'||normalized==='--'||normalized==='—')return null;
+    const n=Number(normalized);
+    return Number.isFinite(n)&&n>0?n:null;
+};
+const rocMarketDateToISO=value=>{
+    const raw=String(value||'').trim().replace(/[^\d]/g,'');
+    if(raw.length===7){
+        const year=Number(raw.slice(0,3))+1911;
+        return `${year}-${raw.slice(3,5)}-${raw.slice(5,7)}`;
+    }
+    if(raw.length===8&&Number(raw.slice(0,4))>1900)return `${raw.slice(0,4)}-${raw.slice(4,6)}-${raw.slice(6,8)}`;
+    return'';
+};
+const fetchJsonWithTimeout=async(url,timeout=12000)=>{
+    const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),timeout);
+    try{
+        const response=await fetch(url,{cache:'no-store',signal:controller.signal,headers:{Accept:'application/json'}});
+        if(!response.ok)throw new Error(`HTTP ${response.status}`);
+        return await response.json();
+    }finally{clearTimeout(timer);}
+};
+const parseTwseCloseSnapshot=rows=>{
+    const map=new Map();
+    if(!Array.isArray(rows))return map;
+    rows.forEach(row=>{
+        const code=String(row?.Code||'').trim(),price=normalizeMarketClosePrice(row?.ClosingPrice);
+        if(!code||price===null)return;
+        map.set(code,{price,date:rocMarketDateToISO(row?.Date),source:'TWSE'});
+    });
+    return map;
+};
+const parseTpexCloseSnapshot=rows=>{
+    const map=new Map();
+    if(!Array.isArray(rows))return map;
+    rows.forEach(row=>{
+        const code=String(row?.SecuritiesCompanyCode||'').trim(),price=normalizeMarketClosePrice(row?.Close);
+        if(!code||price===null)return;
+        map.set(code,{price,date:rocMarketDateToISO(row?.Date),source:'TPEx'});
+    });
+    return map;
+};
+const formatYahooTimestampDate=timestamp=>{
+    if(!Number.isFinite(Number(timestamp)))return'';
+    try{
+        const parts=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date(Number(timestamp)*1000));
+        const get=type=>parts.find(part=>part.type===type)?.value||'';
+        return `${get('year')}-${get('month')}-${get('day')}`;
+    }catch(error){return'';}
+};
+const fetchYahooClosePrice=async code=>{
+    const normalized=normalizeYahooStockCode(code);
+    if(!normalized)return null;
+    for(const suffix of ['.TW','.TWO']){
+        try{
+            const url=`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(normalized+suffix)}?range=10d&interval=1d&includePrePost=false`;
+            const data=await fetchJsonWithTimeout(url,9000),result=data?.chart?.result?.[0];
+            if(!result)continue;
+            const closes=result.indicators?.quote?.[0]?.close||[],timestamps=result.timestamp||[];
+            for(let i=closes.length-1;i>=0;i--){
+                const price=normalizeMarketClosePrice(closes[i]);
+                if(price===null)continue;
+                return{price,date:formatYahooTimestampDate(timestamps[i]),source:'Yahoo'};
+            }
+        }catch(error){}
+    }
+    return null;
+};
+const runWithConcurrency=async(items,limit,worker)=>{
+    const results=new Array(items.length);let cursor=0;
+    const runners=Array.from({length:Math.min(limit,items.length)},async()=>{
+        while(cursor<items.length){
+            const index=cursor++;
+            try{results[index]=await worker(items[index],index);}catch(error){results[index]=null;}
+        }
+    });
+    await Promise.all(runners);return results;
+};
+const updateJournalClosePrices=async()=>{
+    const button=document.getElementById('btn-update-journal-close-prices'),status=document.getElementById('journal-close-price-status');
+    const visible=getFilteredAndSortedData(state.journals,state.filters,state.sortConfig);
+    const codes=[...new Set(visible.map(item=>String(item.code||'').trim()).filter(code=>code&&code!=='TX00'))];
+    if(!codes.length)return showToast('目前策略日誌沒有可更新的股票','error');
+    if(button?.disabled)return;
+    if(button){button.disabled=true;button.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i><span>更新中</span>';}
+    if(status){status.classList.remove('hidden');status.textContent=`正在更新 ${codes.length} 檔…`;}
+    const twseUrl='https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL';
+    const tpexUrl='https://www.tpex.org.tw/openapi/v1/tpex_mainboard_daily_close_quotes';
+    let twseMap=new Map(),tpexMap=new Map(),officialErrors=0;
+    const official=await Promise.allSettled([fetchJsonWithTimeout(twseUrl,15000),fetchJsonWithTimeout(tpexUrl,15000)]);
+    if(official[0].status==='fulfilled')twseMap=parseTwseCloseSnapshot(official[0].value);else officialErrors++;
+    if(official[1].status==='fulfilled')tpexMap=parseTpexCloseSnapshot(official[1].value);else officialErrors++;
+
+    const next={...(state.journalClosePrices||{})},missing=[];
+    let updated=0,twseCount=0,tpexCount=0,yahooCount=0;
+    codes.forEach(code=>{
+        const item=twseMap.get(code)||tpexMap.get(code);
+        if(item){
+            next[code]={...item,updatedAt:Date.now()};
+            updated++;
+            if(item.source==='TWSE')twseCount++;else tpexCount++;
+        }else missing.push(code);
+    });
+
+    if(missing.length){
+        if(status)status.textContent=`官方資料完成，備援查詢 ${missing.length} 檔…`;
+        const yahooResults=await runWithConcurrency(missing,4,code=>fetchYahooClosePrice(code));
+        yahooResults.forEach((item,index)=>{
+            if(!item)return;
+            next[missing[index]]={...item,updatedAt:Date.now()};
+            updated++;yahooCount++;
+        });
+    }
+
+    state.journalClosePrices=next;
+    saveLocalData();
+    processAndRenderJournals();
+
+    const failed=codes.length-updated,sourceParts=[];
+    if(twseCount)sourceParts.push(`上市 ${twseCount}`);
+    if(tpexCount)sourceParts.push(`上櫃 ${tpexCount}`);
+    if(yahooCount)sourceParts.push(`Yahoo備援 ${yahooCount}`);
+    if(status){
+        status.classList.remove('hidden');
+        status.textContent=`已更新 ${updated}/${codes.length} 檔${sourceParts.length?`｜${sourceParts.join('、')}`:''}`;
+        status.title=`更新時間 ${new Date().toLocaleString('zh-TW',{hour12:false})}`;
+    }
+    if(button){button.disabled=false;button.innerHTML='<i class="fa-solid fa-arrows-rotate"></i><span>更新收盤價</span>';}
+    if(updated===0){
+        showToast(officialErrors===2?'收盤價來源目前無法連線，請稍後再試':'目前沒有取得可用收盤價','error');
+    }else if(failed){
+        showToast(`收盤價更新完成 ${updated} 檔，${failed} 檔未取得`,'error');
+    }else{
+        showToast(`收盤價更新完成，共 ${updated} 檔`);
+    }
+};
+document.getElementById('btn-update-journal-close-prices')?.addEventListener('click',updateJournalClosePrices);
+
 function processAndRenderJournals(){refreshJournalInsightCache();const data=getFilteredAndSortedData(state.journals,state.filters,state.sortConfig);renderTableRows(data,'journal-table-body','journal-empty');renderJournalActiveFilterChips();renderJournalDashboard(data);renderWarRoom();if(lastJournalStreakResult)renderJournalStreaks();}
 function renderFavorites(){renderTableRows(getFilteredAndSortedData(state.journals,state.favFilters,state.favSortConfig).filter(j=>j.isFavorite),'fav-table-body','fav-empty',true);}
 
