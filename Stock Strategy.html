@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="203">
+<meta name="app-version" content="204">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -1388,6 +1388,10 @@ nav, .top-nav, .desktop-nav, .module-nav{
                                         <input type="checkbox" id="streak-high-turnover-revenue" class="streak-data-filter rounded border-gray-300 dark:border-gray-600 text-amber-500 focus:ring-amber-500 w-3.5 h-3.5 sm:w-4 sm:h-4">
                                         <span class="text-xs sm:text-sm text-amber-600 dark:text-amber-400 font-medium whitespace-nowrap">高成交值高營收</span>
                                     </label>
+                                    <label class="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white dark:bg-gray-900/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-700/50 transition hover:bg-gray-50 dark:hover:bg-gray-800">
+                                        <input type="checkbox" id="streak-chip-concentration-holder" class="streak-data-filter rounded border-gray-300 dark:border-gray-600 text-fuchsia-500 focus:ring-fuchsia-500 w-3.5 h-3.5 sm:w-4 sm:h-4">
+                                        <span class="text-xs sm:text-sm text-fuchsia-600 dark:text-fuchsia-400 font-medium whitespace-nowrap">籌碼集中大戶增</span>
+                                    </label>
                                 </div>
                             </div>
                             <div class="col-span-12 grid grid-cols-12 gap-2 items-end">
@@ -2519,12 +2523,12 @@ const TAG_CATEGORIES = [
     {title: "🌟 特別關注", theme: "rose", tags: ["特別追蹤", "非凡重點", "總編概念股"]},
     {title: "📊 基本面佳", theme: "blue", tags: ["多頭營收創高", "赤兔馬", "千里馬"]},
     {title: "🔥 動能與型態", theme: "amber", tags: ["一陽指", "金包銀", "披荊斬棘", "破繭而出", "月來越好", "季不可失", "守株待兔", "缺口", "阿婆散步", "多排破上關"]},
-    {title: "💰 量價與籌碼", theme: "purple", tags: ["量價齊揚", "高成交值", "法人加持", "外資+投信", "外資+自營", "投信+自營", "三法聯手", "1日籌碼集中度", "5日籌碼集中", "20日籌碼集中", "籌碼集中集中大戶增"]},
+    {title: "💰 量價與籌碼", theme: "purple", tags: ["量價齊揚", "高成交值", "法人加持", "外資+投信", "外資+自營", "投信+自營", "三法聯手", "1日籌碼集中度", "5日籌碼集中", "20日籌碼集中", "籌碼集中大戶增"]},
     {title: "📈 技術指標", theme: "teal", tags: ["OBV突破", "MACD突破", "KD金叉"]},
     {title: "🎯 分析師專區｜漁夫林睿閎投資週報", theme: "purple", tags: ["黑卡會員", "尊耀會員", "頂峰會員"]}
 ];
 
-const STRATEGY_TAG_ALIASES={'一條根':'一陽指','跳空缺口':'缺口','1日籌碼集中':'1日籌碼集中度','小碎步':'阿婆散步','阿甘步伐':'阿婆散步','總編認同':'總編概念股'};
+const STRATEGY_TAG_ALIASES={'一條根':'一陽指','跳空缺口':'缺口','1日籌碼集中':'1日籌碼集中度','小碎步':'阿婆散步','阿甘步伐':'阿婆散步','總編認同':'總編概念股','籌碼集中集中大戶增':'籌碼集中大戶增'};
 const normalizeStrategyTagName=tag=>{
     const raw=String(tag??'').trim();
     return STRATEGY_TAG_ALIASES[raw]||raw;
@@ -4337,7 +4341,8 @@ const getStreakDataFilterState=()=>({
     excludeNegativeGrowth:!!document.getElementById('streak-exclude-negative-growth')?.checked,
     revenueHigh:!!document.getElementById('streak-revenue-high')?.checked,
     largeHolder:!!document.getElementById('streak-large-holder')?.checked,
-    highTurnoverRevenue:!!document.getElementById('streak-high-turnover-revenue')?.checked
+    highTurnoverRevenue:!!document.getElementById('streak-high-turnover-revenue')?.checked,
+    chipConcentrationHolder:!!document.getElementById('streak-chip-concentration-holder')?.checked
 });
 const matchesStreakDataFilters=(item,referenceDate,filters)=>{
     const code=String(item?.code||'').trim();
@@ -4349,6 +4354,7 @@ const matchesStreakDataFilters=(item,referenceDate,filters)=>{
     if(filters.revenueHigh&&!hasRecentRevenueHigh(code,referenceDate,1))return false;
     if(filters.largeHolder&&!hasLatestLargeHolderIncrease(code,referenceDate))return false;
     if(filters.highTurnoverRevenue&&!hasHighTurnoverRevenue(code,referenceDate))return false;
+    if(filters.chipConcentrationHolder&&!(item.days||[]).some(day=>(day.tags||[]).some(tag=>normalizeStrategyTagName(tag)==='籌碼集中大戶增')))return false;
     return true;
 };
 const getStreakDataFilterLabels=filters=>{
@@ -4357,6 +4363,7 @@ const getStreakDataFilterLabels=filters=>{
     if(filters.revenueHigh)labels.push('營收創高');
     if(filters.largeHolder)labels.push('千張大戶增');
     if(filters.highTurnoverRevenue)labels.push('高成交值高營收');
+    if(filters.chipConcentrationHolder)labels.push('籌碼集中大戶增');
     return labels;
 };
 
@@ -6680,9 +6687,9 @@ const SESSION={
         }
       });
 
-      // v201：既有使用者自動補上「量價與籌碼」必要標籤，包含法人聯手與「籌碼集中集中大戶增」。
+      // v201：既有使用者自動補上「量價與籌碼」必要標籤，包含法人聯手與「籌碼集中大戶增」。
       var chipCategoryTitle='💰 量價與籌碼';
-      var chipAllianceTags=['外資+投信','外資+自營','投信+自營','三法聯手','籌碼集中集中大戶增'];
+      var chipAllianceTags=['外資+投信','外資+自營','投信+自營','三法聯手','籌碼集中大戶增'];
       var chipCategory=normalizedCategories.find(function(category){return String(category.title||'')===chipCategoryTitle;});
       if(!chipCategory){
         chipCategory={title:chipCategoryTitle,theme:'purple',tags:[]};
