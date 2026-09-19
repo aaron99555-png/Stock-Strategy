@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="199">
+<meta name="app-version" content="200">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -2315,6 +2315,7 @@ nav, .top-nav, .desktop-nav, .module-nav{
                     <div class="shrink-0 flex flex-wrap items-center justify-end gap-1.5 sm:gap-2">
                         <div class="flex items-center gap-1" aria-label="法人報告語音朗讀">
                             <button type="button" id="report-reader-speak-btn" title="朗讀目前法人報告" aria-label="朗讀目前法人報告" class="h-9 sm:h-10 px-2.5 sm:px-3 rounded-lg border border-sky-200 bg-sky-50 text-sky-700 hover:bg-sky-100 text-xs sm:text-sm font-black inline-flex items-center justify-center gap-1.5 transition active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"><i id="report-reader-speak-icon" class="fa-solid fa-volume-high"></i><span id="report-reader-speak-label">朗讀</span></button>
+                            <label class="h-9 sm:h-10 inline-flex items-center gap-1 rounded-lg border border-sky-200 bg-white px-2 text-[10px] sm:text-xs font-bold text-sky-700" title="調整朗讀速度"><span class="hidden sm:inline">語速</span><select id="report-reader-speech-rate" class="bg-transparent outline-none font-black text-sky-700 cursor-pointer" aria-label="朗讀速度"><option value="0.75">0.75×</option><option value="1">1.0×</option><option value="1.25">1.25×</option><option value="1.5">1.5×</option><option value="2">2.0×</option></select></label>
                             <button type="button" id="report-reader-speech-stop-btn" title="停止朗讀" aria-label="停止朗讀" class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg border border-gray-200 bg-gray-100 text-gray-500 hover:bg-red-50 hover:border-red-200 hover:text-red-600 inline-flex items-center justify-center transition active:scale-95 disabled:opacity-35 disabled:cursor-not-allowed" disabled><i class="fa-solid fa-stop"></i></button>
                         </div>
                         <div class="flex items-center justify-center gap-1 sm:gap-2" aria-label="報告文字大小">
@@ -4863,6 +4864,9 @@ document.getElementById('plan-table-body')?.addEventListener('click',async e=>{c
 function renderPlans(){const tb=document.getElementById('plan-table-body');if(!tb)return;let cc=0,wc=0,tp=0,rh='';const sp=[...state.plans].sort((a,b)=>{let vA,vB;switch(state.planSortConfig.key){case'entryDate':vA=a.entryDate||'';vB=b.entryDate||'';break;case'stock':vA=a.stock;vB=b.stock;break;case'qty':vA=a.qty;vB=b.qty;break;case'entry':vA=a.entry;vB=b.entry;break;case'target':vA=a.target||0;vB=b.target||0;break;case'stop':vA=a.stop;vB=b.stop;break;case'status':const o={'持倉中':1,'已停利':2,'已停損':3};vA=o[a.status]||99;vB=o[b.status]||99;break;default:vA=a.createdAt||0;vB=b.createdAt||0;break;}if(vA===vB)return(a.createdAt||0)-(b.createdAt||0);return state.planSortConfig.asc?(vA>vB?1:-1):(vA>vB?-1:1);});sp.forEach(i=>{const isC=i.status!=='持倉中';if(isC){cc++;if(i.status==='已停利')wc++;tp+=i.pnl||0;}const cm=i.stock.match(/\d{4}/),isF=cm?getEpsInfo(cm[0],{}).futures:false,dn=i.name||state.codeToName[i.stock]||'',fd=i.entryDate?i.entryDate.replace(/-/g,'/'):'';rh+=`<tr class="table-row-hover border-b border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-sm ${isC?'opacity-50':''}"><td class="table-sticky-bg py-3 px-2 sm:px-3 text-center sticky left-0 z-20"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${i.id}" data-type="plan" ${selectedIds['plan'].has(i.id)?'checked':''}></td><td class="py-3 px-3 sm:px-4 font-medium text-gray-600 dark:text-gray-400">${escapeHTML(fd)}</td><td class="py-3 px-3 sm:px-4 font-medium">${isF?'<span class="bg-sky-600 text-white text-[10px] px-1.5 py-0.5 rounded mr-1.5 shadow-sm">期</span>':''}<span class="font-bold mr-1.5 text-gray-800 dark:text-gray-200">${escapeHTML(i.stock)}</span><span class="text-gray-600 dark:text-gray-400">${escapeHTML(dn)}</span><div class="text-[10px] text-gray-400 mt-0.5">${escapeHTML(i.note||'')}</div></td><td class="py-3 px-3 sm:px-4">${i.qty}</td><td class="py-3 px-3 sm:px-4">${i.entry}</td><td class="py-3 px-3 sm:px-4 tw-red font-bold">${i.target||'-'}</td><td class="py-3 px-3 sm:px-4 tw-green font-bold">${i.stop}</td><td class="py-3 px-3 sm:px-4"><span class="px-2 py-1 rounded-md text-xs font-medium ${i.status==='持倉中'?'bg-blue-100 text-blue-700':(i.status==='已停利'?'bg-red-100 text-red-700':'bg-green-100 text-green-700')}">${i.status}</span></td><td class="py-3 px-3 sm:px-4 whitespace-nowrap">${!isC?`<button data-action="close-plan" data-id="${i.id}" class="text-xs bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 px-3 py-1.5 rounded-lg transition shadow-sm mr-2 active:scale-95">結算</button>`:`<span class="mr-3 ${i.pnl>0?'tw-red':'tw-green'} font-bold">${formatNumColor(i.pnl)}</span>`}<button data-action="edit-plan" data-id="${i.id}" class="text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110 mr-1"><i class="fa-solid fa-pen pointer-events-none"></i></button><button data-action="delete-plan" data-id="${i.id}" class="text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110"><i class="fa-solid fa-trash pointer-events-none"></i></button></td></tr>`;});setHTMLIfChanged(tb,rh);document.getElementById('stat-total').textContent=cc;document.getElementById('stat-winrate').textContent=cc>0?Math.round((wc/cc)*100)+'%':'0%';document.getElementById('stat-pnl').textContent=tp.toString();document.getElementById('stat-pnl').className=`text-2xl font-bold ${tp>0?'tw-red':(tp<0?'tw-green':'text-gray-900 dark:text-white')} transition-colors duration-300`;updateBatchUI('plan');}
 
 let reportReaderItems=[],reportReaderIndex=0,reportReaderTouchStart=null,reportReaderBodyOverflow='',reportReaderEnteredFullscreen=false;
+const REPORT_READER_SPEECH_RATE_KEY='ryan_report_reader_speech_rate_v1';
+const normalizeReportSpeechRate=value=>{const allowed=[0.75,1,1.25,1.5,2],numeric=Number(value);return allowed.includes(numeric)?numeric:1;};
+let reportReaderSpeechRate=normalizeReportSpeechRate(localStorage.getItem(REPORT_READER_SPEECH_RATE_KEY)||'1');
 let reportReaderSpeechState={status:'idle',chunks:[],index:0,runId:0};
 const getReportReaderItems=()=>{
     let reports=normalizeReportRecords(state.reports||[]).records;
@@ -4918,7 +4922,25 @@ const splitReportSpeechText=text=>{
     });
     return chunks;
 };
+
+const syncReportReaderSpeechRateUI=()=>{const select=document.getElementById('report-reader-speech-rate');if(select)select.value=String(reportReaderSpeechRate);};
+const setReportReaderSpeechRate=value=>{
+    const next=normalizeReportSpeechRate(value);
+    if(next===reportReaderSpeechRate){syncReportReaderSpeechRateUI();return;}
+    reportReaderSpeechRate=next;
+    try{localStorage.setItem(REPORT_READER_SPEECH_RATE_KEY,String(next));}catch(error){}
+    syncReportReaderSpeechRateUI();
+    if(reportReaderSpeechState.status==='speaking'||reportReaderSpeechState.status==='paused'){
+        const currentIndex=Math.max(0,reportReaderSpeechState.index-1),chunks=[...reportReaderSpeechState.chunks],runId=reportReaderSpeechState.runId+1;
+        try{window.speechSynthesis?.cancel();}catch(error){}
+        reportReaderSpeechState={status:'speaking',chunks,index:currentIndex,runId};
+        updateReportReaderSpeechUI();
+        setTimeout(()=>speakReportReaderNextChunk(runId),30);
+    }
+};
+
 const updateReportReaderSpeechUI=()=>{
+    syncReportReaderSpeechRateUI();
     const speakBtn=document.getElementById('report-reader-speak-btn'),
           speakLabel=document.getElementById('report-reader-speak-label'),
           speakIcon=document.getElementById('report-reader-speak-icon'),
@@ -4972,7 +4994,7 @@ const speakReportReaderNextChunk=runId=>{
     const text=reportReaderSpeechState.chunks[reportReaderSpeechState.index++];
     const utterance=new SpeechSynthesisUtterance(text);
     utterance.lang='zh-TW';
-    utterance.rate=1;
+    utterance.rate=reportReaderSpeechRate;
     utterance.pitch=1;
     utterance.volume=1;
     const voice=getReportSpeechVoice();if(voice)utterance.voice=voice;
@@ -5071,6 +5093,7 @@ document.getElementById('report-reader-close-btn')?.addEventListener('click',clo
 document.getElementById('report-reader-copy-btn')?.addEventListener('click',()=>{const report=reportReaderItems[reportReaderIndex];if(report)executeCopy(`[${report.date||''}] ${report.code} / ${report.name}\n${report.content||''}`);});
 document.getElementById('report-reader-speak-btn')?.addEventListener('click',toggleReportReaderSpeech);
 document.getElementById('report-reader-speech-stop-btn')?.addEventListener('click',stopReportReaderSpeech);
+document.getElementById('report-reader-speech-rate')?.addEventListener('change',e=>setReportReaderSpeechRate(e.target.value));
 updateReportReaderSpeechUI();
 const REPORT_READER_FONT_KEY='ryan_report_reader_font_v1',reportReaderFontSizes=[15,17,19,21,23];let reportReaderFontIndex=Math.max(0,Math.min(reportReaderFontSizes.length-1,parseInt(localStorage.getItem(REPORT_READER_FONT_KEY)||'1')));
 const applyReportReaderFont=()=>{const content=document.getElementById('report-reader-content'),label=document.getElementById('report-reader-font-label'),down=document.getElementById('report-reader-font-down'),up=document.getElementById('report-reader-font-up');if(content){content.style.fontSize=`${reportReaderFontSizes[reportReaderFontIndex]}px`;content.style.lineHeight=reportReaderFontIndex>=3?'2':'1.9';}if(label)label.textContent=['較小','標準','舒適','大字','特大'][reportReaderFontIndex];if(down)down.disabled=reportReaderFontIndex===0;if(up)up.disabled=reportReaderFontIndex===reportReaderFontSizes.length-1;};
