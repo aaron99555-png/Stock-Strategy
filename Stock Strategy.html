@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="200">
+<meta name="app-version" content="201">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -6636,9 +6636,9 @@ const SESSION={
         }
       });
 
-      // v171：既有使用者自動補上「量價與籌碼」的法人聯手標籤。
+      // v201：既有使用者自動補上「量價與籌碼」必要標籤，包含法人聯手與「籌碼集中集中大戶增」。
       var chipCategoryTitle='💰 量價與籌碼';
-      var chipAllianceTags=['外資+投信','外資+自營','投信+自營','三法聯手'];
+      var chipAllianceTags=['外資+投信','外資+自營','投信+自營','三法聯手','籌碼集中集中大戶增'];
       var chipCategory=normalizedCategories.find(function(category){return String(category.title||'')===chipCategoryTitle;});
       if(!chipCategory){
         chipCategory={title:chipCategoryTitle,theme:'purple',tags:[]};
