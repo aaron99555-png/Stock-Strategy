@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="196">
+<meta name="app-version" content="199">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -2310,12 +2310,18 @@ nav, .top-nav, .desktop-nav, .module-nav{
         </header>
         <div id="report-reader-content-wrap" class="flex-1 min-h-0 overflow-y-auto px-3 py-4 sm:px-8 sm:py-7 lg:px-14">
             <article class="max-w-5xl mx-auto bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-lg p-5 sm:p-8 lg:p-10 min-h-full">
-                <div class="flex items-center justify-between gap-2 mb-4 pb-3 border-b border-gray-200 dark:border-gray-700">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-4 pb-3 border-b border-gray-200 dark:border-gray-700">
                     <div class="min-w-0 flex items-center gap-2 text-sm sm:text-base font-black text-indigo-700 dark:text-indigo-300"><span class="w-8 h-8 shrink-0 rounded-lg bg-indigo-100 dark:bg-indigo-900/50 inline-flex items-center justify-center"><i class="fa-solid fa-align-left"></i></span><span class="truncate">報告摘要</span></div>
-                    <div class="shrink-0 flex items-center justify-center gap-1 sm:gap-2" aria-label="報告文字大小">
-                        <button type="button" id="report-reader-font-down" class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-xs sm:text-sm font-black disabled:opacity-35" aria-label="縮小報告文字">A−</button>
-                        <span id="report-reader-font-label" class="min-w-[42px] sm:min-w-[52px] text-center text-[10px] sm:text-[11px] font-bold text-gray-400">標準</span>
-                        <button type="button" id="report-reader-font-up" class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-xs sm:text-sm font-black disabled:opacity-35" aria-label="放大報告文字">A＋</button>
+                    <div class="shrink-0 flex flex-wrap items-center justify-end gap-1.5 sm:gap-2">
+                        <div class="flex items-center gap-1" aria-label="法人報告語音朗讀">
+                            <button type="button" id="report-reader-speak-btn" title="朗讀目前法人報告" aria-label="朗讀目前法人報告" class="h-9 sm:h-10 px-2.5 sm:px-3 rounded-lg border border-sky-200 bg-sky-50 text-sky-700 hover:bg-sky-100 text-xs sm:text-sm font-black inline-flex items-center justify-center gap-1.5 transition active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"><i id="report-reader-speak-icon" class="fa-solid fa-volume-high"></i><span id="report-reader-speak-label">朗讀</span></button>
+                            <button type="button" id="report-reader-speech-stop-btn" title="停止朗讀" aria-label="停止朗讀" class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg border border-gray-200 bg-gray-100 text-gray-500 hover:bg-red-50 hover:border-red-200 hover:text-red-600 inline-flex items-center justify-center transition active:scale-95 disabled:opacity-35 disabled:cursor-not-allowed" disabled><i class="fa-solid fa-stop"></i></button>
+                        </div>
+                        <div class="flex items-center justify-center gap-1 sm:gap-2" aria-label="報告文字大小">
+                            <button type="button" id="report-reader-font-down" class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-xs sm:text-sm font-black disabled:opacity-35" aria-label="縮小報告文字">A−</button>
+                            <span id="report-reader-font-label" class="min-w-[42px] sm:min-w-[52px] text-center text-[10px] sm:text-[11px] font-bold text-gray-400">標準</span>
+                            <button type="button" id="report-reader-font-up" class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-xs sm:text-sm font-black disabled:opacity-35" aria-label="放大報告文字">A＋</button>
+                        </div>
                     </div>
                 </div>
                 <div id="report-reader-content" class="whitespace-pre-wrap break-words text-base sm:text-lg lg:text-xl leading-8 sm:leading-9 lg:leading-10 font-normal tracking-wide text-gray-800 dark:text-gray-100"></div>
@@ -2512,7 +2518,7 @@ const TAG_CATEGORIES = [
     {title: "🌟 特別關注", theme: "rose", tags: ["特別追蹤", "非凡重點", "總編概念股"]},
     {title: "📊 基本面佳", theme: "blue", tags: ["多頭營收創高", "赤兔馬", "千里馬"]},
     {title: "🔥 動能與型態", theme: "amber", tags: ["一陽指", "金包銀", "披荊斬棘", "破繭而出", "月來越好", "季不可失", "守株待兔", "缺口", "阿婆散步", "多排破上關"]},
-    {title: "💰 量價與籌碼", theme: "purple", tags: ["量價齊揚", "高成交值", "法人加持", "外資+投信", "外資+自營", "投信+自營", "三法聯手", "1日籌碼集中度", "5日籌碼集中", "20日籌碼集中"]},
+    {title: "💰 量價與籌碼", theme: "purple", tags: ["量價齊揚", "高成交值", "法人加持", "外資+投信", "外資+自營", "投信+自營", "三法聯手", "1日籌碼集中度", "5日籌碼集中", "20日籌碼集中", "籌碼集中集中大戶增"]},
     {title: "📈 技術指標", theme: "teal", tags: ["OBV突破", "MACD突破", "KD金叉"]},
     {title: "🎯 分析師專區｜漁夫林睿閎投資週報", theme: "purple", tags: ["黑卡會員", "尊耀會員", "頂峰會員"]}
 ];
@@ -4857,6 +4863,7 @@ document.getElementById('plan-table-body')?.addEventListener('click',async e=>{c
 function renderPlans(){const tb=document.getElementById('plan-table-body');if(!tb)return;let cc=0,wc=0,tp=0,rh='';const sp=[...state.plans].sort((a,b)=>{let vA,vB;switch(state.planSortConfig.key){case'entryDate':vA=a.entryDate||'';vB=b.entryDate||'';break;case'stock':vA=a.stock;vB=b.stock;break;case'qty':vA=a.qty;vB=b.qty;break;case'entry':vA=a.entry;vB=b.entry;break;case'target':vA=a.target||0;vB=b.target||0;break;case'stop':vA=a.stop;vB=b.stop;break;case'status':const o={'持倉中':1,'已停利':2,'已停損':3};vA=o[a.status]||99;vB=o[b.status]||99;break;default:vA=a.createdAt||0;vB=b.createdAt||0;break;}if(vA===vB)return(a.createdAt||0)-(b.createdAt||0);return state.planSortConfig.asc?(vA>vB?1:-1):(vA>vB?-1:1);});sp.forEach(i=>{const isC=i.status!=='持倉中';if(isC){cc++;if(i.status==='已停利')wc++;tp+=i.pnl||0;}const cm=i.stock.match(/\d{4}/),isF=cm?getEpsInfo(cm[0],{}).futures:false,dn=i.name||state.codeToName[i.stock]||'',fd=i.entryDate?i.entryDate.replace(/-/g,'/'):'';rh+=`<tr class="table-row-hover border-b border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-sm ${isC?'opacity-50':''}"><td class="table-sticky-bg py-3 px-2 sm:px-3 text-center sticky left-0 z-20"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${i.id}" data-type="plan" ${selectedIds['plan'].has(i.id)?'checked':''}></td><td class="py-3 px-3 sm:px-4 font-medium text-gray-600 dark:text-gray-400">${escapeHTML(fd)}</td><td class="py-3 px-3 sm:px-4 font-medium">${isF?'<span class="bg-sky-600 text-white text-[10px] px-1.5 py-0.5 rounded mr-1.5 shadow-sm">期</span>':''}<span class="font-bold mr-1.5 text-gray-800 dark:text-gray-200">${escapeHTML(i.stock)}</span><span class="text-gray-600 dark:text-gray-400">${escapeHTML(dn)}</span><div class="text-[10px] text-gray-400 mt-0.5">${escapeHTML(i.note||'')}</div></td><td class="py-3 px-3 sm:px-4">${i.qty}</td><td class="py-3 px-3 sm:px-4">${i.entry}</td><td class="py-3 px-3 sm:px-4 tw-red font-bold">${i.target||'-'}</td><td class="py-3 px-3 sm:px-4 tw-green font-bold">${i.stop}</td><td class="py-3 px-3 sm:px-4"><span class="px-2 py-1 rounded-md text-xs font-medium ${i.status==='持倉中'?'bg-blue-100 text-blue-700':(i.status==='已停利'?'bg-red-100 text-red-700':'bg-green-100 text-green-700')}">${i.status}</span></td><td class="py-3 px-3 sm:px-4 whitespace-nowrap">${!isC?`<button data-action="close-plan" data-id="${i.id}" class="text-xs bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 px-3 py-1.5 rounded-lg transition shadow-sm mr-2 active:scale-95">結算</button>`:`<span class="mr-3 ${i.pnl>0?'tw-red':'tw-green'} font-bold">${formatNumColor(i.pnl)}</span>`}<button data-action="edit-plan" data-id="${i.id}" class="text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110 mr-1"><i class="fa-solid fa-pen pointer-events-none"></i></button><button data-action="delete-plan" data-id="${i.id}" class="text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110"><i class="fa-solid fa-trash pointer-events-none"></i></button></td></tr>`;});setHTMLIfChanged(tb,rh);document.getElementById('stat-total').textContent=cc;document.getElementById('stat-winrate').textContent=cc>0?Math.round((wc/cc)*100)+'%':'0%';document.getElementById('stat-pnl').textContent=tp.toString();document.getElementById('stat-pnl').className=`text-2xl font-bold ${tp>0?'tw-red':(tp<0?'tw-green':'text-gray-900 dark:text-white')} transition-colors duration-300`;updateBatchUI('plan');}
 
 let reportReaderItems=[],reportReaderIndex=0,reportReaderTouchStart=null,reportReaderBodyOverflow='',reportReaderEnteredFullscreen=false;
+let reportReaderSpeechState={status:'idle',chunks:[],index:0,runId:0};
 const getReportReaderItems=()=>{
     let reports=normalizeReportRecords(state.reports||[]).records;
     if(state.reportFilters){
@@ -4876,6 +4883,142 @@ const getReportReaderItems=()=>{
         return(state.reportSortConfig?state.reportSortConfig.asc:false)?(valueA>valueB?1:-1):(valueA>valueB?-1:1);
     });
 };
+
+const isReportSpeechSupported=()=>('speechSynthesis' in window)&&('SpeechSynthesisUtterance' in window);
+const getReportSpeechVoice=()=>{
+    if(!isReportSpeechSupported())return null;
+    const voices=window.speechSynthesis.getVoices?.()||[];
+    return voices.find(v=>/^zh-TW$/i.test(v.lang))
+        ||voices.find(v=>/^zh-(Hant|HK)$/i.test(v.lang))
+        ||voices.find(v=>/^zh/i.test(v.lang))
+        ||null;
+};
+const splitReportSpeechText=text=>{
+    const source=String(text||'').replace(/\r/g,'').trim();
+    if(!source)return[];
+    const sentenceParts=source.match(/[^。！？!?；;\n]+[。！？!?；;]?\s*|\n+/g)||[source];
+    const chunks=[];
+    sentenceParts.forEach(part=>{
+        let segment=String(part||'').replace(/\s*\n+\s*/g,'。').trim();
+        if(!segment)return;
+        while(segment.length>180){
+            let cut=Math.max(
+                segment.lastIndexOf('，',180),
+                segment.lastIndexOf(',',180),
+                segment.lastIndexOf('、',180),
+                segment.lastIndexOf('：',180),
+                segment.lastIndexOf(':',180),
+                segment.lastIndexOf(' ',180)
+            );
+            if(cut<70)cut=180;
+            chunks.push(segment.slice(0,cut+1).trim());
+            segment=segment.slice(cut+1).trim();
+        }
+        if(segment)chunks.push(segment);
+    });
+    return chunks;
+};
+const updateReportReaderSpeechUI=()=>{
+    const speakBtn=document.getElementById('report-reader-speak-btn'),
+          speakLabel=document.getElementById('report-reader-speak-label'),
+          speakIcon=document.getElementById('report-reader-speak-icon'),
+          stopBtn=document.getElementById('report-reader-speech-stop-btn'),
+          supported=isReportSpeechSupported(),
+          status=reportReaderSpeechState.status;
+    if(!speakBtn||!speakLabel||!speakIcon||!stopBtn)return;
+    speakBtn.disabled=!supported;
+    stopBtn.disabled=!supported||status==='idle';
+    if(!supported){
+        speakLabel.textContent='不支援';
+        speakIcon.className='fa-solid fa-volume-xmark';
+        speakBtn.title='此瀏覽器不支援語音朗讀';
+        speakBtn.setAttribute('aria-label','此瀏覽器不支援語音朗讀');
+        return;
+    }
+    if(status==='speaking'){
+        speakLabel.textContent='暫停';
+        speakIcon.className='fa-solid fa-pause';
+        speakBtn.title='暫停朗讀';
+        speakBtn.setAttribute('aria-label','暫停朗讀');
+    }else if(status==='paused'){
+        speakLabel.textContent='繼續';
+        speakIcon.className='fa-solid fa-play';
+        speakBtn.title='繼續朗讀';
+        speakBtn.setAttribute('aria-label','繼續朗讀');
+    }else{
+        speakLabel.textContent='朗讀';
+        speakIcon.className='fa-solid fa-volume-high';
+        speakBtn.title='朗讀目前法人報告';
+        speakBtn.setAttribute('aria-label','朗讀目前法人報告');
+    }
+};
+const stopReportReaderSpeech=()=>{
+    reportReaderSpeechState.runId+=1;
+    reportReaderSpeechState.status='idle';
+    reportReaderSpeechState.chunks=[];
+    reportReaderSpeechState.index=0;
+    try{window.speechSynthesis?.cancel();}catch(error){}
+    updateReportReaderSpeechUI();
+};
+const speakReportReaderNextChunk=runId=>{
+    if(!isReportSpeechSupported()||runId!==reportReaderSpeechState.runId||reportReaderSpeechState.status==='idle')return;
+    if(reportReaderSpeechState.index>=reportReaderSpeechState.chunks.length){
+        reportReaderSpeechState.status='idle';
+        reportReaderSpeechState.chunks=[];
+        reportReaderSpeechState.index=0;
+        updateReportReaderSpeechUI();
+        return;
+    }
+    const text=reportReaderSpeechState.chunks[reportReaderSpeechState.index++];
+    const utterance=new SpeechSynthesisUtterance(text);
+    utterance.lang='zh-TW';
+    utterance.rate=1;
+    utterance.pitch=1;
+    utterance.volume=1;
+    const voice=getReportSpeechVoice();if(voice)utterance.voice=voice;
+    utterance.onend=()=>{if(runId===reportReaderSpeechState.runId&&reportReaderSpeechState.status!=='idle')speakReportReaderNextChunk(runId);};
+    utterance.onerror=e=>{
+        if(runId!==reportReaderSpeechState.runId||reportReaderSpeechState.status==='idle')return;
+        if(e?.error==='canceled'||e?.error==='interrupted')return;
+        reportReaderSpeechState.status='idle';
+        updateReportReaderSpeechUI();
+        showToast('語音朗讀中斷，請再試一次','error');
+    };
+    try{window.speechSynthesis.speak(utterance);}
+    catch(error){
+        reportReaderSpeechState.status='idle';
+        updateReportReaderSpeechUI();
+        showToast('無法啟動語音朗讀','error');
+    }
+};
+const toggleReportReaderSpeech=()=>{
+    if(!isReportSpeechSupported())return showToast('此瀏覽器不支援語音朗讀','error');
+    const synth=window.speechSynthesis;
+    if(reportReaderSpeechState.status==='speaking'){
+        synth.pause();
+        reportReaderSpeechState.status='paused';
+        updateReportReaderSpeechUI();
+        return;
+    }
+    if(reportReaderSpeechState.status==='paused'){
+        synth.resume();
+        reportReaderSpeechState.status='speaking';
+        updateReportReaderSpeechUI();
+        return;
+    }
+    const report=reportReaderItems[reportReaderIndex];
+    const chunks=splitReportSpeechText(report?.content||'');
+    if(!chunks.length)return showToast('目前這篇法人報告沒有可朗讀內容','error');
+    try{synth.cancel();}catch(error){}
+    const runId=reportReaderSpeechState.runId+1;
+    reportReaderSpeechState={status:'speaking',chunks,index:0,runId};
+    updateReportReaderSpeechUI();
+    speakReportReaderNextChunk(runId);
+};
+if(isReportSpeechSupported()){
+    window.speechSynthesis.addEventListener?.('voiceschanged',updateReportReaderSpeechUI);
+}
+
 const renderReportReader=()=>{
     const report=reportReaderItems[reportReaderIndex];if(!report)return;
     const codeEl=document.getElementById('report-reader-code'),nameEl=document.getElementById('report-reader-name'),dateEl=document.getElementById('report-reader-date');
@@ -4890,6 +5033,7 @@ const renderReportReader=()=>{
 };
 const moveReportReader=step=>{
     const next=Math.max(0,Math.min(reportReaderItems.length-1,reportReaderIndex+step));if(next===reportReaderIndex)return;
+    stopReportReaderSpeech();
     reportReaderIndex=next;renderReportReader();
 };
 const requestReportBrowserFullscreen=()=>{
@@ -4903,6 +5047,7 @@ const requestReportBrowserFullscreen=()=>{
     }catch(e){}
 };
 const openReportReader=id=>{
+    stopReportReaderSpeech();
     reportReaderItems=getReportReaderItems();reportReaderIndex=reportReaderItems.findIndex(report=>String(report.id)===String(id));
     if(reportReaderIndex<0)return showToast('找不到這筆報告','error');
     const modal=document.getElementById('report-reader-modal');if(!modal)return;
@@ -4914,6 +5059,7 @@ document.getElementById('btn-open-report-reader')?.addEventListener('click',()=>
 });
 const closeReportReader=()=>{
     const modal=document.getElementById('report-reader-modal');if(!modal||modal.classList.contains('hidden'))return;
+    stopReportReaderSpeech();
     modal.classList.add('hidden');document.body.style.overflow=reportReaderBodyOverflow;reportReaderTouchStart=null;
     const fullscreenElement=document.fullscreenElement||document.webkitFullscreenElement;
     if(reportReaderEnteredFullscreen&&fullscreenElement){try{const result=document.exitFullscreen?document.exitFullscreen():document.webkitExitFullscreen?.();if(result&&typeof result.catch==='function')result.catch(()=>{});}catch(e){}}
@@ -4923,6 +5069,9 @@ document.getElementById('report-reader-prev-btn')?.addEventListener('click',()=>
 document.getElementById('report-reader-next-btn')?.addEventListener('click',()=>moveReportReader(1));
 document.getElementById('report-reader-close-btn')?.addEventListener('click',closeReportReader);
 document.getElementById('report-reader-copy-btn')?.addEventListener('click',()=>{const report=reportReaderItems[reportReaderIndex];if(report)executeCopy(`[${report.date||''}] ${report.code} / ${report.name}\n${report.content||''}`);});
+document.getElementById('report-reader-speak-btn')?.addEventListener('click',toggleReportReaderSpeech);
+document.getElementById('report-reader-speech-stop-btn')?.addEventListener('click',stopReportReaderSpeech);
+updateReportReaderSpeechUI();
 const REPORT_READER_FONT_KEY='ryan_report_reader_font_v1',reportReaderFontSizes=[15,17,19,21,23];let reportReaderFontIndex=Math.max(0,Math.min(reportReaderFontSizes.length-1,parseInt(localStorage.getItem(REPORT_READER_FONT_KEY)||'1')));
 const applyReportReaderFont=()=>{const content=document.getElementById('report-reader-content'),label=document.getElementById('report-reader-font-label'),down=document.getElementById('report-reader-font-down'),up=document.getElementById('report-reader-font-up');if(content){content.style.fontSize=`${reportReaderFontSizes[reportReaderFontIndex]}px`;content.style.lineHeight=reportReaderFontIndex>=3?'2':'1.9';}if(label)label.textContent=['較小','標準','舒適','大字','特大'][reportReaderFontIndex];if(down)down.disabled=reportReaderFontIndex===0;if(up)up.disabled=reportReaderFontIndex===reportReaderFontSizes.length-1;};
 const changeReportReaderFont=step=>{reportReaderFontIndex=Math.max(0,Math.min(reportReaderFontSizes.length-1,reportReaderFontIndex+step));localStorage.setItem(REPORT_READER_FONT_KEY,String(reportReaderFontIndex));applyReportReaderFont();};
@@ -5384,6 +5533,15 @@ document.querySelectorAll('.btn-copy').forEach(b=>{b.addEventListener('click',e=
     if(m==='strategy'){
         const sm={};
         d.forEach(j=>{if(j.tags)j.tags.forEach(t=>{if(!NON_STRATEGY_COPY_TAGS.has(t)&&(cf.tags.length===0||cf.tags.includes(t))){if(!sm[t])sm[t]=[];sm[t].push(j);}});});
+
+        // v198：黑卡會員／尊耀會員／頂峰會員使用「漁夫林睿閎投資週報」專屬複製抬頭。
+        const selectedAnalystTags=(cf.tags||[]).map(normalizeStrategyTagName).filter(tag=>ANALYST_SECTION_TAGS.has(tag));
+        if(selectedAnalystTags.length){
+            const analystRows=d.filter(j=>(j.tags||[]).map(normalizeStrategyTagName).some(tag=>selectedAnalystTags.includes(tag)));
+            const latestAnalystDate=analystRows.map(j=>String(j.date||'')).filter(Boolean).sort().reverse()[0]||cf.end||cf.start||getToday();
+            tx=`| ${String(latestAnalystDate).replace(/-/g,'/')}漁夫林睿閎投資週報 |\n\n`;
+        }
+
         const duplicateCodes=getDuplicateStrategyCodes(sm),tagIcons=buildCopyTagIconMap(Object.keys(sm));
         const ord=cf.tags.length?[...cf.tags]:TAG_CATEGORIES.flatMap(c=>c.tags);
         Object.keys(sm).sort((a,b)=>{const iA=ord.indexOf(a),iB=ord.indexOf(b);if(iA!==-1&&iB!==-1)return iA-iB;if(iA!==-1)return -1;if(iB!==-1)return 1;return a.localeCompare(b);}).forEach(s=>{
