@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="207">
+<meta name="app-version" content="208">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -1074,6 +1074,59 @@ html:not(.dark) .shadow-xl{
   #journal-war-room .war-rank-flag{
     min-height:16px!important;
     font-size:8px!important;
+  }
+
+  /* v208：手機版策略訊號雷達結果中的代號 / 股名改為上下換行 */
+  #module-overview #journal-streaks [data-mobile-code-name]{
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:flex-start!important;
+    gap:.08rem!important;
+    white-space:normal!important;
+    line-height:1.18!important;
+  }
+  #module-overview #journal-streaks [data-mobile-code-name] .mobile-code{
+    display:block!important;
+    font-size:11px!important;
+    font-weight:800!important;
+    opacity:.82!important;
+    line-height:1.1!important;
+  }
+  #module-overview #journal-streaks [data-mobile-code-name] .mobile-name{
+    display:block!important;
+    font-size:14px!important;
+    font-weight:900!important;
+    line-height:1.22!important;
+    word-break:break-word!important;
+  }
+
+  /* v208：資料條件四格一律 2 欄等寬，千張大戶增/高成交值高營收與排除負成長同寬 */
+  #module-overview #journal-streaks .streak-data-filter-group,
+  #module-overview #journal-streaks .journal-streak-data-group{
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:.5rem!important;
+    width:100%!important;
+  }
+  #module-overview #journal-streaks .streak-data-filter-group > label,
+  #module-overview #journal-streaks .journal-streak-data-group > label{
+    display:flex!important;
+    align-items:center!important;
+    gap:.45rem!important;
+    width:100%!important;
+    min-width:0!important;
+    min-height:46px!important;
+    padding:.45rem .7rem!important;
+    box-sizing:border-box!important;
+    justify-content:flex-start!important;
+  }
+  #module-overview #journal-streaks .streak-data-filter-group > label span,
+  #module-overview #journal-streaks .journal-streak-data-group > label span{
+    flex:1 1 auto!important;
+    min-width:0!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
   }
 
   /* v206：策略訊號雷達手機版篩選區重排，避免日期與條件跑版 */
@@ -4585,6 +4638,7 @@ function renderJournalStreaks(){
         const resultBadge=analysis.mode==='window'?`${analysis.minDays} 日內 ${item.occurrences} 次`:`連續 ${item.streak} 日`,tagFrequency=item.tagCounts.slice(0,5).map(entry=>`<span class="inline-flex items-center rounded-md border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-1.5 py-0.5 text-[10px] font-bold text-gray-600 dark:text-gray-200">${escapeHTML(entry.tag)} ×${entry.count}</span>`).join(''),journal=state.journals.find(record=>String(record.id)===String(item.latestJournalId)),favoriteLevel=journal?(journal.isFavorite===true?1:(parseInt(journal.isFavorite)||0)):0,trackingButton=hasStoredAdminAccess()&&journal?`<button type="button" data-streak-action="favorite" data-id="${escapeHTML(journal.id)}" title="${favoriteLevel?'調整追蹤等級':'加入追蹤'}" class="h-8 px-2.5 rounded-lg border ${favoriteLevel?'border-amber-300 bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-300':'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-300'} text-[11px] font-bold hover:scale-105 transition"><i class="fa-solid fa-star mr-1"></i>${favoriteLevel?`追蹤 ${favoriteLevel}★`:'加入追蹤'}</button>`:'';
         return`<article class="rounded-xl border border-violet-200 dark:border-violet-800/60 bg-white dark:bg-gray-900/35 p-3 sm:p-4 shadow-sm"><div class="flex items-start justify-between gap-2"><div class="min-w-0 flex flex-wrap items-center gap-1 rounded-lg px-1 -mx-1"${getYahooStockAttributes(item.code)}><span class="font-black text-violet-700 dark:text-violet-300 mr-1">${escapeHTML(item.code)}</span><span class="font-bold text-gray-800 dark:text-gray-100">${escapeHTML(item.name||'未命名')}</span>${item.isHorseNewEntry?'<span class="shrink-0 inline-flex items-center text-[12px] leading-none" title="同股往前一個月內未出現相同馬標籤">🆕</span>':''}${infoIcons}</div><span class="shrink-0 rounded-full bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 px-2.5 py-1 text-[10px] font-black">${resultBadge}</span></div><div class="flex flex-wrap items-center gap-1.5 mt-2">${renderStreakHeatBadge(item.heat)}<span class="text-[10px] text-gray-400">前期 ${item.previousWindowOccurrences} 次 → 本期 ${item.currentWindowOccurrences} 次</span></div>${renderStreakStrength(item)}<div class="flex flex-wrap items-center gap-1 mt-3 mb-2"><span class="text-[10px] text-gray-500 dark:text-gray-400 mr-1">共同策略</span>${common}</div><div class="flex flex-wrap items-center gap-1 mb-2"><span class="text-[10px] text-gray-500 dark:text-gray-400 mr-1">策略頻率</span>${tagFrequency||'<span class="text-[10px] text-gray-400">無策略標籤</span>'}</div><div>${daily}</div><div class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700/70 flex flex-wrap gap-2"><button type="button" data-streak-action="overview" data-code="${escapeHTML(item.code)}" data-name="${escapeHTML(item.name||'')}" class="h-8 px-2.5 rounded-lg border border-violet-200 dark:border-violet-700 bg-violet-50 dark:bg-violet-900/30 text-violet-700 dark:text-violet-200 text-[11px] font-bold hover:scale-105 transition"><i class="fa-solid fa-chart-pie mr-1"></i>個股總覽</button>${trackingButton}</div></article>`;
     }).join('');
+    optimizeStreakResultMobileCodeName();
 }
 
 const buildJournalStreakCopyText=analysis=>{
@@ -4657,10 +4711,27 @@ const optimizeStreakMobileLayout=()=>{
         if(common) common.classList.add('streak-select-row');
     }
 
+    // 將 4 個資料條件 checkbox 盡量收攏到同一個等寬 group
     const dataFilterInputs=[...root.querySelectorAll('.streak-data-filter')];
-    if(dataFilterInputs.length){
-        const parents=[...new Set(dataFilterInputs.map(el=>el.closest('label')?.parentElement).filter(Boolean))];
-        parents.forEach(group=>group.classList.add('streak-data-filter-group'));
+    const labels=[...new Set(dataFilterInputs.map(el=>el.closest('label')).filter(Boolean))];
+    if(labels.length){
+        const existingGroup=labels[0].closest('.streak-data-filter-group');
+        if(existingGroup){
+            existingGroup.classList.add('streak-data-filter-group');
+        }else{
+            const firstParent=labels[0].parentElement;
+            const sameParent=labels.every(label=>label.parentElement===firstParent);
+            if(sameParent && firstParent){
+                firstParent.classList.add('streak-data-filter-group');
+            }else{
+                const wrapper=document.createElement('div');
+                wrapper.className='streak-data-filter-group';
+                const insertBeforeEl=labels[0];
+                insertBeforeEl.parentElement.insertBefore(wrapper, insertBeforeEl);
+                labels.forEach(label=>wrapper.appendChild(label));
+            }
+        }
+        labels.forEach(label=>label.style.width='100%');
     }
 
     const clearBtn=[...root.querySelectorAll('button')].find(el=>/清除|還原預設/.test((el.textContent||'').trim()));
@@ -4668,7 +4739,25 @@ const optimizeStreakMobileLayout=()=>{
     const host=(clearBtn?.parentElement===tagBtn?.parentElement)?clearBtn?.parentElement:null;
     if(host && tagBtn && clearBtn) host.classList.add('streak-action-row');
 };
+
+const optimizeStreakResultMobileCodeName=()=>{
+    if(window.innerWidth>430)return;
+    const root=document.getElementById('streak-results'); if(!root) return;
+    const candidates=[...root.querySelectorAll('article h3, article h4, article .font-black, article .font-extrabold, article [data-code-name], article [data-streak-code-name]')];
+    candidates.forEach(el=>{
+        if(el.dataset.mobileCodeNameApplied==='1')return;
+        const txt=(el.textContent||'').trim().replace(/\s+/g,' ');
+        const match=txt.match(/^(\d{4,6}[A-Z]?)\s+(.+)$/);
+        if(!match)return;
+        const code=match[1],name=match[2];
+        el.innerHTML=`<span class="mobile-code">${code}</span><span class="mobile-name">${name}</span>`;
+        el.setAttribute('data-mobile-code-name','1');
+        el.dataset.mobileCodeNameApplied='1';
+    });
+};
+
 optimizeStreakMobileLayout();
+optimizeStreakResultMobileCodeName();
 ['streak-result-sort','streak-heat-filter','streak-min-strength'].forEach(id=>document.getElementById(id)?.addEventListener('change',()=>scheduleStreakAutoRender()));
 document.getElementById('streak-search-form')?.addEventListener('click',e=>{
     const button=e.target.closest('[data-streak-preset]');if(!button)return;
