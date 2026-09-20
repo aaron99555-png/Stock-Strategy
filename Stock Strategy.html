@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="212" name="app-version"/>
+<meta content="213" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -1422,14 +1422,14 @@ nav, .top-nav, .desktop-nav, .module-nav{
     outline-offset:-2px;
 }
 </style>
-<style id="journal-mobile-filter-layout-v212">
+<style id="journal-mobile-filter-layout-v213">
 /* Desktop/tablet: row wrappers do not change the original toolbar flow. */
 @media (min-width:431px){
   #module-journal .journal-fixed-filter-toolbar > .journal-mobile-row{display:contents}
   #module-journal .journal-filter-tags-display-row{display:contents}
 }
 
-/* Mobile: date and search each get a full-width row; mid controls use 3x2 grid. */
+/* Mobile */
 @media (max-width:430px){
   #module-journal .card-panel,
   #module-journal .journal-fixed-filter-toolbar,
@@ -1508,12 +1508,15 @@ nav, .top-nav, .desktop-nav, .module-nav{
     overflow:visible!important;
   }
 
-  /* 第2排：搜尋 */
-  #module-journal .journal-filter-row-search{
-    display:block!important;
+  /* 第2排：搜尋 + 清除 */
+  #module-journal .journal-filter-row-search-clear{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) 104px!important;
+    gap:.45rem!important;
     width:100%!important;
+    align-items:stretch!important;
   }
-  #module-journal .journal-filter-row-search > div{
+  #module-journal .journal-filter-row-search-clear > div:first-child{
     width:100%!important;
     min-width:0!important;
     height:46px!important;
@@ -1523,13 +1526,23 @@ nav, .top-nav, .desktop-nav, .module-nav{
     padding:.25rem .55rem!important;
     overflow:visible!important;
   }
-  #module-journal .journal-filter-row-search #filter-code{
+  #module-journal .journal-filter-row-search-clear #filter-code{
     width:100%!important;
     min-width:0!important;
     max-width:none!important;
     height:100%!important;
     padding:0 .35rem!important;
     font-size:13px!important;
+  }
+  #module-journal .journal-filter-row-search-clear #btn-clear-filters{
+    width:100%!important;
+    min-width:0!important;
+    height:46px!important;
+    min-height:46px!important;
+    justify-content:center!important;
+    padding:.35rem .45rem!important;
+    font-size:12px!important;
+    border-radius:12px!important;
   }
 
   /* 第3排：排除負成長 / 營收創高 / 僅含股期 */
@@ -1625,22 +1638,6 @@ nav, .top-nav, .desktop-nav, .module-nav{
     justify-content:center!important;
     padding:.35rem .35rem!important;
     font-size:11px!important;
-    border-radius:12px!important;
-  }
-
-  /* 第6排：清除 */
-  #module-journal .journal-filter-row-clear{
-    display:block!important;
-    width:100%!important;
-  }
-  #module-journal .journal-filter-row-clear #btn-clear-filters{
-    width:100%!important;
-    min-width:0!important;
-    height:46px!important;
-    min-height:46px!important;
-    justify-content:center!important;
-    padding:.35rem .45rem!important;
-    font-size:12px!important;
     border-radius:12px!important;
   }
 
@@ -1866,10 +1863,10 @@ nav, .top-nav, .desktop-nav, .module-nav{
 <input class="filter-end bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-0.5 sm:px-1 w-[75px] sm:w-auto text-center h-full box-border m-0" id="filter-end" type="date"/>
 <button class="date-shift-btn" data-date-field="end" data-range-scope="journal" data-range-shift="1" title="結束日往後一天" type="button"><i class="fa-solid fa-chevron-right"></i></button>
 </div>
-</div></div><div class="journal-mobile-row journal-filter-row-search"><div class="flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 h-[38px] sm:h-auto box-border">
+</div></div><div class="journal-mobile-row journal-filter-row-search-clear"><div class="flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 h-[38px] sm:h-auto box-border">
 <i class="fa-solid fa-search text-gray-400 text-[10px] sm:text-xs ml-1 sm:ml-2"></i>
 <input autocomplete="off" class="filter-code bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-1 w-[130px] sm:w-[170px] h-full box-border m-0" id="filter-code" placeholder="代號／股名／備註" spellcheck="false" type="text"/>
-</div></div>
+</div><button class="text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-red-600 text-gray-700 dark:text-gray-300 hover:text-white border border-gray-300 dark:border-gray-600 hover:border-red-500 px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center whitespace-nowrap" id="btn-clear-filters" type="button"><i class="fa-solid fa-eraser sm:mr-1.5"></i><span class="hidden sm:inline">清除篩選</span><span class="sm:hidden">清除</span></button></div>
 <div class="journal-mobile-row journal-filter-row-conditions-1">
 <label class="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white dark:bg-gray-900/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-700/50 transition hover:bg-gray-50 dark:hover:bg-gray-800">
 <input class="filter-exclude-negative-growth rounded border-gray-300 dark:border-gray-600 text-green-500 focus:ring-green-500 w-3.5 h-3.5 sm:w-4 sm:h-4" id="filter-exclude-negative-growth" type="checkbox"/>
@@ -1904,8 +1901,6 @@ nav, .top-nav, .desktop-nav, .module-nav{
 </div>
 </div></div>
 
-
-<div class="journal-mobile-row journal-filter-row-clear"><button class="text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-red-600 text-gray-700 dark:text-gray-300 hover:text-white border border-gray-300 dark:border-gray-600 hover:border-red-500 px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center whitespace-nowrap" id="btn-clear-filters" type="button"><i class="fa-solid fa-eraser sm:mr-1.5"></i><span class="hidden sm:inline">清除篩選</span><span class="sm:hidden">清除</span></button></div>
 <div class="journal-filter-tags-display-row">
 <div class="flex flex-wrap gap-1.5 w-full md:w-auto mt-2 lg:mt-0" id="filter-tags-display"></div>
 </div>
