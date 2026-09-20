@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="206">
+<meta name="app-version" content="207">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -1084,7 +1084,8 @@ html:not(.dark) .shadow-xl{
   }
 
   #module-overview #journal-streaks .streak-filter-grid,
-  #module-overview #journal-streaks .journal-streak-filter-grid{
+  #module-overview #journal-streaks .journal-streak-filter-grid,
+  #module-overview #journal-streaks .streak-top-grid{
     display:grid!important;
     grid-template-columns:1fr!important;
     gap:.6rem!important;
@@ -1097,6 +1098,14 @@ html:not(.dark) .shadow-xl{
     grid-template-columns:46px minmax(0,1fr) 46px!important;
     align-items:center!important;
     gap:.45rem!important;
+  }
+  #module-overview #journal-streaks .streak-date-row,
+  #module-overview #journal-streaks .journal-streak-date-row{
+    width:100%!important;
+  }
+  #module-overview #journal-streaks .streak-search-row,
+  #module-overview #journal-streaks .journal-streak-search-row{
+    width:100%!important;
   }
   #module-overview #journal-streaks .streak-date-row > button,
   #module-overview #journal-streaks .journal-streak-date-row > button{
@@ -1140,12 +1149,31 @@ html:not(.dark) .shadow-xl{
     display:grid!important;
     grid-template-columns:repeat(2,minmax(0,1fr))!important;
     gap:.5rem!important;
+    width:100%!important;
   }
-  #module-overview #journal-streaks .streak-data-filter-group label,
-  #module-overview #journal-streaks .journal-streak-data-group label,
+  #module-overview #journal-streaks .streak-data-filter-group > label,
+  #module-overview #journal-streaks .journal-streak-data-group > label{
+    display:flex!important;
+    align-items:center!important;
+    gap:.45rem!important;
+    width:100%!important;
+    min-width:0!important;
+    min-height:46px!important;
+    padding:.45rem .7rem!important;
+    box-sizing:border-box!important;
+  }
+  #module-overview #journal-streaks .streak-data-filter-group > label span,
+  #module-overview #journal-streaks .journal-streak-data-group > label span{
+    flex:1 1 auto!important;
+    min-width:0!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
   #module-overview #journal-streaks .streak-data-filter,
   #module-overview #journal-streaks .journal-streak-data-group .filter-chip{
     min-width:0!important;
+    flex:0 0 auto!important;
   }
 
   /* 分數/狀態/排序：三欄但等寬 */
@@ -4607,27 +4635,34 @@ document.querySelectorAll('.streak-data-filter').forEach(input=>input.addEventLi
 const optimizeStreakMobileLayout=()=>{
     const root=document.getElementById('journal-streaks'); if(!root) return;
     const dateInput=root.querySelector('input[type="date"]');
+    let dateWrap=null,searchWrap=null;
     if(dateInput){
         dateInput.classList.add('streak-date');
-        const dateWrap=dateInput.closest('.flex')||dateInput.parentElement;
+        dateWrap=dateInput.closest('.flex')||dateInput.parentElement;
         if(dateWrap) dateWrap.classList.add('streak-date-row');
     }
     const searchInput=[...root.querySelectorAll('input[type="text"],input[type="search"]')].find(el=>/代號|股名|備註/.test(el.placeholder||''));
     if(searchInput){
-        const wrap=searchInput.closest('.flex')||searchInput.parentElement;
-        if(wrap) wrap.classList.add('streak-search-row');
+        searchWrap=searchInput.closest('.flex')||searchInput.parentElement;
+        if(searchWrap) searchWrap.classList.add('streak-search-row');
     }
+    if(dateWrap && searchWrap){
+        const topHost=(dateWrap.parentElement===searchWrap.parentElement)?dateWrap.parentElement:null;
+        if(topHost) topHost.classList.add('streak-top-grid');
+    }
+
     const selects=[...root.querySelectorAll('select')];
     if(selects.length){
         const common=selects[0].closest('.grid')||selects[0].parentElement;
         if(common) common.classList.add('streak-select-row');
     }
+
     const dataFilterInputs=[...root.querySelectorAll('.streak-data-filter')];
     if(dataFilterInputs.length){
-        const labelSet=[...new Set(dataFilterInputs.map(el=>el.closest('label')).filter(Boolean))];
-        const group=labelSet[0]?.parentElement;
-        if(group) group.classList.add('streak-data-filter-group');
+        const parents=[...new Set(dataFilterInputs.map(el=>el.closest('label')?.parentElement).filter(Boolean))];
+        parents.forEach(group=>group.classList.add('streak-data-filter-group'));
     }
+
     const clearBtn=[...root.querySelectorAll('button')].find(el=>/清除|還原預設/.test((el.textContent||'').trim()));
     const tagBtn=[...root.querySelectorAll('button')].find(el=>/標籤挑選/.test((el.textContent||'').trim()));
     const host=(clearBtn?.parentElement===tagBtn?.parentElement)?clearBtn?.parentElement:null;
