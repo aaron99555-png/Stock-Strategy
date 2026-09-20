@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="211" name="app-version"/>
+<meta content="212" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -1422,14 +1422,14 @@ nav, .top-nav, .desktop-nav, .module-nav{
     outline-offset:-2px;
 }
 </style>
-<style id="journal-mobile-filter-layout-v211">
+<style id="journal-mobile-filter-layout-v212">
 /* Desktop/tablet: row wrappers do not change the original toolbar flow. */
 @media (min-width:431px){
   #module-journal .journal-fixed-filter-toolbar > .journal-mobile-row{display:contents}
   #module-journal .journal-filter-tags-display-row{display:contents}
 }
 
-/* Mobile: date and search each get a full-width row to avoid clipping. */
+/* Mobile: date and search each get a full-width row; mid controls use 3x2 grid. */
 @media (max-width:430px){
   #module-journal .card-panel,
   #module-journal .journal-fixed-filter-toolbar,
@@ -1454,7 +1454,7 @@ nav, .top-nav, .desktop-nav, .module-nav{
     max-height:none!important;
   }
 
-  /* 第1排：日期，整排滿寬 */
+  /* 第1排：日期 */
   #module-journal .journal-filter-row-date{
     display:block!important;
     width:100%!important;
@@ -1508,7 +1508,7 @@ nav, .top-nav, .desktop-nav, .module-nav{
     overflow:visible!important;
   }
 
-  /* 第2排：搜尋，整排滿寬 */
+  /* 第2排：搜尋 */
   #module-journal .journal-filter-row-search{
     display:block!important;
     width:100%!important;
@@ -1533,18 +1533,14 @@ nav, .top-nav, .desktop-nav, .module-nav{
   }
 
   /* 第3排：排除負成長 / 營收創高 / 僅含股期 */
-  #module-journal .journal-filter-row-conditions-1,
-  /* 第4排：千張大戶增 / 高成交值高營收 / 分數不限 */
-  #module-journal .journal-filter-row-conditions-2{
+  #module-journal .journal-filter-row-conditions-1{
     display:grid!important;
     grid-template-columns:repeat(3,minmax(0,1fr))!important;
     gap:.45rem!important;
     width:100%!important;
     align-items:stretch!important;
   }
-  #module-journal .journal-filter-row-conditions-1 > label,
-  #module-journal .journal-filter-row-conditions-2 > label,
-  #module-journal .journal-filter-row-conditions-2 > select{
+  #module-journal .journal-filter-row-conditions-1 > label{
     width:100%!important;
     min-width:0!important;
     max-width:none!important;
@@ -1552,22 +1548,17 @@ nav, .top-nav, .desktop-nav, .module-nav{
     height:46px!important;
     box-sizing:border-box!important;
     border-radius:12px!important;
-  }
-  #module-journal .journal-filter-row-conditions-1 > label,
-  #module-journal .journal-filter-row-conditions-2 > label{
     padding:.35rem .35rem!important;
     gap:.28rem!important;
     justify-content:flex-start!important;
     overflow:hidden!important;
   }
-  #module-journal .journal-filter-row-conditions-1 > label input,
-  #module-journal .journal-filter-row-conditions-2 > label input{
+  #module-journal .journal-filter-row-conditions-1 > label input{
     width:17px!important;
     height:17px!important;
     flex:0 0 17px!important;
   }
-  #module-journal .journal-filter-row-conditions-1 > label span,
-  #module-journal .journal-filter-row-conditions-2 > label span{
+  #module-journal .journal-filter-row-conditions-1 > label span{
     min-width:0!important;
     flex:1 1 auto!important;
     white-space:normal!important;
@@ -1575,47 +1566,74 @@ nav, .top-nav, .desktop-nav, .module-nav{
     font-size:10px!important;
     font-weight:800!important;
     line-height:1.12!important;
-    overflow:visible!important;
   }
-  #module-journal .journal-filter-row-conditions-2 > select{
+
+  /* 第4-5排：紅框區 3 欄 × 2 排 */
+  #module-journal .journal-filter-row-grid-6{
+    display:grid!important;
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:.45rem!important;
+    width:100%!important;
+    align-items:stretch!important;
+  }
+  #module-journal .journal-filter-row-grid-6 > label,
+  #module-journal .journal-filter-row-grid-6 > select,
+  #module-journal .journal-filter-row-grid-6 > .journal-filter-tag-cell{
+    width:100%!important;
+    min-width:0!important;
+    max-width:none!important;
+    min-height:46px!important;
+    height:46px!important;
+    box-sizing:border-box!important;
+  }
+  #module-journal .journal-filter-row-grid-6 > label{
+    display:flex!important;
+    align-items:center!important;
+    padding:.35rem .35rem!important;
+    gap:.28rem!important;
+    border-radius:12px!important;
+    overflow:hidden!important;
+  }
+  #module-journal .journal-filter-row-grid-6 > label input{
+    width:17px!important;
+    height:17px!important;
+    flex:0 0 17px!important;
+  }
+  #module-journal .journal-filter-row-grid-6 > label span{
+    min-width:0!important;
+    flex:1 1 auto!important;
+    white-space:normal!important;
+    text-align:center!important;
+    font-size:10px!important;
+    font-weight:800!important;
+    line-height:1.12!important;
+  }
+  #module-journal .journal-filter-row-grid-6 > select{
+    border-radius:12px!important;
     padding:.35rem .3rem!important;
     font-size:11px!important;
     text-align:center!important;
   }
-
-  /* 第5排：狀態 / 快速條件 */
-  #module-journal .journal-filter-row-selects{
-    display:grid!important;
-    grid-template-columns:1fr 1fr!important;
-    gap:.45rem!important;
-    width:100%!important;
+  #module-journal .journal-filter-row-grid-6 > .journal-filter-tag-cell{
+    position:relative!important;
   }
-  #module-journal .journal-filter-row-selects > select{
+  #module-journal .journal-filter-row-grid-6 #filter-tag-btn{
     width:100%!important;
     min-width:0!important;
     height:46px!important;
     min-height:46px!important;
+    justify-content:center!important;
+    padding:.35rem .35rem!important;
+    font-size:11px!important;
     border-radius:12px!important;
-    padding:.35rem .55rem!important;
-    font-size:13px!important;
-    text-align:center!important;
   }
 
-  /* 第6排：標籤挑選 / 清除 */
-  #module-journal .journal-filter-row-actions{
-    display:grid!important;
-    grid-template-columns:1fr 1fr!important;
-    gap:.55rem!important;
-    width:100%!important;
-    align-items:stretch!important;
-  }
-  #module-journal .journal-filter-row-actions > *,
-  #module-journal .journal-filter-row-actions .journal-filter-tag-cell{
-    min-width:0!important;
+  /* 第6排：清除 */
+  #module-journal .journal-filter-row-clear{
+    display:block!important;
     width:100%!important;
   }
-  #module-journal .journal-filter-row-actions #filter-tag-btn,
-  #module-journal .journal-filter-row-actions #btn-clear-filters{
+  #module-journal .journal-filter-row-clear #btn-clear-filters{
     width:100%!important;
     min-width:0!important;
     height:46px!important;
@@ -1839,66 +1857,55 @@ nav, .top-nav, .desktop-nav, .module-nav{
 <span class="text-xs text-gray-500 dark:text-gray-400 px-1 sm:px-2 hidden xl:inline"><i class="fa-solid fa-filter mr-1"></i>區間</span>
 <div class="date-field-shift">
 <button class="date-shift-btn" data-date-field="start" data-range-scope="journal" data-range-shift="-1" title="起始日往前一天" type="button"><i class="fa-solid fa-chevron-left"></i></button>
-<input class="filter-start bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-0.5 sm:px-1 w-[75px] sm:w-auto text-center h-full box-border m-0" id="filter-start" type="date">
+<input class="filter-start bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-0.5 sm:px-1 w-[75px] sm:w-auto text-center h-full box-border m-0" id="filter-start" type="date"/>
 <button class="date-shift-btn" data-date-field="start" data-range-scope="journal" data-range-shift="1" title="起始日往後一天" type="button"><i class="fa-solid fa-chevron-right"></i></button>
-</input></div>
+</div>
 <span class="date-range-separator text-gray-400 mx-1">～</span>
 <div class="date-field-shift">
 <button class="date-shift-btn" data-date-field="end" data-range-scope="journal" data-range-shift="-1" title="結束日往前一天" type="button"><i class="fa-solid fa-chevron-left"></i></button>
-<input class="filter-end bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-0.5 sm:px-1 w-[75px] sm:w-auto text-center h-full box-border m-0" id="filter-end" type="date">
+<input class="filter-end bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-0.5 sm:px-1 w-[75px] sm:w-auto text-center h-full box-border m-0" id="filter-end" type="date"/>
 <button class="date-shift-btn" data-date-field="end" data-range-scope="journal" data-range-shift="1" title="結束日往後一天" type="button"><i class="fa-solid fa-chevron-right"></i></button>
-</input></div>
+</div>
 </div></div><div class="journal-mobile-row journal-filter-row-search"><div class="flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 h-[38px] sm:h-auto box-border">
 <i class="fa-solid fa-search text-gray-400 text-[10px] sm:text-xs ml-1 sm:ml-2"></i>
-<input autocomplete="off" class="filter-code bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-1 w-[130px] sm:w-[170px] h-full box-border m-0" id="filter-code" placeholder="代號／股名／備註" spellcheck="false" type="text">
-</input></div></div>
+<input autocomplete="off" class="filter-code bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-1 w-[130px] sm:w-[170px] h-full box-border m-0" id="filter-code" placeholder="代號／股名／備註" spellcheck="false" type="text"/>
+</div></div>
 <div class="journal-mobile-row journal-filter-row-conditions-1">
 <label class="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white dark:bg-gray-900/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-700/50 transition hover:bg-gray-50 dark:hover:bg-gray-800">
-<input class="filter-exclude-negative-growth rounded border-gray-300 dark:border-gray-600 text-green-500 focus:ring-green-500 w-3.5 h-3.5 sm:w-4 sm:h-4" id="filter-exclude-negative-growth" type="checkbox">
+<input class="filter-exclude-negative-growth rounded border-gray-300 dark:border-gray-600 text-green-500 focus:ring-green-500 w-3.5 h-3.5 sm:w-4 sm:h-4" id="filter-exclude-negative-growth" type="checkbox"/>
 <span class="text-xs sm:text-sm text-green-600 dark:text-green-400 font-medium whitespace-nowrap">排除負成長</span>
-</input></label>
+</label>
 <label class="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white dark:bg-gray-900/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-700/50 transition hover:bg-gray-50 dark:hover:bg-gray-800">
-<input class="filter-revenue-high rounded border-gray-300 dark:border-gray-600 text-pink-500 focus:ring-pink-500 w-3.5 h-3.5 sm:w-4 sm:h-4" id="filter-revenue-high" type="checkbox">
+<input class="filter-revenue-high rounded border-gray-300 dark:border-gray-600 text-pink-500 focus:ring-pink-500 w-3.5 h-3.5 sm:w-4 sm:h-4" id="filter-revenue-high" type="checkbox"/>
 <span class="text-xs sm:text-sm text-pink-600 dark:text-pink-400 font-medium whitespace-nowrap">營收創高</span>
-</input></label>
+</label>
 <label class="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white dark:bg-gray-900/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-700/50 transition hover:bg-gray-50 dark:hover:bg-gray-800">
-<input class="filter-futures rounded border-gray-300 dark:border-gray-600 text-sky-500 focus:ring-sky-500 w-3.5 h-3.5 sm:w-4 sm:h-4" id="filter-futures" type="checkbox">
+<input class="filter-futures rounded border-gray-300 dark:border-gray-600 text-sky-500 focus:ring-sky-500 w-3.5 h-3.5 sm:w-4 sm:h-4" id="filter-futures" type="checkbox"/>
 <span class="text-xs sm:text-sm text-sky-600 dark:text-sky-400 font-medium whitespace-nowrap">僅含股期</span>
-</input></label>
-</div>
-<div class="journal-mobile-row journal-filter-row-conditions-2">
-<label class="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white dark:bg-gray-900/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-700/50 transition hover:bg-gray-50 dark:hover:bg-gray-800" title="不限制天數：只要日誌日期以前最近一次有千張大戶增加紀錄即符合">
-<input class="filter-large-holder rounded border-gray-300 dark:border-gray-600 text-violet-500 focus:ring-violet-500 w-3.5 h-3.5 sm:w-4 sm:h-4" id="filter-large-holder" type="checkbox">
+</label>
+</div><div class="journal-mobile-row journal-filter-row-grid-6"><label class="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white dark:bg-gray-900/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-700/50 transition hover:bg-gray-50 dark:hover:bg-gray-800" title="不限制天數：只要日誌日期以前最近一次有千張大戶增加紀錄即符合">
+<input class="filter-large-holder rounded border-gray-300 dark:border-gray-600 text-violet-500 focus:ring-violet-500 w-3.5 h-3.5 sm:w-4 sm:h-4" id="filter-large-holder" type="checkbox"/>
 <span class="text-xs sm:text-sm text-violet-600 dark:text-violet-400 font-medium whitespace-nowrap">千張大戶增</span>
-</input></label>
-<label class="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white dark:bg-gray-900/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-700/50 transition hover:bg-gray-50 dark:hover:bg-gray-800" title="連結籌碼動能：日誌日期以前曾出現高成交值高營收即符合">
-<input class="filter-high-turnover-revenue rounded border-gray-300 dark:border-gray-600 text-amber-500 focus:ring-amber-500 w-3.5 h-3.5 sm:w-4 sm:h-4" id="filter-high-turnover-revenue" type="checkbox">
+</label><label class="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white dark:bg-gray-900/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-700/50 transition hover:bg-gray-50 dark:hover:bg-gray-800" title="連結籌碼動能：日誌日期以前曾出現高成交值高營收即符合">
+<input class="filter-high-turnover-revenue rounded border-gray-300 dark:border-gray-600 text-amber-500 focus:ring-amber-500 w-3.5 h-3.5 sm:w-4 sm:h-4" id="filter-high-turnover-revenue" type="checkbox"/>
 <span class="text-xs sm:text-sm text-amber-600 dark:text-amber-400 font-medium whitespace-nowrap">高成交值高營收</span>
-</input></label>
-<select class="filter-score bg-white dark:bg-gray-900/50 text-gray-900 dark:text-white text-base sm:text-sm border border-gray-300 dark:border-gray-700/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 focus:ring-2 focus:ring-blue-500 outline-none transition hover:bg-gray-50 dark:hover:bg-gray-800" id="filter-score">
+</label><select class="filter-score bg-white dark:bg-gray-900/50 text-gray-900 dark:text-white text-base sm:text-sm border border-gray-300 dark:border-gray-700/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 focus:ring-2 focus:ring-blue-500 outline-none transition hover:bg-gray-50 dark:hover:bg-gray-800" id="filter-score">
 <option value="0">分數不限</option><option value="1">1分(含)以上</option><option value="2">2分(含)以上</option><option value="3">3分(含)以上</option><option value="4">4分(含)以上</option>
-</select>
-</div>
-<div class="journal-mobile-row journal-filter-row-selects">
-<select class="filter-journal-status bg-white dark:bg-gray-900/50 text-gray-900 dark:text-white text-base sm:text-sm border border-gray-300 dark:border-gray-700/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 focus:ring-2 focus:ring-blue-500 outline-none transition hover:bg-gray-50 dark:hover:bg-gray-800" id="filter-journal-status">
+</select><select class="filter-journal-status bg-white dark:bg-gray-900/50 text-gray-900 dark:text-white text-base sm:text-sm border border-gray-300 dark:border-gray-700/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 focus:ring-2 focus:ring-blue-500 outline-none transition hover:bg-gray-50 dark:hover:bg-gray-800" id="filter-journal-status">
 <option value="all">全部狀態</option><option value="新訊號">新訊號</option><option value="觀察中">觀察中</option><option value="已進場">已進場</option><option value="已失效">已失效</option><option value="已結案">已結案</option>
-</select>
-<select class="filter-journal-quick bg-white dark:bg-gray-900/50 text-gray-900 dark:text-white text-base sm:text-sm border border-gray-300 dark:border-gray-700/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 focus:ring-2 focus:ring-blue-500 outline-none transition hover:bg-gray-50 dark:hover:bg-gray-800" id="filter-journal-quick">
+</select><select class="filter-journal-quick bg-white dark:bg-gray-900/50 text-gray-900 dark:text-white text-base sm:text-sm border border-gray-300 dark:border-gray-700/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 focus:ring-2 focus:ring-blue-500 outline-none transition hover:bg-gray-50 dark:hover:bg-gray-800" id="filter-journal-quick">
 <option value="all">全部訊號</option><option value="today">今日新增</option><option value="resonance">多重訊號</option><option value="basicResonance">🔥 基本籌碼共振</option><option value="pendingReview">尚未複盤</option><option value="overdue">逾期未處理</option><option value="issues">資料異常</option>
-</select>
-</div>
-<div class="journal-mobile-row journal-filter-row-actions">
-<div class="journal-filter-tag-cell relative">
+</select><div class="journal-filter-tag-cell relative">
 <button class="bg-white dark:bg-gray-900/50 text-gray-900 dark:text-white text-xs sm:text-sm border border-gray-300 dark:border-gray-700/50 rounded-lg px-3 py-1.5 sm:py-2 focus:ring-2 focus:ring-blue-500 outline-none transition hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center justify-between gap-2 shadow-sm whitespace-nowrap" id="filter-tag-btn" type="button"><span>+ 標籤挑選</span><i class="fa-solid fa-chevron-down text-[10px] opacity-70"></i></button>
 <div class="absolute left-0 top-full mt-1.5 w-[280px] sm:w-[320px] bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl shadow-2xl hidden z-50 p-3 max-h-[60vh] overflow-y-auto modal-enter" id="filter-tag-panel">
 <div class="mb-3 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between"><span class="text-xs font-bold text-gray-700 dark:text-gray-300">篩選邏輯</span><div class="flex items-center bg-gray-100 dark:bg-gray-900 p-1 rounded-lg"><button class="logic-btn px-2 py-1 text-[10px] sm:text-xs rounded font-medium transition-colors bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm" data-logic="OR" id="btn-logic-or" type="button">符合任一 (OR)</button><button class="logic-btn px-2 py-1 text-[10px] sm:text-xs rounded font-medium transition-colors text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" data-logic="AND" id="btn-logic-and" type="button">完全符合 (AND)</button></div></div>
 <div id="filter-tags-container"></div>
 <div class="sm:hidden sticky bottom-0 pt-3 mt-2 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"><button class="w-full min-h-[42px] rounded-lg bg-blue-600 text-white text-sm font-black shadow-sm" data-close-filter-tags="" type="button">完成標籤挑選</button></div>
 </div>
-</div>
-<button class="text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-red-600 text-gray-700 dark:text-gray-300 hover:text-white border border-gray-300 dark:border-gray-600 hover:border-red-500 px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center whitespace-nowrap" id="btn-clear-filters" type="button"><i class="fa-solid fa-eraser sm:mr-1.5"></i><span class="hidden sm:inline">清除篩選</span><span class="sm:hidden">清除</span></button>
+</div></div>
 
-</div>
+
+<div class="journal-mobile-row journal-filter-row-clear"><button class="text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-red-600 text-gray-700 dark:text-gray-300 hover:text-white border border-gray-300 dark:border-gray-600 hover:border-red-500 px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center whitespace-nowrap" id="btn-clear-filters" type="button"><i class="fa-solid fa-eraser sm:mr-1.5"></i><span class="hidden sm:inline">清除篩選</span><span class="sm:hidden">清除</span></button></div>
 <div class="journal-filter-tags-display-row">
 <div class="flex flex-wrap gap-1.5 w-full md:w-auto mt-2 lg:mt-0" id="filter-tags-display"></div>
 </div>
