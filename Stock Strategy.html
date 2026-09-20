@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="216" name="app-version"/>
+<meta content="217" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -1060,18 +1060,17 @@ html:not(.dark) .shadow-xl{
     font-size:8px!important;
   }
 
-  /* v214：策略訊號雷達【資料條件】手機版固定兩行顯示並重新排序 */
+  /* v217：策略訊號雷達【資料條件】手機版固定兩行顯示並重新排序 */
   @media (max-width:430px){
-    #module-overview #journal-streaks .streak-data-filter-group,
-    #module-overview #journal-streaks .journal-streak-data-group{
+    .streak-data-filter-group{
       display:grid!important;
       grid-template-columns:repeat(3,minmax(0,1fr))!important;
       gap:.55rem!important;
       width:100%!important;
       align-items:stretch!important;
+      margin-top:.4rem!important;
     }
-    #module-overview #journal-streaks .streak-data-filter-group > label,
-    #module-overview #journal-streaks .journal-streak-data-group > label{
+    .streak-data-filter-group > label{
       display:flex!important;
       align-items:center!important;
       justify-content:flex-start!important;
@@ -1082,9 +1081,9 @@ html:not(.dark) .shadow-xl{
       padding:.48rem .6rem!important;
       box-sizing:border-box!important;
       border-radius:14px!important;
+      overflow:hidden!important;
     }
-    #module-overview #journal-streaks .streak-data-filter-group > label span,
-    #module-overview #journal-streaks .journal-streak-data-group > label span{
+    .streak-data-filter-group > label span{
       flex:1 1 auto!important;
       min-width:0!important;
       white-space:normal!important;
@@ -1093,8 +1092,7 @@ html:not(.dark) .shadow-xl{
       font-weight:800!important;
       text-align:center!important;
     }
-    #module-overview #journal-streaks .streak-data-filter-group > label input,
-    #module-overview #journal-streaks .journal-streak-data-group > label input{
+    .streak-data-filter-group > label input{
       width:18px!important;
       height:18px!important;
       flex:0 0 18px!important;
@@ -4850,6 +4848,8 @@ function renderJournalStreaks(){
     }).join('');
     optimizeStreakResultMobileCodeName();
 optimizeStreakDataConditionOrder();
+setTimeout(optimizeStreakDataConditionOrder,0);
+setTimeout(optimizeStreakDataConditionOrder,180);
 }
 
 const buildJournalStreakCopyText=analysis=>{
@@ -4972,12 +4972,7 @@ optimizeStreakResultMobileCodeName();
 
 const optimizeStreakDataConditionOrder=()=>{
     if(window.innerWidth>430)return;
-    const root=document.getElementById('journal-streaks');
-    if(!root)return;
 
-    // 指定排序：
-    // 第一排：排除負成長 / 營收創高 / 千張大戶增
-    // 第二排：高成交值高營收 / 籌碼集中大戶增
     const ids=[
         'streak-exclude-negative-growth',
         'streak-revenue-high',
@@ -4986,22 +4981,34 @@ const optimizeStreakDataConditionOrder=()=>{
         'streak-chip-concentration-holder'
     ];
 
-    const labels=ids.map(id=>root.querySelector('#'+id)?.closest('label')).filter(Boolean);
-    if(!labels.length)return;
+    const labels=ids
+      .map(id=>document.getElementById(id))
+      .filter(Boolean)
+      .map(el=>el.closest('label'))
+      .filter(Boolean);
 
-    let group=root.querySelector('.streak-data-filter-group, .journal-streak-data-group');
+    if(labels.length!==5)return;
+
+    const originalParent=labels[0].parentElement;
+    if(!originalParent)return;
+
+    // 找到「資料條件」標題
+    const titleNode=[...originalParent.children].find(el=>el.tagName==='SPAN' && (el.textContent||'').includes('資料條件'));
+    if(!titleNode)return;
+
+    let group=originalParent.querySelector(':scope > .streak-data-filter-group');
     if(!group){
-        const firstLabel=labels[0];
         group=document.createElement('div');
         group.className='streak-data-filter-group';
-        firstLabel.parentElement.insertBefore(group, firstLabel);
+        titleNode.insertAdjacentElement('afterend', group);
     }
 
-    // 先把指定五個條件完整抽出，再依序放回去，確保手機版顯示為 3 + 2
-    labels.forEach(label=>{
-        try{ label.remove(); }catch(e){}
-    });
+    // 依指定順序重組：
+    // 第一排：排除負成長 / 營收創高 / 千張大戶增
+    // 第二排：高成交值高營收 / 籌碼集中大戶增
     labels.forEach(label=>group.appendChild(label));
+
+    // 若原本父層還殘留其他空白文字節點，不處理也無妨；重點是五個條件都進 group
 };
 optimizeStreakDataConditionOrder();
 ['streak-result-sort','streak-heat-filter','streak-min-strength'].forEach(id=>document.getElementById(id)?.addEventListener('change',()=>scheduleStreakAutoRender()));
@@ -6406,7 +6413,8 @@ document.addEventListener('DOMContentLoaded',async()=>{
     };
     document.getElementById('jellystock-mobile-fullscreen-btn')?.addEventListener('click',()=>setJellyStockMobileFullscreen(!document.body.classList.contains('jellystock-fullscreen-open')));
     document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.body.classList.contains('jellystock-fullscreen-open'))setJellyStockMobileFullscreen(false);});
-    window.addEventListener('resize',()=>{if(window.innerWidth>1023&&document.body.classList.contains('jellystock-fullscreen-open'))setJellyStockMobileFullscreen(false);});
+    window.addEventListener('resize',()=>{
+  optimizeStreakDataConditionOrder();if(window.innerWidth>1023&&document.body.classList.contains('jellystock-fullscreen-open'))setJellyStockMobileFullscreen(false);});
 
 
     // 初始化導航列按鈕事件 (修正"按下去沒反應"的關鍵區塊)
