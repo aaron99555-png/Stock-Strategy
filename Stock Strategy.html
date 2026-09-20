@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="208">
+<meta name="app-version" content="209">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -1074,6 +1074,106 @@ html:not(.dark) .shadow-xl{
   #journal-war-room .war-rank-flag{
     min-height:16px!important;
     font-size:8px!important;
+  }
+
+  /* v209：手機版紅框篩選區重新排版 */
+  @media (max-width:430px){
+    #module-journal .mobile-journal-date-row{
+      display:grid!important;
+      grid-template-columns:46px minmax(0,1fr) 46px!important;
+      gap:.45rem!important;
+      align-items:center!important;
+      width:100%!important;
+      margin-top:.2rem!important;
+    }
+    #module-journal .mobile-journal-date-row > button{
+      width:46px!important;
+      min-width:46px!important;
+      height:46px!important;
+      padding:0!important;
+      border-radius:14px!important;
+    }
+    #module-journal .mobile-journal-date-row input[type="date"]{
+      width:100%!important;
+      min-width:0!important;
+      height:46px!important;
+      padding:.45rem .7rem!important;
+      font-size:14px!important;
+      font-weight:800!important;
+      text-align:center!important;
+    }
+
+    #module-journal .mobile-journal-search-row{
+      display:block!important;
+      width:100%!important;
+      margin-top:.55rem!important;
+    }
+    #module-journal .mobile-journal-search-row input[type="text"],
+    #module-journal .mobile-journal-search-row input[type="search"]{
+      width:100%!important;
+      min-width:0!important;
+      height:46px!important;
+      font-size:14px!important;
+    }
+
+    #module-journal .mobile-journal-data-grid{
+      display:grid!important;
+      grid-template-columns:repeat(2,minmax(0,1fr))!important;
+      gap:.5rem!important;
+      width:100%!important;
+      margin-top:.55rem!important;
+    }
+    #module-journal .mobile-journal-data-grid > label{
+      display:flex!important;
+      align-items:center!important;
+      gap:.45rem!important;
+      width:100%!important;
+      min-width:0!important;
+      min-height:46px!important;
+      padding:.45rem .7rem!important;
+      box-sizing:border-box!important;
+      justify-content:flex-start!important;
+      border-radius:14px!important;
+    }
+    #module-journal .mobile-journal-data-grid > label span{
+      flex:1 1 auto!important;
+      min-width:0!important;
+      white-space:nowrap!important;
+      overflow:hidden!important;
+      text-overflow:ellipsis!important;
+      font-size:13px!important;
+    }
+
+    #module-journal .mobile-journal-select-row{
+      display:grid!important;
+      grid-template-columns:1.35fr .85fr .85fr!important;
+      gap:.5rem!important;
+      width:100%!important;
+      margin-top:.55rem!important;
+    }
+    #module-journal .mobile-journal-select-row > *{
+      width:100%!important;
+      min-width:0!important;
+    }
+    #module-journal .mobile-journal-select-row select{
+      width:100%!important;
+      min-width:0!important;
+      height:46px!important;
+      font-size:14px!important;
+    }
+
+    #module-journal .mobile-journal-action-row{
+      display:grid!important;
+      grid-template-columns:1fr 1fr!important;
+      gap:.6rem!important;
+      width:100%!important;
+      margin-top:.55rem!important;
+    }
+    #module-journal .mobile-journal-action-row > *{
+      width:100%!important;
+      min-width:0!important;
+      height:48px!important;
+    }
   }
 
   /* v208：手機版策略訊號雷達結果中的代號 / 股名改為上下換行 */
@@ -4758,6 +4858,94 @@ const optimizeStreakResultMobileCodeName=()=>{
 
 optimizeStreakMobileLayout();
 optimizeStreakResultMobileCodeName();
+
+const optimizeJournalMobileFilterLayout=()=>{
+    if(window.innerWidth>430)return;
+    const module=document.getElementById('module-journal');
+    if(!module)return;
+
+    const dateInput=module.querySelector('#filter-date, input[type="date"].filter-date, input[type="date"]');
+    const searchInput=module.querySelector('#filter-revenue-code-search, input[placeholder*="代號"], input[placeholder*="股名"]');
+    const negativeInput=module.querySelector('#filter-negative-growth');
+    const revenueHighInput=module.querySelector('#filter-revenue-high');
+    const largeHolderInput=module.querySelector('#filter-large-holder');
+    const highTurnoverInput=module.querySelector('#filter-high-turnover-revenue');
+    const scoreSelect=module.querySelector('#filter-momentum-score');
+    const statusSelect=module.querySelector('#filter-status, #filter-journal-status, #filter-momentum-status');
+    const quickSelect=module.querySelector('#filter-journal-quick');
+    const tagBtn=module.querySelector('#filter-tag-btn');
+    const clearBtn=module.querySelector('#clear-filters-btn');
+
+    if(dateInput){
+        const row=dateInput.closest('.flex')||dateInput.parentElement;
+        if(row) row.classList.add('mobile-journal-date-row');
+    }
+
+    if(searchInput){
+        const row=searchInput.closest('.flex')||searchInput.parentElement;
+        if(row) row.classList.add('mobile-journal-search-row');
+    }
+
+    const labels=[
+        negativeInput?.closest('label'),
+        revenueHighInput?.closest('label'),
+        largeHolderInput?.closest('label'),
+        highTurnoverInput?.closest('label')
+    ].filter(Boolean);
+
+    if(labels.length){
+        const sameParent=labels.every(label=>label.parentElement===labels[0].parentElement);
+        if(sameParent){
+            labels[0].parentElement.classList.add('mobile-journal-data-grid');
+        }else{
+            let wrapper=module.querySelector('.mobile-journal-data-grid');
+            if(!wrapper){
+                wrapper=document.createElement('div');
+                wrapper.className='mobile-journal-data-grid';
+                const first=labels[0];
+                first.parentElement.insertBefore(wrapper, first);
+            }
+            labels.forEach(label=>{
+                if(label.parentElement!==wrapper) wrapper.appendChild(label);
+            });
+        }
+    }
+
+    const selects=[scoreSelect,statusSelect,quickSelect].filter(Boolean);
+    if(selects.length){
+        const sameParent=selects.every(el=>el.parentElement===selects[0].parentElement);
+        if(sameParent){
+            selects[0].parentElement.classList.add('mobile-journal-select-row');
+        }else{
+            let wrapper=module.querySelector('.mobile-journal-select-row');
+            if(!wrapper){
+                wrapper=document.createElement('div');
+                wrapper.className='mobile-journal-select-row';
+                const first=selects[0];
+                first.parentElement.insertBefore(wrapper, first);
+            }
+            selects.forEach(el=>{
+                if(el.parentElement!==wrapper) wrapper.appendChild(el);
+            });
+        }
+    }
+
+    if(tagBtn&&clearBtn){
+        if(tagBtn.parentElement===clearBtn.parentElement){
+            tagBtn.parentElement.classList.add('mobile-journal-action-row');
+        }else{
+            let wrapper=module.querySelector('.mobile-journal-action-row');
+            if(!wrapper){
+                wrapper=document.createElement('div');
+                wrapper.className='mobile-journal-action-row';
+                tagBtn.parentElement.insertBefore(wrapper, tagBtn);
+            }
+            if(tagBtn.parentElement!==wrapper) wrapper.appendChild(tagBtn);
+            if(clearBtn.parentElement!==wrapper) wrapper.appendChild(clearBtn);
+        }
+    }
+};
+optimizeJournalMobileFilterLayout();
 ['streak-result-sort','streak-heat-filter','streak-min-strength'].forEach(id=>document.getElementById(id)?.addEventListener('change',()=>scheduleStreakAutoRender()));
 document.getElementById('streak-search-form')?.addEventListener('click',e=>{
     const button=e.target.closest('[data-streak-preset]');if(!button)return;
