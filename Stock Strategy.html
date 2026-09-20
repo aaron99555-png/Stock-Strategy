@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>萊恩起漲手札</title>
-<meta name="app-version" content="204">
+<meta name="app-version" content="206">
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -1035,9 +1035,159 @@ html:not(.dark) .shadow-xl{
   #journal-war-room .war-rank-card{min-height:70px!important;padding:.55rem!important}
 }
 @media (max-width:430px){
-  #journal-war-room #war-room-ranking{grid-template-columns:1fr!important}
-  #journal-war-room .war-rank-name{font-size:12px}
-  #journal-war-room .war-rank-score{font-size:13px}
+  /* v205：手機版強度排行固定一排 2 檔 */
+  #journal-war-room #war-room-ranking{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:.4rem!important;
+  }
+  #journal-war-room .war-rank-card{
+    min-height:76px!important;
+    padding:.45rem!important;
+  }
+  #journal-war-room .war-rank-main{gap:.32rem!important}
+  #journal-war-room .war-rank-medal{
+    width:24px!important;
+    height:24px!important;
+    min-width:24px!important;
+    flex-basis:24px!important;
+    font-size:10px!important;
+  }
+  #journal-war-room .war-rank-head{gap:.2rem!important}
+  #journal-war-room .war-rank-name{
+    font-size:10.5px!important;
+    line-height:1.25!important;
+  }
+  #journal-war-room .war-rank-score{
+    min-width:20px!important;
+    font-size:11px!important;
+  }
+  #journal-war-room .war-rank-tags{
+    gap:.18rem!important;
+    margin-top:.3rem!important;
+    font-size:8px!important;
+  }
+  #journal-war-room .war-rank-pill{
+    min-height:16px!important;
+    padding:.1rem .28rem!important;
+    font-size:8px!important;
+  }
+  #journal-war-room .war-rank-flag{
+    min-height:16px!important;
+    font-size:8px!important;
+  }
+
+  /* v206：策略訊號雷達手機版篩選區重排，避免日期與條件跑版 */
+  #module-overview #journal-streaks .streak-filter-toolbar,
+  #module-overview #journal-streaks .streak-filters,
+  #module-overview #journal-streaks .journal-streak-filter-panel{
+    gap:.65rem!important;
+  }
+
+  #module-overview #journal-streaks .streak-filter-grid,
+  #module-overview #journal-streaks .journal-streak-filter-grid{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    gap:.6rem!important;
+  }
+
+  /* 日期切換列：左右按鈕 + 日期置中，單獨成一列 */
+  #module-overview #journal-streaks .streak-date-row,
+  #module-overview #journal-streaks .journal-streak-date-row{
+    display:grid!important;
+    grid-template-columns:46px minmax(0,1fr) 46px!important;
+    align-items:center!important;
+    gap:.45rem!important;
+  }
+  #module-overview #journal-streaks .streak-date-row > button,
+  #module-overview #journal-streaks .journal-streak-date-row > button{
+    width:46px!important;
+    min-width:46px!important;
+    height:46px!important;
+    padding:0!important;
+    border-radius:14px!important;
+  }
+  #module-overview #journal-streaks .streak-date-input,
+  #module-overview #journal-streaks .journal-streak-date-input,
+  #module-overview #journal-streaks input[type="date"].streak-date,
+  #module-overview #journal-streaks input[type="date"].journal-streak-date{
+    width:100%!important;
+    min-width:0!important;
+    height:46px!important;
+    padding:.45rem .7rem!important;
+    text-align:center!important;
+    font-size:14px!important;
+    font-weight:800!important;
+  }
+
+  /* 搜尋列獨立一整列 */
+  #module-overview #journal-streaks .streak-search-row,
+  #module-overview #journal-streaks .journal-streak-search-row{
+    display:block!important;
+  }
+  #module-overview #journal-streaks .streak-search-row input,
+  #module-overview #journal-streaks .journal-streak-search-row input,
+  #module-overview #journal-streaks input[placeholder*="代號"],
+  #module-overview #journal-streaks input[placeholder*="股名"]{
+    width:100%!important;
+    min-width:0!important;
+    height:46px!important;
+    font-size:14px!important;
+  }
+
+  /* 資料條件：兩欄排列，避免每列擠三個 */
+  #module-overview #journal-streaks .streak-data-filter-group,
+  #module-overview #journal-streaks .journal-streak-data-group{
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:.5rem!important;
+  }
+  #module-overview #journal-streaks .streak-data-filter-group label,
+  #module-overview #journal-streaks .journal-streak-data-group label,
+  #module-overview #journal-streaks .streak-data-filter,
+  #module-overview #journal-streaks .journal-streak-data-group .filter-chip{
+    min-width:0!important;
+  }
+
+  /* 分數/狀態/排序：三欄但等寬 */
+  #module-overview #journal-streaks .streak-select-row,
+  #module-overview #journal-streaks .journal-streak-select-row{
+    display:grid!important;
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:.5rem!important;
+  }
+  #module-overview #journal-streaks .streak-select-row select,
+  #module-overview #journal-streaks .journal-streak-select-row select,
+  #module-overview #journal-streaks select{
+    width:100%!important;
+    min-width:0!important;
+    height:46px!important;
+    font-size:14px!important;
+  }
+
+  /* 標籤挑選 + 清除：一排兩欄 */
+  #module-overview #journal-streaks .streak-action-row,
+  #module-overview #journal-streaks .journal-streak-action-row{
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    gap:.6rem!important;
+  }
+  #module-overview #journal-streaks .streak-action-row > * ,
+  #module-overview #journal-streaks .journal-streak-action-row > *{
+    width:100%!important;
+    min-width:0!important;
+    height:48px!important;
+  }
+
+  /* 若原始結構沒有明確 class，直接針對雷達區塊常見 flex/grid 做保底 */
+  #journal-streaks .rounded-2xl.border-2.border-amber-400 .flex,
+  #journal-streaks .rounded-2xl.border-2.border-amber-400 .grid{
+    min-width:0!important;
+  }
+  #journal-streaks .rounded-2xl.border-2.border-amber-400 input,
+  #journal-streaks .rounded-2xl.border-2.border-amber-400 select,
+  #journal-streaks .rounded-2xl.border-2.border-amber-400 button{
+    min-width:0!important;
+  }
 }
 </style>
 
@@ -4454,6 +4604,36 @@ document.getElementById('streak-tag-filter-mode')?.addEventListener('change',()=
 document.getElementById('streak-tag-options')?.addEventListener('change',e=>{if(!e.target.classList.contains('streak-tag-cb'))return;updateStreakTagFilterUI();scheduleStreakAutoRender();});
 document.getElementById('streak-clear-tags-btn')?.addEventListener('click',()=>{document.querySelectorAll('.streak-tag-cb').forEach(input=>input.checked=false);const mode=document.getElementById('streak-tag-filter-mode');if(mode)mode.value='all';updateStreakTagFilterUI();scheduleStreakAutoRender();});
 document.querySelectorAll('.streak-data-filter').forEach(input=>input.addEventListener('change',()=>scheduleStreakAutoRender()));
+const optimizeStreakMobileLayout=()=>{
+    const root=document.getElementById('journal-streaks'); if(!root) return;
+    const dateInput=root.querySelector('input[type="date"]');
+    if(dateInput){
+        dateInput.classList.add('streak-date');
+        const dateWrap=dateInput.closest('.flex')||dateInput.parentElement;
+        if(dateWrap) dateWrap.classList.add('streak-date-row');
+    }
+    const searchInput=[...root.querySelectorAll('input[type="text"],input[type="search"]')].find(el=>/代號|股名|備註/.test(el.placeholder||''));
+    if(searchInput){
+        const wrap=searchInput.closest('.flex')||searchInput.parentElement;
+        if(wrap) wrap.classList.add('streak-search-row');
+    }
+    const selects=[...root.querySelectorAll('select')];
+    if(selects.length){
+        const common=selects[0].closest('.grid')||selects[0].parentElement;
+        if(common) common.classList.add('streak-select-row');
+    }
+    const dataFilterInputs=[...root.querySelectorAll('.streak-data-filter')];
+    if(dataFilterInputs.length){
+        const labelSet=[...new Set(dataFilterInputs.map(el=>el.closest('label')).filter(Boolean))];
+        const group=labelSet[0]?.parentElement;
+        if(group) group.classList.add('streak-data-filter-group');
+    }
+    const clearBtn=[...root.querySelectorAll('button')].find(el=>/清除|還原預設/.test((el.textContent||'').trim()));
+    const tagBtn=[...root.querySelectorAll('button')].find(el=>/標籤挑選/.test((el.textContent||'').trim()));
+    const host=(clearBtn?.parentElement===tagBtn?.parentElement)?clearBtn?.parentElement:null;
+    if(host && tagBtn && clearBtn) host.classList.add('streak-action-row');
+};
+optimizeStreakMobileLayout();
 ['streak-result-sort','streak-heat-filter','streak-min-strength'].forEach(id=>document.getElementById(id)?.addEventListener('change',()=>scheduleStreakAutoRender()));
 document.getElementById('streak-search-form')?.addEventListener('click',e=>{
     const button=e.target.closest('[data-streak-preset]');if(!button)return;
