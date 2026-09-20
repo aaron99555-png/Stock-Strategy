@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="213" name="app-version"/>
+<meta content="215" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -1060,6 +1060,47 @@ html:not(.dark) .shadow-xl{
     font-size:8px!important;
   }
 
+  /* v214：策略訊號雷達【資料條件】手機版固定兩行顯示並重新排序 */
+  @media (max-width:430px){
+    #module-overview #journal-streaks .streak-data-filter-group,
+    #module-overview #journal-streaks .journal-streak-data-group{
+      display:grid!important;
+      grid-template-columns:repeat(3,minmax(0,1fr))!important;
+      gap:.55rem!important;
+      width:100%!important;
+      align-items:stretch!important;
+    }
+    #module-overview #journal-streaks .streak-data-filter-group > label,
+    #module-overview #journal-streaks .journal-streak-data-group > label{
+      display:flex!important;
+      align-items:center!important;
+      justify-content:flex-start!important;
+      gap:.42rem!important;
+      width:100%!important;
+      min-width:0!important;
+      min-height:48px!important;
+      padding:.48rem .6rem!important;
+      box-sizing:border-box!important;
+      border-radius:14px!important;
+    }
+    #module-overview #journal-streaks .streak-data-filter-group > label span,
+    #module-overview #journal-streaks .journal-streak-data-group > label span{
+      flex:1 1 auto!important;
+      min-width:0!important;
+      white-space:normal!important;
+      line-height:1.12!important;
+      font-size:11px!important;
+      font-weight:800!important;
+      text-align:center!important;
+    }
+    #module-overview #journal-streaks .streak-data-filter-group > label input,
+    #module-overview #journal-streaks .journal-streak-data-group > label input{
+      width:18px!important;
+      height:18px!important;
+      flex:0 0 18px!important;
+    }
+  }
+
   /* v208：手機版策略訊號雷達結果中的代號 / 股名改為上下換行 */
   #module-overview #journal-streaks [data-mobile-code-name]{
     display:flex!important;
@@ -1900,7 +1941,6 @@ nav, .top-nav, .desktop-nav, .module-nav{
 <div class="sm:hidden sticky bottom-0 pt-3 mt-2 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"><button class="w-full min-h-[42px] rounded-lg bg-blue-600 text-white text-sm font-black shadow-sm" data-close-filter-tags="" type="button">完成標籤挑選</button></div>
 </div>
 </div></div>
-
 <div class="journal-filter-tags-display-row">
 <div class="flex flex-wrap gap-1.5 w-full md:w-auto mt-2 lg:mt-0" id="filter-tags-display"></div>
 </div>
@@ -4809,6 +4849,7 @@ function renderJournalStreaks(){
         return`<article class="rounded-xl border border-violet-200 dark:border-violet-800/60 bg-white dark:bg-gray-900/35 p-3 sm:p-4 shadow-sm"><div class="flex items-start justify-between gap-2"><div class="min-w-0 flex flex-wrap items-center gap-1 rounded-lg px-1 -mx-1"${getYahooStockAttributes(item.code)}><span class="font-black text-violet-700 dark:text-violet-300 mr-1">${escapeHTML(item.code)}</span><span class="font-bold text-gray-800 dark:text-gray-100">${escapeHTML(item.name||'未命名')}</span>${item.isHorseNewEntry?'<span class="shrink-0 inline-flex items-center text-[12px] leading-none" title="同股往前一個月內未出現相同馬標籤">🆕</span>':''}${infoIcons}</div><span class="shrink-0 rounded-full bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 px-2.5 py-1 text-[10px] font-black">${resultBadge}</span></div><div class="flex flex-wrap items-center gap-1.5 mt-2">${renderStreakHeatBadge(item.heat)}<span class="text-[10px] text-gray-400">前期 ${item.previousWindowOccurrences} 次 → 本期 ${item.currentWindowOccurrences} 次</span></div>${renderStreakStrength(item)}<div class="flex flex-wrap items-center gap-1 mt-3 mb-2"><span class="text-[10px] text-gray-500 dark:text-gray-400 mr-1">共同策略</span>${common}</div><div class="flex flex-wrap items-center gap-1 mb-2"><span class="text-[10px] text-gray-500 dark:text-gray-400 mr-1">策略頻率</span>${tagFrequency||'<span class="text-[10px] text-gray-400">無策略標籤</span>'}</div><div>${daily}</div><div class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700/70 flex flex-wrap gap-2"><button type="button" data-streak-action="overview" data-code="${escapeHTML(item.code)}" data-name="${escapeHTML(item.name||'')}" class="h-8 px-2.5 rounded-lg border border-violet-200 dark:border-violet-700 bg-violet-50 dark:bg-violet-900/30 text-violet-700 dark:text-violet-200 text-[11px] font-bold hover:scale-105 transition"><i class="fa-solid fa-chart-pie mr-1"></i>個股總覽</button>${trackingButton}</div></article>`;
     }).join('');
     optimizeStreakResultMobileCodeName();
+optimizeStreakDataConditionOrder();
 }
 
 const buildJournalStreakCopyText=analysis=>{
@@ -4928,6 +4969,38 @@ const optimizeStreakResultMobileCodeName=()=>{
 
 optimizeStreakMobileLayout();
 optimizeStreakResultMobileCodeName();
+
+const optimizeStreakDataConditionOrder=()=>{
+    if(window.innerWidth>430)return;
+    const root=document.getElementById('journal-streaks');
+    if(!root)return;
+
+    const ids=[
+        'streak-exclude-negative-growth',
+        'streak-revenue-high',
+        'streak-large-holder',
+        'streak-high-turnover-revenue',
+        'streak-chip-concentration-holder'
+    ];
+
+    const labels=ids.map(id=>root.querySelector('#'+id)?.closest('label')).filter(Boolean);
+    if(!labels.length)return;
+
+    let group=root.querySelector('.streak-data-filter-group, .journal-streak-data-group');
+    if(!group){
+        const firstLabel=labels[0];
+        group=document.createElement('div');
+        group.className='streak-data-filter-group';
+        firstLabel.parentElement.insertBefore(group, firstLabel);
+    }
+
+    // 依指定順序重排：第1排三個，第2排兩個
+    labels.forEach(label=>{
+        if(label.parentElement!==group) group.appendChild(label);
+    });
+    labels.forEach(label=>group.appendChild(label));
+};
+optimizeStreakDataConditionOrder();
 ['streak-result-sort','streak-heat-filter','streak-min-strength'].forEach(id=>document.getElementById(id)?.addEventListener('change',()=>scheduleStreakAutoRender()));
 document.getElementById('streak-search-form')?.addEventListener('click',e=>{
     const button=e.target.closest('[data-streak-preset]');if(!button)return;
