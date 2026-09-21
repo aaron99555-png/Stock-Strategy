@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="228" name="app-version"/>
+<meta content="229" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -1989,6 +1989,8 @@ nav, .top-nav, .desktop-nav, .module-nav{
 </div>
 <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="selected">獨選</button>
 <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="strategy">策略</button>
+<button class="flex-shrink-0 btn-copy-base bg-fuchsia-50 dark:bg-fuchsia-900/40 hover:bg-fuchsia-600 border-fuchsia-200 dark:border-fuchsia-700/50 text-fuchsia-700 dark:text-fuchsia-200 btn-copy" data-mode="copy_a" title="破繭而出、月來越好、季不可失、OBV突破、MACD突破">複製A</button>
+<button class="flex-shrink-0 btn-copy-base bg-teal-50 dark:bg-teal-900/40 hover:bg-teal-600 border-teal-200 dark:border-teal-700/50 text-teal-700 dark:text-teal-200 btn-copy" data-mode="copy_b" title="量價齊揚、高成交值、一陽指">複製B</button>
 <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="score">分數</button>
 <button class="flex-shrink-0 btn-copy-base bg-sky-50 dark:bg-sky-900/40 hover:bg-sky-600 border-sky-200 dark:border-sky-700/50 text-sky-700 dark:text-sky-200 btn-copy" data-mode="futures">股期</button>
 <button class="flex-shrink-0 btn-copy-base bg-sky-50 dark:bg-sky-900/40 hover:bg-sky-600 border-sky-200 dark:border-sky-700/50 text-sky-700 dark:text-sky-200 btn-copy" data-mode="futures_score">股期分數</button>
@@ -2645,6 +2647,8 @@ nav, .top-nav, .desktop-nav, .module-nav{
 </div>
 <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="selected">獨選</button>
 <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="strategy">策略</button>
+<button class="flex-shrink-0 btn-copy-base bg-fuchsia-50 dark:bg-fuchsia-900/40 hover:bg-fuchsia-600 border-fuchsia-200 dark:border-fuchsia-700/50 text-fuchsia-700 dark:text-fuchsia-200 btn-copy" data-mode="copy_a" title="破繭而出、月來越好、季不可失、OBV突破、MACD突破">複製A</button>
+<button class="flex-shrink-0 btn-copy-base bg-teal-50 dark:bg-teal-900/40 hover:bg-teal-600 border-teal-200 dark:border-teal-700/50 text-teal-700 dark:text-teal-200 btn-copy" data-mode="copy_b" title="量價齊揚、高成交值、一陽指">複製B</button>
 <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="score">分數</button>
 <button class="flex-shrink-0 btn-copy-base bg-sky-50 dark:bg-sky-900/40 hover:bg-sky-600 border-sky-200 dark:border-sky-700/50 text-sky-700 dark:text-sky-200 btn-copy" data-mode="futures">股期</button>
 <button class="flex-shrink-0 btn-copy-base bg-sky-50 dark:bg-sky-900/40 hover:bg-sky-600 border-sky-200 dark:border-sky-700/50 text-sky-700 dark:text-sky-200 btn-copy" data-mode="futures_score">股期分數</button>
@@ -6326,6 +6330,29 @@ document.querySelectorAll('.btn-copy').forEach(b=>{b.addEventListener('click',e=
         const duplicateCodes=getDuplicateStrategyCodesFromJournals(d,cf.tags);
         let tx=`| ${ds} 非凡重點 (共 ${ff.length} 檔) |\n\n`;
         ff.forEach(j=>tx+=`${j.code} ${getStrategyCopyStockName(j,duplicateCodes)}\n`);
+        executeCopy(tx.trim()+copyFootnote);return;
+    }
+
+    if(m==='copy_a'||m==='copy_b'){
+        const preset=m==='copy_a'
+            ?[{tag:'破繭而出',icon:'🦋'},{tag:'月來越好',icon:'🌙'},{tag:'季不可失',icon:'🗓️'},{tag:'OBV突破',icon:'🌊'},{tag:'MACD突破',icon:'〽️'}]
+            :[{tag:'量價齊揚',icon:'📊'},{tag:'高成交值',icon:'💰'},{tag:'一陽指',icon:'☝️'}];
+        const presetTags=preset.map(x=>x.tag);
+        const duplicateCodes=getDuplicateStrategyCodesFromJournals(d,presetTags);
+        const sections=[];
+        preset.forEach(({tag,icon})=>{
+            const byCode=new Map();
+            d.filter(j=>journalHasStrategyTag(j,tag)).forEach(j=>{
+                const code=String(j.code||'').trim();if(!code)return;
+                const current=byCode.get(code);
+                if(!current||String(j.date||'')>String(current.date||'')||(String(j.date||'')===String(current.date||'')&&Number(j.createdAt||0)>Number(current.createdAt||0)))byCode.set(code,j);
+            });
+            const items=[...byCode.values()].sort((a,b)=>String(a.code||'').localeCompare(String(b.code||''),'zh-Hant',{numeric:true}));
+            if(!items.length)return;
+            sections.push(`${icon} [${tag}] (共 ${items.length} 檔)\n${items.map(j=>`${j.code} ${getStrategyCopyStockName(j,duplicateCodes,tag)}`).join('\n')}`);
+        });
+        if(!sections.length)return showToast(m==='copy_a'?'複製A目前無符合標的':'複製B目前無符合標的','error');
+        const tx=`| ${ds} ${m==='copy_a'?'複製A':'複製B'} |\n\n${sections.join('\n\n')}`;
         executeCopy(tx.trim()+copyFootnote);return;
     }
 
