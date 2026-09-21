@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="229" name="app-version"/>
+<meta content="230" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -6352,7 +6352,7 @@ document.querySelectorAll('.btn-copy').forEach(b=>{b.addEventListener('click',e=
             sections.push(`${icon} [${tag}] (共 ${items.length} 檔)\n${items.map(j=>`${j.code} ${getStrategyCopyStockName(j,duplicateCodes,tag)}`).join('\n')}`);
         });
         if(!sections.length)return showToast(m==='copy_a'?'複製A目前無符合標的':'複製B目前無符合標的','error');
-        const tx=`| ${ds} ${m==='copy_a'?'複製A':'複製B'} |\n\n${sections.join('\n\n')}`;
+        const tx=`| ${ds} 多重濾網 |\n\n${sections.join('\n\n')}`;
         executeCopy(tx.trim()+copyFootnote);return;
     }
 
