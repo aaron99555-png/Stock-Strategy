@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="235" name="app-version"/>
+<meta content="237" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -7457,6 +7457,30 @@ const SESSION={
         normalizedCategories.push({title:String(category.title||('分類 '+(index+1))),theme:theme,tags:tags});
       });
       if(!normalizedCategories.length)normalizedCategories=clone(DEFAULT_TAG_CATEGORIES);
+
+      // v237：既有使用者的自訂標籤設定可能仍是舊版，
+      // 因此強制把「追風馬」補進「📊 基本面佳」，並固定馬廄順序：
+      // 追風馬 → 赤兔馬 → 千里馬。
+      var fundamentalCategory=normalizedCategories.find(function(category){
+        return String(category.title||'').includes('基本面佳');
+      });
+      if(!fundamentalCategory){
+        fundamentalCategory={title:'📊 基本面佳',theme:'blue',tags:[]};
+        normalizedCategories.splice(Math.min(1,normalizedCategories.length),0,fundamentalCategory);
+      }
+      var horseOrder=['追風馬','赤兔馬','千里馬'];
+      horseOrder.forEach(function(tag){
+        normalizedCategories.forEach(function(category){
+          category.tags=(category.tags||[]).filter(function(item){return item!==tag;});
+        });
+      });
+      var revenueIndex=fundamentalCategory.tags.indexOf('多頭營收創高');
+      var insertAt=revenueIndex>=0?revenueIndex+1:fundamentalCategory.tags.length;
+      fundamentalCategory.tags.splice.apply(fundamentalCategory.tags,[insertAt,0].concat(horseOrder));
+      horseOrder.forEach(function(tag){
+        if(!sourceMeta[tag])sourceMeta[tag]=normalizeTagMeta(tag,'blue',null);
+        seen.add(tag);
+      });
 
       // v161：既有使用者也自動補上「分析師專區｜漁夫林睿閎投資週報」與三個會員標籤。
       var analystCategoryTitle='🎯 分析師專區｜漁夫林睿閎投資週報';
