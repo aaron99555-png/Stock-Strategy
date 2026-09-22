@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="243" name="app-version"/>
+<meta content="244" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -4209,7 +4209,9 @@ function resetSessionFiltersToDefaults(syncControls=false){
     if(revenueMonth)revenueMonth.value='';if(revenueCode)revenueCode.value='';const revenueType=document.getElementById('filter-revenue-type');if(revenueType)revenueType.value='all';
     ['filter-rep-start','filter-rep-end','filter-rep-code'].forEach(id=>{const input=document.getElementById(id);if(input)input.value='';});
     applyFilterLogicState('OR','.logic-btn');applyFilterLogicState('OR','.logic-btn-fav');renderFilterTags();
-    resetStreakFiltersToDefaults({renderResults:false,notify:false});
+    // v244：一般頁面 session filter reset 不再清除「策略訊號雷達」。
+    // pageshow 會在畫面完成初次 render 後觸發；舊版在此清空雷達，
+    // 因而造成篩選結果「閃一下就消失」。
     document.querySelectorAll('.has-active-filter').forEach(element=>element.classList.remove('has-active-filter'));
 }
 
@@ -6875,6 +6877,8 @@ document.addEventListener('DOMContentLoaded',async()=>{
     window.addEventListener('pageshow',()=>requestAnimationFrame(()=>{
         resetSessionFiltersToDefaults(true);clearTransientSearchFields();
         processAndRenderJournals();renderFavorites();renderRevenueRecords();renderReports();
+        // v244：pageshow 不清空策略雷達；若已曾產生結果則維持顯示。
+        if(lastJournalStreakResult)renderJournalStreaks();
     }));
 
 setChkDirection('long');
