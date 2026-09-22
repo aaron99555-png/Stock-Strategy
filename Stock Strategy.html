@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="240" name="app-version"/>
+<meta content="241" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -1747,105 +1747,41 @@ nav, .top-nav, .desktop-nav, .module-nav{
 </style>
 
 
-<style id="streak-results-visible-v239">
-/* v239：桌機版壓縮篩選設定高度，讓篩選結果直接出現在同一畫面 */
-@media (min-width:1024px){
-  #streak-filter-panel{
-    max-height:72vh !important;
-    overflow-y:auto !important;
-    overscroll-behavior:contain;
-    scrollbar-gutter:stable;
-  }
-  #streak-filter-panel > div{
-    gap:8px !important;
-  }
-  #streak-results{
-    max-height:520px !important;
-    overflow-y:auto !important;
-  }
+
+
+
+
+<style id="streak-results-fix-v241">
+/* v241：結果直接排在摘要後方，不再使用動態左右搬移 DOM */
+#streak-results-header:not(.hidden){
+  display:flex !important;
 }
-/* 有結果時強制顯示為 grid，避免其他舊版樣式誤把結果區藏住 */
 #streak-results:not(.hidden){
   display:grid !important;
+  visibility:visible !important;
+  opacity:1 !important;
 }
-/* 結果區加上明顯分隔，使用者能直接辨識結果開始位置 */
-#streak-results:not(.hidden){
-  border-top:1px solid rgba(139,92,246,.18);
-  padding-top:12px;
-}
-/* 統計列再縮短 */
-#streak-stats:not(.hidden){
-  padding-top:6px !important;
-  padding-bottom:8px !important;
-}
-</style>
-
-
-<style id="streak-split-layout-v240">
-/* v240：桌機改成「左篩選、右結果」，結果不再被推到最下方 */
 @media (min-width:1024px){
-  #streak-workspace-v240{
-    display:grid !important;
-    grid-template-columns:minmax(430px,42%) minmax(0,58%);
-    align-items:start;
-    min-height:520px;
+  #streak-filter-panel{
+    padding-top:12px !important;
+    padding-bottom:12px !important;
   }
-  #streak-filter-pane-v240{
-    min-width:0;
-    border-right:1px solid rgba(139,92,246,.16);
-    position:sticky;
-    top:8px;
-    align-self:start;
-  }
-  #streak-output-pane-v240{
-    min-width:0;
-    max-height:72vh;
-    overflow-y:auto;
+  #streak-results{
+    grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+    max-height:58vh !important;
+    overflow-y:auto !important;
     overscroll-behavior:contain;
     scrollbar-gutter:stable;
-    background:rgba(255,255,255,.42);
-  }
-  .dark #streak-output-pane-v240{background:rgba(17,24,39,.18)}
-  #streak-filter-panel{
-    max-height:72vh !important;
-    overflow-y:auto !important;
-    border-bottom:0 !important;
-  }
-  #streak-summary{
-    position:sticky;
-    top:0;
-    z-index:5;
-    background:rgba(255,255,255,.96);
-    backdrop-filter:blur(8px);
-    border-bottom:1px solid rgba(139,92,246,.14);
-  }
-  .dark #streak-summary{background:rgba(31,41,55,.96)}
-  #streak-results{
-    max-height:none !important;
-    overflow:visible !important;
-    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
-    padding-bottom:24px !important;
+    padding-top:10px !important;
   }
   #streak-stats{
-    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    margin-top:6px !important;
   }
-  #streak-results-header{
-    position:sticky;
-    top:43px;
-    z-index:4;
-    background:rgba(255,255,255,.96);
-    backdrop-filter:blur(8px);
-    border-bottom:1px solid rgba(139,92,246,.12);
-    padding-bottom:8px;
-  }
-  .dark #streak-results-header{background:rgba(31,41,55,.96)}
 }
-@media (max-width:1023px){
-  #streak-workspace-v240{display:block}
-  #streak-output-pane-v240{overflow:visible}
+#streak-results-header{
+  border-top:1px solid rgba(139,92,246,.16);
+  background:rgba(139,92,246,.035);
 }
-/* 沒有結果時也讓右側清楚顯示狀態 */
-#streak-output-pane-v240{min-height:160px}
 </style>
 
 </head>
@@ -2045,12 +1981,13 @@ nav, .top-nav, .desktop-nav, .module-nav{
 </div>
 </div>
 <div class="px-4 sm:px-5 py-3 text-xs sm:text-sm text-gray-500 dark:text-gray-400" id="streak-summary">條件變更後會自動即時篩選。</div>
-<div class="hidden grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 px-4 sm:px-5 pb-3" id="streak-stats"></div>
+
 <div class="hidden px-4 sm:px-5 pt-2 pb-1 flex items-center justify-between gap-2" id="streak-results-header">
   <div class="text-sm font-black text-violet-700 dark:text-violet-300"><i class="fa-solid fa-list-check mr-1.5"></i>篩選結果 <span id="streak-results-count" class="ml-1 text-xs font-bold text-gray-500 dark:text-gray-400"></span></div>
   <button type="button" id="streak-back-filters-btn" class="h-8 px-3 rounded-lg border border-violet-200 dark:border-violet-700 bg-white dark:bg-gray-800 text-[11px] font-bold text-violet-700 dark:text-violet-300"><i class="fa-solid fa-arrow-up mr-1"></i>回篩選</button>
 </div>
 <div class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 px-4 sm:px-5 pb-5 max-h-[640px] lg:max-h-[75vh] overflow-y-auto" id="streak-results"></div>
+<div class="hidden grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 px-4 sm:px-5 pb-3" id="streak-stats"></div>
 </div>
 </div>
 <div class="card-panel border-t-4 border-t-blue-500 flex flex-col h-full min-h-[500px]">
@@ -5181,6 +5118,10 @@ function renderJournalStreaks(){
     summary.innerHTML=`<span class="font-bold text-violet-700 dark:text-violet-300">${displaySummary}</span>｜實際基準日 ${escapeHTML(analysis.baseDate.replace(/-/g,'/'))}｜${modeSummary}｜${horseSummary}｜週末、休市日不計${analysis.customHolidays.length?`｜自訂休市 ${analysis.customHolidays.length} 日`:''}${escapeHTML(tagSummary)}${escapeHTML(dataSummary)}${analysis.heatFilter!=='all'?`｜熱度：${escapeHTML(analysis.heatFilter)}`:''}${analysis.minStrength?`｜強度 ≥ ${analysis.minStrength}`:''}${adjusted?`<span class="ml-2 text-amber-600 dark:text-amber-400">（${escapeHTML(analysis.requestedBase.replace(/-/g,'/'))} 無資料，已往前取最近紀錄日）</span>`:''}`;
     if(!analysis.results.length){root.innerHTML='';root.classList.add('hidden');document.getElementById('streak-results-header')?.classList.add('hidden');return;}
     root.classList.remove('hidden');
+    root.style.removeProperty('display');
+    root.style.removeProperty('visibility');
+    root.style.removeProperty('opacity');
+    document.getElementById('streak-results-header')?.classList.remove('hidden');
     root.innerHTML=analysis.results.map(item=>{
         const common=item.commonTags.length?item.commonTags.map(tag=>renderStreakTag(tag,item.horseNewEntryTags?.includes(normalizeStrategyTagName(tag)))).join(''):'<span class="text-[10px] text-gray-400">每日策略不同</span>';
         const infoIcons=renderStreakStockInfoIcons(item.code);
@@ -8862,52 +8803,21 @@ document.addEventListener('DOMContentLoaded',()=>{
 </script>
 
 
-<script id="streak-split-layout-script-v240">
+
+
+<script id="streak-results-jump-fix-v241">
 (function(){
-  function buildStreakSplitLayout(){
-    const content=document.getElementById('streak-panel-content');
-    const filter=document.getElementById('streak-filter-panel');
-    const summary=document.getElementById('streak-summary');
-    const stats=document.getElementById('streak-stats');
-    const header=document.getElementById('streak-results-header');
-    const results=document.getElementById('streak-results');
-    if(!content||!filter||!summary||!stats||!results||document.getElementById('streak-workspace-v240'))return;
-
-    const workspace=document.createElement('div');
-    workspace.id='streak-workspace-v240';
-
-    const left=document.createElement('div');
-    left.id='streak-filter-pane-v240';
-
-    const right=document.createElement('div');
-    right.id='streak-output-pane-v240';
-
-    content.insertBefore(workspace,filter);
-    workspace.appendChild(left);
-    workspace.appendChild(right);
-    left.appendChild(filter);
-    right.appendChild(summary);
-    right.appendChild(stats);
-    if(header)right.appendChild(header);
-    right.appendChild(results);
-  }
-
-  if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded',buildStreakSplitLayout,{once:true});
-  }else{
-    buildStreakSplitLayout();
-  }
-
-  /* 「看結果」現在只捲動右側結果窗，不會把整頁帶到最下面 */
-  window.jumpToStreakResults=function(){
-    const pane=document.getElementById('streak-output-pane-v240');
-    const target=document.getElementById('streak-results-header') || document.getElementById('streak-results');
-    if(window.innerWidth>=1024 && pane){
-      pane.scrollTo({top:Math.max(0,(target?.offsetTop||0)-45),behavior:'smooth'});
-    }else{
-      (target||document.getElementById('streak-stats'))?.scrollIntoView({behavior:'smooth',block:'start'});
-    }
-  };
+  document.addEventListener('click',function(e){
+    const btn=e.target.closest('#streak-jump-results-btn');
+    if(!btn)return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    const target=document.getElementById('streak-results-header');
+    const fallback=document.getElementById('streak-results');
+    (target && !target.classList.contains('hidden') ? target : fallback)?.scrollIntoView({
+      behavior:'smooth',block:'start'
+    });
+  },true);
 })();
 </script>
 
