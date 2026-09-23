@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="249" name="app-version"/>
+<meta content="251" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -2079,6 +2079,10 @@ nav, .top-nav, .desktop-nav, .module-nav{
 <input class="copy-mark-large-holder rounded border-violet-300 dark:border-violet-700 accent-violet-600 w-3.5 h-3.5" type="checkbox"/>
 <span>📊千張大戶增</span>
 </label>
+<label class="inline-flex items-center gap-1 cursor-pointer whitespace-nowrap" title="複製時標示新進榜">
+<input class="copy-mark-new-entry rounded border-amber-300 dark:border-amber-700 accent-amber-600 w-3.5 h-3.5" type="checkbox"/>
+<span>🆕新進榜</span>
+</label>
 </div>
 <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="selected">獨選</button>
 <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="strategy">策略</button>
@@ -2737,6 +2741,10 @@ nav, .top-nav, .desktop-nav, .module-nav{
 <input class="copy-mark-large-holder rounded border-violet-300 dark:border-violet-700 accent-violet-600 w-3.5 h-3.5" type="checkbox"/>
 <span>📊千張大戶增</span>
 </label>
+<label class="inline-flex items-center gap-1 cursor-pointer whitespace-nowrap" title="複製時標示新進榜">
+<input class="copy-mark-new-entry rounded border-amber-300 dark:border-amber-700 accent-amber-600 w-3.5 h-3.5" type="checkbox"/>
+<span>🆕新進榜</span>
+</label>
 </div>
 <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="selected">獨選</button>
 <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="strategy">策略</button>
@@ -3004,7 +3012,7 @@ const ADMIN_SESSION_STORAGE_KEY='ryan_admin_session_v1';
 const XLSX_CDN_URL='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
 const getSyncPath=()=>DIRECT_SYNC_PATH;
 const isCloudMode=()=>true;
-let cloudSyncInterval=null, state={journals:[],plans:[],revenueRecords:[],reports:[],checklists:[],trash:[],deletionTombstones:{},tagSettings:null,epsData:{},codeToName:{},nameToCode:{},customMarketHolidays:[],journalClosePrices:{},copyCompareDuplicates:false,copyMarkRevenueHigh:true,copyMarkLargeHolder:true,filters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,largeHolder14:false,highTurnoverRevenue:false,tags:[],minScore:0,tagLogic:'OR',status:'all',quick:'all'},favFilters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,largeHolder14:false,highTurnoverRevenue:false,tags:[],minScore:0,tagLogic:'OR',status:'all',quick:'all'},revenueFilters:{month:'',code:'',type:'all',revenuePattern:'none',revenueN:3,revenueCount:2,holderPattern:'none',holderN:3,holderCount:2,minMomentum:0},reportFilters:{start:'',end:'',code:''},sortConfig:{key:'createdAt',asc:false},favSortConfig:{key:'createdAt',asc:false},planSortConfig:{key:'createdAt',asc:false},revenueSortConfig:{key:'month',asc:false},reportSortConfig:{key:'date',asc:false},checklistSortConfig:{key:'createdAt',asc:false}};
+let cloudSyncInterval=null, state={journals:[],plans:[],revenueRecords:[],reports:[],checklists:[],trash:[],deletionTombstones:{},tagSettings:null,epsData:{},codeToName:{},nameToCode:{},customMarketHolidays:[],journalClosePrices:{},copyCompareDuplicates:false,copyMarkRevenueHigh:true,copyMarkLargeHolder:true,copyMarkNewEntry:true,filters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,largeHolder14:false,highTurnoverRevenue:false,tags:[],minScore:0,tagLogic:'OR',status:'all',quick:'all'},favFilters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,largeHolder14:false,highTurnoverRevenue:false,tags:[],minScore:0,tagLogic:'OR',status:'all',quick:'all'},revenueFilters:{month:'',code:'',type:'all',revenuePattern:'none',revenueN:3,revenueCount:2,holderPattern:'none',holderN:3,holderCount:2,minMomentum:0},reportFilters:{start:'',end:'',code:''},sortConfig:{key:'createdAt',asc:false},favSortConfig:{key:'createdAt',asc:false},planSortConfig:{key:'createdAt',asc:false},revenueSortConfig:{key:'month',asc:false},reportSortConfig:{key:'date',asc:false},checklistSortConfig:{key:'createdAt',asc:false}};
 const selectedIds={journal:new Set(),fav:new Set(),plan:new Set(),revenue:new Set(),report:new Set(),checklist:new Set()};
 
 const escapeHTML=str=>(!str&&str!==0)?'':String(str).replace(/[&<>'"]/g,tag=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[tag]||tag));
@@ -3435,7 +3443,7 @@ const formatNumColor=(val,isP=false)=>{if(val==null||val==='-'||val==='')return'
 const formatTargetPrice=val=>(val==null||val==='-'||val===''||isNaN(val))?'<span class="text-gray-400 dark:text-gray-500">-</span>':`<span class="font-bold text-yellow-600 dark:text-yellow-400">${escapeHTML(val)}</span>`;
 const getEpsInfo=(c,j)=>{const e=state.epsData[c]||{};return{eps2025:e.eps2025??j?.eps2025??null,eps2026:e.eps2026??j?.eps2026??null,epsGrowth:e.epsGrowth??j?.epsGrowth??null,futures:e.futures==='●'||j?.futures==='●',targetPrice:e.targetPrice??j?.targetPrice??null,broker:e.broker??j?.broker??null,reportDate:e.reportDate??j?.reportDate??null};};
 const NON_STRATEGY_COPY_TAGS=new Set(['特別追蹤','非凡重點','總編概念股']);
-const ANALYST_SECTION_TAGS=new Set(['黑卡會員','尊耀會員','頂峰會員']);
+const ANALYST_SECTION_TAGS=new Set(['黑卡會員','尊耀會員','頂峰會員','鐵粉會員']);
 const NON_SCORE_TAGS=new Set([...NON_STRATEGY_COPY_TAGS,...ANALYST_SECTION_TAGS]);
 // v178：法人聯手標籤採互斥加分。
 // 三法聯手 +2 且優先；若沒有三法聯手，另外三種法人雙聯手不論同時出現幾個，最多只 +1。
@@ -4174,6 +4182,7 @@ function loadLocalData(){
     if(state.copyCompareDuplicates===undefined)state.copyCompareDuplicates=true;
     if(state.copyMarkRevenueHigh===undefined)state.copyMarkRevenueHigh=true;
     if(state.copyMarkLargeHolder===undefined)state.copyMarkLargeHolder=true;
+    if(state.copyMarkNewEntry===undefined)state.copyMarkNewEntry=true;
     if(!state.reportSortConfig)state.reportSortConfig={key:'date',asc:false}; if(!state.checklistSortConfig)state.checklistSortConfig={key:'date',asc:false};
     const removedAdminLocalData=!hasStoredAdminAccess()&&((state.plans||[]).length||(state.trash||[]).length||(state.journals||[]).some(item=>Object.prototype.hasOwnProperty.call(item||{},'isFavorite')));
     if(!hasStoredAdminAccess())stripAdminState();
@@ -6396,13 +6405,14 @@ const getCopyMomentumMarks=(code,referenceDate=getToday())=>{
 const getStrategyCopyStockName=(journal,duplicateCodes,horseTag='')=>{
     const name=String(journal?.name||'').trim();
     const isNew=horseTag?isHorseTagNewEntry(journal,horseTag):isHorseNewEntryJournal(journal);
-    return `${name}${isNew?' 🆕新進榜':''}${appendDuplicateMark(journal,duplicateCodes)}${getCopyMomentumMarks(journal?.code,journal?.date||getToday())}`;
+    return `${name}${state.copyMarkNewEntry!==false&&isNew?' 🆕新進榜':''}${appendDuplicateMark(journal,duplicateCodes)}${getCopyMomentumMarks(journal?.code,journal?.date||getToday())}`;
 };
 
 const syncCopyLabelToggles=()=>{
     document.querySelectorAll('.copy-compare-duplicates').forEach(cb=>{cb.checked=state.copyCompareDuplicates!==false;cb.disabled=false;});
     document.querySelectorAll('.copy-mark-revenue-high').forEach(cb=>{cb.checked=state.copyMarkRevenueHigh!==false;cb.disabled=false;});
     document.querySelectorAll('.copy-mark-large-holder').forEach(cb=>{cb.checked=state.copyMarkLargeHolder!==false;cb.disabled=false;});
+    document.querySelectorAll('.copy-mark-new-entry').forEach(cb=>{cb.checked=state.copyMarkNewEntry!==false;cb.disabled=false;});
 };
 const syncDuplicateCompareToggles=syncCopyLabelToggles;
 document.querySelectorAll('.copy-compare-duplicates').forEach(cb=>{
@@ -6427,6 +6437,14 @@ document.querySelectorAll('.copy-mark-large-holder').forEach(cb=>{
         syncCopyLabelToggles();
         saveLocalData();
         showToast(state.copyMarkLargeHolder?'已顯示 📊 千張大戶增小標籤':'已隱藏 📊 千張大戶增小標籤');
+    });
+});
+document.querySelectorAll('.copy-mark-new-entry').forEach(cb=>{
+    cb.addEventListener('change',e=>{
+        state.copyMarkNewEntry=e.target.checked;
+        syncCopyLabelToggles();
+        saveLocalData();
+        showToast(state.copyMarkNewEntry?'已顯示 🆕新進榜小標籤':'已隱藏 🆕新進榜小標籤');
     });
 });
 syncCopyLabelToggles();
@@ -6585,16 +6603,26 @@ document.querySelectorAll('.btn-copy').forEach(b=>{b.addEventListener('click',e=
         const sm={};
         d.forEach(j=>{if(j.tags)j.tags.forEach(t=>{if(!NON_STRATEGY_COPY_TAGS.has(t)&&(cf.tags.length===0||cf.tags.includes(t))){if(!sm[t])sm[t]=[];sm[t].push(j);}});});
 
-        // v198：黑卡會員／尊耀會員／頂峰會員使用「漁夫林睿閎投資週報」專屬複製抬頭。
+        // v250：分析師專區只要選到任一會員，複製時四個會員分類一起帶出。
         const selectedAnalystTags=(cf.tags||[]).map(normalizeStrategyTagName).filter(tag=>ANALYST_SECTION_TAGS.has(tag));
         if(selectedAnalystTags.length){
-            const analystRows=d.filter(j=>(j.tags||[]).map(normalizeStrategyTagName).some(tag=>selectedAnalystTags.includes(tag)));
+            const analystCopyOrder=['黑卡會員','尊耀會員','頂峰會員','鐵粉會員'];
+            const analystRows=d.filter(j=>(j.tags||[]).map(normalizeStrategyTagName).some(tag=>ANALYST_SECTION_TAGS.has(tag)));
             const latestAnalystDate=analystRows.map(j=>String(j.date||'')).filter(Boolean).sort().reverse()[0]||cf.end||cf.start||getToday();
             tx=`| ${String(latestAnalystDate).replace(/-/g,'/')}漁夫林睿閎投資週報 |\n\n`;
+
+            // 重新建立分析師四會員資料，不受目前只勾哪一個會員限制。
+            analystCopyOrder.forEach(tag=>{
+                const rows=d.filter(j=>(j.tags||[]).map(normalizeStrategyTagName).includes(tag));
+                if(rows.length)sm[tag]=rows;
+            });
         }
 
         const duplicateCodes=getDuplicateStrategyCodes(sm),tagIcons=buildCopyTagIconMap(Object.keys(sm));
-        const ord=cf.tags.length?[...cf.tags]:TAG_CATEGORIES.flatMap(c=>c.tags);
+        const hasAnalystCopy=(cf.tags||[]).map(normalizeStrategyTagName).some(tag=>ANALYST_SECTION_TAGS.has(tag));
+        const ord=hasAnalystCopy
+            ? ['黑卡會員','尊耀會員','頂峰會員','鐵粉會員',...TAG_CATEGORIES.flatMap(c=>c.tags).filter(tag=>!ANALYST_SECTION_TAGS.has(normalizeStrategyTagName(tag)))]
+            : (cf.tags.length?[...cf.tags]:TAG_CATEGORIES.flatMap(c=>c.tags));
         Object.keys(sm).sort((a,b)=>{const iA=ord.indexOf(a),iB=ord.indexOf(b);if(iA!==-1&&iB!==-1)return iA-iB;if(iA!==-1)return -1;if(iB!==-1)return 1;return a.localeCompare(b);}).forEach(s=>{
             tx+=`${tagIcons.get(s)||'🏷️'} [${s}] (共 ${sm[s].length} 檔)\n`;
             sm[s].forEach(a=>tx+=`${a.code} ${getStrategyCopyStockName(a,duplicateCodes)}\n`);
