@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="246" name="app-version"/>
+<meta content="247" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -7641,11 +7641,19 @@ const SESSION={
         var tags=[];
         (Array.isArray(category.tags)?category.tags:[]).forEach(function(rawTag){
           var tag=normalizeStrategyTagName(String(rawTag||'').trim());
+          // v247：舊版 localStorage / 雲端 tagSettings 名稱遷移
+          if(tag==='多排破上關')tag='多排上漲';
           if(tag&&!seen.has(tag)){seen.add(tag);tags.push(tag);}
         });
         normalizedCategories.push({title:String(category.title||('分類 '+(index+1))),theme:theme,tags:tags});
       });
       if(!normalizedCategories.length)normalizedCategories=clone(DEFAULT_TAG_CATEGORIES);
+      // v247：同步遷移標籤 meta，確保畫面不再被舊設定覆蓋。
+      if(sourceMeta['多排破上關']){
+        if(!sourceMeta['多排上漲'])sourceMeta['多排上漲']=sourceMeta['多排破上關'];
+        delete sourceMeta['多排破上關'];
+        changed=true;
+      }
 
       // v237：既有使用者的自訂標籤設定可能仍是舊版，
       // 因此強制把「追風馬」補進「📊 基本面佳」，並固定馬廄順序：
@@ -8917,6 +8925,29 @@ document.addEventListener('DOMContentLoaded',()=>{
       behavior:'smooth',block:'start'
     });
   },true);
+})();
+</script>
+
+
+<script id="rename-multi-rise-v247">
+(function(){
+  function renameValue(v){return v==='多排破上關'?'多排上漲':v;}
+  function migrate(){
+    try{
+      if(window.state && Array.isArray(state.journals)){
+        state.journals.forEach(function(j){
+          ['tags','strategyTags'].forEach(function(key){
+            if(Array.isArray(j[key]))j[key]=j[key].map(renameValue);
+          });
+          ['tag','strategyTag','strategy'].forEach(function(key){
+            if(j[key]==='多排破上關')j[key]='多排上漲';
+          });
+        });
+      }
+    }catch(e){console.warn('v247 tag rename migration',e);}
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',migrate,{once:true});
+  else migrate();
 })();
 </script>
 
