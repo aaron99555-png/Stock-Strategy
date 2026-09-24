@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="252" name="app-version"/>
+<meta content="253" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -3151,7 +3151,7 @@ const TAG_CATEGORIES = [
     {title: "🔥 動能與型態", theme: "amber", tags: ["一陽指", "金包銀", "披荊斬棘", "破繭而出", "月來越好", "季不可失", "守株待兔", "缺口", "阿婆散步", "多排上漲"]},
     {title: "💰 量價與籌碼", theme: "purple", tags: ["量價齊揚", "高成交值", "法人加持", "外資+投信", "外資+自營", "投信+自營", "三法聯手", "1日籌碼集中度", "5日籌碼集中", "20日籌碼集中", "籌碼集中大戶增"]},
     {title: "📈 技術指標", theme: "teal", tags: ["OBV突破", "MACD突破", "KD金叉"]},
-    {title: "🎯 分析師專區｜漁夫林睿閎投資週報", theme: "purple", tags: ["黑卡會員", "尊耀會員", "頂峰會員", "鐵粉會員"]}
+    {title: "🌱 快樂農夫與他韭菜田投資週報", theme: "purple", tags: ["黑卡會員", "尊耀會員", "頂峰會員", "鐵粉會員"]}
 ];
 
 const STRATEGY_TAG_ALIASES={'一條根':'一陽指','跳空缺口':'缺口','1日籌碼集中':'1日籌碼集中度','小碎步':'阿婆散步','阿甘步伐':'阿婆散步','總編認同':'總編概念股','籌碼集中集中大戶增':'籌碼集中大戶增'};
@@ -6609,7 +6609,7 @@ document.querySelectorAll('.btn-copy').forEach(b=>{b.addEventListener('click',e=
             const analystCopyOrder=['黑卡會員','尊耀會員','頂峰會員','鐵粉會員'];
             const analystRows=d.filter(j=>(j.tags||[]).map(normalizeStrategyTagName).some(tag=>ANALYST_SECTION_TAGS.has(tag)));
             const latestAnalystDate=analystRows.map(j=>String(j.date||'')).filter(Boolean).sort().reverse()[0]||cf.end||cf.start||getToday();
-            tx=`| ${String(latestAnalystDate).replace(/-/g,'/')}漁夫林睿閎投資週報 |\n\n`;
+            tx=`| ${String(latestAnalystDate).replace(/-/g,'/')} 🌱 快樂農夫與他韭菜田投資週報 |\n\n`;
 
             // 重新建立分析師四會員資料，不受目前只勾哪一個會員限制。
             analystCopyOrder.forEach(tag=>{
@@ -7673,7 +7673,16 @@ const SESSION={
           if(tag==='多排破上關')tag='多排上漲';
           if(tag&&!seen.has(tag)){seen.add(tag);tags.push(tag);}
         });
-        normalizedCategories.push({title:String(category.title||('分類 '+(index+1))),theme:theme,tags:tags});
+        var normalizedTitle=String(category.title||('分類 '+(index+1)));
+        // v253：分析師專區全面改名，包含既有 localStorage / 雲端 tagSettings。
+        if([
+          '🎯 分析師專區｜漁夫林睿閎投資週報',
+          '分析師專區｜漁夫林睿閎投資週報',
+          '漁夫林睿閎投資週報',
+          '🌱 快樂農夫與他韭菜農場',
+          '快樂農夫與他韭菜農場'
+        ].includes(normalizedTitle.trim())) normalizedTitle='🌱 快樂農夫與他韭菜田投資週報';
+        normalizedCategories.push({title:normalizedTitle,theme:theme,tags:tags});
       });
       if(!normalizedCategories.length)normalizedCategories=clone(DEFAULT_TAG_CATEGORIES);
       // v247：同步遷移標籤 meta，確保畫面不再被舊設定覆蓋。
@@ -7707,8 +7716,8 @@ const SESSION={
         seen.add(tag);
       });
 
-      // v161：既有使用者也自動補上「分析師專區｜漁夫林睿閎投資週報」與三個會員標籤。
-      var analystCategoryTitle='🎯 分析師專區｜漁夫林睿閎投資週報';
+      // v161：既有使用者也自動補上「🌱 快樂農夫與他韭菜田投資週報」與三個會員標籤。
+      var analystCategoryTitle='🌱 快樂農夫與他韭菜田投資週報';
       var analystTags=['黑卡會員','尊耀會員','頂峰會員','鐵粉會員'];
       var analystCategory=normalizedCategories.find(function(category){return String(category.title||'')===analystCategoryTitle;});
       if(!analystCategory){
@@ -8985,45 +8994,6 @@ document.addEventListener('DOMContentLoaded',()=>{
 </script>
 
 
-<script id="farmer-weekly-title-v252">
-(function(){
-  const OLD_TITLES=['🌱 快樂農夫與他韭菜田','快樂農夫與他韭菜田'];
-  const NEW_TITLE='🌱 快樂農夫與他韭菜田投資週報';
-  function migrateFarmerWeeklyTitle(){
-    try{
-      if(window.state && state.tagSettings && Array.isArray(state.tagSettings.categories)){
-        let changed=false;
-        state.tagSettings.categories.forEach(function(category){
-          if(OLD_TITLES.includes(String(category.title||'').trim())){
-            category.title=NEW_TITLE;
-            changed=true;
-          }
-        });
-        if(changed){
-          state.tagSettings.updatedAt=Date.now();
-          if(typeof saveLocalData==='function')saveLocalData();
-          if(typeof renderDynamicTags==='function')renderDynamicTags();
-        }
-      }
-      document.querySelectorAll('*').forEach(function(el){
-        if(el.children.length===0 && OLD_TITLES.includes(String(el.textContent||'').trim())){
-          el.textContent=NEW_TITLE;
-        }
-      });
-    }catch(e){console.warn('v252 farmer weekly title migration',e);}
-  }
-  if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded',function(){
-      migrateFarmerWeeklyTitle();
-      setTimeout(migrateFarmerWeeklyTitle,300);
-      setTimeout(migrateFarmerWeeklyTitle,1200);
-    },{once:true});
-  }else{
-    migrateFarmerWeeklyTitle();
-    setTimeout(migrateFarmerWeeklyTitle,300);
-  }
-})();
-</script>
 
 </body>
 </html>
