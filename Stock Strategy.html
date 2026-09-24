@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="254" name="app-version"/>
+<meta content="255" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -6405,7 +6405,10 @@ const getCopyMomentumMarks=(code,referenceDate=getToday())=>{
 const getStrategyCopyStockName=(journal,duplicateCodes,horseTag='')=>{
     const name=String(journal?.name||'').trim();
     const isNew=horseTag?isHorseTagNewEntry(journal,horseTag):isHorseNewEntryJournal(journal);
-    return `${name}${state.copyMarkNewEntry!==false&&isNew?' 🆕新進榜':''}${appendDuplicateMark(journal,duplicateCodes)}${getCopyMomentumMarks(journal?.code,journal?.date||getToday())}`;
+    // v255：有備註紀錄時，複製內容在股名後一併呈現。
+    const note=String(journal?.notes||'').trim().replace(/\s*\n+\s*/g,'；');
+    const noteText=note?`【備註：${note}】`:'';
+    return `${name}${noteText}${state.copyMarkNewEntry!==false&&isNew?' 🆕新進榜':''}${appendDuplicateMark(journal,duplicateCodes)}${getCopyMomentumMarks(journal?.code,journal?.date||getToday())}`;
 };
 
 const syncCopyLabelToggles=()=>{
