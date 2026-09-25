@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="256" name="app-version"/>
+<meta content="257" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -2083,6 +2083,14 @@ nav, .top-nav, .desktop-nav, .module-nav{
 <input class="copy-mark-new-entry rounded border-amber-300 dark:border-amber-700 accent-amber-600 w-3.5 h-3.5" type="checkbox"/>
 <span>🆕新進榜</span>
 </label>
+<label class="inline-flex items-center gap-1 cursor-pointer whitespace-nowrap" title="複製時顯示一個月內參考資料的法人目標價">
+<input class="copy-mark-target-price rounded border-red-300 dark:border-red-700 accent-red-600 w-3.5 h-3.5" type="checkbox"/>
+<span>🎯目標價</span>
+</label>
+<label class="inline-flex items-center gap-1 cursor-pointer whitespace-nowrap" title="複製時顯示策略日誌備註">
+<input class="copy-mark-notes rounded border-slate-300 dark:border-slate-600 accent-slate-600 w-3.5 h-3.5" type="checkbox"/>
+<span>📝備註</span>
+</label>
 </div>
 <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="selected">獨選</button>
 <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="strategy">策略</button>
@@ -2746,6 +2754,14 @@ nav, .top-nav, .desktop-nav, .module-nav{
 <input class="copy-mark-new-entry rounded border-amber-300 dark:border-amber-700 accent-amber-600 w-3.5 h-3.5" type="checkbox"/>
 <span>🆕新進榜</span>
 </label>
+<label class="inline-flex items-center gap-1 cursor-pointer whitespace-nowrap" title="複製時顯示一個月內參考資料的法人目標價">
+<input class="copy-mark-target-price rounded border-red-300 dark:border-red-700 accent-red-600 w-3.5 h-3.5" type="checkbox"/>
+<span>🎯目標價</span>
+</label>
+<label class="inline-flex items-center gap-1 cursor-pointer whitespace-nowrap" title="複製時顯示策略日誌備註">
+<input class="copy-mark-notes rounded border-slate-300 dark:border-slate-600 accent-slate-600 w-3.5 h-3.5" type="checkbox"/>
+<span>📝備註</span>
+</label>
 </div>
 <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="selected">獨選</button>
 <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="strategy">策略</button>
@@ -3013,7 +3029,7 @@ const ADMIN_SESSION_STORAGE_KEY='ryan_admin_session_v1';
 const XLSX_CDN_URL='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
 const getSyncPath=()=>DIRECT_SYNC_PATH;
 const isCloudMode=()=>true;
-let cloudSyncInterval=null, state={journals:[],plans:[],revenueRecords:[],reports:[],checklists:[],trash:[],deletionTombstones:{},tagSettings:null,epsData:{},codeToName:{},nameToCode:{},customMarketHolidays:[],journalClosePrices:{},copyCompareDuplicates:false,copyMarkRevenueHigh:true,copyMarkLargeHolder:true,copyMarkNewEntry:true,filters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,largeHolder14:false,highTurnoverRevenue:false,tags:[],minScore:0,tagLogic:'OR',status:'all',quick:'all'},favFilters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,largeHolder14:false,highTurnoverRevenue:false,tags:[],minScore:0,tagLogic:'OR',status:'all',quick:'all'},revenueFilters:{month:'',code:'',type:'all',revenuePattern:'none',revenueN:3,revenueCount:2,holderPattern:'none',holderN:3,holderCount:2,minMomentum:0},reportFilters:{start:'',end:'',code:''},sortConfig:{key:'createdAt',asc:false},favSortConfig:{key:'createdAt',asc:false},planSortConfig:{key:'createdAt',asc:false},revenueSortConfig:{key:'month',asc:false},reportSortConfig:{key:'date',asc:false},checklistSortConfig:{key:'createdAt',asc:false}};
+let cloudSyncInterval=null, state={journals:[],plans:[],revenueRecords:[],reports:[],checklists:[],trash:[],deletionTombstones:{},tagSettings:null,epsData:{},codeToName:{},nameToCode:{},customMarketHolidays:[],journalClosePrices:{},copyCompareDuplicates:false,copyMarkRevenueHigh:true,copyMarkLargeHolder:true,copyMarkNewEntry:true,copyMarkTargetPrice:true,copyMarkNotes:true,filters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,largeHolder14:false,highTurnoverRevenue:false,tags:[],minScore:0,tagLogic:'OR',status:'all',quick:'all'},favFilters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,largeHolder14:false,highTurnoverRevenue:false,tags:[],minScore:0,tagLogic:'OR',status:'all',quick:'all'},revenueFilters:{month:'',code:'',type:'all',revenuePattern:'none',revenueN:3,revenueCount:2,holderPattern:'none',holderN:3,holderCount:2,minMomentum:0},reportFilters:{start:'',end:'',code:''},sortConfig:{key:'createdAt',asc:false},favSortConfig:{key:'createdAt',asc:false},planSortConfig:{key:'createdAt',asc:false},revenueSortConfig:{key:'month',asc:false},reportSortConfig:{key:'date',asc:false},checklistSortConfig:{key:'createdAt',asc:false}};
 const selectedIds={journal:new Set(),fav:new Set(),plan:new Set(),revenue:new Set(),report:new Set(),checklist:new Set()};
 
 const escapeHTML=str=>(!str&&str!==0)?'':String(str).replace(/[&<>'"]/g,tag=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[tag]||tag));
@@ -4184,6 +4200,8 @@ function loadLocalData(){
     if(state.copyMarkRevenueHigh===undefined)state.copyMarkRevenueHigh=true;
     if(state.copyMarkLargeHolder===undefined)state.copyMarkLargeHolder=true;
     if(state.copyMarkNewEntry===undefined)state.copyMarkNewEntry=true;
+    if(state.copyMarkTargetPrice===undefined)state.copyMarkTargetPrice=true;
+    if(state.copyMarkNotes===undefined)state.copyMarkNotes=true;
     if(!state.reportSortConfig)state.reportSortConfig={key:'date',asc:false}; if(!state.checklistSortConfig)state.checklistSortConfig={key:'date',asc:false};
     const removedAdminLocalData=!hasStoredAdminAccess()&&((state.plans||[]).length||(state.trash||[]).length||(state.journals||[]).some(item=>Object.prototype.hasOwnProperty.call(item||{},'isFavorite')));
     if(!hasStoredAdminAccess())stripAdminState();
@@ -6411,13 +6429,30 @@ const getCopyMomentumMarks=(code,referenceDate=getToday())=>{
     if(state.copyMarkLargeHolder!==false&&hasLatestLargeHolderIncrease(code,referenceDate))marks+=' 📊';
     return marks;
 };
+const getRecentBrokerTargetPrice=(code,referenceDate=getToday())=>{
+    const info=state.epsData?.[String(code||'').trim()]||{};
+    const target=Number(info.targetPrice);
+    const reportDate=normalizeReportDate(info.reportDate||'');
+    const refDate=normalizeReportDate(referenceDate||getToday());
+    if(!Number.isFinite(target)||target<=0||!reportDate||!refDate)return null;
+    const parseIso=iso=>{const m=String(iso||'').match(/^(\d{4})-(\d{2})-(\d{2})$/);if(!m)return null;return new Date(Date.UTC(Number(m[1]),Number(m[2])-1,Number(m[3])));};
+    const report=parseIso(reportDate),ref=parseIso(refDate);
+    if(!report||!ref||report>ref)return null;
+    const cutoff=new Date(ref.getTime());
+    cutoff.setUTCMonth(cutoff.getUTCMonth()-1);
+    if(report<cutoff)return null;
+    return{targetPrice:target,broker:String(info.broker||'').trim(),reportDate};
+};
+const formatCopyTargetPrice=value=>Number(value).toLocaleString('zh-TW',{maximumFractionDigits:2});
 const getStrategyCopyStockName=(journal,duplicateCodes,horseTag='')=>{
     const name=String(journal?.name||'').trim();
+    const referenceDate=journal?.date||getToday();
     const isNew=horseTag?isHorseTagNewEntry(journal,horseTag):isHorseNewEntryJournal(journal);
-    // v255：有備註紀錄時，複製內容在股名後一併呈現。
+    const recentTarget=state.copyMarkTargetPrice!==false?getRecentBrokerTargetPrice(journal?.code,referenceDate):null;
+    const targetText=recentTarget?`【目標價：${formatCopyTargetPrice(recentTarget.targetPrice)}】`:'';
     const note=String(journal?.notes||'').trim().replace(/\s*\n+\s*/g,'；');
-    const noteText=note?`【備註：${note}】`:'';
-    return `${name}${noteText}${state.copyMarkNewEntry!==false&&isNew?' 🆕新進榜':''}${appendDuplicateMark(journal,duplicateCodes)}${getCopyMomentumMarks(journal?.code,journal?.date||getToday())}`;
+    const noteText=state.copyMarkNotes!==false&&note?`【備註：${note}】`:'';
+    return `${name}${targetText}${noteText}${state.copyMarkNewEntry!==false&&isNew?' 🆕新進榜':''}${appendDuplicateMark(journal,duplicateCodes)}${getCopyMomentumMarks(journal?.code,referenceDate)}`;
 };
 
 const syncCopyLabelToggles=()=>{
@@ -6425,6 +6460,8 @@ const syncCopyLabelToggles=()=>{
     document.querySelectorAll('.copy-mark-revenue-high').forEach(cb=>{cb.checked=state.copyMarkRevenueHigh!==false;cb.disabled=false;});
     document.querySelectorAll('.copy-mark-large-holder').forEach(cb=>{cb.checked=state.copyMarkLargeHolder!==false;cb.disabled=false;});
     document.querySelectorAll('.copy-mark-new-entry').forEach(cb=>{cb.checked=state.copyMarkNewEntry!==false;cb.disabled=false;});
+    document.querySelectorAll('.copy-mark-target-price').forEach(cb=>{cb.checked=state.copyMarkTargetPrice!==false;cb.disabled=false;});
+    document.querySelectorAll('.copy-mark-notes').forEach(cb=>{cb.checked=state.copyMarkNotes!==false;cb.disabled=false;});
 };
 const syncDuplicateCompareToggles=syncCopyLabelToggles;
 document.querySelectorAll('.copy-compare-duplicates').forEach(cb=>{
@@ -6457,6 +6494,22 @@ document.querySelectorAll('.copy-mark-new-entry').forEach(cb=>{
         syncCopyLabelToggles();
         saveLocalData();
         showToast(state.copyMarkNewEntry?'已顯示 🆕新進榜小標籤':'已隱藏 🆕新進榜小標籤');
+    });
+});
+document.querySelectorAll('.copy-mark-target-price').forEach(cb=>{
+    cb.addEventListener('change',e=>{
+        state.copyMarkTargetPrice=e.target.checked;
+        syncCopyLabelToggles();
+        saveLocalData();
+        showToast(state.copyMarkTargetPrice?'已顯示 🎯 一個月內法人目標價':'已隱藏 🎯 法人目標價');
+    });
+});
+document.querySelectorAll('.copy-mark-notes').forEach(cb=>{
+    cb.addEventListener('change',e=>{
+        state.copyMarkNotes=e.target.checked;
+        syncCopyLabelToggles();
+        saveLocalData();
+        showToast(state.copyMarkNotes?'已顯示 📝 備註':'已隱藏 📝 備註');
     });
 });
 syncCopyLabelToggles();
