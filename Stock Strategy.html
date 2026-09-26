@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="261" name="app-version"/>
+<meta content="262" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -5290,8 +5290,8 @@ function renderJournalStreaks(){
             return `<article class="rounded-xl border border-violet-200 dark:border-violet-800/60 bg-white dark:bg-gray-900/35 p-3 sm:p-4 shadow-sm">
                 <div class="flex items-start justify-between gap-2">
                     <div class="min-w-0 flex flex-wrap items-center gap-1">
-                        <span class="font-black text-violet-700 dark:text-violet-300">${safeCode}</span>
-                        <span class="font-bold text-gray-800 dark:text-gray-100">${safeName}</span>${newBadge}${infoIcons}
+                        <span class="font-black text-violet-700 dark:text-violet-300 cursor-pointer hover:underline hover:text-blue-600 dark:hover:text-blue-300 transition" data-yahoo-stock-code="${safeCode}" role="link" tabindex="0" title="開啟 Yahoo 股市 ${safeCode}">${safeCode}</span>
+                        <span class="font-bold text-gray-800 dark:text-gray-100 cursor-pointer hover:underline hover:text-blue-600 dark:hover:text-blue-300 transition" data-yahoo-stock-code="${safeCode}" role="link" tabindex="0" title="開啟 Yahoo 股市 ${safeCode}">${safeName}</span>${newBadge}${infoIcons}
                     </div>
                     <span class="shrink-0 rounded-full bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 px-2.5 py-1 text-[10px] font-black">${escapeHTML(resultBadge)}</span>
                 </div>
@@ -5307,7 +5307,7 @@ function renderJournalStreaks(){
         }catch(error){
             console.error('streak result card render failed',item,error);
             return `<article class="rounded-xl border border-red-200 bg-white dark:bg-gray-900/35 p-3">
-                <div class="font-black text-violet-700">${escapeHTML(String(item?.code||''))} ${escapeHTML(String(item?.name||'未命名'))}</div>
+                <div class="font-black text-violet-700"><span class="cursor-pointer hover:underline" data-yahoo-stock-code="${escapeHTML(String(item?.code||''))}" role="link" tabindex="0">${escapeHTML(String(item?.code||''))}</span> <span class="cursor-pointer hover:underline" data-yahoo-stock-code="${escapeHTML(String(item?.code||''))}" role="link" tabindex="0">${escapeHTML(String(item?.name||'未命名'))}</span></div>
                 <div class="mt-1 text-xs text-gray-500">此股票附加資訊載入失敗，但篩選結果仍保留顯示。</div>
             </article>`;
         }
