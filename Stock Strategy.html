@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="260" name="app-version"/>
+<meta content="261" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -7828,6 +7828,28 @@ const SESSION={
         ].includes(normalizedTitle.trim())) normalizedTitle='🌱 快樂農夫與他的韭菜田投資週報';
         normalizedCategories.push({title:normalizedTitle,theme:theme,tags:tags});
       });
+
+      // v261：合併同名分類，移除舊版本遺留下來的重複空白分類。
+      // 例如多個舊「分析師專區」名稱都轉成
+      // 「🌱 快樂農夫與他的韭菜田投資週報」後，只保留一個分類。
+      var mergedCategoryMap=new Map(),mergedCategories=[];
+      normalizedCategories.forEach(function(category){
+        var key=String(category.title||'').trim();
+        if(!key)return;
+        var existing=mergedCategoryMap.get(key);
+        if(!existing){
+          existing={title:key,theme:category.theme,tags:[]};
+          mergedCategoryMap.set(key,existing);
+          mergedCategories.push(existing);
+        }
+        (category.tags||[]).forEach(function(tag){
+          if(tag&&!existing.tags.includes(tag))existing.tags.push(tag);
+        });
+      });
+      normalizedCategories=mergedCategories.filter(function(category){
+        return (category.tags||[]).length>0;
+      });
+
       if(!normalizedCategories.length)normalizedCategories=clone(DEFAULT_TAG_CATEGORIES);
       // v247：同步遷移標籤 meta，確保畫面不再被舊設定覆蓋。
       if(sourceMeta['多排破上關']){
@@ -7881,6 +7903,14 @@ const SESSION={
       var analystOtherTags=(analystCategory.tags||[]).filter(function(tag){return !analystMemberOrder.includes(tag);});
       analystCategory.tags=analystMemberOrder.filter(function(tag){return (analystCategory.tags||[]).includes(tag);}).concat(analystOtherTags);
       if(!sourceMeta['鐵粉會員'])sourceMeta['鐵粉會員']=normalizeTagMeta('鐵粉會員','purple',null);
+
+      // v261：保險清理同名農夫分類，只留下目前使用中的一個。
+      var analystSeen=false;
+      normalizedCategories=normalizedCategories.filter(function(category){
+        if(String(category.title||'')!==analystCategoryTitle)return true;
+        if(!analystSeen){analystSeen=true;return true;}
+        return false;
+      });
 
       // v201：既有使用者自動補上「量價與籌碼」必要標籤，包含法人聯手與「籌碼集中大戶增」。
       var chipCategoryTitle='💰 量價與籌碼';
