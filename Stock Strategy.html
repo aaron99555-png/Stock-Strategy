@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="258" name="app-version"/>
+<meta content="260" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -1905,6 +1905,7 @@ nav, .top-nav, .desktop-nav, .module-nav{
 </div>
 </div>
 <div class="hidden overflow-hidden transition-all duration-300 mt-2 border-t border-gray-200 dark:border-gray-700/50 pt-3" id="form-tags-wrapper">
+<div id="tag-required-reminder" class="hidden mb-3 rounded-xl border px-3 py-2 text-xs sm:text-sm"></div>
 <div class="space-y-3" id="form-tags-container"></div>
 </div>
 </div>
@@ -2006,15 +2007,15 @@ nav, .top-nav, .desktop-nav, .module-nav{
 <div class="journal-mobile-row journal-filter-row-date"><div class="date-range-fast flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 h-[38px] sm:h-auto box-border" data-date-range="journal">
 <span class="text-xs text-gray-500 dark:text-gray-400 px-1 sm:px-2 hidden xl:inline"><i class="fa-solid fa-filter mr-1"></i>區間</span>
 <div class="date-field-shift">
-<button class="date-shift-btn" data-date-field="start" data-range-scope="journal" data-range-shift="-1" title="起始日往前一天" type="button"><i class="fa-solid fa-chevron-left"></i></button>
+<button class="date-shift-btn" data-date-field="start" data-range-scope="journal" data-range-shift="-1" title="前一個開盤日" type="button"><i class="fa-solid fa-chevron-left"></i></button>
 <input class="filter-start bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-0.5 sm:px-1 w-[75px] sm:w-auto text-center h-full box-border m-0" id="filter-start" type="date"/>
-<button class="date-shift-btn" data-date-field="start" data-range-scope="journal" data-range-shift="1" title="起始日往後一天" type="button"><i class="fa-solid fa-chevron-right"></i></button>
+<button class="date-shift-btn" data-date-field="start" data-range-scope="journal" data-range-shift="1" title="下一個開盤日" type="button"><i class="fa-solid fa-chevron-right"></i></button>
 </div>
 <span class="date-range-separator text-gray-400 mx-1">～</span>
 <div class="date-field-shift">
-<button class="date-shift-btn" data-date-field="end" data-range-scope="journal" data-range-shift="-1" title="結束日往前一天" type="button"><i class="fa-solid fa-chevron-left"></i></button>
+<button class="date-shift-btn" data-date-field="end" data-range-scope="journal" data-range-shift="-1" title="前一個開盤日" type="button"><i class="fa-solid fa-chevron-left"></i></button>
 <input class="filter-end bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-0.5 sm:px-1 w-[75px] sm:w-auto text-center h-full box-border m-0" id="filter-end" type="date"/>
-<button class="date-shift-btn" data-date-field="end" data-range-scope="journal" data-range-shift="1" title="結束日往後一天" type="button"><i class="fa-solid fa-chevron-right"></i></button>
+<button class="date-shift-btn" data-date-field="end" data-range-scope="journal" data-range-shift="1" title="下一個開盤日" type="button"><i class="fa-solid fa-chevron-right"></i></button>
 </div>
 </div></div><div class="journal-mobile-row journal-filter-row-search-clear"><div class="flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 h-[38px] sm:h-auto box-border">
 <i class="fa-solid fa-search text-gray-400 text-[10px] sm:text-xs ml-1 sm:ml-2"></i>
@@ -2505,15 +2506,15 @@ nav, .top-nav, .desktop-nav, .module-nav{
 <div class="date-range-fast flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 h-[38px] sm:h-auto box-border" data-date-range="report">
 <span class="text-xs text-gray-500 dark:text-gray-400 px-1 sm:px-2 hidden xl:inline"><i class="fa-solid fa-filter mr-1"></i>區間</span>
 <div class="date-field-shift">
-<button class="date-shift-btn" data-date-field="start" data-range-scope="report" data-range-shift="-1" title="起始日往前一天" type="button"><i class="fa-solid fa-chevron-left"></i></button>
+<button class="date-shift-btn" data-date-field="start" data-range-scope="report" data-range-shift="-1" title="前一個開盤日" type="button"><i class="fa-solid fa-chevron-left"></i></button>
 <input class="bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-0.5 sm:px-1 w-[75px] sm:w-auto text-center h-full box-border m-0" id="filter-rep-start" type="date"/>
-<button class="date-shift-btn" data-date-field="start" data-range-scope="report" data-range-shift="1" title="起始日往後一天" type="button"><i class="fa-solid fa-chevron-right"></i></button>
+<button class="date-shift-btn" data-date-field="start" data-range-scope="report" data-range-shift="1" title="下一個開盤日" type="button"><i class="fa-solid fa-chevron-right"></i></button>
 </div>
 <span class="date-range-separator text-gray-400 mx-1">～</span>
 <div class="date-field-shift">
-<button class="date-shift-btn" data-date-field="end" data-range-scope="report" data-range-shift="-1" title="結束日往前一天" type="button"><i class="fa-solid fa-chevron-left"></i></button>
+<button class="date-shift-btn" data-date-field="end" data-range-scope="report" data-range-shift="-1" title="前一個開盤日" type="button"><i class="fa-solid fa-chevron-left"></i></button>
 <input class="bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-0.5 sm:px-1 w-[75px] sm:w-auto text-center h-full box-border m-0" id="filter-rep-end" type="date"/>
-<button class="date-shift-btn" data-date-field="end" data-range-scope="report" data-range-shift="1" title="結束日往後一天" type="button"><i class="fa-solid fa-chevron-right"></i></button>
+<button class="date-shift-btn" data-date-field="end" data-range-scope="report" data-range-shift="1" title="下一個開盤日" type="button"><i class="fa-solid fa-chevron-right"></i></button>
 </div>
 </div>
 <div class="flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 h-[38px] sm:h-auto box-border">
@@ -2676,15 +2677,15 @@ nav, .top-nav, .desktop-nav, .module-nav{
 <div class="date-range-fast flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 h-[38px] sm:h-auto box-border" data-date-range="fav">
 <span class="text-xs text-gray-500 dark:text-gray-400 px-1 sm:px-2 hidden xl:inline"><i class="fa-solid fa-filter mr-1"></i>區間</span>
 <div class="date-field-shift">
-<button class="date-shift-btn" data-date-field="start" data-range-scope="fav" data-range-shift="-1" title="起始日往前一天" type="button"><i class="fa-solid fa-chevron-left"></i></button>
+<button class="date-shift-btn" data-date-field="start" data-range-scope="fav" data-range-shift="-1" title="前一個開盤日" type="button"><i class="fa-solid fa-chevron-left"></i></button>
 <input class="filter-start bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-0.5 sm:px-1 w-[75px] sm:w-auto text-center h-full box-border m-0" id="filter-start-fav" type="date"/>
-<button class="date-shift-btn" data-date-field="start" data-range-scope="fav" data-range-shift="1" title="起始日往後一天" type="button"><i class="fa-solid fa-chevron-right"></i></button>
+<button class="date-shift-btn" data-date-field="start" data-range-scope="fav" data-range-shift="1" title="下一個開盤日" type="button"><i class="fa-solid fa-chevron-right"></i></button>
 </div>
 <span class="date-range-separator text-gray-400 mx-1">～</span>
 <div class="date-field-shift">
-<button class="date-shift-btn" data-date-field="end" data-range-scope="fav" data-range-shift="-1" title="結束日往前一天" type="button"><i class="fa-solid fa-chevron-left"></i></button>
+<button class="date-shift-btn" data-date-field="end" data-range-scope="fav" data-range-shift="-1" title="前一個開盤日" type="button"><i class="fa-solid fa-chevron-left"></i></button>
 <input class="filter-end bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-0.5 sm:px-1 w-[75px] sm:w-auto text-center h-full box-border m-0" id="filter-end-fav" type="date"/>
-<button class="date-shift-btn" data-date-field="end" data-range-scope="fav" data-range-shift="1" title="結束日往後一天" type="button"><i class="fa-solid fa-chevron-right"></i></button>
+<button class="date-shift-btn" data-date-field="end" data-range-scope="fav" data-range-shift="1" title="下一個開盤日" type="button"><i class="fa-solid fa-chevron-right"></i></button>
 </div>
 </div>
 <div class="flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 h-[38px] sm:h-auto box-border">
@@ -3895,7 +3896,8 @@ function renderDynamicTags(){
     const fc=document.getElementById('form-tags-container');
     const currentFormTag=fc?.querySelector('.tag-input:checked')?.value||rememberedJournalFormTag;
     if(currentFormTag)rememberJournalFormTag(currentFormTag);
-    if(fc)fc.innerHTML=TAG_CATEGORIES.map(c=>`<div><div class="text-xs font-bold text-gray-500 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 pb-1 mb-2">${escapeHTML(c.title)}</div><div class="flex flex-wrap gap-2">${c.tags.map(t=>{const theme=window.getManagedTagTheme?.(t,c.theme)||c.theme;return`<label class="cursor-pointer"><input type="checkbox" value="${escapeHTML(t)}" class="hidden tag-input" data-theme="${theme}"><div class="px-3 py-1.5 rounded-lg text-xs font-bold border transition active:scale-95 ${THEME_MAP[theme].inactive}">${escapeHTML(t)}</div></label>`;}).join('')}</div></div>`).join('');
+    if(fc)fc.innerHTML=TAG_CATEGORIES.map(c=>`<div><div class="text-xs font-bold text-gray-500 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 pb-1 mb-2">${escapeHTML(c.title)}</div><div class="flex flex-wrap gap-2">${c.tags.map(t=>{const theme=window.getManagedTagTheme?.(t,c.theme)||c.theme,req=window.getManagedTagRequirement?.(t)||{cadence:'none',color:'amber',hex:'#f59e0b'},required=req.cadence==='daily'||req.cadence==='weekly',badge=req.cadence==='daily'?'每日':req.cadence==='weekly'?'每週':'';return`<label class="cursor-pointer relative"><input type="checkbox" value="${escapeHTML(t)}" class="hidden tag-input" data-theme="${theme}"><div class="px-3 py-1.5 rounded-lg text-xs font-bold border transition active:scale-95 ${THEME_MAP[theme].inactive}" ${required?`style="box-shadow:0 0 0 2px ${req.hex} inset,0 0 0 1px ${req.hex};"`:''}>${escapeHTML(t)}${required?`<span class="ml-1.5 inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-black text-white align-middle" style="background:${req.hex}">${badge}</span>`:''}</div></label>`;}).join('')}</div></div>`).join('');
+    window.renderTagRequirementReminder?.();
     
     document.querySelectorAll('#filter-tags-container, #filter-tags-container-fav').forEach(container=>{
         if(!container)return;
@@ -4211,7 +4213,7 @@ function loadLocalData(){
 }
 
 // v163：策略標籤篩選預設為「符合任一（OR）」。
-function createDefaultJournalFilters(){const today=getToday();return{start:today,end:today,code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,largeHolder14:false,highTurnoverRevenue:false,tags:[],minScore:0,tagLogic:'OR',status:'all',quick:'all'};}
+function createDefaultJournalFilters(){const rawToday=getToday(),today=window.ryanLastTradingDay?.(rawToday)||rawToday;return{start:today,end:today,code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,largeHolder14:false,highTurnoverRevenue:false,tags:[],minScore:0,tagLogic:'OR',status:'all',quick:'all'};}
 function applyFilterLogicState(logic,selector){
     document.querySelectorAll(selector).forEach(button=>{
         const active=button.dataset.logic===(logic||'OR');
@@ -4806,6 +4808,7 @@ const renderCustomMarketHolidays=()=>{
 };
 const persistCustomMarketHolidays=async()=>{
     state.customMarketHolidays=normalizeCustomMarketHolidays(state.customMarketHolidays);saveLocalData();renderCustomMarketHolidays();
+    window.ryanNormalizeRangeDates?.();
     if(lastJournalStreakResult)renderJournalStreaks();
     return putDataToCloud('customMarketHolidaySettings',{dates:[...state.customMarketHolidays],updatedAt:Date.now()});
 };
@@ -5568,7 +5571,7 @@ const filterFields=[{key:'start',cls:'filter-start',type:'value'},{key:'end',cls
 const handleFilterChange=debounce((f,el)=>{let v=el.type==='checkbox'?el.checked:el.value;if(f.isInt)v=parseInt(v)||0;if(f.type==='value'&&el.type==='text')v=v.trim();state.filters[f.key]=v;state.favFilters[f.key]=v;document.querySelectorAll(`.${f.cls}`).forEach(o=>{if(f.type==='checked')o.checked=v;else o.value=v;});renderJournalFilterViews();},260);
 filterFields.forEach(f=>{document.querySelectorAll(`.${f.cls}`).forEach(el=>{const evt=(f.type==='value'&&el.type==='text')?'input':'change';if(evt==='input'){el.addEventListener('input',e=>handleFilterChange(f,e.target));}else{el.addEventListener('change',e=>{let v=e.target.type==='checkbox'?e.target.checked:e.target.value;if(f.isInt)v=parseInt(v)||0;state.filters[f.key]=v;state.favFilters[f.key]=v;document.querySelectorAll(`.${f.cls}`).forEach(o=>{if(f.type==='checked')o.checked=v;else o.value=v;});renderJournalFilterViews();});}});});
 
-['btn-clear-filters','btn-clear-filters-fav'].forEach(bId=>{document.getElementById(bId)?.addEventListener('click',()=>{const t=getToday();state.filters=createDefaultJournalFilters();state.favFilters=createDefaultJournalFilters();document.querySelectorAll('.filter-start').forEach(el=>el.value=t);document.querySelectorAll('.filter-end').forEach(el=>el.value=t);document.querySelectorAll('.filter-code').forEach(el=>el.value='');document.querySelectorAll('.filter-futures, .filter-exclude-negative-growth, .filter-revenue-high, .filter-large-holder, .filter-high-turnover-revenue').forEach(el=>el.checked=false);document.querySelectorAll('.filter-score').forEach(el=>el.value="0");document.querySelectorAll('.filter-journal-status,.filter-journal-quick').forEach(el=>el.value='all');document.querySelectorAll('.filter-tag-cb').forEach(cb=>cb.checked=false);applyFilterLogicState('OR','.logic-btn');applyFilterLogicState('OR','.logic-btn-fav');renderFilterTags();renderJournalFilterViews();showToast('已清除篩選');});});
+['btn-clear-filters','btn-clear-filters-fav'].forEach(bId=>{document.getElementById(bId)?.addEventListener('click',()=>{const rawToday=getToday(),t=window.ryanLastTradingDay?.(rawToday)||rawToday;state.filters=createDefaultJournalFilters();state.favFilters=createDefaultJournalFilters();document.querySelectorAll('.filter-start').forEach(el=>el.value=t);document.querySelectorAll('.filter-end').forEach(el=>el.value=t);document.querySelectorAll('.filter-code').forEach(el=>el.value='');document.querySelectorAll('.filter-futures, .filter-exclude-negative-growth, .filter-revenue-high, .filter-large-holder, .filter-high-turnover-revenue').forEach(el=>el.checked=false);document.querySelectorAll('.filter-score').forEach(el=>el.value="0");document.querySelectorAll('.filter-journal-status,.filter-journal-quick').forEach(el=>el.value='all');document.querySelectorAll('.filter-tag-cb').forEach(cb=>cb.checked=false);applyFilterLogicState('OR','.logic-btn');applyFilterLogicState('OR','.logic-btn-fav');renderFilterTags();renderJournalFilterViews();showToast('已清除篩選');});});
 
 const syncRevenuePatternUI=()=>{const revenueMode=document.getElementById('filter-revenue-pattern')?.value||'none',holderMode=document.getElementById('filter-holder-pattern')?.value||'none';document.getElementById('filter-revenue-pattern-count-wrap')?.classList.toggle('hidden',revenueMode!=='window');document.getElementById('filter-holder-pattern-count-wrap')?.classList.toggle('hidden',holderMode!=='window');};
 const handleRevenueFilterChange = debounce(() => { const f=state.revenueFilters;f.month=document.getElementById('filter-revenue-month')?.value||'';f.code=document.getElementById('filter-revenue-code')?.value.trim()||'';f.type=document.getElementById('filter-revenue-type')?.value||'all';f.revenuePattern=document.getElementById('filter-revenue-pattern')?.value||'none';f.revenueN=Math.max(1,parseInt(document.getElementById('filter-revenue-pattern-n')?.value)||3);f.revenueCount=Math.max(1,parseInt(document.getElementById('filter-revenue-pattern-count')?.value)||2);f.holderPattern=document.getElementById('filter-holder-pattern')?.value||'none';f.holderN=Math.max(1,parseInt(document.getElementById('filter-holder-pattern-n')?.value)||3);f.holderCount=Math.max(1,parseInt(document.getElementById('filter-holder-pattern-count')?.value)||2);f.minMomentum=Math.max(0,parseInt(document.getElementById('filter-momentum-score')?.value)||0);syncRevenuePatternUI();renderRevenueRecords(); }, 280);
@@ -5682,7 +5685,8 @@ const shiftDateField=(scope,field,days)=>{
     const cfg=configs[scope];if(!cfg)return;
     const id=field==='end'?cfg.end:cfg.start;
     const el=document.getElementById(id);if(!el)return;
-    const next=shiftISODate(el.value||getToday(),days);
+    const base=el.value||getToday();
+    const next=window.ryanShiftTradingDate?.(base,days)||shiftISODate(base,days);
     el.value=next;
 
     if(cfg.type==='journal'){
@@ -5732,6 +5736,7 @@ const syncJournalReferenceMode=()=>{
     wrap?.classList.toggle('dark:ring-amber-700',enabled);
 };
 document.getElementById('journal-reference-only')?.addEventListener('change',syncJournalReferenceMode);
+document.getElementById('j-date')?.addEventListener('change',()=>window.renderTagRequirementReminder?.());
 syncJournalReferenceMode();
 
 document.getElementById('journal-form')?.addEventListener('submit', async e => {
@@ -5818,6 +5823,7 @@ document.getElementById('journal-form')?.addEventListener('submit', async e => {
         }
     }
     
+    window.renderTagRequirementReminder?.();
     document.getElementById('j-code').value = '';
     document.getElementById('j-name').value = '';
     document.getElementById('j-notes').value = '';
@@ -7079,7 +7085,7 @@ setChkDirection('long');
             const wsPlan = XLSX.utils.json_to_sheet(state.plans.map(p => ({'進場日期':p.entryDate,'狀態':p.status,'代號':p.stock,'股名':p.name,'部位(張)':p.qty,'進場價':p.entry,'停損防守':p.stop,'停利目標':p.target||'','實際出場':p.exitPrice||'','實現損益':p.pnl||0,'權證/備註':p.note||''})));
             XLSX.utils.book_append_sheet(wb, wsPlan, '交易規劃');
 
-            const tagRows=(state.tagSettings?.categories||TAG_CATEGORIES).flatMap((category,categoryIndex)=>(category.tags||[]).map((tag,tagIndex)=>{const meta=state.tagSettings?.meta?.[tag]||{};return{'分類順序':categoryIndex+1,'分類':category.title,'分類主題':category.theme,'標籤順序':tagIndex+1,'標籤':tag,'顏色':meta.theme||category.theme,'複製圖示':meta.icon||'','參與策略':meta.isStrategy===false?'否':'是'};}));
+            const tagRows=(state.tagSettings?.categories||TAG_CATEGORIES).flatMap((category,categoryIndex)=>(category.tags||[]).map((tag,tagIndex)=>{const meta=state.tagSettings?.meta?.[tag]||{};return{'分類順序':categoryIndex+1,'分類':category.title,'分類主題':category.theme,'標籤順序':tagIndex+1,'標籤':tag,'顏色':meta.theme||category.theme,'複製圖示':meta.icon||'','參與策略':meta.isStrategy===false?'否':'是','必填頻率':meta.requiredCadence==='daily'?'每天開盤必填':meta.requiredCadence==='weekly'?'每週必填':'','提醒顏色':meta.reminderColor||'amber'};}));
             const wsTags=XLSX.utils.json_to_sheet(tagRows);
             XLSX.utils.book_append_sheet(wb,wsTags,'標籤設定');
             
@@ -7776,10 +7782,14 @@ const SESSION={
   }
   function normalizeTagMeta(name,categoryTheme,meta){
     var source=meta&&typeof meta==='object'?meta:{};
+    var cadence=['none','daily','weekly'].includes(source.requiredCadence)?source.requiredCadence:'none';
+    var reminderColor=VALID_THEMES.includes(source.reminderColor)?source.reminderColor:'amber';
     return{
       isStrategy:source.isStrategy!==undefined?!!source.isStrategy:!NON_STRATEGY_COPY_TAGS.has(name),
       icon:String(source.icon||COPY_TAG_ICONS[name]||'').trim().slice(0,12),
-      theme:VALID_THEMES.includes(source.theme)?source.theme:categoryTheme
+      theme:VALID_THEMES.includes(source.theme)?source.theme:categoryTheme,
+      requiredCadence:cadence,
+      reminderColor:reminderColor
     };
   }
 
@@ -7912,6 +7922,52 @@ const SESSION={
     var meta=state.tagSettings&&state.tagSettings.meta&&state.tagSettings.meta[tag];
     return meta&&meta.icon?meta.icon:'';
   };
+  var TAG_REMINDER_HEX={rose:'#e11d48',blue:'#2563eb',amber:'#f59e0b',purple:'#7c3aed',teal:'#0d9488'};
+  window.getManagedTagRequirement=function(tag){
+    var meta=state.tagSettings&&state.tagSettings.meta&&state.tagSettings.meta[tag]||{};
+    var cadence=['daily','weekly'].includes(meta.requiredCadence)?meta.requiredCadence:'none';
+    var color=VALID_THEMES.includes(meta.reminderColor)?meta.reminderColor:'amber';
+    return{cadence:cadence,color:color,hex:TAG_REMINDER_HEX[color]||TAG_REMINDER_HEX.amber};
+  };
+  window.renderTagRequirementReminder=function(){
+    var root=document.getElementById('tag-required-reminder');if(!root)return;
+    var ref=String(document.getElementById('j-date')?.value||getToday()).slice(0,10);
+    var m=ref.match(/^(\d{4})-(\d{2})-(\d{2})$/);if(!m){root.classList.add('hidden');return;}
+    var date=new Date(Date.UTC(Number(m[1]),Number(m[2])-1,Number(m[3])));
+    var weekday=date.getUTCDay(),isWeekend=weekday===0||weekday===6,isHoliday=(state.customMarketHolidays||[]).includes(ref);
+    var dayOffset=weekday===0?6:weekday-1;
+    var monday=new Date(date.getTime()-dayOffset*86400000),sunday=new Date(monday.getTime()+6*86400000);
+    var iso=d=>`${d.getUTCFullYear()}-${String(d.getUTCMonth()+1).padStart(2,'0')}-${String(d.getUTCDate()).padStart(2,'0')}`;
+    var weekStart=iso(monday),weekEnd=iso(sunday);
+    var daily=[],weekly=[];
+    Object.entries(state.tagSettings?.meta||{}).forEach(function(entry){
+      var tag=entry[0],meta=entry[1]||{};
+      if(meta.requiredCadence==='daily')daily.push(tag);
+      else if(meta.requiredCadence==='weekly')weekly.push(tag);
+    });
+    if(!daily.length&&!weekly.length){root.classList.add('hidden');return;}
+    var hasTagOn=function(tag,start,end){
+      return (state.journals||[]).some(function(j){
+        var jd=String(j.date||'').slice(0,10);
+        return jd>=start&&jd<=end&&(j.tags||[]).map(normalizeStrategyTagName).includes(normalizeStrategyTagName(tag));
+      });
+    };
+    var missingDaily=(isWeekend||isHoliday)?[]:daily.filter(tag=>!hasTagOn(tag,ref,ref));
+    var missingWeekly=weekly.filter(tag=>!hasTagOn(tag,weekStart,weekEnd));
+    var allDone=!missingDaily.length&&!missingWeekly.length;
+    root.className='mb-3 rounded-xl border px-3 py-2 text-xs sm:text-sm '+(allDone?'border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300':'border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20 text-amber-800 dark:text-amber-200');
+    if(allDone){
+      var closedText=(isWeekend||isHoliday)?'（休市日不檢查每日必填）':'';
+      root.innerHTML='<div class="font-black">✅ 必填策略標籤已完成 '+escapeHTML(closedText)+'</div>';
+    }else{
+      var parts=[];
+      if(missingDaily.length)parts.push('<div><b>📅 今日尚未填：</b>'+missingDaily.map(escapeHTML).join('、')+'</div>');
+      if(missingWeekly.length)parts.push('<div class="mt-1"><b>🗓️ 本週尚未填：</b>'+missingWeekly.map(escapeHTML).join('、')+'</div>');
+      if(isWeekend||isHoliday)parts.push('<div class="mt-1 text-[10px] opacity-75">休市日不檢查每日必填。</div>');
+      root.innerHTML=parts.join('');
+    }
+    root.classList.remove('hidden');
+  };
   window.syncCustomTagSettings=function(){
     window.ensureOptimizationState();
     var categories=clone(state.tagSettings.categories);
@@ -7942,13 +7998,15 @@ const SESSION={
     document.body.insertAdjacentHTML('beforeend',[
       '<div id="tag-manager-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-[190] hidden items-center justify-center p-3">',
       '<div class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-2xl border border-gray-200 dark:border-gray-700 shadow-2xl w-full max-w-4xl max-h-[92vh] flex flex-col modal-enter">',
-      '<div class="p-4 sm:p-5 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between gap-3"><div><h3 class="text-lg sm:text-xl font-black text-rose-600 dark:text-rose-300"><i class="fa-solid fa-tags mr-2"></i>自訂標籤管理</h3><p class="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 mt-1">可新增、改名、分類、排序、設定顏色與是否參與策略計分／複製。</p></div><button id="tag-manager-close" type="button" class="w-9 h-9 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-500 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button></div>',
+      '<div class="p-4 sm:p-5 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between gap-3"><div><h3 class="text-lg sm:text-xl font-black text-rose-600 dark:text-rose-300"><i class="fa-solid fa-tags mr-2"></i>自訂標籤管理</h3><p class="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 mt-1">可新增、改名、分類、排序、設定標籤顏色；也能指定「每天開盤必填／每週必填」與提醒標註顏色。</p></div><button id="tag-manager-close" type="button" class="w-9 h-9 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-500 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button></div>',
       '<div class="grid grid-cols-1 lg:grid-cols-12 min-h-0 flex-1">',
       '<div class="lg:col-span-5 p-4 sm:p-5 border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-gray-700 bg-gray-50/70 dark:bg-gray-900/30">',
       '<input type="hidden" id="tag-manager-original">',
       '<div class="grid grid-cols-2 gap-3"><div class="col-span-2"><label class="block text-xs font-bold text-gray-500 mb-1">標籤名稱</label><input id="tag-manager-name" maxlength="20" class="input-base" placeholder="例如：總編概念股"></div>',
       '<div><label class="block text-xs font-bold text-gray-500 mb-1">分類</label><select id="tag-manager-category" class="input-base"></select></div>',
-      '<div><label class="block text-xs font-bold text-gray-500 mb-1">顏色</label><select id="tag-manager-theme" class="input-base"><option value="rose">紅色</option><option value="blue">藍色</option><option value="amber">橘色</option><option value="purple">紫色</option><option value="teal">綠色</option></select></div>',
+      '<div><label class="block text-xs font-bold text-gray-500 mb-1">標籤顏色</label><select id="tag-manager-theme" class="input-base"><option value="rose">紅色</option><option value="blue">藍色</option><option value="amber">橘色</option><option value="purple">紫色</option><option value="teal">綠色</option></select></div>',
+      '<div><label class="block text-xs font-bold text-gray-500 mb-1">必填頻率</label><select id="tag-manager-required-cadence" class="input-base"><option value="none">不提醒</option><option value="daily">每天開盤必填</option><option value="weekly">每週必填</option></select></div>',
+      '<div><label class="block text-xs font-bold text-gray-500 mb-1">提醒標註顏色</label><select id="tag-manager-reminder-color" class="input-base"><option value="rose">紅色</option><option value="amber">橘色</option><option value="blue">藍色</option><option value="purple">紫色</option><option value="teal">綠色</option></select></div>',
       '<div class="col-span-2"><label class="block text-xs font-bold text-gray-500 mb-1">複製圖示（選填）</label><input id="tag-manager-icon" maxlength="12" class="input-base" placeholder="例如：🎯"></div>',
       '<label class="col-span-2 flex items-center gap-2 p-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 cursor-pointer"><input type="checkbox" id="tag-manager-strategy" class="w-4 h-4 accent-rose-600" checked><span class="text-xs sm:text-sm font-bold">納入策略計分及一般策略複製</span></label></div>',
       '<div class="flex gap-2 mt-4"><button id="tag-manager-save" type="button" class="flex-1 h-10 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-bold text-sm"><i class="fa-solid fa-floppy-disk mr-1.5"></i>儲存標籤</button><button id="tag-manager-cancel-edit" type="button" class="hidden px-4 h-10 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-200 text-sm font-bold">取消編輯</button></div>',
@@ -7979,6 +8037,8 @@ const SESSION={
     var category=document.getElementById('tag-manager-category');if(category)category.value='0';
     document.getElementById('tag-manager-strategy').checked=false;
     document.getElementById('tag-manager-theme').value=(state.tagSettings?.categories?.[0]?.theme)||'rose';
+    document.getElementById('tag-manager-required-cadence').value='none';
+    document.getElementById('tag-manager-reminder-color').value='amber';
     document.getElementById('tag-manager-cancel-edit').classList.add('hidden');
     document.getElementById('tag-manager-save').innerHTML='<i class="fa-solid fa-plus mr-1.5"></i>新增標籤';
   }
@@ -7999,9 +8059,10 @@ const SESSION={
       var rows=category.tags.map(function(tag,index){
         var meta=state.tagSettings.meta[tag]||normalizeTagMeta(tag,category.theme,null);
         var encoded=encodeURIComponent(tag);
+        var req=window.getManagedTagRequirement(tag),reqLabel=req.cadence==='daily'?'每天開盤必填':req.cadence==='weekly'?'每週必填':'';
         return '<div class="flex items-center gap-2 p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900/40">'+
           '<span class="w-8 h-8 shrink-0 rounded-lg flex items-center justify-center border text-base '+getTagStyle(tag,true)+'">'+escapeHTML(meta.icon||'🏷️')+'</span>'+
-          '<div class="min-w-0 flex-1"><div class="font-bold text-sm truncate">'+escapeHTML(tag)+'</div><div class="flex flex-wrap gap-1 mt-1"><span class="text-[9px] px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-gray-500">'+escapeHTML(meta.theme)+'</span><span class="text-[9px] px-1.5 py-0.5 rounded '+(meta.isStrategy?'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300':'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300')+'">'+(meta.isStrategy?'參與策略':'僅關注')+'</span></div></div>'+
+          '<div class="min-w-0 flex-1"><div class="font-bold text-sm truncate">'+escapeHTML(tag)+'</div><div class="flex flex-wrap gap-1 mt-1"><span class="text-[9px] px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-gray-500">'+escapeHTML(meta.theme)+'</span><span class="text-[9px] px-1.5 py-0.5 rounded '+(meta.isStrategy?'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300':'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300')+'">'+(meta.isStrategy?'參與策略':'僅關注')+'</span>'+(reqLabel?'<span class="text-[9px] px-1.5 py-0.5 rounded text-white font-black" style="background:'+req.hex+'">'+escapeHTML(reqLabel)+'</span>':'')+'</div></div>'+
           '<div class="flex items-center gap-1"><button type="button" data-tag-action="up" data-tag-name="'+encoded+'" title="往前" class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-500 disabled:opacity-30" '+(index===0?'disabled':'')+'><i class="fa-solid fa-arrow-up"></i></button><button type="button" data-tag-action="down" data-tag-name="'+encoded+'" title="往後" class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-500 disabled:opacity-30" '+(index===category.tags.length-1?'disabled':'')+'><i class="fa-solid fa-arrow-down"></i></button><button type="button" data-tag-action="edit" data-tag-name="'+encoded+'" title="編輯" class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300"><i class="fa-solid fa-pen"></i></button><button type="button" data-tag-action="delete" data-tag-name="'+encoded+'" title="刪除" class="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-900/30 text-red-500"><i class="fa-solid fa-trash"></i></button></div>'+
           '</div>';
       }).join('');
@@ -8028,6 +8089,7 @@ const SESSION={
     renderTagManager();
     processAndRenderJournals();
     renderFavorites();
+    window.renderTagRequirementReminder?.();
     await putDataToCloud('tagSettings',state.tagSettings);
     if(syncJournals)await putDataToCloud('journals',Object.fromEntries(state.journals.map(function(item){return[item.id,item];})));
   }
@@ -8039,6 +8101,8 @@ const SESSION={
     var theme=document.getElementById('tag-manager-theme').value;
     var icon=document.getElementById('tag-manager-icon').value.trim();
     var isStrategy=document.getElementById('tag-manager-strategy').checked;
+    var requiredCadence=document.getElementById('tag-manager-required-cadence').value;
+    var reminderColor=document.getElementById('tag-manager-reminder-color').value;
     if(!name)return showToast('請輸入標籤名稱','error');
     if(name.length>20||/[<>"']/.test(name))return showToast('標籤名稱格式不正確','error');
     var allTags=state.tagSettings.categories.reduce(function(result,category){return result.concat(category.tags);},[]);
@@ -8056,7 +8120,7 @@ const SESSION={
       updateReferencesForRenamedTag(original,name);
       delete state.tagSettings.meta[original];
     }
-    state.tagSettings.meta[name]={isStrategy:isStrategy,icon:icon.slice(0,12),theme:VALID_THEMES.includes(theme)?theme:target.theme};
+    state.tagSettings.meta[name]={isStrategy:isStrategy,icon:icon.slice(0,12),theme:VALID_THEMES.includes(theme)?theme:target.theme,requiredCadence:['daily','weekly'].includes(requiredCadence)?requiredCadence:'none',reminderColor:VALID_THEMES.includes(reminderColor)?reminderColor:'amber'};
     resetTagForm();
     await persistTagSettings(original&&original!==name);
     showToast(original?'標籤已更新':'標籤已新增');
@@ -8071,6 +8135,8 @@ const SESSION={
     document.getElementById('tag-manager-theme').value=meta.theme;
     document.getElementById('tag-manager-icon').value=meta.icon||'';
     document.getElementById('tag-manager-strategy').checked=!!meta.isStrategy;
+    document.getElementById('tag-manager-required-cadence').value=['daily','weekly'].includes(meta.requiredCadence)?meta.requiredCadence:'none';
+    document.getElementById('tag-manager-reminder-color').value=VALID_THEMES.includes(meta.reminderColor)?meta.reminderColor:'amber';
     document.getElementById('tag-manager-cancel-edit').classList.remove('hidden');
     document.getElementById('tag-manager-save').innerHTML='<i class="fa-solid fa-floppy-disk mr-1.5"></i>儲存修改';
     document.getElementById('tag-manager-name').focus();
@@ -8274,7 +8340,8 @@ const SESSION={
         var title=String(row['分類']).trim(),tag=String(row['標籤']).trim(),category=categoryMap.get(title),categoryTheme=VALID_THEMES.includes(row['分類主題'])?row['分類主題']:'blue';
         if(!category){category={title:title,theme:categoryTheme,tags:[]};categoryMap.set(title,category);categories.push(category);}
         if(!category.tags.includes(tag))category.tags.push(tag);
-        meta[tag]={theme:VALID_THEMES.includes(row['顏色'])?row['顏色']:category.theme,icon:String(row['複製圖示']||'').trim().slice(0,12),isStrategy:String(row['參與策略']||'是').trim()!=='否'};
+        var cadenceText=String(row['必填頻率']||'').trim(),requiredCadence=cadenceText==='每天開盤必填'?'daily':cadenceText==='每週必填'?'weekly':'none',reminderColor=VALID_THEMES.includes(row['提醒顏色'])?row['提醒顏色']:'amber';
+        meta[tag]={theme:VALID_THEMES.includes(row['顏色'])?row['顏色']:category.theme,icon:String(row['複製圖示']||'').trim().slice(0,12),isStrategy:String(row['參與策略']||'是').trim()!=='否',requiredCadence:requiredCadence,reminderColor:reminderColor};
       });
       importedTagSettings={version:1,categories:categories,meta:meta,updatedAt:Date.now()};
       var currentTags=new Set(state.tagSettings?.categories?.flatMap(function(category){return category.tags;})||[]),newTags=0,duplicateTags=0;
@@ -9015,42 +9082,180 @@ document.addEventListener('DOMContentLoaded',()=>{
 </script>
 
 
-<script id="global-last-trading-day-v227">
+<script id="global-last-trading-day-v260">
 (()=>{
-  // v227：全站日期/區間日期週六、週日不往後跑，停留於最近週五。
-  // 國定休市日仍由既有「自訂休市日」/實際資料日期機制處理。
+  'use strict';
+
+  // v260：區間日期統一停留在最近實際開盤日。
+  // 規則來源：
+  // 1. 週六、週日
+  // 2. TWSE 官方開休市日期（線上自動抓取）
+  // 3. 使用者在策略訊號雷達設定的自訂休市日
+  // 若 TWSE API 暫時無法連線，仍保留 2026 官方休市日做離線備援。
+
+  const TWSE_HOLIDAY_API='https://openapi.twse.com.tw/v1/holidaySchedule/holidaySchedule';
+  const CACHE_KEY='ryan_twse_holiday_schedule_v260';
+
+  // 2026 TWSE 官方休市日備援；週末即使列入也不影響結果。
+  const FALLBACK_2026=[
+    '2026-01-01',
+    '2026-02-12','2026-02-13','2026-02-15','2026-02-16','2026-02-17','2026-02-18','2026-02-19','2026-02-20',
+    '2026-02-27','2026-02-28',
+    '2026-04-03','2026-04-04','2026-04-05','2026-04-06',
+    '2026-05-01','2026-06-19',
+    '2026-09-25','2026-09-28',
+    '2026-10-09','2026-10-10','2026-10-25','2026-10-26',
+    '2026-12-25'
+  ];
+
+  const officialClosed=new Set(FALLBACK_2026);
+  let normalizing=false;
+
   const pad=n=>String(n).padStart(2,'0');
   const isoLocal=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-  const lastWeekday=value=>{
-    if(!value)return value;
-    const d=new Date(`${String(value).slice(0,10)}T12:00:00`);
-    if(!Number.isFinite(d.getTime()))return value;
-    if(d.getDay()===6)d.setDate(d.getDate()-1);
-    else if(d.getDay()===0)d.setDate(d.getDate()-2);
+  const parseISO=value=>{
+    if(!value)return null;
+    const raw=String(value).slice(0,10);
+    const m=raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if(!m)return null;
+    const d=new Date(Number(m[1]),Number(m[2])-1,Number(m[3]),12,0,0);
+    if(!Number.isFinite(d.getTime()))return null;
+    return d;
+  };
+
+  const getCustomClosed=()=>{
+    try{
+      if(typeof state!=='undefined'&&Array.isArray(state.customMarketHolidays)){
+        return new Set(state.customMarketHolidays.map(x=>String(x||'').slice(0,10)).filter(Boolean));
+      }
+    }catch(e){}
+    return new Set();
+  };
+
+  const isClosed=value=>{
+    const d=parseISO(value);if(!d)return false;
+    const iso=isoLocal(d),weekday=d.getDay();
+    if(weekday===0||weekday===6)return true;
+    if(officialClosed.has(iso))return true;
+    return getCustomClosed().has(iso);
+  };
+
+  const previousTradingDay=value=>{
+    const d=parseISO(value);if(!d)return value;
+    let guard=0;
+    while(isClosed(isoLocal(d))&&guard<40){
+      d.setDate(d.getDate()-1);
+      guard++;
+    }
     return isoLocal(d);
   };
-  const normalizeDateInput=el=>{
-    if(!el || el.type!=='date' || !el.value)return;
-    const fixed=lastWeekday(el.value);
-    if(fixed!==el.value){
-      el.value=fixed;
-      el.dispatchEvent(new Event('change',{bubbles:true}));
+
+  const shiftTradingDate=(value,direction)=>{
+    const d=parseISO(value)||parseISO(typeof getToday==='function'?getToday():'');
+    if(!d)return value;
+    const step=Number(direction)<0?-1:1;
+    d.setDate(d.getDate()+step);
+    let guard=0;
+    while(isClosed(isoLocal(d))&&guard<40){
+      d.setDate(d.getDate()+step);
+      guard++;
+    }
+    return isoLocal(d);
+  };
+
+  const isRangeDateInput=el=>Boolean(el&&(
+    el.matches?.('.filter-start,.filter-end')||
+    ['filter-rep-start','filter-rep-end'].includes(el.id)
+  ));
+
+  const normalizeDateInput=(el,dispatch=false)=>{
+    if(!isRangeDateInput(el)||!el.value)return false;
+    const fixed=previousTradingDay(el.value);
+    if(!fixed||fixed===el.value)return false;
+    el.value=fixed;
+    if(dispatch)el.dispatchEvent(new Event('change',{bubbles:true}));
+    return true;
+  };
+
+  const normalizeAll=(dispatch=false)=>{
+    if(normalizing)return;
+    normalizing=true;
+    try{
+      document.querySelectorAll('.filter-start,.filter-end,#filter-rep-start,#filter-rep-end')
+        .forEach(el=>normalizeDateInput(el,dispatch));
+    }finally{
+      normalizing=false;
     }
   };
-  const normalizeAll=()=>{
-    document.querySelectorAll('input[type="date"]').forEach(normalizeDateInput);
+
+  const rocToIso=raw=>{
+    const digits=String(raw||'').replace(/\D/g,'');
+    if(digits.length<7)return '';
+    const rocYear=Number(digits.slice(0,-4)),month=digits.slice(-4,-2),day=digits.slice(-2);
+    if(!Number.isFinite(rocYear)||rocYear<=0)return '';
+    return `${rocYear+1911}-${month}-${day}`;
   };
+
+  const applyHolidayRows=rows=>{
+    if(!Array.isArray(rows))return 0;
+    let count=0;
+    rows.forEach(row=>{
+      const name=String(row?.Name||row?.name||'').trim();
+      const iso=rocToIso(row?.Date||row?.date);
+      if(!iso)return;
+
+      // 「開始交易日」「最後交易日」是有交易的日期，不可誤判為休市。
+      if(/開始交易|最後交易/.test(name))return;
+
+      officialClosed.add(iso);
+      count++;
+    });
+    return count;
+  };
+
+  const loadCache=()=>{
+    try{
+      const cached=JSON.parse(localStorage.getItem(CACHE_KEY)||'null');
+      if(cached&&Array.isArray(cached.rows))applyHolidayRows(cached.rows);
+    }catch(e){}
+  };
+
+  const fetchTwseHolidays=async()=>{
+    try{
+      const response=await fetch(TWSE_HOLIDAY_API,{cache:'no-store'});
+      if(!response.ok)throw new Error(`HTTP ${response.status}`);
+      const rows=await response.json();
+      if(applyHolidayRows(rows)){
+        try{localStorage.setItem(CACHE_KEY,JSON.stringify({time:Date.now(),rows}));}catch(e){}
+        // API 回來後若目前剛好停在休市日，立即退回前一開盤日並重跑篩選。
+        normalizeAll(true);
+      }
+    }catch(error){
+      console.warn('TWSE 開休市日期讀取失敗，使用內建/快取休市日',error);
+    }
+  };
+
+  // 手動選日期時，在既有篩選 change handler 執行前就先改成最近開盤日。
+  document.addEventListener('change',event=>{
+    if(normalizing||!isRangeDateInput(event.target))return;
+    const el=event.target;
+    const fixed=previousTradingDay(el.value);
+    if(fixed&&fixed!==el.value){
+      el.value=fixed;
+    }
+  },true);
+
   document.addEventListener('DOMContentLoaded',()=>{
-    normalizeAll();
-    // 任何區間日期被選到六/日，立即退回最近週五。
-    document.addEventListener('change',e=>{
-      if(e.target?.matches?.('input[type="date"]')) normalizeDateInput(e.target);
-    },true);
-    // 部分模組會在切換頁面/篩選後重新指定日期，因此再做輕量同步。
-    const observer=new MutationObserver(()=>normalizeAll());
-    observer.observe(document.body,{childList:true,subtree:true});
+    loadCache();
+    normalizeAll(true);
+    fetchTwseHolidays();
   });
-  window.ryanLastTradingWeekday=lastWeekday;
+
+  // 供既有篩選、清除篩選、左右日期箭頭與自訂休市日共用。
+  window.ryanIsMarketClosed=isClosed;
+  window.ryanLastTradingDay=previousTradingDay;
+  window.ryanShiftTradingDate=shiftTradingDate;
+  window.ryanNormalizeRangeDates=()=>normalizeAll(true);
 })();
 </script>
 
