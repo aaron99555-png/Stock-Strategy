@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="257" name="app-version"/>
+<meta content="258" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -4883,6 +4883,66 @@ const getHorseNewEntryTagsForCodeDate=(code,date)=>{
 const isHorseNewEntryJournal=journal=>Boolean(journal?._horseNewEntry)||getHorseNewEntryTags(journal).length>0;
 const getCopyJournalName=journal=>`${journal?.name||''}${isHorseNewEntryJournal(journal)?' 🆕新進榜':''}`;
 
+// v258：輸入追風馬／赤兔馬／千里馬時，若本次屬於新進榜，跳出醒目通知。
+const showHorseNewEntryNotice=(journal,tag)=>{
+    const normalizedTag=normalizeStrategyTagName(tag);
+    if(!journal||!HORSE_NEW_ENTRY_TAGS.has(normalizedTag)||!isHorseTagNewEntry(journal,normalizedTag))return false;
+
+    document.getElementById('horse-new-entry-notice')?.remove();
+    const iconMap={'追風馬':'🌪️','赤兔馬':'🐎','千里馬':'🏇'};
+
+    const notice=document.createElement('div');
+    notice.id='horse-new-entry-notice';
+    notice.setAttribute('role','alert');
+    notice.setAttribute('aria-live','assertive');
+    Object.assign(notice.style,{
+        position:'fixed',
+        top:'88px',
+        left:'50%',
+        transform:'translateX(-50%)',
+        zIndex:'9999',
+        width:'min(92vw, 440px)',
+        padding:'16px 18px',
+        borderRadius:'16px',
+        border:'2px solid #f59e0b',
+        background:'linear-gradient(135deg,#fffbeb 0%,#fff7ed 100%)',
+        boxShadow:'0 18px 45px rgba(120,53,15,.28)',
+        color:'#78350f',
+        fontFamily:'inherit'
+    });
+
+    const header=document.createElement('div');
+    header.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:12px;';
+    const title=document.createElement('div');
+    title.style.cssText='font-size:19px;font-weight:900;letter-spacing:.02em;';
+    title.textContent='🆕 新進榜通知！';
+    const close=document.createElement('button');
+    close.type='button';
+    close.setAttribute('aria-label','關閉通知');
+    close.textContent='×';
+    close.style.cssText='border:0;background:transparent;color:#92400e;font-size:24px;line-height:1;cursor:pointer;padding:0 2px;';
+    close.addEventListener('click',()=>notice.remove());
+    header.append(title,close);
+
+    const stock=document.createElement('div');
+    stock.style.cssText='margin-top:8px;font-size:17px;font-weight:900;color:#9a3412;';
+    stock.textContent=`${String(journal.code||'').trim()} ${String(journal.name||'').trim()}`;
+
+    const detail=document.createElement('div');
+    detail.style.cssText='margin-top:5px;font-size:14px;font-weight:800;';
+    detail.textContent=`${iconMap[normalizedTag]||'🏇'} ${normalizedTag}｜這一檔是新進榜`;
+
+    const hint=document.createElement('div');
+    hint.style.cssText='margin-top:5px;font-size:11px;color:#a16207;';
+    hint.textContent='依目前馬廄新進榜規則判定，🆕標示會維持一週。';
+
+    notice.append(header,stock,detail,hint);
+    document.body.appendChild(notice);
+    try{navigator.vibrate?.([80,40,80]);}catch(e){}
+    setTimeout(()=>notice.remove(),5500);
+    return true;
+};
+
 const normalizeStreakTagFilterMode=mode=>['include','matchAll','exclude'].includes(mode)?mode:'all';
 const getSelectedStreakTags=()=>Array.from(document.querySelectorAll('.streak-tag-cb:checked')).map(input=>normalizeStrategyTagName(input.value)).filter(Boolean);
 const updateStreakTagFilterUI=()=>{
@@ -5698,6 +5758,7 @@ document.getElementById('journal-form')?.addEventListener('submit', async e => {
     if (!d) return showToast('請選擇日期', 'error');
 
     const selectedTag = document.querySelector('.tag-input:checked')?.value || '';
+    const normalizedSelectedTag=normalizeStrategyTagName(selectedTag);
     const tags = selectedTag ? [selectedTag] : [];
     rememberJournalFormTag(selectedTag);
     
@@ -5727,6 +5788,9 @@ document.getElementById('journal-form')?.addEventListener('submit', async e => {
         if (document.getElementById('module-favorites').classList.contains('active')) renderFavorites();
         await putDataToCloud(`journals/${existing.id}`, existing);
         showToast('策略標籤已合併至同一列');
+        if(HORSE_NEW_ENTRY_TAGS.has(normalizedSelectedTag)){
+            showHorseNewEntryNotice(existing,normalizedSelectedTag);
+        }
     } else {
         // 如果不存在，則建立新資料
         const id = generateId();
@@ -5749,6 +5813,9 @@ document.getElementById('journal-form')?.addEventListener('submit', async e => {
         if (document.getElementById('module-favorites').classList.contains('active')) renderFavorites();
         await putDataToCloud(`journals/${id}`, p);
         showToast('策略日誌已加入');
+        if(HORSE_NEW_ENTRY_TAGS.has(normalizedSelectedTag)){
+            showHorseNewEntryNotice(p,normalizedSelectedTag);
+        }
     }
     
     document.getElementById('j-code').value = '';
