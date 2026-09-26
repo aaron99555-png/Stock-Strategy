@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="263" name="app-version"/>
+<meta content="264" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -2256,10 +2256,14 @@ nav, .top-nav, .desktop-nav, .module-nav{
 </button>
 </div>
 </div>
+<button class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 disabled:bg-gray-300 dark:disabled:bg-gray-700 text-white font-bold px-4 py-2 rounded-lg transition shadow-sm active:scale-95 disabled:cursor-wait" id="btn-load-stock-info" type="button" title="依代號帶入最近交易日最高、最低與最新收盤價">
+<i class="fa-solid fa-arrow-trend-up"></i> 帶入個股資訊
+</button>
 <span class="text-xs text-gray-500 dark:text-gray-400" id="market-index-status"></span>
+<span class="text-xs text-gray-500 dark:text-gray-400" id="stock-info-status"></span>
 </div>
 <div class="col-span-6 md:col-span-5 text-[11px] text-gray-500 dark:text-gray-400 mt-1" id="cross-session-note">
-                    計算邏輯：點選日盤＝使用夜盤數據計算日盤支撐壓力；點選夜盤＝使用日盤數據計算夜盤支撐壓力。
+                    大盤：點選日盤＝使用夜盤數據計算日盤支撐壓力；點選夜盤＝使用日盤數據計算夜盤支撐壓力。個股：輸入代號後，帶入最近交易日最高／最低／最新收盤價。
                 </div>
 <div class="hidden col-span-6 md:col-span-5 rounded-lg border px-3 py-2 text-xs font-bold" id="calc-input-warning" role="alert"></div>
 <div class="col-span-6 md:col-span-5 flex flex-wrap gap-4 items-center mt-2 mb-1 border-t border-gray-200 dark:border-gray-700/50 pt-4">
@@ -6824,12 +6828,27 @@ const formatCalcDistance=(value,close,isTX)=>{
     return`${sign}${isTX?Math.round(diff):diff.toFixed(2)}${isTX?' 點':''}（${sign}${pct.toFixed(2)}%）`;
 };
 const getCalcDataContext=()=>{
-    const form=document.getElementById('calc-form'),source=form?.dataset.marketSourceSession||'',target=form?.dataset.marketSession||'',date=form?.dataset.marketDate||new Date().toLocaleDateString('sv-SE',{timeZone:'Asia/Taipei'}),contract=form?.dataset.marketContract||'',edited=form?.dataset.marketEdited==='true';
-    const sourceLabel=source==='day'?'日盤':source==='night'?'夜盤':'',targetLabel=target==='day'?'日盤':target==='night'?'夜盤':'';
+    const form=document.getElementById('calc-form'),
+        source=form?.dataset.marketSourceSession||'',
+        target=form?.dataset.marketSession||'',
+        stockSource=form?.dataset.stockSource||'',
+        date=form?.dataset.marketDate||new Date().toLocaleDateString('sv-SE',{timeZone:'Asia/Taipei'}),
+        contract=form?.dataset.marketContract||'',
+        edited=form?.dataset.marketEdited==='true';
+    const sourceLabel=source==='day'?'日盤':source==='night'?'夜盤':'',
+        targetLabel=target==='day'?'日盤':target==='night'?'夜盤':'';
     let stale=false;
-    if(source&&date){const dt=new Date(`${date}T00:00:00+08:00`),today=new Date(new Date().toLocaleDateString('sv-SE',{timeZone:'Asia/Taipei'})+'T00:00:00+08:00');stale=Number.isFinite(dt.getTime())&&((today-dt)/86400000)>3;}
-    const text=source?`計算盤別：${targetLabel||'-'}｜資料來源：${sourceLabel}｜日期：${date}${contract?`｜近月合約：${contract}`:''}${edited?'｜已手動調整':''}${stale?'｜⚠ 資料可能過期':''}`:`手動輸入｜計算日期：${date}`;
-    return{source,target,date,contract,sourceLabel,targetLabel,edited,stale,text};
+    if((source||stockSource)&&date){
+        const dt=new Date(`${date}T00:00:00+08:00`),
+            today=new Date(new Date().toLocaleDateString('sv-SE',{timeZone:'Asia/Taipei'})+'T00:00:00+08:00');
+        stale=Number.isFinite(dt.getTime())&&((today-dt)/86400000)>5;
+    }
+    const text=source
+        ?`計算盤別：${targetLabel||'-'}｜資料來源：${sourceLabel}｜日期：${date}${contract?`｜近月合約：${contract}`:''}${edited?'｜已手動調整':''}${stale?'｜⚠ 資料可能過期':''}`
+        :stockSource
+            ?`個股行情｜資料來源：${stockSource}｜日期：${date}${edited?'｜已手動調整':''}${stale?'｜⚠ 資料可能過期':''}`
+            :`手動輸入｜計算日期：${date}`;
+    return{source,target,stockSource,date,contract,sourceLabel,targetLabel,edited,stale,text};
 };
 const buildCalcConfluences=(levels,close,isTX)=>{
     const tolerance=isTX?20:Math.max(Math.abs(close)*0.002,0.01),clusters=[];
@@ -6888,7 +6907,7 @@ const calculateSupportPressure=(silent=false)=>{
     return true;
 };
 document.getElementById('calc-form')?.addEventListener('submit',e=>{e.preventDefault();calculateSupportPressure(false);});
-['c-high','c-low','c-close'].forEach(id=>document.getElementById(id)?.addEventListener('input',()=>{const form=document.getElementById('calc-form');if(form?.dataset.marketSourceSession)form.dataset.marketEdited='true';calculateSupportPressure(true);}));
+['c-high','c-low','c-close'].forEach(id=>document.getElementById(id)?.addEventListener('input',()=>{const form=document.getElementById('calc-form');if(form?.dataset.marketSourceSession||form?.dataset.stockSource)form.dataset.marketEdited='true';calculateSupportPressure(true);}));
 
 const getCalcText=t=>{
     if(document.getElementById('cdp-cdp').textContent==='-')return null;
@@ -6908,15 +6927,16 @@ const getCalcText=t=>{
     if(t==='all')return`【計算結果】${s?' '+s:''}\n高:${document.getElementById('c-high').value} 低:${document.getElementById('c-low').value} 收:${document.getElementById('c-close').value}\n\n${tC}\n\n${tP}\n\n${tG}\n\n${tFib}`;
 };
 
-const clearCalcMarketContext=()=>{const f=document.getElementById('calc-form');if(!f)return;delete f.dataset.marketSession;delete f.dataset.marketSourceSession;delete f.dataset.marketDate;delete f.dataset.marketContract;delete f.dataset.marketEdited;window.__marketSourceSession=null;window.__marketTargetSession=null;window.__marketSourceDate='';};
+const clearCalcMarketContext=()=>{const f=document.getElementById('calc-form');if(!f)return;delete f.dataset.marketSession;delete f.dataset.marketSourceSession;delete f.dataset.marketDate;delete f.dataset.marketContract;delete f.dataset.marketDataSource;delete f.dataset.stockSource;delete f.dataset.marketEdited;window.__marketSourceSession=null;window.__marketTargetSession=null;window.__marketSourceDate='';};
 document.getElementById('c-code')?.addEventListener('input',()=>{const code=document.getElementById('c-code').value.trim().toUpperCase();if(code!=='TX'&&code!=='TX00')clearCalcMarketContext();calculateSupportPressure(true);});
 document.getElementById('c-name')?.addEventListener('input',()=>{if(!document.getElementById('c-name').value.includes('臺指期'))clearCalcMarketContext();calculateSupportPressure(true);});
 document.querySelectorAll('.btn-copy-calc').forEach(b=>b.addEventListener('click',e=>{const t=getCalcText(e.currentTarget.dataset.target);t?executeCopy(t+copyFootnote):showToast('請先計算','error');}));
 const getCalcCopyIntro=()=>{
-    const instrument=getCalcInstrument(),context=getCalcDataContext(),form=document.getElementById('calc-form'),session=instrument.isTX?(form.dataset.marketSession||''):'',sessionText=session==='day'?'日盤':session==='night'?'夜盤':'',date=(instrument.isTX&&form.dataset.marketDate)?form.dataset.marketDate:new Date().toLocaleDateString('sv-SE',{timeZone:'Asia/Taipei'}),stock=(instrument.code||instrument.name)?`${instrument.code}${instrument.code&&instrument.name?' / ':''}${instrument.name}`:'';
+    const instrument=getCalcInstrument(),context=getCalcDataContext(),form=document.getElementById('calc-form'),session=instrument.isTX?(form.dataset.marketSession||''):'',sessionText=session==='day'?'日盤':session==='night'?'夜盤':'',date=form.dataset.marketDate||new Date().toLocaleDateString('sv-SE',{timeZone:'Asia/Taipei'}),stock=(instrument.code||instrument.name)?`${instrument.code}${instrument.code&&instrument.name?' / ':''}${instrument.name}`:'';
     const h=parseFloat(document.getElementById('c-high').value),l=parseFloat(document.getElementById('c-low').value),c=parseFloat(document.getElementById('c-close').value),fmt=v=>Number.isFinite(v)?formatCalcPrice(v,instrument.isTX):'-';
     let text=`[${date}]${sessionText?' ['+sessionText+']':''} 支撐壓力\n${stock?`${stock}\n`:''}高:${fmt(h)} 低:${fmt(l)} 收:${fmt(c)}`;
     if(context.source)text+=`\n資料：${context.sourceLabel}${context.contract?' / '+context.contract:''}${context.edited?' / 已手動調整':''}${context.stale?' / ⚠ 可能過期':''}`;
+    else if(context.stockSource)text+=`\n資料：${context.stockSource}${context.edited?' / 已手動調整':''}${context.stale?' / ⚠ 可能過期':''}`;
     return{text,instrument,context};
 };
 document.getElementById('btn-copy-calc-compact')?.addEventListener('click',()=>{
@@ -7537,146 +7557,596 @@ setChkDirection('long');
 <script id="market-index-module">
 (function(){
   'use strict';
+
   const btn=document.getElementById('btn-load-market-index');
-  if(!btn) return;
+  if(!btn)return;
+
   const menu=document.getElementById('market-session-menu');
   const status=document.getElementById('market-index-status');
   const $=id=>document.getElementById(id);
 
-  window.__marketSourceSession = window.__marketSourceSession || null;
-window.__marketSourceDate = window.__marketSourceDate || '';
-const SESSION={
+  window.__marketSourceSession=window.__marketSourceSession||null;
+  window.__marketSourceDate=window.__marketSourceDate||'';
+
+  const TAIFEX_OPENAPI='https://openapi.taifex.com.tw/v1/DailyMarketReportFut';
+
+  const SESSION={
     day:{
       label:'日盤',
+      apiSession:'一般',
       name:'臺指期(近月)',
-      official:'https://www.taifex.com.tw/cht/3/futDailyMarketExcel?commodity_id=TX',
-      proxy:'https://r.jina.ai/https://www.taifex.com.tw/cht/3/futDailyMarketExcel?commodity_id=TX'
+      official:'https://www.taifex.com.tw/cht/3/futDailyMarketReport?commodity_id=TX',
+      legacy:'https://www.taifex.com.tw/cht/3/futDailyMarketExcel?commodity_id=TX'
     },
     night:{
       label:'夜盤',
+      apiSession:'盤後',
       name:'臺指期(近月)',
-      official:'https://www.taifex.com.tw/cht/3/futDailyMarketExcel?marketCode=1&commodity_id=TX',
-      proxy:'https://r.jina.ai/https://www.taifex.com.tw/cht/3/futDailyMarketExcel?marketCode=1&commodity_id=TX'
+      official:'https://www.taifex.com.tw/cht/3/futDailyMarketReport?marketCode=1&commodity_id=TX',
+      legacy:'https://www.taifex.com.tw/cht/3/futDailyMarketExcel?marketCode=1&commodity_id=TX'
     }
   };
 
-  const setStatus=(t,ok=false)=>{
-    if(status){
-      status.textContent=t;
-      status.className='text-xs '+(ok?'text-emerald-600 dark:text-emerald-400':'text-gray-500 dark:text-gray-400');
-    }
+  const setStatus=(text,ok=false,error=false)=>{
+    if(!status)return;
+    status.textContent=text;
+    status.className='text-xs '+(
+      error
+        ?'text-red-600 dark:text-red-400'
+        :ok
+          ?'text-emerald-600 dark:text-emerald-400'
+          :'text-gray-500 dark:text-gray-400'
+    );
   };
 
-  function setBusy(b,session){
-    btn.disabled=b;
-    btn.classList.toggle('opacity-60',b);
-    btn.innerHTML=b
-      ? `<i class="fa-solid fa-spinner fa-spin"></i> 取得${SESSION[session]?.label||''}資料中…`
-      : '<i class="fa-solid fa-chart-line"></i> 帶入大盤資訊 <i class="fa-solid fa-chevron-down text-[10px] opacity-80"></i>';
-  }
+  const setBusy=(busy,targetSession)=>{
+    btn.disabled=busy;
+    btn.classList.toggle('opacity-60',busy);
+    btn.innerHTML=busy
+      ?`<i class="fa-solid fa-spinner fa-spin"></i> 取得${SESSION[targetSession]?.label||''}資料中…`
+      :'<i class="fa-solid fa-chart-line"></i> 帶入大盤資訊 <i class="fa-solid fa-chevron-down text-[10px] opacity-80"></i>';
+  };
 
-  function fill(data,sourceSession,targetSession){
-    const cfg=SESSION[sourceSession];
+  const numberValue=value=>{
+    if(value===null||value===undefined)return null;
+    const raw=String(value).replace(/,/g,'').trim();
+    if(!raw||['-','--','—','NULL','null','N/A'].includes(raw))return null;
+    const n=Number(raw.replace(/[^0-9.\-]/g,''));
+    return Number.isFinite(n)?n:null;
+  };
+
+  const normalizeSession=value=>{
+    const raw=String(value||'').trim();
+    if(raw==='一般'||/一般|regular|day/i.test(raw))return'day';
+    if(raw==='盤後'||/盤後|after|night/i.test(raw))return'night';
+    return'';
+  };
+
+  const normalizeContract=value=>String(value||'').trim();
+
+  // TAIFEX OpenAPI：只取 TX、指定盤別、最近月份的非價差合約。
+  const parseOpenApi=(rows,sourceSession)=>{
+    if(!Array.isArray(rows))return null;
+
+    const candidates=rows.map(row=>{
+      const contract=String(row?.Contract||row?.contract||'').trim();
+      const contractMonth=normalizeContract(
+        row?.['ContractMonth(Week)'] ??
+        row?.ContractMonthWeek ??
+        row?.contractMonth ??
+        ''
+      );
+      const session=normalizeSession(row?.TradingSession ?? row?.tradingSession);
+      const high=numberValue(row?.High);
+      const low=numberValue(row?.Low);
+      const close=numberValue(row?.Last ?? row?.Close);
+      const date=normalizeMarketDataDate(row?.Date);
+      const volume=numberValue(row?.Volume)||0;
+
+      return{
+        contract,
+        contractMonth,
+        session,
+        high,
+        low,
+        close,
+        date,
+        volume
+      };
+    }).filter(item=>
+      item.contract==='TX' &&
+      item.session===sourceSession &&
+      /^\d{6}$/.test(item.contractMonth) &&
+      Number.isFinite(item.high) &&
+      Number.isFinite(item.low) &&
+      Number.isFinite(item.close) &&
+      item.high>0 &&
+      item.low>0 &&
+      item.close>0
+    );
+
+    if(!candidates.length)return null;
+
+    // API 可能同時含多日期；先取最新交易日，再取最近月。
+    const latestDate=candidates.map(x=>x.date).filter(Boolean).sort().reverse()[0]||'';
+    const sameDate=latestDate
+      ?candidates.filter(x=>x.date===latestDate)
+      :candidates;
+
+    sameDate.sort((a,b)=>{
+      const monthCompare=a.contractMonth.localeCompare(b.contractMonth,'en',{numeric:true});
+      if(monthCompare!==0)return monthCompare;
+      return b.volume-a.volume;
+    });
+
+    const best=sameDate[0];
+    return{
+      contract:best.contractMonth,
+      high:best.high,
+      low:best.low,
+      close:best.close,
+      date:best.date,
+      session:sourceSession,
+      source:'TAIFEX OpenAPI'
+    };
+  };
+
+  // 舊 HTML/Jina 格式只當最後備援。
+  const parseLegacyText=(text,sourceSession)=>{
+    const lines=String(text||'').split(/\r?\n/);
+
+    for(const line of lines){
+      if(!/\|\s*TX\s*\|/.test(line))continue;
+
+      const raw=line.split('|');
+      const cells=raw.map(x=>x.trim()).filter((x,i,a)=>!(i===0||i===a.length-1));
+      if(cells.length<6)continue;
+
+      const contract=String(cells[1]||'').trim();
+      if(!/^\d{6}$/.test(contract))continue;
+
+      const high=numberValue(cells[3]);
+      const low=numberValue(cells[4]);
+      const close=numberValue(cells[5]);
+
+      if(!Number.isFinite(high)||!Number.isFinite(low)||!Number.isFinite(close))continue;
+
+      const dm=String(text||'').match(/日期[：:]\s*([0-9]{4}[\/\-][0-9]{1,2}[\/\-][0-9]{1,2})/);
+      const date=dm?dm[1].replace(/\//g,'-'):'';
+
+      return{
+        contract,
+        high,
+        low,
+        close,
+        date,
+        session:sourceSession,
+        source:'TAIFEX 網頁備援'
+      };
+    }
+
+    return null;
+  };
+
+  const fill=(data,sourceSession,targetSession)=>{
+    const sourceCfg=SESSION[sourceSession];
+    const targetCfg=SESSION[targetSession];
+
     window.__marketSourceSession=sourceSession;
     window.__marketTargetSession=targetSession;
     window.__marketSourceDate=data.date||'';
+
     $('c-code').value='TX00';
     $('c-name').value='臺指期(近月)';
     $('c-high').value=data.high;
     $('c-low').value=data.low;
     $('c-close').value=data.close;
+
     const form=$('calc-form');
-    // 複製抬頭使用使用者實際點選的目標盤別；行情來源另外保存。
     form.dataset.marketSession=targetSession;
     form.dataset.marketSourceSession=sourceSession;
     form.dataset.marketDate=data.date||new Date().toLocaleDateString('sv-SE',{timeZone:'Asia/Taipei'});
     form.dataset.marketContract=data.contract||'';
+    form.dataset.marketDataSource=data.source||'TAIFEX';
+    delete form.dataset.stockSource;
     delete form.dataset.marketEdited;
-    const targetLabel=SESSION[targetSession]?.label||'';
-    setStatus(`${targetLabel}支撐壓力｜使用${cfg.label}數據｜${data.date||'最近交易日'}｜TX ${data.contract||''}｜最高 ${data.high} / 最低 ${data.low} / 收盤 ${data.close}`,true);
-    form.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}));
-  }
 
-  function parse(text,session){
-    const lines=text.split(/\r?\n/);
-    for(const line of lines){
-      if(!/\|\s*TX\s*\|/.test(line)) continue;
-      const raw=line.split('|');
-      const cells=raw.map(x=>x.trim()).filter((x,i,a)=>!(i===0||i===a.length-1));
-      if(cells.length<6) continue;
-      const contract=cells[1]||'';
-      if(contract.includes('/')) continue;
-      const high=parseFloat(String(cells[3]).replace(/,/g,''));
-      const low=parseFloat(String(cells[4]).replace(/,/g,''));
-      const close=parseFloat(String(cells[5]).replace(/[^0-9.\-]/g,''));
-      if(contract && Number.isFinite(high)&&Number.isFinite(low)&&Number.isFinite(close)){
-        const dm=text.match(/日期：\s*([0-9]{4}[\/\-][0-9]{1,2}[\/\-][0-9]{1,2})/);
-        const date=dm?dm[1].replace(/\//g,'-'):'';
-        return {contract,high,low,close,date,session};
+    setStatus(
+      `${targetCfg.label}支撐壓力｜使用${sourceCfg.label}數據｜${data.date||'最近交易日'}｜TX ${data.contract||''}｜高 ${data.high} / 低 ${data.low} / 收 ${data.close}`,
+      true
+    );
+
+    form.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}));
+  };
+
+  const loadOpenApi=async sourceSession=>{
+    const payload=await fetchPublicJsonWithCorsFallback(TAIFEX_OPENAPI,16000);
+    return parseOpenApi(payload,sourceSession);
+  };
+
+  const loadLegacy=async sourceSession=>{
+    const cfg=SESSION[sourceSession];
+
+    // 先用文字代理讀 TAIFEX 報表頁，避免 Excel 下載端點直接回傳二進位檔。
+    const candidates=[
+      `https://r.jina.ai/${cfg.official}`,
+      `https://r.jina.ai/${cfg.legacy}`
+    ];
+
+    let lastError=null;
+    for(const url of candidates){
+      try{
+        const response=await fetch(url,{cache:'no-store'});
+        if(!response.ok)throw new Error(`HTTP ${response.status}`);
+        const text=await response.text();
+        const parsed=parseLegacyText(text,sourceSession);
+        if(parsed)return parsed;
+      }catch(error){
+        lastError=error;
       }
     }
+    if(lastError)throw lastError;
     return null;
-  }
+  };
 
-  async function load(session){
-    const targetSession=session;
-    const sourceSession=session==='night'?'day':'night';
-    window.__marketTargetSession=targetSession;
-    const cfg=SESSION[sourceSession];
+  const load=async targetSession=>{
+    const sourceSession=targetSession==='night'?'day':'night';
+    const sourceCfg=SESSION[sourceSession];
     const targetCfg=SESSION[targetSession];
-    if(!cfg||!targetCfg) return;
+
+    if(!sourceCfg||!targetCfg)return;
+
+    window.__marketTargetSession=targetSession;
     menu?.classList.add('hidden');
     setBusy(true,targetSession);
-    setStatus(`正在讀取 ${cfg.label}數據，計算 ${targetCfg.label}支撐壓力…`);
+    setStatus(`正在讀取 TAIFEX ${sourceCfg.label}最新行情，計算 ${targetCfg.label}支撐壓力…`);
+
     try{
-      let text='';
+      let data=null;
+      let apiError=null;
+
       try{
-        const r=await fetch(cfg.proxy,{cache:'no-store'});
-        if(!r.ok) throw new Error('proxy '+r.status);
-        text=await r.text();
-      }catch(e){
-        const r=await fetch(cfg.official,{cache:'no-store'});
-        if(!r.ok) throw new Error('TAIFEX '+r.status);
-        text=await r.text();
+        data=await loadOpenApi(sourceSession);
+      }catch(error){
+        apiError=error;
       }
-      const data=parse(text,sourceSession);
-      if(!data) throw new Error(`找不到 TX ${cfg.label}近月行情`);
+
+      if(!data){
+        setStatus(`TAIFEX OpenAPI 暫未取得 ${sourceCfg.label}，改用網頁備援…`);
+        try{
+          data=await loadLegacy(sourceSession);
+        }catch(error){
+          if(!apiError)apiError=error;
+        }
+      }
+
+      if(!data){
+        throw apiError||new Error(`找不到 TX ${sourceCfg.label}近月行情`);
+      }
+
       fill(data,sourceSession,targetSession);
-      if(window.showUXToast) window.showUXToast(`${targetCfg.label}支撐壓力已使用${cfg.label}數據完成計算`);
-    }catch(e){
-      console.error(e);
-      setStatus(`無法自動取得 TX ${cfg.label}行情；無法計算${targetCfg.label}支撐壓力。`);
-      if(window.showUXToast) window.showUXToast(`取得${cfg.label}資料失敗`);
-      let a=document.getElementById('market-index-source-link');
-      if(!a){
-        a=document.createElement('a');
-        a.id='market-index-source-link';
-        a.target='_blank';
-        a.rel='noopener';
-        a.className='market-index-source text-sky-600 dark:text-sky-400 underline ml-1';
-        a.textContent='開啟期交所行情';
-        status&&status.appendChild(a);
+      if(window.showUXToast){
+        window.showUXToast(`${targetCfg.label}支撐壓力已帶入 ${sourceCfg.label} 最新數據`);
+      }else if(window.showToast){
+        showToast(`${targetCfg.label}支撐壓力已帶入 ${sourceCfg.label} 最新數據`);
       }
-      a.href=cfg.official;
+
+    }catch(error){
+      console.error('帶入大盤資訊失敗',error);
+      setStatus(
+        `大盤帶入失敗：目前無法取得 TX ${sourceCfg.label}行情。`,
+        false,
+        true
+      );
+
+      if(window.showUXToast)window.showUXToast(`取得${sourceCfg.label}資料失敗`);
+      else if(window.showToast)showToast(`取得${sourceCfg.label}資料失敗`,'error');
+
+      let link=document.getElementById('market-index-source-link');
+      if(!link){
+        link=document.createElement('a');
+        link.id='market-index-source-link';
+        link.target='_blank';
+        link.rel='noopener';
+        link.className='market-index-source text-sky-600 dark:text-sky-400 underline ml-1';
+        link.textContent='開啟期交所行情';
+        status?.appendChild(link);
+      }
+      link.href=sourceCfg.official;
     }finally{
       setBusy(false,targetSession);
     }
-  }
+  };
 
-  btn.addEventListener('click',(e)=>{
-    e.stopPropagation();
+  btn.addEventListener('click',event=>{
+    event.stopPropagation();
     menu?.classList.toggle('hidden');
   });
 
-  menu?.addEventListener('click',(e)=>{
-    const item=e.target.closest('[data-market-session]');
-    if(!item) return;
+  menu?.addEventListener('click',event=>{
+    const item=event.target.closest('[data-market-session]');
+    if(!item)return;
     load(item.dataset.marketSession);
   });
 
-  document.addEventListener('click',(e)=>{
-    if(!e.target.closest('#btn-load-market-index')&&!e.target.closest('#market-session-menu')){
+  document.addEventListener('click',event=>{
+    if(!event.target.closest('#btn-load-market-index')&&!event.target.closest('#market-session-menu')){
       menu?.classList.add('hidden');
+    }
+  });
+})();
+</script>
+<script id="support-stock-info-v264">
+(function(){
+  'use strict';
+
+  const button=document.getElementById('btn-load-stock-info');
+  if(!button)return;
+
+  const status=document.getElementById('stock-info-status');
+  const $=id=>document.getElementById(id);
+
+  const setStatus=(text,ok=false,error=false)=>{
+    if(!status)return;
+    status.textContent=text;
+    status.className='text-xs '+(
+      error
+        ?'text-red-600 dark:text-red-400'
+        :ok
+          ?'text-emerald-600 dark:text-emerald-400'
+          :'text-gray-500 dark:text-gray-400'
+    );
+  };
+
+  const setBusy=busy=>{
+    button.disabled=busy;
+    button.innerHTML=busy
+      ?'<i class="fa-solid fa-spinner fa-spin"></i> 取得個股行情中…'
+      :'<i class="fa-solid fa-arrow-trend-up"></i> 帶入個股資訊';
+  };
+
+  const num=value=>{
+    if(value===null||value===undefined)return null;
+    const raw=String(value).replace(/,/g,'').trim();
+    if(!raw||['-','--','—','X','NULL','null'].includes(raw))return null;
+    const n=Number(raw);
+    return Number.isFinite(n)&&n>0?n:null;
+  };
+
+  const validBar=bar=>
+    bar &&
+    Number.isFinite(bar.high) &&
+    Number.isFinite(bar.low) &&
+    Number.isFinite(bar.close) &&
+    bar.high>0 &&
+    bar.low>0 &&
+    bar.close>0;
+
+  const parseTwse=(rows,code)=>{
+    if(!Array.isArray(rows))return null;
+    const row=rows.find(item=>String(item?.Code||'').trim()===code);
+    if(!row)return null;
+
+    const bar={
+      code,
+      name:String(row?.Name||'').trim(),
+      high:num(row?.HighestPrice),
+      low:num(row?.LowestPrice),
+      close:num(row?.ClosingPrice),
+      date:normalizeMarketDataDate(row?.Date),
+      source:'TWSE OpenAPI'
+    };
+    return validBar(bar)?bar:null;
+  };
+
+  const parseTpex=(rows,code)=>{
+    if(!Array.isArray(rows))return null;
+    const row=rows.find(item=>String(item?.SecuritiesCompanyCode||item?.Code||'').trim()===code);
+    if(!row)return null;
+
+    const bar={
+      code,
+      name:String(
+        row?.CompanyName ??
+        row?.SecuritiesCompanyName ??
+        row?.Name ??
+        ''
+      ).trim(),
+      high:num(row?.High ?? row?.HighestPrice ?? row?.Highest),
+      low:num(row?.Low ?? row?.LowestPrice ?? row?.Lowest),
+      close:num(row?.Close ?? row?.ClosingPrice),
+      date:normalizeMarketDataDate(row?.Date),
+      source:'TPEx OpenAPI'
+    };
+    return validBar(bar)?bar:null;
+  };
+
+  const fetchOfficial=async code=>{
+    const results=await Promise.allSettled([
+      fetchPublicJsonWithCorsFallback(
+        'https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL',
+        15000
+      ),
+      fetchPublicJsonWithCorsFallback(
+        'https://www.tpex.org.tw/openapi/v1/tpex_mainboard_daily_close_quotes',
+        15000
+      )
+    ]);
+
+    if(results[0].status==='fulfilled'){
+      const twse=parseTwse(results[0].value,code);
+      if(twse)return twse;
+    }
+
+    if(results[1].status==='fulfilled'){
+      const tpex=parseTpex(results[1].value,code);
+      if(tpex)return tpex;
+    }
+
+    return null;
+  };
+
+  const fetchYahooBar=async code=>{
+    for(const suffix of ['.TW','.TWO']){
+      try{
+        const url=`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(code+suffix)}?range=14d&interval=1d&includePrePost=false`;
+        const data=await fetchJsonWithTimeout(url,10000);
+        const result=data?.chart?.result?.[0];
+        if(!result)continue;
+
+        const quote=result.indicators?.quote?.[0]||{};
+        const highs=quote.high||[];
+        const lows=quote.low||[];
+        const closes=quote.close||[];
+        const timestamps=result.timestamp||[];
+
+        for(let i=Math.max(highs.length,lows.length,closes.length)-1;i>=0;i--){
+          const bar={
+            code,
+            name:'',
+            high:num(highs[i]),
+            low:num(lows[i]),
+            close:num(closes[i]),
+            date:formatYahooTimestampDate(timestamps[i]),
+            source:'Yahoo'
+          };
+          if(validBar(bar))return bar;
+        }
+      }catch(error){}
+    }
+    return null;
+  };
+
+  const fetchFinMindBar=async code=>{
+    const end=getToday();
+    const start=shiftIsoDate(end,-14);
+    const url=`https://api.finmindtrade.com/api/v4/data?dataset=TaiwanStockPrice&data_id=${encodeURIComponent(code)}&start_date=${encodeURIComponent(start)}&end_date=${encodeURIComponent(end)}`;
+
+    try{
+      const payload=await fetchPublicJsonWithCorsFallback(url,12000);
+      if(Number(payload?.status)!==200||!Array.isArray(payload?.data))return null;
+
+      const rows=payload.data
+        .filter(row=>String(row?.stock_id||'').trim()===code)
+        .sort((a,b)=>String(a?.date||'').localeCompare(String(b?.date||'')));
+
+      for(let i=rows.length-1;i>=0;i--){
+        const row=rows[i];
+        const bar={
+          code,
+          name:'',
+          high:num(row?.max ?? row?.high),
+          low:num(row?.min ?? row?.low),
+          close:num(row?.close),
+          date:String(row?.date||''),
+          source:'FinMind'
+        };
+        if(validBar(bar))return bar;
+      }
+    }catch(error){}
+
+    return null;
+  };
+
+  const fillStock=bar=>{
+    const code=String(bar.code||'').trim();
+    const currentName=String($('c-name')?.value||'').trim();
+    const mappedName=state?.codeToName?.[code]||'';
+    const name=getCanonicalStockName(
+      code,
+      bar.name||mappedName||currentName
+    );
+
+    $('c-code').value=code;
+    $('c-name').value=name||currentName;
+    $('c-high').value=bar.high;
+    $('c-low').value=bar.low;
+    $('c-close').value=bar.close;
+
+    const form=$('calc-form');
+
+    // 個股不使用台指期日/夜盤上下文。
+    delete form.dataset.marketSession;
+    delete form.dataset.marketSourceSession;
+    delete form.dataset.marketContract;
+    delete form.dataset.marketEdited;
+
+    form.dataset.marketDate=bar.date||getToday();
+    form.dataset.stockSource=bar.source||'個股行情';
+
+    window.__marketSourceSession=null;
+    window.__marketTargetSession=null;
+    window.__marketSourceDate='';
+
+    setStatus(
+      `${code}${name?' '+name:''}｜${bar.date||'最近交易日'}｜高 ${bar.high} / 低 ${bar.low} / 收 ${bar.close}｜${bar.source}`,
+      true
+    );
+
+    form.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}));
+  };
+
+  const resolveCode=()=>{
+    let code=String($('c-code')?.value||'').trim().toUpperCase();
+    const name=String($('c-name')?.value||'').trim();
+
+    if((!code||code==='TX'||code==='TX00')&&name){
+      const mapped=state?.nameToCode?.[name];
+      if(mapped)code=String(mapped).trim().toUpperCase();
+    }
+
+    return code;
+  };
+
+  button.addEventListener('click',async()=>{
+    const code=resolveCode();
+
+    if(!code){
+      setStatus('請先輸入股票代號',false,true);
+      return showToast('請先輸入股票代號','error');
+    }
+
+    if(code==='TX'||code==='TX00'){
+      setStatus('臺指期請使用「帶入大盤資訊」',false,true);
+      return showToast('臺指期請使用「帶入大盤資訊」','error');
+    }
+
+    if(!/^\d{4,6}[A-Z]?$/.test(code)){
+      setStatus(`股票代號格式不正確：${code}`,false,true);
+      return showToast('股票代號格式不正確','error');
+    }
+
+    setBusy(true);
+    setStatus(`正在取得 ${code} 最近交易日行情…`);
+
+    try{
+      let bar=await fetchOfficial(code);
+
+      if(!bar){
+        setStatus(`官方行情暫未取得 ${code}，改用 Yahoo 備援…`);
+        bar=await fetchYahooBar(code);
+      }
+
+      if(!bar){
+        setStatus(`Yahoo 仍未取得 ${code}，改用 FinMind 備援…`);
+        bar=await fetchFinMindBar(code);
+      }
+
+      if(!bar)throw new Error('所有行情來源均未取得有效日線資料');
+
+      fillStock(bar);
+      showToast(`${code} 最新行情已帶入（${bar.date||'最近交易日'}）`);
+
+    }catch(error){
+      console.error('帶入個股資訊失敗',error);
+      setStatus(
+        `個股帶入失敗：${code} 無法取得最新行情`,
+        false,
+        true
+      );
+      showToast(`無法取得 ${code} 最新行情`,'error');
+    }finally{
+      setBusy(false);
     }
   });
 })();
