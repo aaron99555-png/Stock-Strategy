@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="269" name="app-version"/>
+<meta content="270" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -1882,6 +1882,50 @@ nav, .top-nav, .desktop-nav, .module-nav{
         padding-left:.35rem!important;
         padding-right:.35rem!important;
     }
+}
+</style>
+
+
+<style id="copy-small-label-mobile-wrap-v270">
+@media (max-width: 640px){
+  :is(#module-journal,#module-favorites,#mobile-action-sheet-body) .copy-small-label-controls{
+    display:flex !important;
+    flex-wrap:wrap !important;
+    align-items:flex-start !important;
+    width:100% !important;
+    min-width:0 !important;
+    max-width:100% !important;
+    gap:.35rem .55rem !important;
+    padding:.45rem .55rem !important;
+    overflow:visible !important;
+  }
+
+  :is(#module-journal,#module-favorites,#mobile-action-sheet-body) .copy-small-label-controls > span:first-child{
+    flex:0 0 100% !important;
+    width:100% !important;
+    margin:0 0 .1rem 0 !important;
+    white-space:normal !important;
+    line-height:1.25 !important;
+  }
+
+  :is(#module-journal,#module-favorites,#mobile-action-sheet-body) .copy-small-label-controls label{
+    display:inline-flex !important;
+    align-items:center !important;
+    flex:0 1 auto !important;
+    min-width:0 !important;
+    max-width:100% !important;
+    white-space:nowrap !important;
+    padding:2px 4px !important;
+  }
+
+  :is(#module-journal,#module-favorites,#mobile-action-sheet-body) .copy-small-label-controls label span{
+    font-size:10px !important;
+    line-height:1.2 !important;
+  }
+
+  :is(#module-journal,#module-favorites,#mobile-action-sheet-body) .copy-toolbar{
+    overflow:visible !important;
+  }
 }
 </style>
 
