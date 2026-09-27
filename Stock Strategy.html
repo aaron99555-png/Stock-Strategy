@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="271" name="app-version"/>
+<meta content="272" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -145,7 +145,7 @@ html.viewer-mode [data-batch-delete-type],
 html.viewer-mode [id^="batch-bar-"],
 html.viewer-mode [data-tag-action="delete"],
 html.viewer-mode #streak-holiday-controls,
-html.viewer-mode #streak-clear-holidays-btn,
+html.viewer-mode #streak-holiday-manager,
 html.viewer-mode [data-remove-holiday],
 html.viewer-mode #btn-tag-manager,
 html.viewer-mode #btn-trash-manager,
@@ -2126,7 +2126,7 @@ nav, .top-nav, .desktop-nav, .module-nav{
 <p class="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 lg:max-w-xs" id="streak-mode-description">連續模式會找出最近 N 個有效交易日每天都有訊號的股票；週末及休市日不計入。</p>
 <form action="javascript:void(0);" class="grid grid-cols-12 gap-2 w-full lg:flex-1" id="streak-search-form">
 <div class="col-span-6 sm:col-span-4 lg:col-span-2"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">基準日</label><input class="input-base text-center" id="streak-base-date" type="date"/></div>
-<div class="col-span-6 sm:col-span-4 lg:col-span-2" id="streak-holiday-controls"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium"><i class="fa-solid fa-calendar-xmark mr-1 text-amber-500"></i>自訂休市日</label><div class="flex items-center gap-1.5"><input aria-label="自訂休市日期" class="input-base flex-1 min-w-0 text-center" id="streak-holiday-date" title="臨時休市可自行加入，計算時會強制略過" type="date"/><button aria-label="加入自訂休市日" class="shrink-0 w-[42px] h-[42px] rounded-lg bg-amber-500 hover:bg-amber-400 text-white text-sm font-bold transition active:scale-95" id="streak-add-holiday-btn" title="加入自訂休市日" type="button"><i class="fa-solid fa-plus"></i></button></div></div>
+<div class="col-span-6 sm:col-span-4 lg:col-span-2 flex items-end" id="streak-holiday-controls"><button aria-controls="streak-holiday-manager" aria-expanded="false" class="w-full h-[42px] rounded-lg border border-amber-300 dark:border-amber-700 bg-white dark:bg-gray-800 text-amber-700 dark:text-amber-300 text-xs sm:text-sm font-bold hover:bg-amber-50 dark:hover:bg-amber-900/30 transition shadow-sm active:scale-95" id="streak-holiday-toggle-btn" title="展開休市日設定" type="button"><i class="fa-solid fa-calendar-xmark mr-1.5"></i>休市日 <i class="fa-solid fa-chevron-down ml-1 text-[10px]" id="streak-holiday-toggle-icon"></i></button></div>
 <div class="col-span-6 sm:col-span-4 lg:col-span-2"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">判定方式</label><select class="input-base text-center" id="streak-mode"><option value="consecutive">N 日連續出現</option><option value="window">N 日內重複出現</option></select></div>
 <div class="col-span-6 sm:col-span-4 lg:col-span-1"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium" id="streak-day-count-label">連續日數</label><input aria-describedby="streak-mode-description" class="input-base text-center" id="streak-min-days" inputmode="numeric" max="60" min="2" step="1" type="number" value="2"/></div>
 <div class="hidden col-span-6 sm:col-span-4 lg:col-span-1" id="streak-min-occurrences-wrap"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">至少幾次</label><input aria-label="至少出現次數" class="input-base text-center" id="streak-min-occurrences" inputmode="numeric" max="2" min="2" step="1" type="number" value="2"/></div>
@@ -2179,10 +2179,19 @@ nav, .top-nav, .desktop-nav, .module-nav{
 <div class="col-span-6 sm:col-span-4 lg:col-span-2"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">最低強度</label><select class="input-base text-center text-xs" id="streak-min-strength"><option value="0">不限</option><option value="50">50分以上</option><option value="65">65分以上</option><option value="80">80分以上</option></select></div>
 <div class="col-span-6 sm:col-span-12 lg:col-span-4"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">快速條件</label><div class="grid grid-cols-3 gap-1.5"><button class="h-[42px] rounded-lg border border-violet-200 dark:border-violet-700 bg-white dark:bg-gray-800 text-[10px] sm:text-[11px] font-bold text-violet-700 dark:text-violet-300 hover:bg-violet-50 dark:hover:bg-violet-900/30 transition" data-streak-preset="consecutive-2" type="button">2日連續</button><button class="h-[42px] rounded-lg border border-violet-200 dark:border-violet-700 bg-white dark:bg-gray-800 text-[10px] sm:text-[11px] font-bold text-violet-700 dark:text-violet-300 hover:bg-violet-50 dark:hover:bg-violet-900/30 transition" data-streak-preset="window-5-3" type="button">5日3次</button><button class="h-[42px] rounded-lg border border-violet-200 dark:border-violet-700 bg-white dark:bg-gray-800 text-[10px] sm:text-[11px] font-bold text-violet-700 dark:text-violet-300 hover:bg-violet-50 dark:hover:bg-violet-900/30 transition" data-streak-preset="window-10-4" type="button">10日4次</button></div></div>
 </div>
-<div class="col-span-12 mt-1 pt-2 border-t border-violet-100 dark:border-violet-900/40 flex flex-col sm:flex-row sm:items-center gap-2">
-<span class="shrink-0 text-[10px] sm:text-xs font-bold text-gray-500 dark:text-gray-400">已設定休市日</span>
-<div aria-live="polite" class="flex flex-1 flex-wrap gap-2" id="streak-holiday-list"><span class="text-[11px] text-gray-400">尚未設定自訂休市日</span></div>
-<button class="hidden shrink-0 h-8 px-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-[11px] font-bold text-gray-500 dark:text-gray-300 hover:text-red-500 hover:border-red-300 transition active:scale-95" id="streak-clear-holidays-btn" type="button">清除全部</button>
+<div class="hidden col-span-12 mt-1 rounded-xl border border-amber-200 dark:border-amber-800/70 bg-amber-50/60 dark:bg-amber-900/10 p-3" id="streak-holiday-manager">
+<div class="flex items-center justify-between gap-2 mb-3">
+<div><div class="text-xs sm:text-sm font-black text-amber-700 dark:text-amber-300"><i class="fa-solid fa-calendar-xmark mr-1.5"></i>休市日設定</div><div class="mt-0.5 text-[10px] text-gray-500 dark:text-gray-400">按「還原預設」只會還原篩選條件，不會刪除已設定的休市日。</div></div>
+<button aria-label="收合休市日設定" class="w-8 h-8 shrink-0 rounded-lg bg-white dark:bg-gray-800 border border-amber-200 dark:border-amber-800 text-amber-600 dark:text-amber-300" id="streak-holiday-close-btn" type="button"><i class="fa-solid fa-xmark"></i></button>
+</div>
+<div class="flex flex-col sm:flex-row sm:items-end gap-2">
+<div class="flex-1"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">新增自訂休市日</label><input aria-label="自訂休市日期" class="input-base w-full text-center" id="streak-holiday-date" title="臨時休市可自行加入，計算時會強制略過" type="date"/></div>
+<button aria-label="加入自訂休市日" class="h-[42px] px-4 rounded-lg bg-amber-500 hover:bg-amber-400 text-white text-xs sm:text-sm font-bold transition active:scale-95" id="streak-add-holiday-btn" title="加入自訂休市日" type="button"><i class="fa-solid fa-plus mr-1"></i>加入</button>
+</div>
+<div class="mt-3 pt-3 border-t border-amber-200/70 dark:border-amber-800/60">
+<div class="mb-2 text-[10px] sm:text-xs font-bold text-gray-500 dark:text-gray-400">已設定休市日</div>
+<div aria-live="polite" class="flex flex-wrap gap-2" id="streak-holiday-list"><span class="text-[11px] text-gray-400">尚未設定自訂休市日</span></div>
+</div>
 </div>
 </form>
 </div>
@@ -5128,10 +5137,9 @@ const initStreakPanelToggle=()=>{
     if(pinned)setStreakPanelPinned(true,false);else{streakPanelPinned=false;updateStreakPinUI();setStreakPanelCollapsed(collapsed);}
 };
 const renderCustomMarketHolidays=()=>{
-    const root=document.getElementById('streak-holiday-list'),clearBtn=document.getElementById('streak-clear-holidays-btn');if(!root)return;
+    const root=document.getElementById('streak-holiday-list');if(!root)return;
     const holidays=normalizeCustomMarketHolidays(state.customMarketHolidays).sort().reverse();
-    if(clearBtn)clearBtn.classList.toggle('hidden',holidays.length===0);
-    root.innerHTML=holidays.length?holidays.map(date=>`<span class="inline-flex items-center gap-1.5 rounded-lg border border-amber-200 dark:border-amber-800/70 bg-amber-50 dark:bg-amber-900/20 px-2.5 py-1.5 text-[11px] font-bold text-amber-700 dark:text-amber-300"><i class="fa-solid fa-calendar-xmark"></i>${escapeHTML(date.replace(/-/g,'/'))}<button type="button" data-remove-holiday="${escapeHTML(date)}" aria-label="移除休市日 ${escapeHTML(date)}" class="ml-0.5 w-5 h-5 inline-flex items-center justify-center rounded-full hover:bg-amber-200 dark:hover:bg-amber-800/60 transition"><i class="fa-solid fa-xmark pointer-events-none"></i></button></span>`).join(''):'<span class="text-[11px] text-gray-400">尚未設定自訂休市日</span>';
+    root.innerHTML=holidays.length?holidays.map(date=>`<span class="inline-flex items-center gap-1.5 rounded-lg border border-amber-200 dark:border-amber-800/70 bg-white dark:bg-gray-800 px-2.5 py-1.5 text-[11px] font-bold text-amber-700 dark:text-amber-300"><i class="fa-solid fa-calendar-xmark"></i>${escapeHTML(date.replace(/-/g,'/'))}<button type="button" data-remove-holiday="${escapeHTML(date)}" aria-label="移除休市日 ${escapeHTML(date)}" class="ml-0.5 w-5 h-5 inline-flex items-center justify-center rounded-full hover:bg-amber-200 dark:hover:bg-amber-800/60 transition" title="移除此休市日"><i class="fa-solid fa-xmark pointer-events-none"></i></button></span>`).join(''):'<span class="text-[11px] text-gray-400">尚未設定自訂休市日</span>';
 };
 const persistCustomMarketHolidays=async()=>{
     state.customMarketHolidays=normalizeCustomMarketHolidays(state.customMarketHolidays);saveLocalData();renderCustomMarketHolidays();
@@ -5306,7 +5314,7 @@ function resetStreakFiltersToDefaults(options={}){
     const renderResults=options.renderResults!==false,notify=options.notify!==false,base=document.getElementById('streak-base-date'),mode=document.getElementById('streak-mode'),days=document.getElementById('streak-min-days'),occurrences=document.getElementById('streak-min-occurrences'),horseMode=document.getElementById('streak-horse-mode'),holidayInput=document.getElementById('streak-holiday-date'),tagMode=document.getElementById('streak-tag-filter-mode'),sort=document.getElementById('streak-result-sort'),heat=document.getElementById('streak-heat-filter'),strength=document.getElementById('streak-min-strength'),chipRadar=document.getElementById('streak-chipradar-filter');
     if(base){base.value='';initStreakBaseDate();}if(mode)mode.value='consecutive';if(days)days.value='2';if(occurrences){occurrences.value='2';occurrences.max='2';}if(horseMode)horseMode.value='ignoreTags';if(holidayInput)holidayInput.value='';if(tagMode)tagMode.value='all';if(sort)sort.value='latestDate';if(heat)heat.value='all';if(strength)strength.value='0';if(chipRadar)chipRadar.value='all';document.querySelectorAll('.streak-tag-cb').forEach(input=>input.checked=false);document.querySelectorAll('.streak-data-filter').forEach(input=>input.checked=false);document.getElementById('streak-tag-filter-details')?.removeAttribute('open');updateStreakModeUI();updateStreakTagFilterUI();
     if(renderResults)renderJournalStreaks();else{lastJournalStreakResult=null;const summary=document.getElementById('streak-summary'),stats=document.getElementById('streak-stats'),results=document.getElementById('streak-results'),copy=document.getElementById('streak-copy-btn');if(summary)summary.textContent='條件變更後會自動即時篩選。';if(stats){stats.innerHTML='';stats.classList.add('hidden');}if(results){results.innerHTML='';results.classList.add('hidden');}if(copy)copy.disabled=true;}
-    if(notify)showToast('策略訊號雷達已還原預設值');
+    if(notify)showToast('策略訊號雷達已還原預設值，休市日設定已保留');
 }
 
 const enumerateTradingDates=(baseDate,earliestDate,customHolidays)=>{
@@ -5830,11 +5838,21 @@ document.getElementById('streak-holiday-list')?.addEventListener('click',async e
     const date=button.dataset.removeHoliday;state.customMarketHolidays=(state.customMarketHolidays||[]).filter(item=>item!==date);
     await persistCustomMarketHolidays();renderJournalStreaks();showToast(`已移除休市日 ${date.replace(/-/g,'/')}`);
 });
-document.getElementById('streak-clear-holidays-btn')?.addEventListener('click',()=>{
-    if(!window.isAdminMode||!window.isAdminMode())return showToast('清除自訂休市日僅限管理者使用','error');
-    if(!(state.customMarketHolidays||[]).length)return;
-    window.openConfirmModal('確定要清除全部自訂休市日嗎？',async()=>{state.customMarketHolidays=[];await persistCustomMarketHolidays();renderJournalStreaks();showToast('已清除全部自訂休市日');});
+const setStreakHolidayManagerOpen=open=>{
+    const panel=document.getElementById('streak-holiday-manager'),
+        button=document.getElementById('streak-holiday-toggle-btn'),
+        icon=document.getElementById('streak-holiday-toggle-icon');
+    if(!panel||!button)return;
+    panel.classList.toggle('hidden',!open);
+    button.setAttribute('aria-expanded',String(!!open));
+    button.title=open?'收合休市日設定':'展開休市日設定';
+    if(icon)icon.style.transform=open?'rotate(180deg)':'';
+};
+document.getElementById('streak-holiday-toggle-btn')?.addEventListener('click',()=>{
+    const panel=document.getElementById('streak-holiday-manager');
+    setStreakHolidayManagerOpen(panel?.classList.contains('hidden'));
 });
+document.getElementById('streak-holiday-close-btn')?.addEventListener('click',()=>setStreakHolidayManagerOpen(false));
 document.getElementById('streak-toggle-btn')?.addEventListener('click',()=>{
     const content=document.getElementById('streak-filter-panel');if(!content)return;
     if(streakPanelPinned)return showToast('雷達篩選設定已釘選，請先取消釘選','error');
@@ -9818,7 +9836,7 @@ setChkDirection('long');
   document.addEventListener('click',function(event){
     var restrictedModule=event.target.closest('[data-target="module-plan"], [data-target="module-favorites"]');
     if(restrictedModule&&!adminMode){requireAdmin(event,'此模組僅限管理者查看');return;}
-    var restrictedAction=event.target.closest('#btn-journal-submit, #btn-revenue-submit, #btn-report-submit, [data-action="review-journal"], [data-action="add-plan"], [data-action="toggle-fav"], [data-streak-action="favorite"], [data-action="remove-tag"], [data-action="edit-notes"], [data-action="delete-journal"], [data-action="edit-report"], [data-action="delete-report"], [data-action="delete-revenue"], [data-batch-delete-type], [data-tag-action="delete"], #streak-holiday-date, #streak-add-holiday-btn, #streak-clear-holidays-btn, [data-remove-holiday], #btn-tag-manager, #btn-trash-manager, #btn-undo-import, #btn-db-upload, #btn-import-backup, #btn-export-backup');
+    var restrictedAction=event.target.closest('#btn-journal-submit, #btn-revenue-submit, #btn-report-submit, [data-action="review-journal"], [data-action="add-plan"], [data-action="toggle-fav"], [data-streak-action="favorite"], [data-action="remove-tag"], [data-action="edit-notes"], [data-action="delete-journal"], [data-action="edit-report"], [data-action="delete-report"], [data-action="delete-revenue"], [data-batch-delete-type], [data-tag-action="delete"], #streak-holiday-date, #streak-add-holiday-btn, [data-remove-holiday], #btn-tag-manager, #btn-trash-manager, #btn-undo-import, #btn-db-upload, #btn-import-backup, #btn-export-backup');
     if(restrictedAction&&!adminMode){requireAdmin(event,'此操作僅限管理者使用');return;}
   },true);
 
