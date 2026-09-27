@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="268" name="app-version"/>
+<meta content="269" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -7028,10 +7028,55 @@ document.querySelectorAll('.btn-copy').forEach(b=>{b.addEventListener('click',e=
             tx+=`[期] ${j.code} ${getStrategyCopyStockName(j,allDuplicateCodes)} [${j.totalScore}分]${tgArr.length>0?` ${tgArr.map(t=>t[0]).join('')}`:''}\n`;
         });
     }else if(m==='chip'){
-        const cd=d.filter(j=>j.tags&&j.tags.some(t=>t.includes('籌碼集中')));
+        // v269：籌碼集中複製改為依「策略數量」由多至少排序。
+        // 同一檔股票在目前篩選區間內只列一次，策略數採所有有效策略標籤去重後計算。
+        const chipMap=new Map();
+        d.forEach(j=>{
+            const rawTags=Array.isArray(j.tags)?j.tags:[],
+                chipTags=rawTags.filter(t=>String(t||'').includes('籌碼集中')).map(normalizeStrategyTagName).filter(Boolean);
+            if(!chipTags.length)return;
+
+            const code=String(j.code||'').trim();
+            if(!code)return;
+
+            const strategyTags=rawTags
+                .map(normalizeStrategyTagName)
+                .filter(t=>t&&!NON_STRATEGY_COPY_TAGS.has(t));
+
+            let item=chipMap.get(code);
+            if(!item){
+                item={...j,_chipTags:new Set(),_strategyTags:new Set()};
+                chipMap.set(code,item);
+            }else{
+                // 同股多筆資料時，以較新日期那筆作為顯示名稱／目標價／備註等基準。
+                if(String(j.date||'')>String(item.date||'')){
+                    const keepChipTags=item._chipTags,keepStrategyTags=item._strategyTags;
+                    item={...j,_chipTags:keepChipTags,_strategyTags:keepStrategyTags};
+                    chipMap.set(code,item);
+                }
+            }
+
+            chipTags.forEach(tag=>item._chipTags.add(tag));
+            strategyTags.forEach(tag=>item._strategyTags.add(tag));
+        });
+
+        const cd=[...chipMap.values()].sort((a,b)=>{
+            const countDiff=b._strategyTags.size-a._strategyTags.size;
+            if(countDiff!==0)return countDiff;
+
+            // 策略數相同時，優先放分數較高，再依股票代號排序。
+            const scoreDiff=Number(b.score||0)-Number(a.score||0);
+            if(scoreDiff!==0)return scoreDiff;
+            return String(a.code||'').localeCompare(String(b.code||''),'zh-Hant',{numeric:true});
+        });
+
         if(cd.length===0)return showToast('無籌碼集中標的','error');
+
         tx=`| ${ds} 籌碼集中漏斗 |\n\n`;
-        cd.forEach(j=>tx+=`${j.code} ${getStrategyCopyStockName(j,allDuplicateCodes)} [${orderTagsForCopy(j.tags.filter(t=>t.includes('籌碼集中')),cf.tags).join('+')}]\n`);
+        cd.forEach(j=>{
+            const chipTags=orderTagsForCopy([...j._chipTags],cf.tags);
+            tx+=`${j.code} ${getStrategyCopyStockName(j,allDuplicateCodes)} [${chipTags.join('+')}]\n`;
+        });
     }
     executeCopy(tx.trim()+copyFootnote);
 });});
