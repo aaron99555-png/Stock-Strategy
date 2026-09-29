@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="282" name="app-version"/>
+<meta content="284" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -2356,7 +2356,7 @@ nav, .top-nav, .desktop-nav, .module-nav{
 <button class="flex-shrink-0 btn-copy-base bg-rose-50 dark:bg-rose-900/40 hover:bg-rose-600 border-rose-200 dark:border-rose-700/50 text-rose-700 dark:text-rose-200 btn-copy" data-mode="feifan">非凡重點</button>
 </div>
 <div class="flex items-center gap-2 flex-wrap">
-<button class="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:text-gray-500 text-white px-3 py-1.5 text-xs sm:text-sm font-bold shadow-sm transition active:scale-95 disabled:cursor-wait" id="btn-update-journal-close-prices" title="更新最新一個策略日誌日期的股票，行情使用最近可取得的收盤價；更早歷史紀錄不變" type="button"><i class="fa-solid fa-arrows-rotate"></i><span>更新收盤價</span></button>
+<button class="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:text-gray-500 text-white px-3 py-1.5 text-xs sm:text-sm font-bold shadow-sm transition active:scale-95 disabled:cursor-wait" id="btn-update-journal-close-prices" title="開啟網頁時會自動更新；也可手動重新更新最新一個策略日誌日期的收盤價，更早歷史紀錄不變" type="button"><i class="fa-solid fa-arrows-rotate"></i><span>更新收盤價</span></button>
 <span class="hidden text-[10px] sm:text-xs text-gray-400 dark:text-gray-500 whitespace-nowrap cursor-help" id="journal-close-price-status" title="收盤價來源狀態"></span>
 </div>
 </div>
@@ -2380,7 +2380,7 @@ nav, .top-nav, .desktop-nav, .module-nav{
 <th class="py-3 px-2 sm:px-3 w-[95px] sticky left-[95px] top-0 bg-gray-50 dark:bg-gray-900 z-40 border-r border-gray-200 dark:border-gray-700 sortable cursor-pointer" data-module="journal" data-sort="code">代號/股名 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
 <th class="journal-close-price-col py-3 px-2 sm:px-3 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-module="journal" data-sort="closePrice" title="最新可取得的盤後收盤價">收盤價 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
 <th class="py-3 px-3 sm:px-4 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-module="journal" data-sort="targetPrice" title="法人／參考資料目標價">目標價 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
-<th class="journal-upside-col py-3 px-2 sm:px-3 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-module="journal" data-sort="potentialUpside" title="(目標價－收盤價) ÷ 收盤價">潛在漲幅 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+<th class="journal-upside-col py-3 px-2 sm:px-3 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-module="journal" data-sort="potentialUpside" title="潛在空間＝（目標價－收盤價）÷收盤價">潛在空間 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
 <th class="py-3 px-2 sm:px-3 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-module="journal" data-sort="eps2025">25 EPS <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
 <th class="py-3 px-2 sm:px-3 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-module="journal" data-sort="eps2026">26 EPS <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
 <th class="py-3 px-3 sm:px-4 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-module="journal" data-sort="epsGrowth">成長率 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
@@ -3280,7 +3280,7 @@ nav, .top-nav, .desktop-nav, .module-nav{
 4. 手機版操作按鈕分兩排
 5. 籌碼集中複製依策略數由多至少
 6. A/B/C/D 等級篩選、更新收盤價命名、移除顯示檔數格
-7. 目標價旁顯示潛在漲幅
+7. 目標價旁顯示潛在空間
 8. 手機標籤挑選彈窗、目標價移至收盤價右側
 9. 支撐壓力大盤帶入修正、個股最新收盤資料帶入
 10. 阿婆散步全面改名小碎步
@@ -3300,6 +3300,16 @@ nav, .top-nav, .desktop-nav, .module-nav{
 - resize / 主題切換批次更新
 - 非策略日誌頁面不額外重算 War Room / 訊號雷達視覺區
 所有 v280 既有功能完整保留。
+-->
+<!-- v283：
+- 開啟網頁並完成雲端同步後，自動更新一次收盤價（管理者模式）。
+- 按鈕固定顯示「更新收盤價」。
+- 更新提示文字統一使用「更新收盤價／收盤價」，不再以「最新收盤價」作為操作名稱。
+-->
+<!-- v284：
+- 策略日誌欄位順序固定為：收盤價 → 目標價 → 潛在空間。
+- 「潛在漲幅」改名為「潛在空間」。
+- 潛在空間公式： （目標價－收盤價）÷收盤價，畫面以百分比顯示。
 -->
 <!-- 核心 JavaScript -->
 <script>
@@ -4868,6 +4878,7 @@ const renderJournalDashboard=data=>{
     performanceRoot.classList.remove('hidden');performanceRoot.innerHTML=`<div class="flex items-center justify-between gap-2 mb-2"><span class="text-xs font-black text-emerald-700 dark:text-emerald-300"><i class="fa-solid fa-chart-column mr-1.5"></i>策略複盤績效</span><span class="text-[10px] text-gray-400">僅統計已判定成功／失敗</span></div><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1.5">${ranking.map(group=>{const rate=Math.round(group.wins/group.total*100),average=group.returns.length?group.returns.reduce((sum,value)=>sum+value,0)/group.returns.length:null;return`<div class="rounded-lg bg-white dark:bg-gray-900 border border-emerald-100 dark:border-emerald-900/70 px-2.5 py-2 text-xs"><div class="font-bold text-gray-700 dark:text-gray-200 truncate">${escapeHTML(group.tag)}</div><div class="mt-1 flex justify-between text-[10px] text-gray-500 dark:text-gray-400"><span>樣本 ${group.total}</span><span class="font-black text-emerald-600 dark:text-emerald-300">勝率 ${rate}%</span><span>${average===null?'無報酬':`均報 ${average>=0?'+':''}${average.toFixed(1)}%`}</span></div></div>`;}).join('')}</div>`;
 };
 
+// v284：潛在空間＝（目標價－收盤價）÷收盤價，畫面以百分比顯示。
 const getPotentialUpsidePercent=(targetPrice,closePrice)=>{
     const target=Number(targetPrice),close=Number(closePrice);
     if(!Number.isFinite(target)||target<=0||!Number.isFinite(close)||close<=0)return null;
@@ -5237,8 +5248,12 @@ const fetchLatestClosePriceMap=async(codes,statusEl)=>{
     return{map:result,diagnostics};
 };
 
-const updateJournalClosePrices=async()=>{
-    if(!window.isAdminMode||!window.isAdminMode())return showToast('更新收盤價僅限管理者使用','error');
+const updateJournalClosePrices=async(options={})=>{
+    const auto=options?.auto===true,silent=options?.silent===true;
+    if(!window.isAdminMode||!window.isAdminMode()){
+        if(!auto)showToast('更新收盤價僅限管理者使用','error');
+        return false;
+    }
 
     const button=document.getElementById('btn-update-journal-close-prices');
     const status=document.getElementById('journal-close-price-status');
@@ -5253,8 +5268,14 @@ const updateJournalClosePrices=async()=>{
     const latestRows=latestJournalDate?eligibleRows.filter(item=>String(item.date)===latestJournalDate):[];
     const codes=[...new Set(latestRows.map(item=>String(item.code||'').trim()).filter(code=>code&&code!=='TX00'))];
 
-    if(!latestJournalDate||!latestRows.length)return showToast('目前沒有可更新的策略日誌紀錄','error');
-    if(!codes.length)return showToast(`最新紀錄 ${latestJournalDate.replace(/-/g,'/')} 沒有可更新的股票`,'error');
+    if(!latestJournalDate||!latestRows.length){
+        if(!silent)showToast('目前沒有可更新的策略日誌紀錄','error');
+        return false;
+    }
+    if(!codes.length){
+        if(!silent)showToast(`最新紀錄 ${latestJournalDate.replace(/-/g,'/')} 沒有可更新的股票`,'error');
+        return false;
+    }
 
     if(button){
         button.disabled=true;
@@ -5262,7 +5283,7 @@ const updateJournalClosePrices=async()=>{
     }
     if(status){
         status.classList.remove('hidden');
-        status.textContent=`最新紀錄 ${latestJournalDate.replace(/-/g,'/')}｜查詢 ${codes.length} 檔…`;
+        status.textContent=`${auto?'自動更新收盤價':'更新收盤價'}｜${latestJournalDate.replace(/-/g,'/')}｜查詢 ${codes.length} 檔…`;
     }
 
     try{
@@ -5304,15 +5325,16 @@ const updateJournalClosePrices=async()=>{
         if(!updatedCodes){
             if(status){
                 status.classList.remove('hidden');
-                status.textContent='行情來源未取得最新收盤價';
+                status.textContent='行情來源未取得收盤價';
                 status.title=`策略日誌日期：${latestJournalDate.replace(/-/g,'/')}｜${diagnostics.join('｜')}${failedCodes.length?`｜未取得：${failedCodes.join('、')}`:''}`;
             }
-            showToast(`${codes.length} 檔皆未取得最新收盤價，請查看更新狀態診斷`,'error');
+            if(!silent)showToast(`${codes.length} 檔皆未取得收盤價，請查看更新狀態診斷`,'error');
         }else if(failedCodes.length){
-            showToast(`最新收盤價已更新 ${updatedCodes} 檔，${failedCodes.length} 檔未取得：${failedCodes.join('、')}`,'error');
+            if(!silent)showToast(`收盤價已更新 ${updatedCodes} 檔，${failedCodes.length} 檔未取得：${failedCodes.join('、')}`,'error');
         }else{
-            showToast(`最新收盤價更新完成，共 ${updatedCodes} 檔${latestPriceDate?`（${latestPriceDate.replace(/-/g,'/')}）`:''}`);
+            if(!silent)showToast(`更新收盤價完成，共 ${updatedCodes} 檔${latestPriceDate?`（${latestPriceDate.replace(/-/g,'/')}）`:''}`);
         }
+        return updatedCodes>0;
     }catch(error){
         console.error('更新最新收盤價失敗',error);
         if(status){
@@ -5320,7 +5342,8 @@ const updateJournalClosePrices=async()=>{
             status.textContent='更新失敗';
             status.title=String(error?.message||error||'未知錯誤');
         }
-        showToast(`更新最新收盤價失敗：${error?.message||'來源無法連線'}`,'error');
+        if(!silent)showToast(`更新收盤價失敗：${error?.message||'來源無法連線'}`,'error');
+        return false;
     }finally{
         if(button){
             button.disabled=false;
@@ -5329,6 +5352,22 @@ const updateJournalClosePrices=async()=>{
     }
 };
 document.getElementById('btn-update-journal-close-prices')?.addEventListener('click',updateJournalClosePrices);
+
+// v283：開啟網頁完成雲端同步後，自動更新一次最新策略日誌日期的收盤價。
+// 僅在已登入管理者模式時執行，避免一般瀏覽模式改動資料。
+let journalClosePriceAutoUpdateStarted=false;
+const autoUpdateJournalClosePricesOnOpen=async()=>{
+    if(journalClosePriceAutoUpdateStarted)return false;
+    journalClosePriceAutoUpdateStarted=true;
+    if(!window.isAdminMode?.())return false;
+    const status=document.getElementById('journal-close-price-status');
+    if(status){
+        status.classList.remove('hidden');
+        status.textContent='開啟網頁｜準備更新收盤價…';
+        status.title='系統會在雲端資料同步完成後自動更新一次收盤價';
+    }
+    return updateJournalClosePrices({auto:true,silent:true});
+};
 
 function renderJournalPrimaryView(){refreshJournalInsightCache();const data=getFilteredAndSortedData(state.journals,state.filters,state.sortConfig);renderTableRows(data,'journal-table-body','journal-empty');renderJournalActiveFilterChips();renderJournalDashboard(data);return data;}
 function processAndRenderJournals(){
@@ -7802,6 +7841,8 @@ setChkDirection('long');
     });
 
     await performDirectCloudSync(false);
+    // v283：頁面開啟時自動更新一次收盤價；不需再手動按按鈕。
+    await autoUpdateJournalClosePricesOnOpen();
 });
 </script>
 <script id="responsive-module-optimization">
@@ -7817,7 +7858,7 @@ setChkDirection('long');
     'module-plan':[]
   };
   const mobileDetailColumns={
-    // v266 手機卡片第一層保留「收盤價＋目標價＋潛在漲幅」，方便直接比對。
+    // v266 手機卡片第一層保留「收盤價＋目標價＋潛在空間」，方便直接比對。
     // 25EPS、成長率、分數、備註收進「詳情」。
     'module-journal':[6,8,9,12],
     'module-favorites':[3,5,6,7],
@@ -7906,7 +7947,7 @@ setChkDirection('long');
     const labels=Array.from(table.querySelectorAll('thead th')).map((th,index)=>{
       if(index===0)return'選取';
       const raw=th.textContent.replace(/\s+/g,' ').trim();
-      const compactLabels={'26 EPS':'26EPS','25 EPS':'25EPS','營收／籌碼':'籌碼動能','策略標籤':'策略／強度','目標價':'目標價','潛在漲幅':'潛在漲幅','成長率':'EPS成長'};
+      const compactLabels={'26 EPS':'26EPS','25 EPS':'25EPS','營收／籌碼':'籌碼動能','策略標籤':'策略／強度','目標價':'目標價','潛在空間':'潛在空間','成長率':'EPS成長'};
       return compactLabels[raw]||raw;
     });
     table.querySelectorAll('tbody tr').forEach(row=>{
