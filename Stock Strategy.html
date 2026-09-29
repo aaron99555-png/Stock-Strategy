@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="281" name="app-version"/>
+<meta content="282" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -2016,6 +2016,16 @@ nav, .top-nav, .desktop-nav, .module-nav{
 }
 </style>
 
+
+<style id="streak-stock-search-v282">
+@media (max-width:640px){
+  #streak-stock-search{
+    height:42px!important;
+    font-size:13px!important;
+  }
+}
+</style>
+
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen flex flex-col antialiased">
 <nav class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-50 transition-colors duration-300">
@@ -2152,6 +2162,13 @@ nav, .top-nav, .desktop-nav, .module-nav{
 <p class="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 lg:max-w-xs" id="streak-mode-description">連續模式會找出最近 N 個有效交易日每天都有訊號的股票；週末及休市日不計入。</p>
 <form action="javascript:void(0);" class="grid grid-cols-12 gap-2 w-full lg:flex-1" id="streak-search-form">
 <div class="col-span-6 sm:col-span-4 lg:col-span-2"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">基準日</label><input class="input-base text-center" id="streak-base-date" type="date"/></div>
+<div class="col-span-6 sm:col-span-4 lg:col-span-2">
+<label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium"><i class="fa-solid fa-magnifying-glass mr-1 text-violet-500"></i>個股搜尋</label>
+<div class="relative">
+<input autocomplete="off" class="input-base !pr-9 text-center" id="streak-stock-search" placeholder="代號／股名" spellcheck="false" type="text"/>
+<button aria-label="清除個股搜尋" class="absolute right-1 top-1/2 -translate-y-1/2 w-7 h-7 rounded-md text-gray-400 hover:text-red-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition hidden" id="streak-stock-search-clear" title="清除個股搜尋" type="button"><i class="fa-solid fa-xmark"></i></button>
+</div>
+</div>
 <div class="col-span-6 sm:col-span-4 lg:col-span-2 flex items-end" id="streak-holiday-controls"><button aria-controls="streak-holiday-manager" aria-expanded="false" class="w-full h-[42px] rounded-lg border border-amber-300 dark:border-amber-700 bg-white dark:bg-gray-800 text-amber-700 dark:text-amber-300 text-xs sm:text-sm font-bold hover:bg-amber-50 dark:hover:bg-amber-900/30 transition shadow-sm active:scale-95" id="streak-holiday-toggle-btn" title="展開休市日設定" type="button"><i class="fa-solid fa-calendar-xmark mr-1.5"></i>休市日 <i class="fa-solid fa-chevron-down ml-1 text-[10px]" id="streak-holiday-toggle-icon"></i></button></div>
 <div class="col-span-6 sm:col-span-4 lg:col-span-2"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">判定方式</label><select class="input-base text-center" id="streak-mode"><option value="consecutive">N 日連續出現</option><option value="window">N 日內重複出現</option></select></div>
 <div class="col-span-6 sm:col-span-4 lg:col-span-1"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium" id="streak-day-count-label">連續日數</label><input aria-describedby="streak-mode-description" class="input-base text-center" id="streak-min-days" inputmode="numeric" max="60" min="2" step="1" type="number" value="2"/></div>
@@ -4217,7 +4234,7 @@ const bindAutoFill=(cId,nId,cb=null,strict=false)=>{
 // 只有輸入「完整股票代號格式」(4～6 碼數字，可帶尾碼) 且查無此股時才提醒，
 // 輸入股名、備註關鍵字等文字搜尋不會誤響。
 const bindUnknownStockSoundToFilterCodes=()=>{
-    const ids=['filter-code','filter-code-fav','filter-revenue-code','filter-rep-code'];
+    const ids=['filter-code','filter-code-fav','filter-revenue-code','filter-rep-code','streak-stock-search'];
     ids.forEach(id=>{
         const input=document.getElementById(id);
         if(!input||input.dataset.unknownStockSoundBound==='1')return;
@@ -5557,8 +5574,8 @@ const updateStreakModeUI=()=>{
 };
 
 function resetStreakFiltersToDefaults(options={}){
-    const renderResults=options.renderResults!==false,notify=options.notify!==false,base=document.getElementById('streak-base-date'),mode=document.getElementById('streak-mode'),days=document.getElementById('streak-min-days'),occurrences=document.getElementById('streak-min-occurrences'),horseMode=document.getElementById('streak-horse-mode'),holidayInput=document.getElementById('streak-holiday-date'),tagMode=document.getElementById('streak-tag-filter-mode'),sort=document.getElementById('streak-result-sort'),heat=document.getElementById('streak-heat-filter'),strength=document.getElementById('streak-min-strength'),chipRadar=document.getElementById('streak-chipradar-filter');
-    if(base){base.value='';initStreakBaseDate();}if(mode)mode.value='consecutive';if(days)days.value='2';if(occurrences){occurrences.value='2';occurrences.max='2';}if(horseMode)horseMode.value='ignoreTags';if(holidayInput)holidayInput.value='';if(tagMode)tagMode.value='all';if(sort)sort.value='latestDate';if(heat)heat.value='all';if(strength)strength.value='0';if(chipRadar)chipRadar.value='all';document.querySelectorAll('.streak-tag-cb').forEach(input=>input.checked=false);document.querySelectorAll('.streak-data-filter').forEach(input=>input.checked=false);document.getElementById('streak-tag-filter-details')?.removeAttribute('open');updateStreakModeUI();updateStreakTagFilterUI();
+    const renderResults=options.renderResults!==false,notify=options.notify!==false,base=document.getElementById('streak-base-date'),stockSearch=document.getElementById('streak-stock-search'),mode=document.getElementById('streak-mode'),days=document.getElementById('streak-min-days'),occurrences=document.getElementById('streak-min-occurrences'),horseMode=document.getElementById('streak-horse-mode'),holidayInput=document.getElementById('streak-holiday-date'),tagMode=document.getElementById('streak-tag-filter-mode'),sort=document.getElementById('streak-result-sort'),heat=document.getElementById('streak-heat-filter'),strength=document.getElementById('streak-min-strength'),chipRadar=document.getElementById('streak-chipradar-filter');
+    if(base){base.value='';initStreakBaseDate();}if(stockSearch)stockSearch.value='';document.getElementById('streak-stock-search-clear')?.classList.add('hidden');if(mode)mode.value='consecutive';if(days)days.value='2';if(occurrences){occurrences.value='2';occurrences.max='2';}if(horseMode)horseMode.value='ignoreTags';if(holidayInput)holidayInput.value='';if(tagMode)tagMode.value='all';if(sort)sort.value='latestDate';if(heat)heat.value='all';if(strength)strength.value='0';if(chipRadar)chipRadar.value='all';document.querySelectorAll('.streak-tag-cb').forEach(input=>input.checked=false);document.querySelectorAll('.streak-data-filter').forEach(input=>input.checked=false);document.getElementById('streak-tag-filter-details')?.removeAttribute('open');updateStreakModeUI();updateStreakTagFilterUI();
     if(renderResults)renderJournalStreaks();else{lastJournalStreakResult=null;const summary=document.getElementById('streak-summary'),stats=document.getElementById('streak-stats'),results=document.getElementById('streak-results'),copy=document.getElementById('streak-copy-btn');if(summary)summary.textContent='條件變更後會自動即時篩選。';if(stats){stats.innerHTML='';stats.classList.add('hidden');}if(results){results.innerHTML='';results.classList.add('hidden');}if(copy)copy.disabled=true;}
     if(notify)showToast('策略訊號雷達已還原預設值，休市日設定已保留');
 }
@@ -5767,7 +5784,7 @@ const getStreakDataFilterLabels=filters=>{
 };
 
 function renderJournalStreaks(){
-    const baseInput=document.getElementById('streak-base-date'),modeInput=document.getElementById('streak-mode'),daysInput=document.getElementById('streak-min-days'),occurrencesInput=document.getElementById('streak-min-occurrences'),horseModeInput=document.getElementById('streak-horse-mode'),tagModeInput=document.getElementById('streak-tag-filter-mode'),sortInput=document.getElementById('streak-result-sort'),heatInput=document.getElementById('streak-heat-filter'),strengthInput=document.getElementById('streak-min-strength'),summary=document.getElementById('streak-summary'),root=document.getElementById('streak-results'),copyBtn=document.getElementById('streak-copy-btn');
+    const baseInput=document.getElementById('streak-base-date'),stockSearchInput=document.getElementById('streak-stock-search'),modeInput=document.getElementById('streak-mode'),daysInput=document.getElementById('streak-min-days'),occurrencesInput=document.getElementById('streak-min-occurrences'),horseModeInput=document.getElementById('streak-horse-mode'),tagModeInput=document.getElementById('streak-tag-filter-mode'),sortInput=document.getElementById('streak-result-sort'),heatInput=document.getElementById('streak-heat-filter'),strengthInput=document.getElementById('streak-min-strength'),summary=document.getElementById('streak-summary'),root=document.getElementById('streak-results'),copyBtn=document.getElementById('streak-copy-btn');
     if(!baseInput||!modeInput||!daysInput||!occurrencesInput||!horseModeInput||!tagModeInput||!sortInput||!heatInput||!strengthInput||!summary||!root||!copyBtn)return;
     const dayCount=Math.max(2,Math.min(60,parseInt(daysInput.value)||2)),occurrenceCount=Math.max(2,Math.min(dayCount,parseInt(occurrencesInput.value)||2)),horseMode=normalizeStreakHorseMode(horseModeInput.value),selectedTags=getSelectedStreakTags();
     // v245：沒有勾選任何策略時，「不限策略」就是全部，不套用策略標籤篩選。
@@ -5791,7 +5808,15 @@ function renderJournalStreaks(){
     }
     const analysis=analyzeJournalStreaks(state.journals,baseInput.value,dayCount,horseMode,modeInput.value,occurrenceCount,tagFilterMode,selectedTags);
     const dataFilters=getStreakDataFilterState(),referenceDate=analysis.baseDate||analysis.requestedBase||baseInput.value||getToday();
-    const qualifiedResults=[...analysis.results].filter(item=>matchesStreakDataFilters(item,referenceDate,dataFilters));
+    const stockQuery=String(stockSearchInput?.value||'').trim().toLocaleLowerCase();
+    const dataQualifiedResults=[...analysis.results].filter(item=>matchesStreakDataFilters(item,referenceDate,dataFilters));
+    const qualifiedResults=stockQuery
+        ?dataQualifiedResults.filter(item=>{
+            const code=String(item?.code||'').trim().toLocaleLowerCase(),name=String(item?.name||'').trim().toLocaleLowerCase();
+            return code.includes(stockQuery)||name.includes(stockQuery);
+        })
+        :dataQualifiedResults;
+    analysis.stockQuery=stockQuery;
     analysis.dataFilters=dataFilters;analysis.dataFilterLabels=getStreakDataFilterLabels(dataFilters);analysis.qualifiedCount=qualifiedResults.length;analysis.resultSort=sortInput.value;analysis.heatFilter=heatInput.value;analysis.minStrength=Math.max(0,parseInt(strengthInput.value)||0);analysis.results=filterAndSortStreakResults(qualifiedResults,analysis.resultSort,analysis.heatFilter,analysis.minStrength);lastJournalStreakResult=analysis;
     copyBtn.disabled=analysis.results.length===0;renderStreakStats(analysis,qualifiedResults);
     const resultsHeader=document.getElementById('streak-results-header'),resultsCount=document.getElementById('streak-results-count');
@@ -5802,8 +5827,8 @@ function renderJournalStreaks(){
         root.innerHTML='';root.classList.add('hidden');root.classList.remove('streak-has-results');document.getElementById('streak-results-header')?.classList.add('hidden');return;
     }
     const adjusted=analysis.baseDate!==analysis.requestedBase;
-    const modeSummary=analysis.mode==='window'?`最近 ${analysis.minDays} 個交易日內至少出現 ${analysis.minOccurrences} 次${analysis.windowDays<analysis.minDays?`（目前有 ${analysis.windowDays} 日資料）`:''}`:`至少連續 ${analysis.minDays} 個交易日`,tagSummary=analysis.tagFilterMode==='all'?'':`｜${analysis.tagFilterMode==='include'?'包含任一':analysis.tagFilterMode==='matchAll'?'完全符合':'排除'}策略：${analysis.selectedTags.join('、')}`,dataSummary=analysis.dataFilterLabels?.length?`｜資料條件：${analysis.dataFilterLabels.join('、')}`:'',horseSummary=analysis.horseMode==='excludeStock'?'整檔排除追風馬、赤兔馬、千里馬':analysis.horseMode==='ignoreTags'?'只忽略追風馬、赤兔馬、千里馬標籤':'不排除追風馬、赤兔馬、千里馬',displaySummary=analysis.results.length===analysis.qualifiedCount?`找到 ${analysis.qualifiedCount} 檔`:`符合 ${analysis.qualifiedCount} 檔，顯示 ${analysis.results.length} 檔`;
-    summary.innerHTML=`<span class="font-bold text-violet-700 dark:text-violet-300">${displaySummary}</span>｜實際基準日 ${escapeHTML(analysis.baseDate.replace(/-/g,'/'))}｜${modeSummary}｜${horseSummary}｜週末、休市日不計${analysis.customHolidays.length?`｜自訂休市 ${analysis.customHolidays.length} 日`:''}${escapeHTML(tagSummary)}${escapeHTML(dataSummary)}${analysis.heatFilter!=='all'?`｜熱度：${escapeHTML(analysis.heatFilter)}`:''}${analysis.minStrength?`｜強度 ≥ ${analysis.minStrength}`:''}${adjusted?`<span class="ml-2 text-amber-600 dark:text-amber-400">（${escapeHTML(analysis.requestedBase.replace(/-/g,'/'))} 無資料，已往前取最近紀錄日）</span>`:''}`;
+    const modeSummary=analysis.mode==='window'?`最近 ${analysis.minDays} 個交易日內至少出現 ${analysis.minOccurrences} 次${analysis.windowDays<analysis.minDays?`（目前有 ${analysis.windowDays} 日資料）`:''}`:`至少連續 ${analysis.minDays} 個交易日`,tagSummary=analysis.tagFilterMode==='all'?'':`｜${analysis.tagFilterMode==='include'?'包含任一':analysis.tagFilterMode==='matchAll'?'完全符合':'排除'}策略：${analysis.selectedTags.join('、')}`,dataSummary=analysis.dataFilterLabels?.length?`｜資料條件：${analysis.dataFilterLabels.join('、')}`:'',horseSummary=analysis.horseMode==='excludeStock'?'整檔排除追風馬、赤兔馬、千里馬':analysis.horseMode==='ignoreTags'?'只忽略追風馬、赤兔馬、千里馬標籤':'不排除追風馬、赤兔馬、千里馬',displaySummary=analysis.results.length===analysis.qualifiedCount?`找到 ${analysis.qualifiedCount} 檔`:`符合 ${analysis.qualifiedCount} 檔，顯示 ${analysis.results.length} 檔`,stockSearchSummary=analysis.stockQuery?`｜個股搜尋：${analysis.stockQuery}`:'';
+    summary.innerHTML=`<span class="font-bold text-violet-700 dark:text-violet-300">${displaySummary}</span>｜實際基準日 ${escapeHTML(analysis.baseDate.replace(/-/g,'/'))}｜${modeSummary}｜${horseSummary}｜週末、休市日不計${analysis.customHolidays.length?`｜自訂休市 ${analysis.customHolidays.length} 日`:''}${escapeHTML(tagSummary)}${escapeHTML(dataSummary)}${escapeHTML(stockSearchSummary)}${analysis.heatFilter!=='all'?`｜熱度：${escapeHTML(analysis.heatFilter)}`:''}${analysis.minStrength?`｜強度 ≥ ${analysis.minStrength}`:''}${adjusted?`<span class="ml-2 text-amber-600 dark:text-amber-400">（${escapeHTML(analysis.requestedBase.replace(/-/g,'/'))} 無資料，已往前取最近紀錄日）</span>`:''}`;
     if(!analysis.results.length){root.innerHTML='';root.classList.add('hidden');root.classList.remove('streak-has-results');document.getElementById('streak-results-header')?.classList.add('hidden');return;}
     root.classList.remove('hidden');root.classList.add('streak-has-results');
     root.style.removeProperty('display');
@@ -5937,6 +5962,27 @@ const scheduleStreakAutoRender=(delay=30)=>{
 document.getElementById('streak-search-form')?.addEventListener('submit',e=>{e.preventDefault();});
 document.getElementById('streak-reset-btn')?.addEventListener('click',()=>resetStreakFiltersToDefaults({renderResults:true,notify:true}));
 document.getElementById('streak-base-date')?.addEventListener('change',()=>scheduleStreakAutoRender());
+const streakStockSearchInput=document.getElementById('streak-stock-search');
+const streakStockSearchClear=document.getElementById('streak-stock-search-clear');
+streakStockSearchInput?.addEventListener('input',()=>{
+    streakStockSearchClear?.classList.toggle('hidden',!streakStockSearchInput.value.trim());
+    scheduleStreakAutoRender(40);
+});
+streakStockSearchInput?.addEventListener('change',()=>scheduleStreakAutoRender());
+streakStockSearchInput?.addEventListener('keydown',event=>{
+    if(event.key==='Escape'){
+        event.preventDefault();
+        streakStockSearchInput.value='';
+        streakStockSearchClear?.classList.add('hidden');
+        scheduleStreakAutoRender(0);
+    }
+});
+streakStockSearchClear?.addEventListener('click',()=>{
+    if(streakStockSearchInput)streakStockSearchInput.value='';
+    streakStockSearchClear.classList.add('hidden');
+    scheduleStreakAutoRender(0);
+    streakStockSearchInput?.focus();
+});
 document.getElementById('streak-mode')?.addEventListener('change',()=>{updateStreakModeUI();scheduleStreakAutoRender();});
 document.getElementById('streak-min-days')?.addEventListener('input',()=>{updateStreakModeUI();scheduleStreakAutoRender(80);});
 document.getElementById('streak-min-days')?.addEventListener('change',()=>{updateStreakModeUI();scheduleStreakAutoRender();});
