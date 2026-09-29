@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="284" name="app-version"/>
+<meta content="286" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -2026,6 +2026,128 @@ nav, .top-nav, .desktop-nav, .module-nav{
 }
 </style>
 
+
+<style id="filter-tag-modal-v286">
+body.mobile-filter-tag-modal-open{
+  overflow:hidden!important;
+}
+
+#filter-tag-modal-backdrop{
+  position:fixed!important;
+  inset:0!important;
+  z-index:9998!important;
+  background:rgba(15,23,42,.56)!important;
+  backdrop-filter:blur(2px);
+  -webkit-backdrop-filter:blur(2px);
+}
+
+body > #filter-tag-panel.mobile-filter-tag-modal,
+body > #filter-tag-panel-fav.mobile-filter-tag-modal{
+  position:fixed!important;
+  left:50%!important;
+  right:auto!important;
+  top:50%!important;
+  bottom:auto!important;
+  transform:translate(-50%,-50%)!important;
+  width:min(1180px,calc(100vw - 28px))!important;
+  max-width:calc(100vw - 28px)!important;
+  max-height:min(86vh,820px)!important;
+  max-height:min(86dvh,820px)!important;
+  margin:0!important;
+  padding:14px!important;
+  z-index:9999!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  overscroll-behavior:contain!important;
+  border-radius:16px!important;
+  box-shadow:0 28px 90px rgba(15,23,42,.42)!important;
+}
+
+body > #filter-tag-panel.mobile-filter-tag-modal .mobile-tag-modal-header,
+body > #filter-tag-panel-fav.mobile-filter-tag-modal .mobile-tag-modal-header{
+  position:sticky!important;
+  top:-14px!important;
+  z-index:30!important;
+  margin:-14px -14px 10px!important;
+  padding:12px 14px 10px!important;
+  display:flex!important;
+  background:#fff!important;
+}
+
+html.dark body > #filter-tag-panel.mobile-filter-tag-modal .mobile-tag-modal-header,
+html.dark body > #filter-tag-panel-fav.mobile-filter-tag-modal .mobile-tag-modal-header{
+  background:#1f2937!important;
+}
+
+body > #filter-tag-panel.mobile-filter-tag-modal #filter-tags-container,
+body > #filter-tag-panel-fav.mobile-filter-tag-modal #filter-tags-container-fav{
+  width:100%!important;
+  min-width:0!important;
+  overflow:visible!important;
+}
+
+body > #filter-tag-panel.mobile-filter-tag-modal .filter-tag-choice-grid,
+body > #filter-tag-panel-fav.mobile-filter-tag-modal .filter-tag-choice-grid{
+  width:100%!important;
+}
+
+body > #filter-tag-panel.mobile-filter-tag-modal .filter-tag-choice-grid label,
+body > #filter-tag-panel-fav.mobile-filter-tag-modal .filter-tag-choice-grid label{
+  min-width:0!important;
+  padding:.48rem .55rem!important;
+  border:1px solid transparent;
+}
+
+body > #filter-tag-panel.mobile-filter-tag-modal .filter-tag-choice-grid label:hover,
+body > #filter-tag-panel-fav.mobile-filter-tag-modal .filter-tag-choice-grid label:hover{
+  border-color:rgba(148,163,184,.28);
+}
+
+body > #filter-tag-panel.mobile-filter-tag-modal .filter-tag-choice-grid label span,
+body > #filter-tag-panel-fav.mobile-filter-tag-modal .filter-tag-choice-grid label span{
+  min-width:0!important;
+  white-space:normal!important;
+  overflow-wrap:anywhere!important;
+  line-height:1.18!important;
+}
+
+@media (min-width:1280px){
+  body > #filter-tag-panel.mobile-filter-tag-modal,
+  body > #filter-tag-panel-fav.mobile-filter-tag-modal{
+    width:min(1280px,calc(100vw - 40px))!important;
+    max-width:calc(100vw - 40px)!important;
+  }
+}
+
+@media (max-width:640px){
+  body > #filter-tag-panel.mobile-filter-tag-modal,
+  body > #filter-tag-panel-fav.mobile-filter-tag-modal{
+    left:8px!important;
+    right:8px!important;
+    top:max(8px,env(safe-area-inset-top))!important;
+    bottom:max(8px,env(safe-area-inset-bottom))!important;
+    transform:none!important;
+    width:auto!important;
+    max-width:none!important;
+    max-height:none!important;
+    height:auto!important;
+    border-radius:14px!important;
+    padding:12px!important;
+  }
+
+  body > #filter-tag-panel.mobile-filter-tag-modal .mobile-tag-modal-header,
+  body > #filter-tag-panel-fav.mobile-filter-tag-modal .mobile-tag-modal-header{
+    top:-12px!important;
+    margin:-12px -12px 10px!important;
+  }
+
+  body > #filter-tag-panel.mobile-filter-tag-modal .filter-tag-choice-grid label,
+  body > #filter-tag-panel-fav.mobile-filter-tag-modal .filter-tag-choice-grid label{
+    padding:.5rem .45rem!important;
+  }
+}
+</style>
+
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen flex flex-col antialiased">
 <nav class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-50 transition-colors duration-300">
@@ -2380,7 +2502,7 @@ nav, .top-nav, .desktop-nav, .module-nav{
 <th class="py-3 px-2 sm:px-3 w-[95px] sticky left-[95px] top-0 bg-gray-50 dark:bg-gray-900 z-40 border-r border-gray-200 dark:border-gray-700 sortable cursor-pointer" data-module="journal" data-sort="code">代號/股名 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
 <th class="journal-close-price-col py-3 px-2 sm:px-3 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-module="journal" data-sort="closePrice" title="最新可取得的盤後收盤價">收盤價 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
 <th class="py-3 px-3 sm:px-4 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-module="journal" data-sort="targetPrice" title="法人／參考資料目標價">目標價 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
-<th class="journal-upside-col py-3 px-2 sm:px-3 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-module="journal" data-sort="potentialUpside" title="潛在空間＝（目標價－收盤價）÷收盤價">潛在空間 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+<th class="journal-upside-col py-3 px-2 sm:px-3 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-module="journal" data-sort="potentialUpside" title="潛在漲幅＝（目標價－收盤價）÷收盤價">潛在漲幅 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
 <th class="py-3 px-2 sm:px-3 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-module="journal" data-sort="eps2025">25 EPS <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
 <th class="py-3 px-2 sm:px-3 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-module="journal" data-sort="eps2026">26 EPS <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
 <th class="py-3 px-3 sm:px-4 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-module="journal" data-sort="epsGrowth">成長率 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
@@ -3280,7 +3402,7 @@ nav, .top-nav, .desktop-nav, .module-nav{
 4. 手機版操作按鈕分兩排
 5. 籌碼集中複製依策略數由多至少
 6. A/B/C/D 等級篩選、更新收盤價命名、移除顯示檔數格
-7. 目標價旁顯示潛在空間
+7. 目標價旁顯示潛在漲幅
 8. 手機標籤挑選彈窗、目標價移至收盤價右側
 9. 支撐壓力大盤帶入修正、個股最新收盤資料帶入
 10. 阿婆散步全面改名小碎步
@@ -3307,9 +3429,37 @@ nav, .top-nav, .desktop-nav, .module-nav{
 - 更新提示文字統一使用「更新收盤價／收盤價」，不再以「最新收盤價」作為操作名稱。
 -->
 <!-- v284：
-- 策略日誌欄位順序固定為：收盤價 → 目標價 → 潛在空間。
-- 「潛在漲幅」改名為「潛在空間」。
-- 潛在空間公式： （目標價－收盤價）÷收盤價，畫面以百分比顯示。
+- 策略日誌欄位順序固定為：收盤價 → 目標價 → 潛在漲幅。
+- 「潛在漲幅」改名為「潛在漲幅」。
+- 潛在漲幅公式： （目標價－收盤價）÷收盤價，畫面以百分比顯示。
+-->
+<!-- v285：依使用者上傳的 v272 基準，整合確認 20 項需求。
+1 全模組股票代號不足／查無通知音＋同股同策略重複提醒
+2 參考資料顯示目標價更新日與距今天數
+3 標示小標籤手機自動換行
+4 操作按鈕手機分兩排
+5 籌碼集中依策略數由多至少複製
+6 A/B/C/D 篩選＋更新收盤價命名＋移除顯示檔數格
+7 收盤價→目標價→潛在漲幅，公式（目標價－收盤價）÷收盤價
+8 手機標籤挑選彈窗＋目標價緊鄰收盤價
+9 支撐壓力大盤／個股資訊帶入
+10 阿婆散步→小碎步
+11 策略訊號雷達股號／股名可開 Yahoo
+12 假日／未開盤日日期回推前一交易日
+13 每日／每週必填策略提醒顏色
+14 複製小標籤可選目標價／備註
+15 快樂農夫與他的韭菜田名稱＋備註複製
+16 🆕新進榜可選顯示
+17 分析師會員黑卡／尊耀／頂峰／鐵粉一起複製
+18 策略訊號雷達可搜尋個股
+19 開啟網頁自動更新收盤價＋文字統一為更新收盤價
+20 目標價移到收盤價旁＋潛在漲幅欄
+-->
+<!-- v286：
+- 標籤挑選改成手機／平板／桌機皆為 viewport 置中 modal，不再使用可能超出畫面的下拉面板。
+- 桌機視窗最高加寬至 1280px。
+- 策略標籤依螢幕寬度增加為 2／3／5／7／8 欄，一次可看到更多策略。
+- 手機 modal 使用上下安全距離與動態視窗高度，避免按鈕跑出可視範圍。
 -->
 <!-- 核心 JavaScript -->
 <script>
@@ -4379,7 +4529,7 @@ function renderDynamicTags(){
     
     document.querySelectorAll('#filter-tags-container, #filter-tags-container-fav').forEach(container=>{
         if(!container)return;
-        container.innerHTML=TAG_CATEGORIES.map(cat=>`<div class="text-[10px] font-bold text-gray-400 border-b border-gray-300 dark:border-gray-700 pb-1 mb-1.5 mt-2 first:mt-0">${escapeHTML(cat.title)}</div><div class="grid grid-cols-2 sm:grid-cols-5 lg:grid-cols-6 gap-1.5 mb-1">${cat.tags.map(t=>`<label class="flex items-center gap-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700/50 p-1.5 rounded transition"><input type="checkbox" value="${escapeHTML(t)}" class="filter-tag-cb w-3.5 h-3.5 cursor-pointer"><span class="text-xs font-medium text-gray-700 dark:text-gray-300">${escapeHTML(t)}</span></label>`).join('')}</div>`).join('');
+        container.innerHTML=TAG_CATEGORIES.map(cat=>`<div class="text-[10px] font-bold text-gray-400 border-b border-gray-300 dark:border-gray-700 pb-1 mb-1.5 mt-2 first:mt-0">${escapeHTML(cat.title)}</div><div class="filter-tag-choice-grid grid grid-cols-2 min-[480px]:grid-cols-3 sm:grid-cols-5 lg:grid-cols-7 2xl:grid-cols-8 gap-1.5 mb-1">${cat.tags.map(t=>`<label class="flex items-center gap-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700/50 p-1.5 rounded transition"><input type="checkbox" value="${escapeHTML(t)}" class="filter-tag-cb w-3.5 h-3.5 cursor-pointer"><span class="text-xs font-medium text-gray-700 dark:text-gray-300">${escapeHTML(t)}</span></label>`).join('')}</div>`).join('');
     });
     
     const updateTagInputVisual=box=>{
@@ -4438,8 +4588,8 @@ function renderFilterTags(){
 }
 document.addEventListener('click',event=>{const button=event.target.closest('[data-filter-remove-tag]');if(button)window.removeFilterTag(decodeURIComponent(button.dataset.filterRemoveTag));});
 
-// v265：手機版標籤挑選改為置中的 modal，避免面板往右溢出而按不到。
-const isMobileFilterTagModal=()=>window.matchMedia('(max-width:640px)').matches;
+// v286：標籤挑選在手機／平板／桌機一律使用 viewport 置中視窗，避免跳出螢幕外。
+const isMobileFilterTagModal=()=>true;
 
 const getFilterTagModalBackdrop=()=>{
     let backdrop=document.getElementById('filter-tag-modal-backdrop');
@@ -4455,7 +4605,7 @@ const getFilterTagModalBackdrop=()=>{
 const ensureMobileFilterTagHeader=panel=>{
     if(panel.querySelector('.mobile-tag-modal-header'))return;
     const header=document.createElement('div');
-    header.className='mobile-tag-modal-header sm:hidden flex items-center justify-between gap-3 bg-white dark:bg-gray-800';
+    header.className='mobile-tag-modal-header flex items-center justify-between gap-3 bg-white dark:bg-gray-800';
     header.innerHTML='<div class="font-black text-base text-gray-800 dark:text-gray-100"><i class="fa-solid fa-tags mr-2 text-blue-600 dark:text-blue-300"></i>標籤挑選</div><button type="button" data-mobile-filter-tag-close class="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-200" aria-label="關閉標籤挑選"><i class="fa-solid fa-xmark"></i></button>';
     panel.insertBefore(header,panel.firstChild);
 };
@@ -4878,7 +5028,7 @@ const renderJournalDashboard=data=>{
     performanceRoot.classList.remove('hidden');performanceRoot.innerHTML=`<div class="flex items-center justify-between gap-2 mb-2"><span class="text-xs font-black text-emerald-700 dark:text-emerald-300"><i class="fa-solid fa-chart-column mr-1.5"></i>策略複盤績效</span><span class="text-[10px] text-gray-400">僅統計已判定成功／失敗</span></div><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1.5">${ranking.map(group=>{const rate=Math.round(group.wins/group.total*100),average=group.returns.length?group.returns.reduce((sum,value)=>sum+value,0)/group.returns.length:null;return`<div class="rounded-lg bg-white dark:bg-gray-900 border border-emerald-100 dark:border-emerald-900/70 px-2.5 py-2 text-xs"><div class="font-bold text-gray-700 dark:text-gray-200 truncate">${escapeHTML(group.tag)}</div><div class="mt-1 flex justify-between text-[10px] text-gray-500 dark:text-gray-400"><span>樣本 ${group.total}</span><span class="font-black text-emerald-600 dark:text-emerald-300">勝率 ${rate}%</span><span>${average===null?'無報酬':`均報 ${average>=0?'+':''}${average.toFixed(1)}%`}</span></div></div>`;}).join('')}</div>`;
 };
 
-// v284：潛在空間＝（目標價－收盤價）÷收盤價，畫面以百分比顯示。
+// v284：潛在漲幅＝（目標價－收盤價）÷收盤價，畫面以百分比顯示。
 const getPotentialUpsidePercent=(targetPrice,closePrice)=>{
     const target=Number(targetPrice),close=Number(closePrice);
     if(!Number.isFinite(target)||target<=0||!Number.isFinite(close)||close<=0)return null;
@@ -7858,7 +8008,7 @@ setChkDirection('long');
     'module-plan':[]
   };
   const mobileDetailColumns={
-    // v266 手機卡片第一層保留「收盤價＋目標價＋潛在空間」，方便直接比對。
+    // v266 手機卡片第一層保留「收盤價＋目標價＋潛在漲幅」，方便直接比對。
     // 25EPS、成長率、分數、備註收進「詳情」。
     'module-journal':[6,8,9,12],
     'module-favorites':[3,5,6,7],
@@ -7947,7 +8097,7 @@ setChkDirection('long');
     const labels=Array.from(table.querySelectorAll('thead th')).map((th,index)=>{
       if(index===0)return'選取';
       const raw=th.textContent.replace(/\s+/g,' ').trim();
-      const compactLabels={'26 EPS':'26EPS','25 EPS':'25EPS','營收／籌碼':'籌碼動能','策略標籤':'策略／強度','目標價':'目標價','潛在空間':'潛在空間','成長率':'EPS成長'};
+      const compactLabels={'26 EPS':'26EPS','25 EPS':'25EPS','營收／籌碼':'籌碼動能','策略標籤':'策略／強度','目標價':'目標價','潛在漲幅':'潛在漲幅','成長率':'EPS成長'};
       return compactLabels[raw]||raw;
     });
     table.querySelectorAll('tbody tr').forEach(row=>{
