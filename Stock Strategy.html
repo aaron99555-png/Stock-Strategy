@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="276" name="app-version"/>
+<meta content="277" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -3451,7 +3451,7 @@ const playStockNoticeSound=(kind='error',key='')=>{
 
     const tones={
         incomplete:[{f:520,d:.09,g:.09},{f:390,d:.12,g:.08}],
-        notfound:[{f:440,d:.10,g:.09},{f:330,d:.14,g:.08}],
+        notfound:[{f:520,d:.08,g:.10},{f:390,d:.10,g:.09},{f:260,d:.16,g:.09}],
         duplicate:[{f:720,d:.08,g:.08},{f:720,d:.08,g:.08}],
         error:[{f:420,d:.12,g:.08}]
     };
@@ -4132,6 +4132,56 @@ const bindAutoFill=(cId,nId,cb=null,strict=false)=>{
     nameInput.addEventListener('input',scheduleNameLookup);
     nameInput.addEventListener('change',()=>{clearTimeout(nameLookupTimer);syncFromName(false);});
     nameInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();clearTimeout(nameLookupTimer);syncFromName(true);}});
+};
+
+
+// v277：補強所有模組的股票代號欄位。
+// 一般新增/編輯欄位已由 bindAutoFill 處理；這裡再涵蓋各模組的代號篩選欄位。
+// 只有輸入「完整股票代號格式」(4～6 碼數字，可帶尾碼) 且查無此股時才提醒，
+// 輸入股名、備註關鍵字等文字搜尋不會誤響。
+const bindUnknownStockSoundToFilterCodes=()=>{
+    const ids=['filter-code','filter-code-fav','filter-revenue-code','filter-rep-code'];
+    ids.forEach(id=>{
+        const input=document.getElementById(id);
+        if(!input||input.dataset.unknownStockSoundBound==='1')return;
+        input.dataset.unknownStockSoundBound='1';
+
+        let timer=null,lastUnknown='';
+        const check=()=>{
+            clearTimeout(timer);
+            const raw=String(input.value||'').trim().toUpperCase();
+            if(!/^\d{4,6}[A-Z]?$/.test(raw)){
+                lastUnknown='';
+                return;
+            }
+            timer=setTimeout(()=>{
+                const stock=resolveKnownStock(raw);
+                if(stock.valid){
+                    lastUnknown='';
+                    return;
+                }
+                if(lastUnknown===raw)return;
+                lastUnknown=raw;
+                playStockNoticeSound('notfound',`${id}:notfound:${raw}`);
+                showToast(`找不到股票代號「${raw}」，請確認代號是否正確`,'error');
+            },220);
+        };
+
+        input.addEventListener('input',check);
+        input.addEventListener('change',check);
+        input.addEventListener('keydown',event=>{
+            if(event.key!=='Enter'&&event.key!=='Tab')return;
+            clearTimeout(timer);
+            const raw=String(input.value||'').trim().toUpperCase();
+            if(!/^\d{4,6}[A-Z]?$/.test(raw))return;
+            const stock=resolveKnownStock(raw);
+            if(stock.valid)return;
+            if(event.key==='Enter')event.preventDefault();
+            lastUnknown=raw;
+            playStockNoticeSound('notfound',`${id}:notfound:${raw}`);
+            showToast(`找不到股票代號「${raw}」，請確認代號是否正確`,'error');
+        });
+    });
 };
 
 const bindDatalistAutoUpdate=()=>{
@@ -7546,6 +7596,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
             tp.value = '';
         }
     },true);
+    bindUnknownStockSoundToFilterCodes();
     ['chk-code','chk-name'].forEach(id=>document.getElementById(id)?.addEventListener('keydown',e=>{
         if(e.key==='Enter'){
             e.preventDefault();
