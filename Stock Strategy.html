@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="273" name="app-version"/>
+<meta content="275" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -3965,13 +3965,56 @@ document.addEventListener('click',event=>{
     openStockReportFromIndicator(btn.dataset.openStockReport,btn.dataset.reportReferenceDate||'');
 });
 
-const updatePreview=(c,tId='j-preview',col='blue')=>{
-    const p=document.getElementById(tId);if(!c||!state.epsData[c]){if(p)p.classList.add('hidden');return;}
-    const d=state.epsData[c],sn=state.codeToName[c]||d.name||'';
-    if(p){p.classList.remove('hidden');p.innerHTML=`<span class="text-${col}-600 dark:text-${col}-400 font-bold flex items-center flex-shrink-0"><i class="fa-solid fa-link mr-1.5"></i>參考資料 <span class="ml-2 px-2 py-0.5 bg-${col}-100 dark:bg-${col}-900/60 text-${col}-800 dark:text-${col}-200 rounded-md text-xs tracking-wider border border-${col}-200 dark:border-${col}-700/50 shadow-sm cursor-pointer hover:ring-2 hover:ring-${col}-300 dark:hover:ring-${col}-700 transition"${getYahooStockAttributes(c)}>${escapeHTML(c)} ${escapeHTML(sn)} <i class="fa-solid fa-arrow-up-right-from-square ml-1 text-[9px] opacity-70 pointer-events-none"></i></span><button type="button" data-copy-preview-code="${escapeHTML(c)}" class="ml-3 text-[11px] bg-${col}-600 hover:bg-${col}-500 text-white px-2 py-1 rounded shadow-sm transition active:scale-95 flex items-center"><i class="fa-solid fa-copy mr-1"></i>複製</button></span><div class="flex flex-wrap items-center gap-3 text-xs sm:text-sm ml-2 text-gray-700 dark:text-gray-300"><span><span class="text-gray-400 text-[10px] sm:text-xs mr-1">25 EPS:</span>${formatNumColor(d.eps2025)}</span><span><span class="text-gray-400 text-[10px] sm:text-xs mr-1">預26 EPS:</span>${formatNumColor(d.eps2026)}</span><span><span class="text-gray-400 text-[10px] sm:text-xs mr-1">EPS成長率:</span>${d.epsGrowth!=null?formatNumColor(d.epsGrowth,true):'-'}</span><span><span class="text-gray-400 text-[10px] sm:text-xs mr-1">法人最高目標價:</span>${d.targetPrice?`<span class="text-yellow-600 dark:text-yellow-400 font-bold">${escapeHTML(d.targetPrice)}</span>`:'-'}</span><span><span class="text-gray-400 text-[10px] sm:text-xs mr-1">券商:</span>${d.broker?`<span class="text-purple-600 dark:text-purple-400 font-bold">${escapeHTML(d.broker)}</span>`:'-'}</span><span><span class="text-gray-400 text-[10px] sm:text-xs mr-1">報告日期:</span>${d.reportDate?`<span class="text-cyan-600 dark:text-cyan-400 font-bold">${escapeHTML(d.reportDate)}</span>`:'-'}</span>${d.futures==='●'?'<span class="bg-sky-600 text-white text-[10px] px-1.5 py-0.5 rounded ml-1">期</span>':''}</div>`;}
+const normalizeReferenceDate=value=>{
+    const raw=String(value||'').slice(0,10);
+    return /^\d{4}-\d{2}-\d{2}$/.test(raw)?raw:'';
+};
+const timestampToISODate=value=>{
+    const n=Number(value);
+    if(!Number.isFinite(n)||n<=0)return'';
+    try{return new Date(n).toLocaleDateString('sv-SE',{timeZone:'Asia/Taipei'});}catch(error){return'';}
+};
+const getReferenceDateAge=date=>{
+    const normalized=normalizeReferenceDate(date);
+    if(!normalized)return{date:'',days:null,label:'未提供',className:'text-gray-400'};
+    const days=dayDiffISO(normalized,getToday());
+    if(!Number.isFinite(days))return{date:normalized,days:null,label:'',className:'text-gray-400'};
+    const label=days===0?'今天':days===1?'1 天前':days>1?`${days} 天前`:`${Math.abs(days)} 天後`;
+    const className=days<=30?'text-emerald-600 dark:text-emerald-400':days<=60?'text-amber-600 dark:text-amber-400':'text-rose-600 dark:text-rose-400';
+    return{date:normalized,days,label,className};
 };
 
-window.copyPreviewData=c=>{const d=state.epsData[c];if(!d)return;const sn=state.codeToName[c]||d.name||'';let t=`【${c} ${sn}】參考資料\n25 EPS: ${d.eps2025??'-'}\n預26 EPS: ${d.eps2026??'-'}\nEPS成長率: ${d.epsGrowth!=null?(d.epsGrowth*100).toFixed(2)+'%':'-'}\n法人最高目標價: ${d.targetPrice??'-'}\n券商: ${d.broker??'-'}\n報告日期: ${d.reportDate??'-'}\n`;if(d.futures==='●')t+=`*含股期`;executeCopy(t.trim());};
+// v275：不再把「報告日期」視為「目標價日期」。
+// 目標價日期：僅採 Excel 明確提供的 targetPriceDate。
+// 舊 v274 targetPriceUpdatedDate 若剛好等於 reportDate，視為舊版自動帶入，不當成目標價日期。
+const getTargetPriceSourceDate=data=>{
+    if(!data||!data.targetPrice)return'';
+    const explicit=normalizeReferenceDate(data.targetPriceDate);
+    if(explicit)return explicit;
+    const legacy=normalizeReferenceDate(data.targetPriceUpdatedDate);
+    const report=normalizeReferenceDate(data.reportDate);
+    return legacy&&legacy!==report?legacy:'';
+};
+const getTargetPriceImportedDate=data=>{
+    if(!data||!data.targetPrice)return'';
+    return normalizeReferenceDate(data.targetPriceImportedDate)||timestampToISODate(data.updatedAt)||'';
+};
+const getTargetPriceDateInfo=data=>getReferenceDateAge(getTargetPriceSourceDate(data));
+const getTargetPriceImportedInfo=data=>getReferenceDateAge(getTargetPriceImportedDate(data));
+
+const updatePreview=(c,tId='j-preview',col='blue')=>{
+    const p=document.getElementById(tId);if(!c||!state.epsData[c]){if(p)p.classList.add('hidden');return;}
+    const d=state.epsData[c],sn=state.codeToName[c]||d.name||'',targetDate=getTargetPriceDateInfo(d),importedDate=getTargetPriceImportedInfo(d);
+    if(p){p.classList.remove('hidden');p.innerHTML=`<span class="text-${col}-600 dark:text-${col}-400 font-bold flex items-center flex-shrink-0"><i class="fa-solid fa-link mr-1.5"></i>參考資料 <span class="ml-2 px-2 py-0.5 bg-${col}-100 dark:bg-${col}-900/60 text-${col}-800 dark:text-${col}-200 rounded-md text-xs tracking-wider border border-${col}-200 dark:border-${col}-700/50 shadow-sm cursor-pointer hover:ring-2 hover:ring-${col}-300 dark:hover:ring-${col}-700 transition"${getYahooStockAttributes(c)}>${escapeHTML(c)} ${escapeHTML(sn)} <i class="fa-solid fa-arrow-up-right-from-square ml-1 text-[9px] opacity-70 pointer-events-none"></i></span><button type="button" data-copy-preview-code="${escapeHTML(c)}" class="ml-3 text-[11px] bg-${col}-600 hover:bg-${col}-500 text-white px-2 py-1 rounded shadow-sm transition active:scale-95 flex items-center"><i class="fa-solid fa-copy mr-1"></i>複製</button></span><div class="flex flex-wrap items-center gap-3 text-xs sm:text-sm ml-2 text-gray-700 dark:text-gray-300"><span><span class="text-gray-400 text-[10px] sm:text-xs mr-1">25 EPS:</span>${formatNumColor(d.eps2025)}</span><span><span class="text-gray-400 text-[10px] sm:text-xs mr-1">預26 EPS:</span>${formatNumColor(d.eps2026)}</span><span><span class="text-gray-400 text-[10px] sm:text-xs mr-1">EPS成長率:</span>${d.epsGrowth!=null?formatNumColor(d.epsGrowth,true):'-'}</span><span><span class="text-gray-400 text-[10px] sm:text-xs mr-1">法人最高目標價:</span>${d.targetPrice?`<span class="text-yellow-600 dark:text-yellow-400 font-bold">${escapeHTML(d.targetPrice)}</span>`:'-'}</span><span title="目標價本身所屬的資料日期；不等同報告日期"><span class="text-gray-400 text-[10px] sm:text-xs mr-1">目標價日期:</span>${targetDate.date?`<span class="${targetDate.className} font-bold">${escapeHTML(targetDate.date.replace(/-/g,'/'))}${targetDate.label?`（${escapeHTML(targetDate.label)}）`:''}</span>`:'<span class="text-gray-400">未提供</span>'}</span><span title="這筆目標價被匯入／更新進系統的日期"><span class="text-gray-400 text-[10px] sm:text-xs mr-1">目標價匯入日:</span>${importedDate.date?`<span class="text-slate-600 dark:text-slate-300 font-bold">${escapeHTML(importedDate.date.replace(/-/g,'/'))}${importedDate.label?`（${escapeHTML(importedDate.label)}）`:''}</span>`:'<span class="text-gray-400">-</span>'}</span><span><span class="text-gray-400 text-[10px] sm:text-xs mr-1">券商:</span>${d.broker?`<span class="text-purple-600 dark:text-purple-400 font-bold">${escapeHTML(d.broker)}</span>`:'-'}</span><span title="券商／研究報告的發布日期，與目標價日期分開"><span class="text-gray-400 text-[10px] sm:text-xs mr-1">報告日期:</span>${d.reportDate?`<span class="text-cyan-600 dark:text-cyan-400 font-bold">${escapeHTML(d.reportDate)}</span>`:'-'}</span>${d.futures==='●'?'<span class="bg-sky-600 text-white text-[10px] px-1.5 py-0.5 rounded ml-1">期</span>':''}</div>`;}
+};
+
+window.copyPreviewData=c=>{
+    const d=state.epsData[c];if(!d)return;
+    const sn=state.codeToName[c]||d.name||'',targetDate=getTargetPriceDateInfo(d),importedDate=getTargetPriceImportedInfo(d);
+    let t=`【${c} ${sn}】參考資料\n25 EPS: ${d.eps2025??'-'}\n預26 EPS: ${d.eps2026??'-'}\nEPS成長率: ${d.epsGrowth!=null?(d.epsGrowth*100).toFixed(2)+'%':'-'}\n法人最高目標價: ${d.targetPrice??'-'}\n目標價日期: ${targetDate.date?targetDate.date.replace(/-/g,'/'):'未提供'}${targetDate.label&&targetDate.date?'（'+targetDate.label+'）':''}\n目標價匯入日: ${importedDate.date?importedDate.date.replace(/-/g,'/'):'-'}${importedDate.label&&importedDate.date?'（'+importedDate.label+'）':''}\n券商: ${d.broker??'-'}\n報告日期: ${d.reportDate??'-'}\n`;
+    if(d.futures==='●')t+=`*含股期`;
+    executeCopy(t.trim());
+};
 document.addEventListener('click',event=>{const button=event.target.closest('[data-copy-preview-code]');if(button)window.copyPreviewData(button.dataset.copyPreviewCode);});
 
 const bindAutoFill=(cId,nId,cb=null,strict=false)=>{
@@ -9384,6 +9427,7 @@ setChkDirection('long');
     {key:'eps2026',label:'115年／2026 EPS',aliases:['26EPS','預26EPS','2026EPS','2026','明年EPS','預估26EPS','預估2026EPS','預估2026 EPS','預估 2026 EPS','預估2026EPS(元)','預估2026EPS（元）','115年EPS','115EPS','2026年EPS','2026EPS(估)','115年EPS(估)','115EPS(估)','2026估EPS','預估EPS','預估115年EPS','115年預估EPS','2026預估EPS','2026年預估EPS','2026E EPS','2026E EPS(元)','2026E EPS（元）']},
     {key:'epsGrowth',label:'EPS成長率',aliases:['EPS成長率','成長率','預估成長率','YoY','YOY','EPSYoY']},
     {key:'targetPrice',label:'目標價',aliases:['最高目標價','最高目標價(元)','目標價','目標價(元)','TargetPrice','TP']},
+    {key:'targetPriceDate',label:'目標價日期',aliases:['目標價日期','目標價資料日期','目標價更新日期','目標價更新日','TargetPriceDate','TargetPriceUpdateDate','TargetPriceUpdatedDate','TPDate','TP更新日期']},
     {key:'broker',label:'券商',aliases:['券商','發布券商','Broker']},
     {key:'reportDate',label:'報告日期',aliases:['報告日期','報告日','日期','ReportDate','report_date']},
     {key:'futures',label:'股期',aliases:['股期','期貨']}
@@ -9454,6 +9498,7 @@ setChkDirection('long');
         if(!parsed.valid)issues.push({field:label,reason:config[2]?'必須是數字或百分比':'必須是有效數字，可使用負數表示虧損'});else if(parsed.present)item[key]=parsed.value;
       });
       if(map.targetPrice>=0){var rawTarget=cells[map.targetPrice];if(!isImportedBlankMarker(rawTarget)){var targetPrice=normalizeImportedTargetPrice(rawTarget);if(!targetPrice)issues.push({field:'目標價',reason:'必須是大於 0 的單一數字'});else item.targetPrice=targetPrice;}}
+      if(map.targetPriceDate>=0&&!isImportedBlankMarker(cells[map.targetPriceDate])){var targetPriceDate=normalizeImportDate(cells[map.targetPriceDate]);if(!isValidImportedDate(targetPriceDate))issues.push({field:'目標價日期',reason:'格式無效，請使用 YYYY/MM/DD 或有效的 Excel 日期'});else item.targetPriceDate=targetPriceDate;}
       if(map.broker>=0&&!isImportedBlankMarker(cells[map.broker])){var broker=String(cells[map.broker]).trim();if(!isSafeImportedLabel(broker,40))issues.push({field:'券商',reason:'含不支援符號或超過 40 字'});else item.broker=broker;}
       if(map.reportDate>=0&&!isImportedBlankMarker(cells[map.reportDate])){var reportDate=normalizeImportDate(cells[map.reportDate]);if(!isValidImportedDate(reportDate))issues.push({field:'報告日期',reason:'格式無效，請使用 YYYY/MM/DD 或有效的 Excel 日期'});else item.reportDate=reportDate;}
       if(map.futures>=0&&!isImportedBlankMarker(cells[map.futures])){var futuresText=String(cells[map.futures]).trim().toUpperCase(),yesValues=['●','是','Y','YES','1','有'],noValues=['否','N','NO','0','無','-','—'];if(yesValues.includes(futuresText))item.futures='●';else if(noValues.includes(futuresText))item.futures=null;else issues.push({field:'股期',reason:'僅接受「●、是、Y」或「否、N」'});}
@@ -9511,17 +9556,17 @@ setChkDirection('long');
     var details=document.getElementById('import-preview-details');
     if(isBrokerReport&&preview.details&&preview.details.length){
       var visibleDetails=preview.details.slice(0,300),moreCount=Math.max(0,preview.details.length-visibleDetails.length);
-      details.innerHTML='<div class="mb-2 flex flex-wrap items-center justify-between gap-2"><div class="text-xs sm:text-sm font-black text-purple-700 dark:text-purple-300"><i class="fa-solid fa-filter-circle-dollar mr-1.5"></i>擇優結果 '+preview.selectedCount+' 檔</div><div class="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">原始 '+preview.sourceCount+' 筆；排除同代號非擇優 '+preview.discardedCount+' 筆</div></div><div class="max-h-[38vh] overflow-auto rounded-xl border border-gray-200 dark:border-gray-700"><table class="w-full min-w-[560px] text-xs"><thead class="sticky top-0 bg-purple-50 dark:bg-gray-900 text-purple-700 dark:text-purple-300"><tr><th class="p-2 text-left">代號／股名</th><th class="p-2 text-center">日期</th><th class="p-2 text-right">目標價</th><th class="p-2 text-left">券商</th></tr></thead><tbody>'+visibleDetails.map(function(item){return'<tr class="border-t border-gray-200 dark:border-gray-700"><td class="p-2"><b>'+escapeHTML(item.code)+'</b>／'+escapeHTML(item.name)+'</td><td class="p-2 text-center whitespace-nowrap">'+escapeHTML(String(item.reportDate||'').replace(/-/g,'/'))+'</td><td class="p-2 text-right font-black text-red-600 dark:text-red-400">'+Number(item.targetPrice).toLocaleString('zh-TW',{maximumFractionDigits:2})+'</td><td class="p-2 font-bold">'+escapeHTML(item.broker)+'</td></tr>';}).join('')+'</tbody></table></div>'+(moreCount?'<div class="mt-2 text-[10px] text-gray-400 text-right">另有 '+moreCount+' 檔已擇優，確認後會一併更新。</div>':'');
+      details.innerHTML='<div class="mb-2 flex flex-wrap items-center justify-between gap-2"><div class="text-xs sm:text-sm font-black text-purple-700 dark:text-purple-300"><i class="fa-solid fa-filter-circle-dollar mr-1.5"></i>擇優結果 '+preview.selectedCount+' 檔</div><div class="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">原始 '+preview.sourceCount+' 筆；排除同代號非擇優 '+preview.discardedCount+' 筆</div></div><div class="max-h-[38vh] overflow-auto rounded-xl border border-gray-200 dark:border-gray-700"><table class="w-full min-w-[560px] text-xs"><thead class="sticky top-0 bg-purple-50 dark:bg-gray-900 text-purple-700 dark:text-purple-300"><tr><th class="p-2 text-left">代號／股名</th><th class="p-2 text-center">報告日期</th><th class="p-2 text-right">目標價</th><th class="p-2 text-left">券商</th></tr></thead><tbody>'+visibleDetails.map(function(item){return'<tr class="border-t border-gray-200 dark:border-gray-700"><td class="p-2"><b>'+escapeHTML(item.code)+'</b>／'+escapeHTML(item.name)+'</td><td class="p-2 text-center whitespace-nowrap">'+escapeHTML(String(item.reportDate||'').replace(/-/g,'/'))+'</td><td class="p-2 text-right font-black text-red-600 dark:text-red-400">'+Number(item.targetPrice).toLocaleString('zh-TW',{maximumFractionDigits:2})+'</td><td class="p-2 font-bold">'+escapeHTML(item.broker)+'</td></tr>';}).join('')+'</tbody></table></div>'+(moreCount?'<div class="mt-2 text-[10px] text-gray-400 text-right">另有 '+moreCount+' 檔已擇優，確認後會一併更新。</div>':'');
       details.classList.remove('hidden');
     }else if(isDatabase&&preview.details&&preview.details.length){
       var visibleDbDetails=preview.details.slice(0,300),dbMore=Math.max(0,preview.details.length-visibleDbDetails.length);
-      details.innerHTML='<div class="mb-2 flex flex-wrap items-center justify-between gap-2"><div class="text-xs sm:text-sm font-black text-blue-700 dark:text-blue-300"><i class="fa-solid fa-table-list mr-1.5"></i>資料庫辨識結果 '+preview.selectedCount+' 檔</div><div class="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">'+(preview.sourceSheetName?'工作表：'+escapeHTML(preview.sourceSheetName)+'；':'')+'26EPS 欄位：'+(preview.detected2026?'已辨識':'未辨識')+'</div></div><div class="max-h-[38vh] overflow-auto rounded-xl border border-gray-200 dark:border-gray-700"><table class="w-full min-w-[500px] text-xs"><thead class="sticky top-0 bg-blue-50 dark:bg-gray-900 text-blue-700 dark:text-blue-300"><tr><th class="p-2 text-left">代號／股名</th><th class="p-2 text-right">25EPS</th><th class="p-2 text-right">26EPS</th><th class="p-2 text-right">目標價</th></tr></thead><tbody>'+visibleDbDetails.map(function(item){return'<tr class="border-t border-gray-200 dark:border-gray-700"><td class="p-2"><b>'+escapeHTML(item.code)+'</b>／'+escapeHTML(item.name)+'</td><td class="p-2 text-right">'+escapeHTML(item.eps2025??'—')+'</td><td class="p-2 text-right font-black text-blue-600 dark:text-blue-300">'+escapeHTML(item.eps2026??'—')+'</td><td class="p-2 text-right">'+escapeHTML(item.targetPrice??'—')+'</td></tr>';}).join('')+'</tbody></table></div>'+(dbMore?'<div class="mt-2 text-[10px] text-gray-400 text-right">另有 '+dbMore+' 檔確認後會一併更新。</div>':'');
+      details.innerHTML='<div class="mb-2 flex flex-wrap items-center justify-between gap-2"><div class="text-xs sm:text-sm font-black text-blue-700 dark:text-blue-300"><i class="fa-solid fa-table-list mr-1.5"></i>資料庫辨識結果 '+preview.selectedCount+' 檔</div><div class="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">'+(preview.sourceSheetName?'工作表：'+escapeHTML(preview.sourceSheetName)+'；':'')+'26EPS 欄位：'+(preview.detected2026?'已辨識':'未辨識')+'</div></div><div class="max-h-[38vh] overflow-auto rounded-xl border border-gray-200 dark:border-gray-700"><table class="w-full min-w-[500px] text-xs"><thead class="sticky top-0 bg-blue-50 dark:bg-gray-900 text-blue-700 dark:text-blue-300"><tr><th class="p-2 text-left">代號／股名</th><th class="p-2 text-right">25EPS</th><th class="p-2 text-right">26EPS</th><th class="p-2 text-right">目標價</th><th class="p-2 text-center">目標價日期</th></tr></thead><tbody>'+visibleDbDetails.map(function(item){var tpDate=item.targetPriceDate||'';return'<tr class="border-t border-gray-200 dark:border-gray-700"><td class="p-2"><b>'+escapeHTML(item.code)+'</b>／'+escapeHTML(item.name)+'</td><td class="p-2 text-right">'+escapeHTML(item.eps2025??'—')+'</td><td class="p-2 text-right font-black text-blue-600 dark:text-blue-300">'+escapeHTML(item.eps2026??'—')+'</td><td class="p-2 text-right">'+escapeHTML(item.targetPrice??'—')+'</td><td class="p-2 text-center whitespace-nowrap">'+escapeHTML(tpDate?String(tpDate).replace(/-/g,'/'):'未提供')+'</td></tr>';}).join('')+'</tbody></table></div>'+(dbMore?'<div class="mt-2 text-[10px] text-gray-400 text-right">另有 '+dbMore+' 檔確認後會一併更新。</div>':'');
       details.classList.remove('hidden');
     }else{details.innerHTML='';details.classList.add('hidden');}
     var wrap=document.getElementById('import-duplicate-option-wrap');
     wrap.classList.toggle('hidden',preview.duplicateCount===0||preview.hasBlockingErrors===true);
     document.getElementById('import-handle-duplicates').checked=true;
-    document.getElementById('import-duplicate-option-text').textContent=isBrokerReport?'勾選後會更新相同代號的日期、目標價及券商；原有 EPS、股期等資料會保留。':preview.type==='database'?'勾選後會使用 Excel 內容更新相同代號的參考資料。':'可合併資料會合併，其餘完全相同的資料將略過。';
+    document.getElementById('import-duplicate-option-text').textContent=isBrokerReport?'勾選後會更新相同代號的報告日期、目標價、券商與目標價匯入日；報告日期不會當成目標價日期。原有 EPS、股期等資料會保留。':preview.type==='database'?'勾選後會使用 Excel 內容更新相同代號的參考資料。':'可合併資料會合併，其餘完全相同的資料將略過。';
     var confirmButton=document.getElementById('import-preview-confirm');
     confirmButton.disabled=preview.hasBlockingErrors===true||(preview.newCount===0&&preview.duplicateCount===0);
     confirmButton.innerHTML=preview.hasBlockingErrors?'<i class="fa-solid fa-ban mr-1.5"></i>請先修正檔案':(isBrokerReport||isDatabase)&&previewErrors.length?'<i class="fa-solid fa-check mr-1.5"></i>匯入有效資料':'<i class="fa-solid fa-check mr-1.5"></i>確認匯入';
@@ -9617,6 +9662,7 @@ setChkDirection('long');
     (module?module.entries:[]).forEach(function(entry){
       var item=entry.item,current=state.epsData[item.code]||null;
       if(current&&!handleDuplicates){skipped++;return;}
+      if(item.targetPrice!=null){item.targetPriceImportedDate=getToday();if(!item.targetPriceDate)item.targetPriceDate=null;delete item.targetPriceUpdatedDate;}
       var next=Object.assign({},current||{},item,{updatedAt:now});next.name=getCanonicalStockName(item.code,next.name);state.epsData[item.code]=next;state.codeToName[item.code]=next.name;state.nameToCode[next.name]=item.code;
       if(current)updated++;else added++;
     });
@@ -9634,6 +9680,8 @@ setChkDirection('long');
         code:item.code,
         name:getCanonicalStockName(item.code,item.name||(current&&current.name)||''),
         targetPrice:item.targetPrice,
+        targetPriceDate:null,
+        targetPriceImportedDate:getToday(),
         broker:item.broker,
         reportDate:item.reportDate,
         updatedAt:now
