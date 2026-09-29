@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="277" name="app-version"/>
+<meta content="278" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -4065,8 +4065,7 @@ const bindAutoFill=(cId,nId,cb=null,strict=false)=>{
         else if(strict){codeInput.value='';setStockPairValidity(codeInput,nameInput,'');}
         notify(code);
     };
-    // v121：1~3 碼不查；4 碼以上停止輸入後自動查詢。
-    // 若繼續輸入第 5、6 碼，會取消前一次排程，等真正打完再查，避免輸入途中卡頓。
+    // v278：1~3 碼不查；4 碼以上若為已知股票立即帶入。未知代碼僅保留 60ms 防抖，避免 5／6 碼輸入途中誤報。
     let codeLookupTimer=null,isComposingCode=false;
     const cancelCodeLookup=()=>{if(codeLookupTimer){clearTimeout(codeLookupTimer);codeLookupTimer=null;}};
     const scheduleCodeLookup=()=>{
@@ -4080,10 +4079,22 @@ const bindAutoFill=(cId,nId,cb=null,strict=false)=>{
             return;
         }
         if(!/^\d{4,6}[A-Z]?$/i.test(raw))return;
+
+        // v278：完整且已知的股票代碼立即辨識、立即帶入股名，不再等待。
+        const normalized=normalizeStockCodeValue(raw),known=resolveKnownStock(normalized);
+        if(known.valid){
+            codeInput.value=known.code;
+            nameInput.value=known.name;
+            setStockPairValidity(codeInput,nameInput,'');
+            notify(known.code);
+            return;
+        }
+
+        // 查無代碼只保留極短防抖，避免使用者仍在輸入第 5／6 碼時過早警示。
         codeLookupTimer=setTimeout(()=>{
             codeLookupTimer=null;
             syncFromCode(false,true);
-        },160);
+        },60);
     };
     codeInput.addEventListener('compositionstart',()=>{isComposingCode=true;cancelCodeLookup();});
     codeInput.addEventListener('compositionend',()=>{isComposingCode=false;scheduleCodeLookup();});
@@ -4125,7 +4136,7 @@ const bindAutoFill=(cId,nId,cb=null,strict=false)=>{
     const scheduleNameLookup=()=>{
         clearTimeout(nameLookupTimer);
         if(isComposingName)return;
-        nameLookupTimer=setTimeout(()=>syncFromName(false),180);
+        nameLookupTimer=setTimeout(()=>syncFromName(false),60);
     };
     nameInput.addEventListener('compositionstart',()=>{isComposingName=true;clearTimeout(nameLookupTimer);});
     nameInput.addEventListener('compositionend',()=>{isComposingName=false;scheduleNameLookup();});
@@ -4164,7 +4175,7 @@ const bindUnknownStockSoundToFilterCodes=()=>{
                 lastUnknown=raw;
                 playStockNoticeSound('notfound',`${id}:notfound:${raw}`);
                 showToast(`找不到股票代號「${raw}」，請確認代號是否正確`,'error');
-            },220);
+            },60);
         };
 
         input.addEventListener('input',check);
