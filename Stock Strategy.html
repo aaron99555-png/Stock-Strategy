@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="291" name="app-version"/>
+<meta content="293" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -2674,6 +2674,68 @@ html.dark .stock-identity-name{color:#f4f7fb!important}
 }
 </style>
 
+
+<style id="filter-clear-next-to-tags-v292">
+#module-journal .journal-filter-tag-cell{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  gap:.4rem!important;
+  align-items:stretch!important;
+}
+#module-journal .journal-filter-tag-cell #filter-tag-btn{
+  min-width:0!important;
+  width:100%!important;
+}
+#module-journal .journal-filter-tag-cell #btn-clear-filters{
+  min-width:max-content!important;
+  justify-content:center!important;
+}
+#module-journal .journal-filter-tag-cell #filter-tag-panel{
+  grid-column:1/-1!important;
+}
+@media (max-width:430px){
+  #module-journal .journal-filter-row-grid-6 > .journal-filter-tag-cell{
+    grid-column:span 2!important;
+    width:100%!important;
+  }
+  #module-journal .journal-filter-tag-cell #btn-clear-filters{
+    min-width:42px!important;
+    width:42px!important;
+    padding-left:.35rem!important;
+    padding-right:.35rem!important;
+  }
+  #module-journal .journal-filter-tag-cell #btn-clear-filters .sm\:hidden{
+    display:none!important;
+  }
+}
+.copy-small-label-controls{
+  flex-wrap:wrap!important;
+  max-width:100%!important;
+}
+</style>
+
+
+<style id="horse-new-under-name-v293">
+#journal-table-body .horse-new-stock-row,
+#fav-table-body .horse-new-stock-row{
+  display:flex;
+  align-items:center;
+  margin-top:3px;
+  min-height:20px;
+}
+#journal-table-body .horse-new-stock-row .horse-new-badge,
+#fav-table-body .horse-new-stock-row .horse-new-badge{
+  margin-left:0!important;
+  flex:0 0 auto;
+}
+@media (max-width:639px){
+  #journal-table-body .horse-new-stock-row,
+  #fav-table-body .horse-new-stock-row{
+    margin-top:4px;
+  }
+}
+</style>
+
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen flex flex-col antialiased">
 <nav class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-50 transition-colors duration-300">
@@ -2844,7 +2906,7 @@ html.dark .stock-identity-name{color:#f4f7fb!important}
 </label>
 <label class="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white dark:bg-gray-900/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-700/50 transition hover:bg-gray-50 dark:hover:bg-gray-800">
 <input class="streak-data-filter rounded border-gray-300 dark:border-gray-600 text-rose-500 focus:ring-rose-500 w-3.5 h-3.5 sm:w-4 sm:h-4" id="streak-revenue-high-3m" type="checkbox"/>
-<span class="text-xs sm:text-sm text-rose-600 dark:text-rose-400 font-medium whitespace-nowrap">月營收連三月創高</span>
+<span class="text-xs sm:text-sm text-rose-600 dark:text-rose-400 font-medium whitespace-nowrap">營收連三高</span>
 </label>
 <label class="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white dark:bg-gray-900/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-700/50 transition hover:bg-gray-50 dark:hover:bg-gray-800">
 <input class="streak-data-filter rounded border-gray-300 dark:border-gray-600 text-violet-500 focus:ring-violet-500 w-3.5 h-3.5 sm:w-4 sm:h-4" id="streak-large-holder" type="checkbox"/>
@@ -2852,7 +2914,7 @@ html.dark .stock-identity-name{color:#f4f7fb!important}
 </label>
 <label class="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white dark:bg-gray-900/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-700/50 transition hover:bg-gray-50 dark:hover:bg-gray-800" title="最近三個已公布週期皆有千張大戶持股增加紀錄">
 <input class="streak-data-filter rounded border-gray-300 dark:border-gray-600 text-indigo-500 focus:ring-indigo-500 w-3.5 h-3.5 sm:w-4 sm:h-4" id="streak-large-holder-3w" type="checkbox"/>
-<span class="text-xs sm:text-sm text-indigo-600 dark:text-indigo-400 font-medium whitespace-nowrap">千張大戶連三增</span>
+<span class="text-xs sm:text-sm text-indigo-600 dark:text-indigo-400 font-medium whitespace-nowrap">大戶連三增</span>
 </label>
 <label class="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white dark:bg-gray-900/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-700/50 transition hover:bg-gray-50 dark:hover:bg-gray-800">
 <input class="streak-data-filter rounded border-gray-300 dark:border-gray-600 text-amber-500 focus:ring-amber-500 w-3.5 h-3.5 sm:w-4 sm:h-4" id="streak-high-turnover-revenue" type="checkbox"/>
@@ -2918,7 +2980,7 @@ html.dark .stock-identity-name{color:#f4f7fb!important}
 </div></div><div class="journal-mobile-row journal-filter-row-search-clear"><div class="flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 h-[38px] sm:h-auto box-border">
 <i class="fa-solid fa-search text-gray-400 text-[10px] sm:text-xs ml-1 sm:ml-2"></i>
 <input autocomplete="off" class="filter-code bg-transparent text-gray-900 dark:text-white text-[11px] sm:text-sm outline-none px-1 w-[130px] sm:w-[170px] h-full box-border m-0" id="filter-code" placeholder="代號／股名／備註" spellcheck="false" type="text"/>
-</div><button class="text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-red-600 text-gray-700 dark:text-gray-300 hover:text-white border border-gray-300 dark:border-gray-600 hover:border-red-500 px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center whitespace-nowrap" id="btn-clear-filters" type="button"><i class="fa-solid fa-eraser sm:mr-1.5"></i><span class="hidden sm:inline">清除篩選</span><span class="sm:hidden">清除</span></button></div>
+</div></div>
 <div class="journal-mobile-row journal-filter-row-conditions-1">
 <label class="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white dark:bg-gray-900/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-700/50 transition hover:bg-gray-50 dark:hover:bg-gray-800">
 <input class="filter-exclude-negative-growth rounded border-gray-300 dark:border-gray-600 text-green-500 focus:ring-green-500 w-3.5 h-3.5 sm:w-4 sm:h-4" id="filter-exclude-negative-growth" type="checkbox"/>
@@ -2947,7 +3009,7 @@ html.dark .stock-identity-name{color:#f4f7fb!important}
 </select><select class="filter-journal-quick bg-white dark:bg-gray-900/50 text-gray-900 dark:text-white text-base sm:text-sm border border-gray-300 dark:border-gray-700/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 focus:ring-2 focus:ring-blue-500 outline-none transition hover:bg-gray-50 dark:hover:bg-gray-800" id="filter-journal-quick">
 <option value="all">全部訊號</option><option value="today">今日新增</option><option value="resonance">多重訊號</option><option value="basicResonance">🔥 基本籌碼共振</option><option value="pendingReview">尚未複盤</option><option value="overdue">逾期未處理</option><option value="issues">資料異常</option>
 </select><div class="journal-filter-tag-cell relative">
-<button class="bg-white dark:bg-gray-900/50 text-gray-900 dark:text-white text-xs sm:text-sm border border-gray-300 dark:border-gray-700/50 rounded-lg px-3 py-1.5 sm:py-2 focus:ring-2 focus:ring-blue-500 outline-none transition hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center justify-between gap-2 shadow-sm whitespace-nowrap" id="filter-tag-btn" type="button"><span>+ 標籤挑選</span><i class="fa-solid fa-chevron-down text-[10px] opacity-70"></i></button>
+<button class="bg-white dark:bg-gray-900/50 text-gray-900 dark:text-white text-xs sm:text-sm border border-gray-300 dark:border-gray-700/50 rounded-lg px-3 py-1.5 sm:py-2 focus:ring-2 focus:ring-blue-500 outline-none transition hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center justify-between gap-2 shadow-sm whitespace-nowrap" id="filter-tag-btn" type="button"><span>+ 標籤挑選</span><i class="fa-solid fa-chevron-down text-[10px] opacity-70"></i></button><button class="text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-red-600 text-gray-700 dark:text-gray-300 hover:text-white border border-gray-300 dark:border-gray-600 hover:border-red-500 px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center whitespace-nowrap" id="btn-clear-filters" type="button"><i class="fa-solid fa-eraser sm:mr-1.5"></i><span class="hidden sm:inline">清除篩選</span><span class="sm:hidden">清除</span></button>
 <div class="absolute left-0 top-full mt-1.5 w-[calc(100vw-24px)] sm:w-[920px] max-w-[calc(100vw-32px)] bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl shadow-2xl hidden z-50 p-3 max-h-[70vh] overflow-y-auto modal-enter" id="filter-tag-panel">
 <div class="mb-3 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between"><span class="text-xs font-bold text-gray-700 dark:text-gray-300">篩選邏輯</span><div class="flex items-center bg-gray-100 dark:bg-gray-900 p-1 rounded-lg"><button class="logic-btn px-2 py-1 text-[10px] sm:text-xs rounded font-medium transition-colors bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm" data-logic="OR" id="btn-logic-or" type="button">符合任一 (OR)</button><button class="logic-btn px-2 py-1 text-[10px] sm:text-xs rounded font-medium transition-colors text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" data-logic="AND" id="btn-logic-and" type="button">完全符合 (AND)</button></div></div>
 <div id="filter-tags-container"></div>
@@ -2978,6 +3040,10 @@ html.dark .stock-identity-name{color:#f4f7fb!important}
 <label class="inline-flex items-center gap-1 cursor-pointer whitespace-nowrap" title="複製時標示千張大戶增加">
 <input class="copy-mark-large-holder rounded border-violet-300 dark:border-violet-700 accent-violet-600 w-3.5 h-3.5" type="checkbox"/>
 <span>📊千張大戶增</span>
+</label>
+<label class="inline-flex items-center gap-1 cursor-pointer whitespace-nowrap" title="複製時標示最新一期仍符合連續三期大戶增加">
+<input class="copy-mark-large-holder-3w rounded border-indigo-300 dark:border-indigo-700 accent-indigo-600 w-3.5 h-3.5" type="checkbox"/>
+<span>📈大戶連三增</span>
 </label>
 <label class="inline-flex items-center gap-1 cursor-pointer whitespace-nowrap" title="複製時標示新進榜">
 <input class="copy-mark-new-entry rounded border-amber-300 dark:border-amber-700 accent-amber-600 w-3.5 h-3.5" type="checkbox"/>
@@ -3657,6 +3723,10 @@ html.dark .stock-identity-name{color:#f4f7fb!important}
 <input class="copy-mark-large-holder rounded border-violet-300 dark:border-violet-700 accent-violet-600 w-3.5 h-3.5" type="checkbox"/>
 <span>📊千張大戶增</span>
 </label>
+<label class="inline-flex items-center gap-1 cursor-pointer whitespace-nowrap" title="複製時標示最新一期仍符合連續三期大戶增加">
+<input class="copy-mark-large-holder-3w rounded border-indigo-300 dark:border-indigo-700 accent-indigo-600 w-3.5 h-3.5" type="checkbox"/>
+<span>📈大戶連三增</span>
+</label>
 <label class="inline-flex items-center gap-1 cursor-pointer whitespace-nowrap" title="複製時標示新進榜">
 <input class="copy-mark-new-entry rounded border-amber-300 dark:border-amber-700 accent-amber-600 w-3.5 h-3.5" type="checkbox"/>
 <span>🆕新進榜</span>
@@ -4008,6 +4078,18 @@ html.dark .stock-identity-name{color:#f4f7fb!important}
 - 適用所有使用 data-yahoo-stock-code 的模組與表格。
 - Yahoo URL 格式：/quote/{股票代號}/technical-analysis
 -->
+<!-- v292：
+- 策略日誌「清除篩選」移到「標籤挑選」旁邊。
+- 標示小標籤新增「📈大戶連三增」開關，策略日誌與追蹤清單同步。
+- 連三增相關顯示名稱已統一縮短。
+- 連續三月營收創高相關顯示名稱已統一為「營收連三高」。
+- 大戶連三增沿用最新一期規則：最新一期沒有就不算。
+-->
+<!-- v293：
+- 策略日誌與追蹤清單的「🆕新進榜」由股名右側移到股名下方獨立一行。
+- 保留股期「期」標示仍在股名旁。
+- 不變更新進榜判斷邏輯與一週顯示規則。
+-->
 <!-- 核心 JavaScript -->
 <script>
 const originalDateSetter=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set;
@@ -4023,7 +4105,7 @@ const ADMIN_SESSION_STORAGE_KEY='ryan_admin_session_v1';
 const XLSX_CDN_URL='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
 const getSyncPath=()=>DIRECT_SYNC_PATH;
 const isCloudMode=()=>true;
-let cloudSyncInterval=null, state={journals:[],plans:[],revenueRecords:[],reports:[],checklists:[],trash:[],deletionTombstones:{},tagSettings:null,epsData:{},codeToName:{},nameToCode:{},customMarketHolidays:[],journalClosePrices:{},copyCompareDuplicates:false,copyMarkRevenueHigh:true,copyMarkLargeHolder:true,copyMarkNewEntry:true,copyMarkTargetPrice:true,copyMarkNotes:true,filters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,largeHolder14:false,highTurnoverRevenue:false,tags:[],minScore:0,strengthGrade:'all',tagLogic:'OR',status:'all',quick:'all'},favFilters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,largeHolder14:false,highTurnoverRevenue:false,tags:[],minScore:0,strengthGrade:'all',tagLogic:'OR',status:'all',quick:'all'},revenueFilters:{month:'',code:'',type:'all',revenuePattern:'none',revenueN:3,revenueCount:2,holderPattern:'none',holderN:3,holderCount:2,minMomentum:0},reportFilters:{start:'',end:'',code:''},sortConfig:{key:'createdAt',asc:false},favSortConfig:{key:'createdAt',asc:false},planSortConfig:{key:'createdAt',asc:false},revenueSortConfig:{key:'month',asc:false},reportSortConfig:{key:'date',asc:false},checklistSortConfig:{key:'createdAt',asc:false}};
+let cloudSyncInterval=null, state={journals:[],plans:[],revenueRecords:[],reports:[],checklists:[],trash:[],deletionTombstones:{},tagSettings:null,epsData:{},codeToName:{},nameToCode:{},customMarketHolidays:[],journalClosePrices:{},copyCompareDuplicates:false,copyMarkRevenueHigh:true,copyMarkLargeHolder:true,copyMarkLargeHolder3W:true,copyMarkNewEntry:true,copyMarkTargetPrice:true,copyMarkNotes:true,filters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,largeHolder14:false,highTurnoverRevenue:false,tags:[],minScore:0,strengthGrade:'all',tagLogic:'OR',status:'all',quick:'all'},favFilters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,largeHolder14:false,highTurnoverRevenue:false,tags:[],minScore:0,strengthGrade:'all',tagLogic:'OR',status:'all',quick:'all'},revenueFilters:{month:'',code:'',type:'all',revenuePattern:'none',revenueN:3,revenueCount:2,holderPattern:'none',holderN:3,holderCount:2,minMomentum:0},reportFilters:{start:'',end:'',code:''},sortConfig:{key:'createdAt',asc:false},favSortConfig:{key:'createdAt',asc:false},planSortConfig:{key:'createdAt',asc:false},revenueSortConfig:{key:'month',asc:false},reportSortConfig:{key:'date',asc:false},checklistSortConfig:{key:'createdAt',asc:false}};
 const selectedIds={journal:new Set(),fav:new Set(),plan:new Set(),revenue:new Set(),report:new Set(),checklist:new Set()};
 
 const escapeHTML=str=>(!str&&str!==0)?'':String(str).replace(/[&<>'"]/g,tag=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[tag]||tag));
@@ -4546,7 +4628,7 @@ const hasRecentRevenueHigh=(code,referenceDate=getToday(),months=1)=>{
         return diff>=0&&diff<=windowSize;
     });
 };
-// v222：月營收連三月創高：最近三個「已公布月份」需連續都有營收創高紀錄。
+// v222：營收連三高：最近三個「已公布月份」需連續都有營收創高紀錄。
 // 容許最新創高月份落在基準月份或前一個月，以配合月營收公布時差。
 const hasConsecutiveRevenueHigh3M=(code,referenceDate=getToday())=>{
     const refSerial=monthSerial(String(referenceDate||'').slice(0,7));
@@ -4769,19 +4851,15 @@ const hasLatestLargeHolderIncrease=(code,referenceDate=getToday())=>{
         fridaySerial(record.date)===latestSerial
     );
 };
-// v223：千張大戶連三增：以基準日以前的資料判斷，最近三個週期需連續都有增加紀錄。
+// v292：大戶連三增必須從全市場最新一期往前連續三期都有增加。
 const hasConsecutiveLargeHolderIncrease3W=(code,referenceDate=getToday())=>{
-    const ref=String(referenceDate||getToday());
-    const refSerial=fridaySerial(ref);
-    if(refSerial===null)return false;
-    const serials=Array.from(new Set(getRevenueRecordsForCode(code)
-        .filter(record=>normalizeMomentumRecordType(record)==='largeHolder'&&record.date&&String(record.date)<=ref)
+    const latestSerial=getLatestLargeHolderSerial(referenceDate);
+    if(latestSerial===null)return false;
+    const serials=new Set(getRevenueRecordsForCode(code)
+        .filter(record=>normalizeMomentumRecordType(record)==='largeHolder'&&record.date)
         .map(record=>fridaySerial(record.date))
-        .filter(serial=>serial!==null&&serial<=refSerial)))
-        .sort((a,b)=>b-a);
-    if(serials.length<3)return false;
-    const latest=serials[0];
-    return (refSerial-latest)<=1&&serials.includes(latest-1)&&serials.includes(latest-2);
+        .filter(serial=>serial!==null&&serial<=latestSerial));
+    return serials.has(latestSerial)&&serials.has(latestSerial-1)&&serials.has(latestSerial-2);
 };
 const hasHighTurnoverRevenue=(code,referenceDate=getToday())=>{const ref=String(referenceDate||getToday());return getRevenueRecordsForCode(code).some(record=>String(record.code||'')===String(code)&&normalizeMomentumRecordType(record)==='highTurnoverRevenue'&&!!record.date&&String(record.date)<=ref);};
 const getRevenueMonthsHtml=(c,referenceDate=getToday())=>{const r=[...getRevenueRecordsForCode(c)];if(r.length===0)return'<span class="text-gray-300 dark:text-gray-600 text-xs">-</span>';r.sort((a,b)=>getMomentumRecordDate(b).localeCompare(getMomentumRecordDate(a)));return r.map(x=>{const type=normalizeMomentumRecordType(x);if(type==='largeHolder'){const recent=hasLatestLargeHolderIncrease(c,referenceDate)&&fridaySerial(x.date)===getLatestLargeHolderSerial(referenceDate);return`<span class="inline-flex items-center bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 border-violet-200 dark:border-violet-800 text-[10px] font-bold px-1.5 py-0.5 rounded mr-1 mb-1 border shadow-sm ${recent?'ring-1 ring-violet-400':''}" title="千張大戶持股增加：${escapeHTML(x.date||'')}"><i class="fa-solid fa-users mr-1"></i>千張大戶↑ ${escapeHTML((x.date||'').slice(5).replace('-','/'))}</span>`;}if(type==='highTurnoverRevenue'){return`<span class="inline-flex items-center bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800 text-[10px] font-bold px-1.5 py-0.5 rounded mr-1 mb-1 border shadow-sm" title="高成交值高營收：${escapeHTML(x.date||'')}"><i class="fa-solid fa-coins mr-1"></i>高值高成長 ${escapeHTML((x.date||'').slice(5).replace('-','/'))}</span>`;}const p=String(x.month||'').split('-'),m=parseInt(p[1],10)||1;return`<span class="inline-block ${MONTH_BG_COLORS[(m-1)%12]} text-[10px] font-bold px-1.5 py-0.5 rounded mr-1 mb-1 border shadow-sm" title="營收創高：${escapeHTML(x.month||'')}">${escapeHTML((p[0]||'').substring(2)+'/'+(p[1]||''))}</span>`;}).join('')+`<span class="inline-flex flex-wrap gap-1 ml-1">${renderMomentumBadges(c,referenceDate)}</span>`;};
@@ -5656,7 +5734,7 @@ const renderTableRows=(data,tbId,emId,isFav=false)=>{
         let fl=i.isFavorite===true?1:(parseInt(i.isFavorite)||0),fc='text-gray-400 dark:text-gray-500 hover:text-yellow-500',fi='<i class="fa-solid fa-star pointer-events-none"></i>',ft='加入追蹤';
         if(fl===1){fc='text-yellow-500';ft='一星追蹤';}else if(fl===2){fc='text-orange-500';fi='<i class="fa-solid fa-star pointer-events-none"></i><span class="ml-1 text-[10px] font-bold pointer-events-none">2</span>';ft='二次追蹤';}else if(fl===3){fc='text-red-500';fi='<i class="fa-solid fa-star pointer-events-none"></i><span class="ml-1 text-[10px] font-bold pointer-events-none">3</span>';ft='三次追蹤';}
         const fd=i.date?i.date.replace(/-/g,'/'):'',closePriceValue=Number(i.closePrice),closePriceDate=String(i.closePriceDate||''),closePriceSource=String(i.closePriceSource||''),closePriceHtml=Number.isFinite(closePriceValue)&&closePriceValue>0?`<div class="font-black text-[13px] sm:text-sm text-gray-800 dark:text-gray-100 tabular-nums" title="${escapeHTML(closePriceSource?`來源：${closePriceSource}`:'')}">${escapeHTML(formatMarketPrice(closePriceValue))}</div>${closePriceDate?`<div class="mt-0.5 text-[9px] text-gray-400 tabular-nums">${escapeHTML(closePriceDate.replace(/-/g,'/'))}</div>`:''}`:'<span class="text-gray-300 dark:text-gray-600">—</span>',potentialUpside=getPotentialUpsidePercent(ei.targetPrice,closePriceValue),potentialUpsideHtml=formatPotentialUpside(potentialUpside),rbh=getRevenueMonthsHtml(i.code,i.date||getToday()),hr=hasReportForCode(i.code),rb=hr?renderReportIndicator(i.code,i.date||''):'',futuresBadge=ei.futures?'<span class="shrink-0 bg-sky-600 text-white text-[9px] px-1 rounded ml-1">期</span>':'',resonance=getJournalResonance(i),resonanceBadge=resonance.isMultiple?`<span class="inline-flex items-center rounded-md bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-200 px-1.5 py-0.5 text-[10px] font-black mr-1 mb-1" title="共振來源：${escapeHTML(resonance.sources.join('、'))}"><i class="fa-solid fa-bolt mr-1"></i>${escapeHTML(resonance.sources.join('＋'))}</span>`:'',th=renderStockStrengthBadges(i.code,i.date||getToday())+resonanceBadge+tagHtml,statusBadge=getJournalStatusBadge(i.status),overdueBadge=isJournalOverdue(i)?`<span class="inline-flex items-center rounded-md bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-200 px-1.5 py-0.5 text-[10px] font-black ml-1"><i class="fa-solid fa-clock mr-1"></i>逾期 ${journalTradingAge(i.date)} 日</span>`:'',returnValue=getJournalReturn(i),reviewBadge=i.review?.reviewDate?`<div class="mt-1 text-[10px] font-bold ${returnValue===null?'text-gray-500 dark:text-gray-400':returnValue>=0?'tw-red':'tw-green'}">複盤 ${escapeHTML(i.review.outcome||'未判定')}${returnValue===null?'':`｜${returnValue>=0?'+':''}${returnValue.toFixed(1)}%`}</div>`:'',dataIssues=getJournalDataIssues(i),issueBadge=dataIssues.length?`<div class="mt-1 inline-flex items-center rounded-md bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-200 px-1.5 py-0.5 text-[10px] font-black" title="${escapeHTML(dataIssues.join('；'))}"><i class="fa-solid fa-triangle-exclamation mr-1"></i>異常 ${dataIssues.length} 項</div>`:'',notesHtml=`<div class="mb-1">${statusBadge}${overdueBadge}</div>${reviewBadge}${issueBadge}<div class="mt-1">${escapeHTML(i.notes||'')}</div>`;
-        rh+=`<tr class="table-row-hover transition border-b border-gray-200 dark:border-gray-700/50 text-gray-900 dark:text-white text-sm ${ei.futures?"bg-sky-50 dark:bg-sky-900 hover:bg-sky-100 dark:hover:bg-sky-800":"bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800"}"><td class="table-sticky-bg py-3 px-2 w-[40px] min-w-[40px] max-w-[40px] text-center sticky left-0 z-20 ${ei.futures?"!bg-sky-50 dark:!bg-sky-900":""}"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${i.id}" data-type="${lt}" ${selectedIds[lt].has(i.id)?'checked':''}></td><td class="table-sticky-bg py-3 px-1 sm:px-2 w-[85px] min-w-[85px] max-w-[85px] text-center sticky left-[40px] z-20 font-medium whitespace-nowrap text-xs sm:text-sm text-gray-600 dark:text-gray-400 ${ei.futures?"!bg-sky-50 dark:!bg-sky-900":""}">${escapeHTML(fd)}</td><td class="table-sticky-bg py-2 px-2 sm:px-3 w-[95px] min-w-[95px] max-w-[95px] sticky left-[125px] z-20 border-r border-gray-200 dark:border-gray-700/50 overflow-hidden ${ei.futures?"!bg-sky-50 dark:!bg-sky-900":""}"${getYahooStockAttributes(i.code)}><div class="text-[10px] sm:text-[11px] text-gray-500 dark:text-gray-400 mb-0.5 leading-none flex items-center">${escapeHTML(i.code)}${rb}</div><div class="font-bold text-[14px] sm:text-[15px] leading-tight tracking-wide text-gray-800 dark:text-gray-200 flex items-center min-w-0"><span class="truncate">${escapeHTML(i.name)}</span>${horseNewTags.length?'<span class="horse-new-badge ml-1 shrink-0" title="🆕新進榜 新進榜：同股往前一個月內未出現相同馬標籤">🆕新進榜</span>':''}${futuresBadge}</div></td>${!isFav?`<td class="journal-close-price-cell py-2 px-2 sm:px-3 text-right align-middle">${closePriceHtml}</td><td class="py-3 px-3 sm:px-4 text-right">${formatTargetPrice(ei.targetPrice)}</td><td class="journal-upside-cell py-3 px-2 sm:px-3 text-right">${potentialUpsideHtml}</td>`:''}<td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2025)}</td><td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2026)}</td><td class="py-3 px-3 sm:px-4 text-right">${formatNumColor(ei.epsGrowth,true)}</td><td class="py-3 px-3 sm:px-4 text-center font-bold">${sc}</td>${isFav?`<td class="py-3 px-3 sm:px-4 text-right">${formatTargetPrice(ei.targetPrice)}</td>`:''}<td class="py-2 px-3 whitespace-normal w-[100px] min-w-[100px] text-center">${rbh}</td><td class="py-2 px-3 align-top whitespace-normal min-w-[120px] sm:min-w-[140px] lg:w-[320px] lg:min-w-[320px] xl:w-[380px] xl:min-w-[380px] lg:max-w-[460px]">${th}</td>${!isFav?`<td class="py-3 px-3 align-top text-gray-600 dark:text-gray-300 max-w-[110px] sm:max-w-[180px] lg:w-[220px] lg:min-w-[220px] lg:max-w-[250px] whitespace-normal break-words text-xs leading-relaxed" title="${escapeHTML(i.notes||'')}">${notesHtml}</td>`:''}<td class="journal-action-cell py-3 px-3 text-center whitespace-normal"><div class="journal-action-grid"><button class="hover:scale-110 text-emerald-600 dark:text-emerald-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="review-journal" data-id="${i.id}" title="訊號狀態與複盤"><i class="fa-solid fa-clipboard-check pointer-events-none"></i></button><button class="hover:scale-110 text-green-600 dark:text-green-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="add-plan" data-code="${escapeHTML(i.code)}" title="加入交易規劃"><i class="fa-solid fa-chess-knight pointer-events-none"></i></button><button class="hover:scale-110 ${fc} bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="toggle-fav" data-id="${i.id}" title="${ft}">${fi}</button><button class="hover:scale-110 text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="edit-notes" data-id="${i.id}" title="修改備註"><i class="fa-solid fa-comment-dots pointer-events-none"></i></button><button class="text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="delete-journal" data-id="${i.id}" title="刪除"><i class="fa-solid fa-trash pointer-events-none"></i></button></div></td></tr>`;
+        rh+=`<tr class="table-row-hover transition border-b border-gray-200 dark:border-gray-700/50 text-gray-900 dark:text-white text-sm ${ei.futures?"bg-sky-50 dark:bg-sky-900 hover:bg-sky-100 dark:hover:bg-sky-800":"bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800"}"><td class="table-sticky-bg py-3 px-2 w-[40px] min-w-[40px] max-w-[40px] text-center sticky left-0 z-20 ${ei.futures?"!bg-sky-50 dark:!bg-sky-900":""}"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${i.id}" data-type="${lt}" ${selectedIds[lt].has(i.id)?'checked':''}></td><td class="table-sticky-bg py-3 px-1 sm:px-2 w-[85px] min-w-[85px] max-w-[85px] text-center sticky left-[40px] z-20 font-medium whitespace-nowrap text-xs sm:text-sm text-gray-600 dark:text-gray-400 ${ei.futures?"!bg-sky-50 dark:!bg-sky-900":""}">${escapeHTML(fd)}</td><td class="table-sticky-bg py-2 px-2 sm:px-3 w-[95px] min-w-[95px] max-w-[95px] sticky left-[125px] z-20 border-r border-gray-200 dark:border-gray-700/50 overflow-hidden ${ei.futures?"!bg-sky-50 dark:!bg-sky-900":""}"${getYahooStockAttributes(i.code)}><div class="text-[10px] sm:text-[11px] text-gray-500 dark:text-gray-400 mb-0.5 leading-none flex items-center">${escapeHTML(i.code)}${rb}</div><div class="font-bold text-[14px] sm:text-[15px] leading-tight tracking-wide text-gray-800 dark:text-gray-200 flex items-center min-w-0"><span class="truncate">${escapeHTML(i.name)}</span>${futuresBadge}</div>${horseNewTags.length?'<div class="horse-new-stock-row"><span class="horse-new-badge" title="🆕新進榜：同股往前一個月內未出現相同馬標籤">🆕新進榜</span></div>':''}</td>${!isFav?`<td class="journal-close-price-cell py-2 px-2 sm:px-3 text-right align-middle">${closePriceHtml}</td><td class="py-3 px-3 sm:px-4 text-right">${formatTargetPrice(ei.targetPrice)}</td><td class="journal-upside-cell py-3 px-2 sm:px-3 text-right">${potentialUpsideHtml}</td>`:''}<td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2025)}</td><td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2026)}</td><td class="py-3 px-3 sm:px-4 text-right">${formatNumColor(ei.epsGrowth,true)}</td><td class="py-3 px-3 sm:px-4 text-center font-bold">${sc}</td>${isFav?`<td class="py-3 px-3 sm:px-4 text-right">${formatTargetPrice(ei.targetPrice)}</td>`:''}<td class="py-2 px-3 whitespace-normal w-[100px] min-w-[100px] text-center">${rbh}</td><td class="py-2 px-3 align-top whitespace-normal min-w-[120px] sm:min-w-[140px] lg:w-[320px] lg:min-w-[320px] xl:w-[380px] xl:min-w-[380px] lg:max-w-[460px]">${th}</td>${!isFav?`<td class="py-3 px-3 align-top text-gray-600 dark:text-gray-300 max-w-[110px] sm:max-w-[180px] lg:w-[220px] lg:min-w-[220px] lg:max-w-[250px] whitespace-normal break-words text-xs leading-relaxed" title="${escapeHTML(i.notes||'')}">${notesHtml}</td>`:''}<td class="journal-action-cell py-3 px-3 text-center whitespace-normal"><div class="journal-action-grid"><button class="hover:scale-110 text-emerald-600 dark:text-emerald-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="review-journal" data-id="${i.id}" title="訊號狀態與複盤"><i class="fa-solid fa-clipboard-check pointer-events-none"></i></button><button class="hover:scale-110 text-green-600 dark:text-green-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="add-plan" data-code="${escapeHTML(i.code)}" title="加入交易規劃"><i class="fa-solid fa-chess-knight pointer-events-none"></i></button><button class="hover:scale-110 ${fc} bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="toggle-fav" data-id="${i.id}" title="${ft}">${fi}</button><button class="hover:scale-110 text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="edit-notes" data-id="${i.id}" title="修改備註"><i class="fa-solid fa-comment-dots pointer-events-none"></i></button><button class="text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="delete-journal" data-id="${i.id}" title="刪除"><i class="fa-solid fa-trash pointer-events-none"></i></button></div></td></tr>`;
     });
     setHTMLIfChanged(tb,rh); updateBatchUI(lt);
 };
@@ -6562,9 +6640,9 @@ const getStreakDataFilterLabels=filters=>{
     const labels=[];
     if(filters.excludeNegativeGrowth)labels.push('排除負成長');
     if(filters.revenueHigh)labels.push('營收創高');
-    if(filters.revenueHigh3M)labels.push('月營收連三月創高');
+    if(filters.revenueHigh3M)labels.push('營收連三高');
     if(filters.largeHolder)labels.push('千張大戶增');
-    if(filters.largeHolder3W)labels.push('千張大戶連三增');
+    if(filters.largeHolder3W)labels.push('大戶連三增');
     if(filters.highTurnoverRevenue)labels.push('高成交值高營收');
     if(filters.chipConcentrationHolder)labels.push('籌碼集中大戶增');
     if(filters.chipRadar==='strong')labels.push('籌碼強度70+');
@@ -7957,6 +8035,7 @@ const getCopyMomentumMarks=(code,referenceDate=getToday())=>{
     let marks='';
     if(state.copyMarkRevenueHigh!==false&&hasCopyRevenueHigh(code,referenceDate))marks+=' 💰';
     if(state.copyMarkLargeHolder!==false&&hasLatestLargeHolderIncrease(code,referenceDate))marks+=' 📊';
+    if(state.copyMarkLargeHolder3W!==false&&hasConsecutiveLargeHolderIncrease3W(code,referenceDate))marks+=' 📈大戶連三增';
     return marks;
 };
 const getRecentBrokerTargetPrice=(code,referenceDate=getToday())=>{
@@ -7989,6 +8068,7 @@ const syncCopyLabelToggles=()=>{
     document.querySelectorAll('.copy-compare-duplicates').forEach(cb=>{cb.checked=state.copyCompareDuplicates!==false;cb.disabled=false;});
     document.querySelectorAll('.copy-mark-revenue-high').forEach(cb=>{cb.checked=state.copyMarkRevenueHigh!==false;cb.disabled=false;});
     document.querySelectorAll('.copy-mark-large-holder').forEach(cb=>{cb.checked=state.copyMarkLargeHolder!==false;cb.disabled=false;});
+    document.querySelectorAll('.copy-mark-large-holder-3w').forEach(cb=>{cb.checked=state.copyMarkLargeHolder3W!==false;cb.disabled=false;});
     document.querySelectorAll('.copy-mark-new-entry').forEach(cb=>{cb.checked=state.copyMarkNewEntry!==false;cb.disabled=false;});
     document.querySelectorAll('.copy-mark-target-price').forEach(cb=>{cb.checked=state.copyMarkTargetPrice!==false;cb.disabled=false;});
     document.querySelectorAll('.copy-mark-notes').forEach(cb=>{cb.checked=state.copyMarkNotes!==false;cb.disabled=false;});
@@ -8016,6 +8096,14 @@ document.querySelectorAll('.copy-mark-large-holder').forEach(cb=>{
         syncCopyLabelToggles();
         saveLocalData();
         showToast(state.copyMarkLargeHolder?'已顯示 📊 千張大戶增小標籤':'已隱藏 📊 千張大戶增小標籤');
+    });
+});
+document.querySelectorAll('.copy-mark-large-holder-3w').forEach(cb=>{
+    cb.addEventListener('change',e=>{
+        state.copyMarkLargeHolder3W=e.target.checked;
+        syncCopyLabelToggles();
+        saveLocalData();
+        showToast(state.copyMarkLargeHolder3W?'已顯示 📈 大戶連三增小標籤':'已隱藏 📈 大戶連三增小標籤');
     });
 });
 document.querySelectorAll('.copy-mark-new-entry').forEach(cb=>{
