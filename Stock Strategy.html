@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="287" name="app-version"/>
+<meta content="289" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -2148,6 +2148,124 @@ body > #filter-tag-panel-fav.mobile-filter-tag-modal .filter-tag-choice-grid lab
 }
 </style>
 
+
+<style id="war-room-click-list-v288">
+#journal-war-room .workbench-stat-card{
+  cursor:pointer!important;
+}
+#journal-war-room .workbench-stat-card::after{
+  content:'點擊查看';
+  position:absolute;
+  right:.55rem;
+  bottom:.28rem;
+  font-size:8px;
+  line-height:1;
+  font-weight:800;
+  color:#94a3b8;
+  opacity:0;
+  transform:translateY(2px);
+  transition:opacity .16s ease,transform .16s ease;
+}
+#journal-war-room .workbench-stat-card:hover::after,
+#journal-war-room .workbench-stat-card:focus-visible::after{
+  opacity:1;
+  transform:translateY(0);
+}
+#journal-war-room .workbench-stat-card.is-active{
+  border-color:#3b82f6!important;
+  box-shadow:0 0 0 2px rgba(59,130,246,.16),0 8px 22px rgba(15,23,42,.08)!important;
+}
+#journal-war-room .workbench-stat-card.is-active::after{
+  content:'已展開';
+  color:#2563eb;
+  opacity:1;
+  transform:none;
+}
+.dark #journal-war-room .workbench-stat-card.is-active{
+  border-color:#60a5fa!important;
+  box-shadow:0 0 0 2px rgba(96,165,250,.16)!important;
+}
+.dark #journal-war-room .workbench-stat-card.is-active::after{color:#93c5fd}
+.war-room-selection-grid{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:.45rem;
+}
+.war-room-selection-stock{
+  min-width:0;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:.45rem;
+  padding:.55rem .65rem;
+  border:1px solid #dbeafe;
+  border-radius:.65rem;
+  background:#fff;
+  text-align:left;
+  transition:transform .14s ease,border-color .14s ease,box-shadow .14s ease;
+}
+.war-room-selection-stock:hover{
+  transform:translateY(-1px);
+  border-color:#60a5fa;
+  box-shadow:0 4px 12px rgba(15,23,42,.08);
+}
+.dark .war-room-selection-stock{
+  background:#111827;
+  border-color:#334155;
+}
+.dark .war-room-selection-stock:hover{border-color:#60a5fa}
+.war-room-selection-identity{min-width:0}
+.war-room-selection-code{
+  display:block;
+  font-size:10px;
+  line-height:1.1;
+  color:#64748b;
+  font-weight:800;
+}
+.war-room-selection-name{
+  display:block;
+  margin-top:2px;
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:12px;
+  line-height:1.15;
+  font-weight:900;
+  color:#1f2937;
+}
+.dark .war-room-selection-code{color:#94a3b8}
+.dark .war-room-selection-name{color:#f8fafc}
+.war-room-selection-score{
+  flex:0 0 auto;
+  min-width:32px;
+  text-align:right;
+  font-size:11px;
+  font-weight:900;
+}
+@media (max-width:1199px){
+  .war-room-selection-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+@media (max-width:900px){
+  .war-room-selection-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media (max-width:639px){
+  #journal-war-room .workbench-stat-card::after{
+    position:static;
+    display:block;
+    margin-top:.3rem;
+    text-align:right;
+    opacity:.82;
+    transform:none;
+  }
+  .war-room-selection-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:.4rem}
+  .war-room-selection-stock{padding:.5rem}
+}
+@media (max-width:390px){
+  .war-room-selection-grid{grid-template-columns:1fr}
+}
+</style>
+
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen flex flex-col antialiased">
 <nav class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-50 transition-colors duration-300">
@@ -2209,12 +2327,13 @@ body > #filter-tag-panel-fav.mobile-filter-tag-modal .filter-tag-choice-grid lab
 <section class="card-panel mb-3 sm:mb-4 border-t-4 border-rose-500 overflow-hidden" id="journal-war-room">
 <div class="px-3 sm:px-4 py-2.5 sm:py-3 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-rose-50 via-orange-50 to-amber-50 dark:from-rose-950/30 dark:via-orange-950/20 dark:to-amber-950/20">
 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-<div><h2 class="font-black text-rose-600 dark:text-rose-300 text-base sm:text-lg"><i class="fa-solid fa-crosshairs mr-2"></i>今日作戰室</h2><p class="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 mt-1">整合策略、營收、千張大戶、法人與 EPS，自動找出目前最值得優先觀察的股票。</p></div>
+<div><h2 class="font-black text-rose-600 dark:text-rose-300 text-base sm:text-lg"><i class="fa-solid fa-crosshairs mr-2"></i>今日作戰室</h2><p class="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 mt-1">點選「今日新增／強勢股／共振股／營收創高／近14日千張」即可展開對應個股清單。</p></div>
 <span class="text-[11px] font-bold text-gray-500 dark:text-gray-400" id="war-room-date"></span>
 </div>
 </div>
 <div class="war-room-body p-2 sm:p-3">
 <div class="grid gap-2 mb-2.5" id="war-room-stats"></div>
+<div class="hidden war-room-selection-panel mb-2.5 rounded-xl border border-blue-200 dark:border-blue-800 bg-blue-50/60 dark:bg-blue-950/20 overflow-hidden" id="war-room-selection"></div>
 <div class="war-room-ranking-panel rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
 <div class="px-2 py-1.5 bg-gray-50 dark:bg-gray-900 flex items-center justify-between"><span class="text-[11px] font-black text-gray-700 dark:text-gray-200"><i class="fa-solid fa-ranking-star text-amber-500 mr-1"></i>強度排行 TOP 10</span><span class="text-[9px] text-gray-400">點股票查看</span></div>
 <div class="grid gap-2 p-2 bg-white dark:bg-gray-800" id="war-room-ranking"></div>
@@ -2405,7 +2524,7 @@ body > #filter-tag-panel-fav.mobile-filter-tag-modal .filter-tag-choice-grid lab
 <input class="filter-futures rounded border-gray-300 dark:border-gray-600 text-sky-500 focus:ring-sky-500 w-3.5 h-3.5 sm:w-4 sm:h-4" id="filter-futures" type="checkbox"/>
 <span class="text-xs sm:text-sm text-sky-600 dark:text-sky-400 font-medium whitespace-nowrap">僅含股期</span>
 </label>
-</div><div class="journal-mobile-row journal-filter-row-grid-6"><label class="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white dark:bg-gray-900/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-700/50 transition hover:bg-gray-50 dark:hover:bg-gray-800" title="不限制天數：只要日誌日期以前最近一次有千張大戶增加紀錄即符合">
+</div><div class="journal-mobile-row journal-filter-row-grid-6"><label class="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white dark:bg-gray-900/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-700/50 transition hover:bg-gray-50 dark:hover:bg-gray-800" title="以基準日前最新一期千張大戶資料為準；最新一期沒有增加就不算">
 <input class="filter-large-holder rounded border-gray-300 dark:border-gray-600 text-violet-500 focus:ring-violet-500 w-3.5 h-3.5 sm:w-4 sm:h-4" id="filter-large-holder" type="checkbox"/>
 <span class="text-xs sm:text-sm text-violet-600 dark:text-violet-400 font-medium whitespace-nowrap">千張大戶增</span>
 </label><label class="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white dark:bg-gray-900/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-700/50 transition hover:bg-gray-50 dark:hover:bg-gray-800" title="連結籌碼動能：日誌日期以前曾出現高成交值高營收即符合">
@@ -3461,6 +3580,13 @@ body > #filter-tag-panel-fav.mobile-filter-tag-modal .filter-tag-choice-grid lab
 - 策略標籤依螢幕寬度增加為 2／3／5／7／8 欄，一次可看到更多策略。
 - 手機 modal 使用上下安全距離與動態視窗高度，避免按鈕跑出可視範圍。
 -->
+<!-- v288：
+- 今日作戰室 5 個統計卡可點擊。
+- 點擊後在作戰室內直接展開該類別個股清單。
+- 清單顯示股票代號、股名、強度分數，依強度由高至低排列。
+- 點擊清單中的個股可直接進入「個股總覽」。
+- 再點同一統計卡或 X 可收合清單。
+-->
 <!-- 核心 JavaScript -->
 <script>
 const originalDateSetter=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set;
@@ -4029,7 +4155,7 @@ const getScore=(t,e,code='',referenceDate=getToday())=>{
     const g=parseFloat(e?.epsGrowth),e26=parseFloat(e?.eps2026);
     if(!isNaN(g)&&g>0&&!isNaN(e26)&&e26>0)s+=1;
     if(code&&hasRecentRevenueHigh(code,referenceDate,1))s+=1;
-    if(code&&hasRecentLargeHolderIncrease(code,referenceDate,7))s+=1;
+    if(code&&hasLatestLargeHolderIncrease(code,referenceDate))s+=1;
     return s;
 };
 let analysisCacheVersion=0;
@@ -4072,17 +4198,19 @@ const getRevenueRecordsForCode=code=>getAnalysisDataIndex().revenueByCode.get(St
 const getJournalsForCode=code=>getAnalysisDataIndex().journalsByCode.get(String(code||'').trim())||[];
 const hasReportForCode=code=>getAnalysisDataIndex().reportCodes.has(String(code||'').trim());
 
-const getMomentumQualifyingCodes=(type,mode,windowSize,minCount)=>{mode=String(mode||'none');if(mode==='none')return null;const size=Math.max(1,parseInt(windowSize)||1),need=Math.max(1,parseInt(minCount)||1),groups=new Map();(state.revenueRecords||[]).forEach(record=>{if(normalizeMomentumRecordType(record)!==type)return;const code=String(record.code||'').trim();if(!code)return;const serial=type==='largeHolder'?fridaySerial(record.date):monthSerial(record.month);if(serial===null)return;if(!groups.has(code))groups.set(code,new Set());groups.get(code).add(serial);});const matched=new Set();groups.forEach((set,code)=>{const values=[...set].sort((a,b)=>b-a);if(!values.length)return;const latest=values[0];if(mode==='consecutive'){let ok=true;for(let i=0;i<size;i++){if(!set.has(latest-i)){ok=false;break;}}if(ok)matched.add(code);}else if(mode==='window'){const count=values.filter(value=>value<=latest&&value>latest-size).length;if(count>=need)matched.add(code);}});return matched;};
+const getMomentumQualifyingCodes=(type,mode,windowSize,minCount)=>{mode=String(mode||'none');if(mode==='none')return null;const size=Math.max(1,parseInt(windowSize)||1),need=Math.max(1,parseInt(minCount)||1),groups=new Map();(state.revenueRecords||[]).forEach(record=>{if(normalizeMomentumRecordType(record)!==type)return;const code=String(record.code||'').trim();if(!code)return;const serial=type==='largeHolder'?fridaySerial(record.date):monthSerial(record.month);if(serial===null)return;if(!groups.has(code))groups.set(code,new Set());groups.get(code).add(serial);});const matched=new Set(),globalLatest=type==='largeHolder'?getLatestLargeHolderSerial(getToday()):null;groups.forEach((set,code)=>{const values=[...set].sort((a,b)=>b-a);if(!values.length)return;const latest=type==='largeHolder'?globalLatest:values[0];if(latest===null||latest===undefined)return;if(type==='largeHolder'&&!set.has(latest))return;if(mode==='consecutive'){let ok=true;for(let i=0;i<size;i++){if(!set.has(latest-i)){ok=false;break;}}if(ok)matched.add(code);}else if(mode==='window'){const count=values.filter(value=>value<=latest&&value>latest-size).length;if(count>=need)matched.add(code);}});return matched;};
 const applyRevenueMomentumFilters=rows=>{let filtered=[...rows],f=state.revenueFilters||{};if(f.type&&f.type!=='all')filtered=filtered.filter(r=>normalizeMomentumRecordType(r)===f.type);if(f.month)filtered=filtered.filter(r=>normalizeMomentumRecordType(r)==='revenue'&&r.month===f.month);if(f.code){const query=String(f.code).toLocaleLowerCase();filtered=filtered.filter(r=>[r.code,r.name,r.notes,getMomentumTypeLabel(normalizeMomentumRecordType(r))].some(value=>String(value||'').toLocaleLowerCase().includes(query)));}const revenueCodes=getMomentumQualifyingCodes('revenue',f.revenuePattern,f.revenueN,f.revenueCount),holderCodes=getMomentumQualifyingCodes('largeHolder',f.holderPattern,f.holderN,f.holderCount);if(revenueCodes)filtered=filtered.filter(r=>revenueCodes.has(String(r.code||'').trim()));if(holderCodes)filtered=filtered.filter(r=>holderCodes.has(String(r.code||'').trim()));if(Number(f.minMomentum||0)>0)filtered=filtered.filter(r=>getMomentumMetrics(r.code).score>=Number(f.minMomentum));return filtered;};
 const getMomentumMetrics=(code,referenceDate=getToday())=>{
     const c=String(code||''),cacheKey=`${analysisCacheVersion}|${c}|${referenceDate}`;
     if(momentumMetricsCache.has(cacheKey))return momentumMetricsCache.get(cacheKey);
-    const records=getRevenueRecordsForCode(c),revSerials=[...new Set(records.filter(r=>normalizeMomentumRecordType(r)==='revenue').map(r=>monthSerial(r.month)).filter(v=>v!==null))].sort((a,b)=>b-a),holderSerials=[...new Set(records.filter(r=>normalizeMomentumRecordType(r)==='largeHolder').map(r=>fridaySerial(r.date)).filter(v=>v!==null))].sort((a,b)=>b-a);
-    const streak=(values)=>{if(!values.length)return 0;const set=new Set(values);let n=0,cur=values[0];while(set.has(cur-n))n++;return n;};
-    const revenueStreak=streak(revSerials),holderStreak=streak(holderSerials),revenueRecent3=revSerials.length?revSerials.filter(v=>v<=revSerials[0]&&v>revSerials[0]-3).length:0,holderRecent4=holderSerials.length?holderSerials.filter(v=>v<=holderSerials[0]&&v>holderSerials[0]-4).length:0;
-    const hasRevenue=revSerials.length>0,hasHolder=holderSerials.length>0,hasReport=hasReportForCode(c),recentJournals=getJournalsForCode(c).filter(j=>dayDiffISO(j.date,referenceDate)!==null&&dayDiffISO(j.date,referenceDate)>=0&&dayDiffISO(j.date,referenceDate)<14),strategyRepeated=recentJournals.length>=2;
+    const refMonth=monthSerial(String(referenceDate||'').slice(0,7)),refHolderSerial=fridaySerial(String(referenceDate||getToday()));
+    const records=getRevenueRecordsForCode(c),revSerials=[...new Set(records.filter(r=>normalizeMomentumRecordType(r)==='revenue').map(r=>monthSerial(r.month)).filter(v=>v!==null&&(refMonth===null||v<=refMonth)))].sort((a,b)=>b-a),holderSerials=[...new Set(records.filter(r=>normalizeMomentumRecordType(r)==='largeHolder').map(r=>fridaySerial(r.date)).filter(v=>v!==null&&(refHolderSerial===null||v<=refHolderSerial)))].sort((a,b)=>b-a);
+    const streakFrom=(values,start)=>{if(start===null||start===undefined)return 0;const set=new Set(values);let n=0;while(set.has(start-n))n++;return n;};
+    const latestHolderSerial=getLatestLargeHolderSerial(referenceDate),hasHolderLatest=latestHolderSerial!==null&&holderSerials.includes(latestHolderSerial);
+    const revenueStreak=revSerials.length?streakFrom(revSerials,revSerials[0]):0,holderStreak=hasHolderLatest?streakFrom(holderSerials,latestHolderSerial):0,revenueRecent3=revSerials.length?revSerials.filter(v=>v<=revSerials[0]&&v>revSerials[0]-3).length:0,holderRecent4=latestHolderSerial!==null?holderSerials.filter(v=>v<=latestHolderSerial&&v>latestHolderSerial-4).length:0;
+    const hasRevenue=revSerials.length>0,hasHolder=hasHolderLatest,hasReport=hasReportForCode(c),recentJournals=getJournalsForCode(c).filter(j=>dayDiffISO(j.date,referenceDate)!==null&&dayDiffISO(j.date,referenceDate)>=0&&dayDiffISO(j.date,referenceDate)<14),strategyRepeated=recentJournals.length>=2;
     let score=0;if(hasRevenue)score+=10;if(revenueStreak>=2)score+=5;if(revenueStreak>=3)score+=10;if(revenueRecent3>=2)score+=10;if(hasHolder)score+=10;if(holderStreak>=2)score+=5;if(holderStreak>=3)score+=10;if(holderRecent4>=3)score+=10;if(recentJournals.length)score+=5;if(strategyRepeated)score+=5;if(hasReport)score+=5;if(hasRevenue&&hasHolder)score+=5;score=Math.min(100,score);
-    const globalLatestHolder=getAnalysisDataIndex().globalLatestHolderSerial,holderInterrupted=holderSerials.length>0&&globalLatestHolder!==null&&holderSerials[0]<globalLatestHolder&&holderStreak>=2;
+    const holderInterrupted=holderSerials.length>0&&latestHolderSerial!==null&&!hasHolderLatest;
     const firstRevenue=hasRevenue&&revenueRecent3===1,firstHolder=hasHolder&&holderRecent4===1,resonance=hasRevenue&&hasHolder;
     const result={score,revenueStreak,holderStreak,revenueRecent3,holderRecent4,hasRevenue,hasHolder,hasReport,recentJournals:recentJournals.length,strategyRepeated,resonance,firstRevenue,firstHolder,holderInterrupted};
     momentumMetricsCache.set(cacheKey,result);
@@ -4117,24 +4245,61 @@ const getStockStrengthMetrics=(code,referenceDate=getToday())=>{
     return result;
 };
 const renderStockStrengthBadges=(code,referenceDate=getToday())=>{const x=getStockStrengthMetrics(code,referenceDate),gradeClass=x.grade==='A'?'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300':x.grade==='B'?'bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300':x.grade==='C'?'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300':'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300',chipBadge=x.institutionChipScore?`<span class="inline-flex rounded-md bg-cyan-100 dark:bg-cyan-900/40 text-cyan-700 dark:text-cyan-300 px-1.5 py-0.5 text-[10px] font-black mr-1 mb-1" title="法人聯手籌碼加分">籌碼 +${x.institutionChipScore}</span>`:'';return`<span class="inline-flex rounded-md ${gradeClass} px-1.5 py-0.5 text-[10px] font-black mr-1 mb-1">${x.grade}級 ${x.score}</span>${chipBadge}<span class="inline-flex rounded-md bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 px-1.5 py-0.5 text-[10px] font-black mr-1 mb-1">${x.icon}${x.lifecycle}</span>${x.accelerating?'<span class="inline-flex rounded-md bg-rose-100 dark:bg-rose-900/40 text-rose-700 dark:text-rose-300 px-1.5 py-0.5 text-[10px] font-black mr-1 mb-1">↗訊號加速</span>':''}`;};
+let activeWarRoomStatFilter='';
+let warRoomStatData=new Map();
+
+const renderWarRoomSelection=()=>{
+    const panel=document.getElementById('war-room-selection');
+    if(!panel)return;
+    if(!activeWarRoomStatFilter||!warRoomStatData.has(activeWarRoomStatFilter)){
+        panel.classList.add('hidden');
+        panel.innerHTML='';
+        return;
+    }
+    const group=warRoomStatData.get(activeWarRoomStatFilter),rows=group?.rows||[];
+    panel.classList.remove('hidden');
+    panel.innerHTML=`
+      <div class="flex items-center justify-between gap-3 px-2.5 sm:px-3 py-2 border-b border-blue-200 dark:border-blue-800 bg-blue-100/65 dark:bg-blue-900/25">
+        <div class="min-w-0">
+          <span class="text-xs sm:text-sm font-black text-blue-700 dark:text-blue-300"><i class="fa-solid ${group.icon} mr-1.5"></i>${escapeHTML(group.label)}清單</span>
+          <span class="ml-1.5 text-[10px] sm:text-xs font-bold text-gray-500 dark:text-gray-400">共 ${rows.length} 檔</span>
+        </div>
+        <button type="button" data-war-room-selection-close class="shrink-0 w-8 h-8 rounded-lg text-gray-400 hover:text-red-500 hover:bg-white/80 dark:hover:bg-gray-800 transition" title="收合清單" aria-label="收合清單"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="p-2 sm:p-2.5">
+        ${rows.length?`<div class="war-room-selection-grid">${rows.map(x=>`
+          <button type="button" data-war-room-selection-code="${escapeHTML(x.code)}" class="war-room-selection-stock" title="點擊查看 ${escapeHTML(x.code)} ${escapeHTML(x.name||'')} 個股總覽">
+            <span class="war-room-selection-identity">
+              <span class="war-room-selection-code">${escapeHTML(x.code)}</span>
+              <span class="war-room-selection-name">${escapeHTML(x.name||'—')}</span>
+            </span>
+            <span class="war-room-selection-score ${x.score>=85?'text-red-600 dark:text-red-300':x.score>=70?'text-orange-600 dark:text-orange-300':x.score>=55?'text-amber-600 dark:text-amber-300':'text-blue-600 dark:text-blue-300'}">${x.score}</span>
+          </button>`).join('')}</div>`:'<div class="py-5 text-center text-xs text-gray-400">目前沒有符合條件的個股</div>'}
+      </div>`;
+};
+
 const renderWarRoom=()=>{
     const stats=document.getElementById('war-room-stats'),ranking=document.getElementById('war-room-ranking'),dateEl=document.getElementById('war-room-date');if(!stats||!ranking)return;
     const ref=getToday();if(dateEl)dateEl.textContent=`基準 ${ref.replace(/-/g,'/')}`;
     const codes=[...new Set([...(state.journals||[]).map(x=>String(x.code||'')),...(state.revenueRecords||[]).map(x=>String(x.code||'')),...(state.reports||[]).map(x=>String(x.code||''))].filter(Boolean))];
     const rows=codes.map(code=>({code,name:state.codeToName?.[code]||(state.journals||[]).find(j=>String(j.code)===code)?.name||(state.revenueRecords||[]).find(r=>String(r.code)===code)?.name||'',...getStockStrengthMetrics(code,ref)})).sort((a,b)=>b.score-a.score||b.recent14-a.recent14);
-    const todayNew=(state.journals||[]).filter(j=>j.date===ref).length;
-    const strongCount=rows.filter(x=>x.lifecycle==='強勢'||x.score>=85).length;
-    const resonanceCount=rows.filter(x=>x.momentum.resonance).length;
-    const revenueCount=new Set((state.revenueRecords||[]).filter(r=>normalizeMomentumRecordType(r)==='revenue').map(r=>String(r.code||'')).filter(Boolean)).size;
-    const holderRecentCount=codes.filter(code=>hasRecentLargeHolderIncrease(code,ref,14)).length;
+    const rowMap=new Map(rows.map(row=>[String(row.code),row]));
+    const rowsForCodes=list=>[...new Set(list.map(code=>String(code||'')).filter(Boolean))].map(code=>rowMap.get(code)).filter(Boolean).sort((a,b)=>b.score-a.score||b.recent14-a.recent14||String(a.code).localeCompare(String(b.code)));
+    const todayRows=rowsForCodes((state.journals||[]).filter(j=>j.date===ref).map(j=>j.code));
+    const strongRows=rows.filter(x=>x.lifecycle==='強勢'||x.score>=85);
+    const resonanceRows=rows.filter(x=>x.momentum.resonance);
+    const revenueRows=rowsForCodes((state.revenueRecords||[]).filter(r=>normalizeMomentumRecordType(r)==='revenue').map(r=>r.code));
+    const holderRecentRows=rows.filter(x=>hasLatestLargeHolderIncrease(x.code,ref));
     const cards=[
-      {label:'今日新增',value:todayNew,icon:'fa-bolt',box:'bg-blue-50 dark:bg-blue-900/20',iconCls:'bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300',valueCls:'text-blue-600 dark:text-blue-300'},
-      {label:'強勢股',value:strongCount,icon:'fa-crown',box:'bg-rose-50 dark:bg-rose-900/20',iconCls:'bg-rose-100 dark:bg-rose-900/50 text-rose-600 dark:text-rose-300',valueCls:'text-rose-600 dark:text-rose-300'},
-      {label:'共振股',value:resonanceCount,icon:'fa-fire',box:'bg-orange-50 dark:bg-orange-900/20',iconCls:'bg-orange-100 dark:bg-orange-900/50 text-orange-600 dark:text-orange-300',valueCls:'text-orange-600 dark:text-orange-300'},
-      {label:'營收創高',value:revenueCount,icon:'fa-chart-line',box:'bg-pink-50 dark:bg-pink-900/20',iconCls:'bg-pink-100 dark:bg-pink-900/50 text-pink-600 dark:text-pink-300',valueCls:'text-pink-600 dark:text-pink-300'},
-      {label:'近14日千張',value:holderRecentCount,icon:'fa-users',box:'bg-violet-50 dark:bg-violet-900/20',iconCls:'bg-violet-100 dark:bg-violet-900/50 text-violet-600 dark:text-violet-300',valueCls:'text-violet-600 dark:text-violet-300'}
-    ];
-    stats.innerHTML=cards.map(c=>`<div class="workbench-stat-card rounded-xl border border-gray-200 dark:border-gray-700 ${c.box}"><div class="workbench-stat-inner"><span class="workbench-stat-icon ${c.iconCls}"><i class="fa-solid ${c.icon}"></i></span><div class="workbench-stat-copy"><div class="workbench-stat-label text-gray-500 dark:text-gray-400">${c.label}</div><div class="workbench-stat-value ${c.valueCls}">${c.value}</div></div></div></div>`).join('');
+      {key:'today',label:'今日新增',rows:todayRows,icon:'fa-bolt',box:'bg-blue-50 dark:bg-blue-900/20',iconCls:'bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300',valueCls:'text-blue-600 dark:text-blue-300'},
+      {key:'strong',label:'強勢股',rows:strongRows,icon:'fa-crown',box:'bg-rose-50 dark:bg-rose-900/20',iconCls:'bg-rose-100 dark:bg-rose-900/50 text-rose-600 dark:text-rose-300',valueCls:'text-rose-600 dark:text-rose-300'},
+      {key:'resonance',label:'共振股',rows:resonanceRows,icon:'fa-fire',box:'bg-orange-50 dark:bg-orange-900/20',iconCls:'bg-orange-100 dark:bg-orange-900/50 text-orange-600 dark:text-orange-300',valueCls:'text-orange-600 dark:text-orange-300'},
+      {key:'revenue',label:'營收創高',rows:revenueRows,icon:'fa-chart-line',box:'bg-pink-50 dark:bg-pink-900/20',iconCls:'bg-pink-100 dark:bg-pink-900/50 text-pink-600 dark:text-pink-300',valueCls:'text-pink-600 dark:text-pink-300'},
+      {key:'holder',label:'最新千張大戶增',rows:holderRecentRows,icon:'fa-users',box:'bg-violet-50 dark:bg-violet-900/20',iconCls:'bg-violet-100 dark:bg-violet-900/50 text-violet-600 dark:text-violet-300',valueCls:'text-violet-600 dark:text-violet-300'}
+    ].map(card=>({...card,value:card.rows.length}));
+    warRoomStatData=new Map(cards.map(card=>[card.key,card]));
+    stats.innerHTML=cards.map(c=>`<button type="button" data-war-room-stat="${c.key}" aria-pressed="${activeWarRoomStatFilter===c.key?'true':'false'}" class="workbench-stat-card ${activeWarRoomStatFilter===c.key?'is-active ':''}text-left rounded-xl border border-gray-200 dark:border-gray-700 ${c.box}" title="點擊查看「${escapeHTML(c.label)}」個股清單"><div class="workbench-stat-inner"><span class="workbench-stat-icon ${c.iconCls}"><i class="fa-solid ${c.icon}"></i></span><div class="workbench-stat-copy"><div class="workbench-stat-label text-gray-500 dark:text-gray-400">${c.label}</div><div class="workbench-stat-value ${c.valueCls}">${c.value}</div></div></div></button>`).join('');
+    renderWarRoomSelection();
     const medals=['🥇','🥈','🥉'];
     ranking.innerHTML=rows.length?rows.slice(0,10).map((x,index)=>{
         const top=index<3,medal=medals[index]||`${index+1}`;
@@ -4159,14 +4324,29 @@ const renderRevenueMomentumDashboard=()=>{
 
 const dayDiffISO=(fromDate,toDate)=>{const a=new Date(`${fromDate}T00:00:00`),b=new Date(`${toDate}T00:00:00`);if(Number.isNaN(a.getTime())||Number.isNaN(b.getTime()))return null;return Math.round((b-a)/86400000);};
 const hasRecentLargeHolderIncrease=(code,referenceDate=getToday(),days=14)=>getRevenueRecordsForCode(code).some(record=>{if(String(record.code)!==String(code)||normalizeMomentumRecordType(record)!=='largeHolder'||!record.date)return false;const diff=dayDiffISO(record.date,referenceDate);return diff!==null&&diff>=0&&diff<days;});
-// v160：策略日誌的「千張大戶增加」篩選，不再限制 14 天。
-// 只要該股票在日誌基準日以前曾有千張大戶增加紀錄，最近一次有出現就算符合。
-const hasLatestLargeHolderIncrease=(code,referenceDate=getToday())=>{
-    const ref=String(referenceDate||getToday());
-    return getRevenueRecordsForCode(code).some(record=>{
-        if(String(record.code||'')!==String(code)||normalizeMomentumRecordType(record)!=='largeHolder'||!record.date)return false;
-        return String(record.date)<=ref;
+
+// v289：千張大戶增一律以「基準日前全市場最新一期」為準。
+// 某股票如果最新一期沒有出現在千張大戶增加名單，就不再視為「千張大戶增」。
+const getLatestLargeHolderSerial=(referenceDate=getToday())=>{
+    const refSerial=fridaySerial(String(referenceDate||getToday()));
+    if(refSerial===null)return null;
+    let latest=null;
+    (state.revenueRecords||[]).forEach(record=>{
+        if(normalizeMomentumRecordType(record)!=='largeHolder'||!record.date)return;
+        const serial=fridaySerial(record.date);
+        if(serial===null||serial>refSerial)return;
+        if(latest===null||serial>latest)latest=serial;
     });
+    return latest;
+};
+const hasLatestLargeHolderIncrease=(code,referenceDate=getToday())=>{
+    const latestSerial=getLatestLargeHolderSerial(referenceDate);
+    if(latestSerial===null)return false;
+    return getRevenueRecordsForCode(code).some(record=>
+        normalizeMomentumRecordType(record)==='largeHolder'&&
+        !!record.date&&
+        fridaySerial(record.date)===latestSerial
+    );
 };
 // v223：千張大戶連三增：以基準日以前的資料判斷，最近三個週期需連續都有增加紀錄。
 const hasConsecutiveLargeHolderIncrease3W=(code,referenceDate=getToday())=>{
@@ -4183,7 +4363,7 @@ const hasConsecutiveLargeHolderIncrease3W=(code,referenceDate=getToday())=>{
     return (refSerial-latest)<=1&&serials.includes(latest-1)&&serials.includes(latest-2);
 };
 const hasHighTurnoverRevenue=(code,referenceDate=getToday())=>{const ref=String(referenceDate||getToday());return getRevenueRecordsForCode(code).some(record=>String(record.code||'')===String(code)&&normalizeMomentumRecordType(record)==='highTurnoverRevenue'&&!!record.date&&String(record.date)<=ref);};
-const getRevenueMonthsHtml=(c,referenceDate=getToday())=>{const r=[...getRevenueRecordsForCode(c)];if(r.length===0)return'<span class="text-gray-300 dark:text-gray-600 text-xs">-</span>';r.sort((a,b)=>getMomentumRecordDate(b).localeCompare(getMomentumRecordDate(a)));return r.map(x=>{const type=normalizeMomentumRecordType(x);if(type==='largeHolder'){const recent=hasRecentLargeHolderIncrease(c,referenceDate,14)&&dayDiffISO(x.date,referenceDate)>=0&&dayDiffISO(x.date,referenceDate)<14;return`<span class="inline-flex items-center bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 border-violet-200 dark:border-violet-800 text-[10px] font-bold px-1.5 py-0.5 rounded mr-1 mb-1 border shadow-sm ${recent?'ring-1 ring-violet-400':''}" title="千張大戶持股增加：${escapeHTML(x.date||'')}"><i class="fa-solid fa-users mr-1"></i>千張大戶↑ ${escapeHTML((x.date||'').slice(5).replace('-','/'))}</span>`;}if(type==='highTurnoverRevenue'){return`<span class="inline-flex items-center bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800 text-[10px] font-bold px-1.5 py-0.5 rounded mr-1 mb-1 border shadow-sm" title="高成交值高營收：${escapeHTML(x.date||'')}"><i class="fa-solid fa-coins mr-1"></i>高值高成長 ${escapeHTML((x.date||'').slice(5).replace('-','/'))}</span>`;}const p=String(x.month||'').split('-'),m=parseInt(p[1],10)||1;return`<span class="inline-block ${MONTH_BG_COLORS[(m-1)%12]} text-[10px] font-bold px-1.5 py-0.5 rounded mr-1 mb-1 border shadow-sm" title="營收創高：${escapeHTML(x.month||'')}">${escapeHTML((p[0]||'').substring(2)+'/'+(p[1]||''))}</span>`;}).join('')+`<span class="inline-flex flex-wrap gap-1 ml-1">${renderMomentumBadges(c,referenceDate)}</span>`;};
+const getRevenueMonthsHtml=(c,referenceDate=getToday())=>{const r=[...getRevenueRecordsForCode(c)];if(r.length===0)return'<span class="text-gray-300 dark:text-gray-600 text-xs">-</span>';r.sort((a,b)=>getMomentumRecordDate(b).localeCompare(getMomentumRecordDate(a)));return r.map(x=>{const type=normalizeMomentumRecordType(x);if(type==='largeHolder'){const recent=hasLatestLargeHolderIncrease(c,referenceDate)&&fridaySerial(x.date)===getLatestLargeHolderSerial(referenceDate);return`<span class="inline-flex items-center bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 border-violet-200 dark:border-violet-800 text-[10px] font-bold px-1.5 py-0.5 rounded mr-1 mb-1 border shadow-sm ${recent?'ring-1 ring-violet-400':''}" title="千張大戶持股增加：${escapeHTML(x.date||'')}"><i class="fa-solid fa-users mr-1"></i>千張大戶↑ ${escapeHTML((x.date||'').slice(5).replace('-','/'))}</span>`;}if(type==='highTurnoverRevenue'){return`<span class="inline-flex items-center bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800 text-[10px] font-bold px-1.5 py-0.5 rounded mr-1 mb-1 border shadow-sm" title="高成交值高營收：${escapeHTML(x.date||'')}"><i class="fa-solid fa-coins mr-1"></i>高值高成長 ${escapeHTML((x.date||'').slice(5).replace('-','/'))}</span>`;}const p=String(x.month||'').split('-'),m=parseInt(p[1],10)||1;return`<span class="inline-block ${MONTH_BG_COLORS[(m-1)%12]} text-[10px] font-bold px-1.5 py-0.5 rounded mr-1 mb-1 border shadow-sm" title="營收創高：${escapeHTML(x.month||'')}">${escapeHTML((p[0]||'').substring(2)+'/'+(p[1]||''))}</span>`;}).join('')+`<span class="inline-flex flex-wrap gap-1 ml-1">${renderMomentumBadges(c,referenceDate)}</span>`;};
 
 const renderReportIndicator=(code='',referenceDate='')=>`<button type="button" data-open-stock-report="${escapeHTML(String(code||''))}" data-report-reference-date="${escapeHTML(String(referenceDate||''))}" title="點擊開啟該檔法人報告" aria-label="開啟法人報告" class="inline-flex shrink-0 w-5 h-5 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300 text-[10px] hover:bg-indigo-600 hover:text-white transition active:scale-90"><i class="fa-solid fa-file-lines pointer-events-none"></i></button>`;
 
@@ -5013,7 +5193,7 @@ const getFilteredAndSortedData=(dl,cf,cs)=>{
         if(tags.length>0){if(tagLogic==='AND'){if(!tags.every(t=>j.tags&&j.tags.includes(t)))return false;}else{if(!tags.some(t=>j.tags&&j.tags.includes(t)))return false;}}
         return true;
     });
-    fd.sort((a,b)=>{let vA,vB;switch(key){case'date':vA=a.date;vB=b.date;break;case'code':vA=a.code;vB=b.code;break;case'name':vA=a.name;vB=b.name;break;case'closePrice':vA=Number(a.closePrice??-9999);vB=Number(b.closePrice??-9999);break;case'eps2025':vA=a.ei.eps2025??-9999;vB=b.ei.eps2025??-9999;break;case'eps2026':vA=a.ei.eps2026??-9999;vB=b.ei.eps2026??-9999;break;case'epsGrowth':vA=a.ei.epsGrowth??-9999;vB=b.ei.epsGrowth??-9999;break;case'score':vA=a.score;vB=b.score;break;case'targetPrice':vA=a.ei.targetPrice??-9999;vB=b.ei.targetPrice??-9999;break;case'potentialUpside':vA=getPotentialUpsidePercent(a.ei.targetPrice,a.closePrice)??-9999;vB=getPotentialUpsidePercent(b.ei.targetPrice,b.closePrice)??-9999;break;case'revenueHigh':vA=(hasHighTurnoverRevenue(a.code,a.date)?4:0)+(state.revenueRecords.some(r=>String(r.code)===String(a.code)&&normalizeMomentumRecordType(r)==='revenue')?2:0)+(hasRecentLargeHolderIncrease(a.code,a.date,14)?1:0);vB=(hasHighTurnoverRevenue(b.code,b.date)?4:0)+(state.revenueRecords.some(r=>String(r.code)===String(b.code)&&normalizeMomentumRecordType(r)==='revenue')?2:0)+(hasRecentLargeHolderIncrease(b.code,b.date,14)?1:0);break;case'tags':vA=(a.tags||[]).join('、');vB=(b.tags||[]).join('、');break;case'notes':vA=a.notes||'';vB=b.notes||'';break;default:vA=a.createdAt||0;vB=b.createdAt||0;break;}if(vA===vB)return(a.createdAt||0)-(b.createdAt||0);return asc?(vA>vB?1:-1):(vA>vB?-1:1);});
+    fd.sort((a,b)=>{let vA,vB;switch(key){case'date':vA=a.date;vB=b.date;break;case'code':vA=a.code;vB=b.code;break;case'name':vA=a.name;vB=b.name;break;case'closePrice':vA=Number(a.closePrice??-9999);vB=Number(b.closePrice??-9999);break;case'eps2025':vA=a.ei.eps2025??-9999;vB=b.ei.eps2025??-9999;break;case'eps2026':vA=a.ei.eps2026??-9999;vB=b.ei.eps2026??-9999;break;case'epsGrowth':vA=a.ei.epsGrowth??-9999;vB=b.ei.epsGrowth??-9999;break;case'score':vA=a.score;vB=b.score;break;case'targetPrice':vA=a.ei.targetPrice??-9999;vB=b.ei.targetPrice??-9999;break;case'potentialUpside':vA=getPotentialUpsidePercent(a.ei.targetPrice,a.closePrice)??-9999;vB=getPotentialUpsidePercent(b.ei.targetPrice,b.closePrice)??-9999;break;case'revenueHigh':vA=(hasHighTurnoverRevenue(a.code,a.date)?4:0)+(state.revenueRecords.some(r=>String(r.code)===String(a.code)&&normalizeMomentumRecordType(r)==='revenue')?2:0)+(hasLatestLargeHolderIncrease(a.code,a.date)?1:0);vB=(hasHighTurnoverRevenue(b.code,b.date)?4:0)+(state.revenueRecords.some(r=>String(r.code)===String(b.code)&&normalizeMomentumRecordType(r)==='revenue')?2:0)+(hasLatestLargeHolderIncrease(b.code,b.date)?1:0);break;case'tags':vA=(a.tags||[]).join('、');vB=(b.tags||[]).join('、');break;case'notes':vA=a.notes||'';vB=b.notes||'';break;default:vA=a.createdAt||0;vB=b.createdAt||0;break;}if(vA===vB)return(a.createdAt||0)-(b.createdAt||0);return asc?(vA>vB?1:-1):(vA>vB?-1:1);});
     return fd;
 };
 
@@ -7245,6 +7425,33 @@ const buildOverviewCopyText=data=>{
     return lines.join('\n');
 };
 
+document.getElementById('war-room-stats')?.addEventListener('click',e=>{
+    const button=e.target.closest('[data-war-room-stat]');if(!button)return;
+    const key=button.dataset.warRoomStat||'';
+    activeWarRoomStatFilter=activeWarRoomStatFilter===key?'':key;
+    document.querySelectorAll('#war-room-stats [data-war-room-stat]').forEach(item=>{
+        const active=item.dataset.warRoomStat===activeWarRoomStatFilter;
+        item.classList.toggle('is-active',active);
+        item.setAttribute('aria-pressed',String(active));
+    });
+    renderWarRoomSelection();
+    if(activeWarRoomStatFilter){
+        requestAnimationFrame(()=>document.getElementById('war-room-selection')?.scrollIntoView({behavior:'smooth',block:'nearest'}));
+    }
+});
+document.getElementById('war-room-selection')?.addEventListener('click',e=>{
+    if(e.target.closest('[data-war-room-selection-close]')){
+        activeWarRoomStatFilter='';
+        document.querySelectorAll('#war-room-stats [data-war-room-stat]').forEach(item=>{item.classList.remove('is-active');item.setAttribute('aria-pressed','false');});
+        renderWarRoomSelection();
+        return;
+    }
+    const button=e.target.closest('[data-war-room-selection-code]');if(!button)return;
+    const code=button.dataset.warRoomSelectionCode||'';
+    document.querySelector('[data-target="module-overview"]')?.click();
+    const ci=document.getElementById('overview-code');if(ci)ci.value=code;
+    renderStockOverview(code);
+});
 document.getElementById('war-room-ranking')?.addEventListener('click',e=>{const b=e.target.closest('[data-war-room-code]');if(!b)return;const code=b.dataset.warRoomCode||'';document.querySelector('[data-target="module-overview"]')?.click();const ci=document.getElementById('overview-code');if(ci)ci.value=code;renderStockOverview(code);});
 document.getElementById('overview-search-form')?.addEventListener('submit',e=>{e.preventDefault();renderStockOverview();});
 document.getElementById('overview-clear-btn')?.addEventListener('click',()=>{
