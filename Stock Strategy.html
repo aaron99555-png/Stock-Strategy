@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="289" name="app-version"/>
+<meta content="291" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -2266,6 +2266,414 @@ body > #filter-tag-panel-fav.mobile-filter-tag-modal .filter-tag-choice-grid lab
 }
 </style>
 
+
+<style id="dashboard-redesign-v290">
+/* ==========================================================
+   v290 資訊儀表板大改版
+   原則：不改既有 ID / data-* / 表單流程 / 事件邏輯，只重整視覺層級。
+   ========================================================== */
+:root{
+  --v290-bg:#f4f7fb;
+  --v290-panel:#ffffff;
+  --v290-panel-soft:#f8fafc;
+  --v290-line:#dbe3ef;
+  --v290-line-soft:#e9eef5;
+  --v290-text:#172033;
+  --v290-muted:#68758a;
+  --v290-blue:#2563eb;
+  --v290-blue-soft:#eff6ff;
+  --v290-indigo:#4f46e5;
+  --v290-shadow:0 8px 26px rgba(15,23,42,.065);
+  --v290-shadow-hover:0 12px 32px rgba(15,23,42,.10);
+}
+html.dark{
+  --v290-bg:#09111f;
+  --v290-panel:#111b2b;
+  --v290-panel-soft:#0d1726;
+  --v290-line:#28364b;
+  --v290-line-soft:#1d2a3c;
+  --v290-text:#eef4ff;
+  --v290-muted:#9babc1;
+  --v290-blue:#60a5fa;
+  --v290-blue-soft:rgba(30,64,175,.22);
+  --v290-indigo:#818cf8;
+  --v290-shadow:0 10px 30px rgba(0,0,0,.22);
+  --v290-shadow-hover:0 14px 36px rgba(0,0,0,.30);
+}
+
+/* 整體工作區 */
+body{
+  background:
+    radial-gradient(circle at 8% -10%,rgba(37,99,235,.08),transparent 28rem),
+    radial-gradient(circle at 92% 0%,rgba(124,58,237,.06),transparent 24rem),
+    var(--v290-bg)!important;
+  color:var(--v290-text)!important;
+}
+html.dark body{
+  background:
+    radial-gradient(circle at 8% -10%,rgba(37,99,235,.15),transparent 28rem),
+    radial-gradient(circle at 92% 0%,rgba(124,58,237,.11),transparent 24rem),
+    var(--v290-bg)!important;
+}
+main{
+  padding-top:1rem!important;
+  padding-bottom:2rem!important;
+}
+@media (min-width:1280px){
+  main{max-width:1880px!important;padding-left:22px!important;padding-right:22px!important}
+}
+
+/* 頂部導覽：改成專業工作台 */
+body > nav{
+  background:rgba(255,255,255,.94)!important;
+  border-bottom:1px solid var(--v290-line)!important;
+  box-shadow:0 7px 24px rgba(15,23,42,.07)!important;
+}
+html.dark body > nav{background:rgba(9,17,31,.94)!important}
+body > nav .header-brand > div:first-child{
+  border-radius:12px!important;
+  box-shadow:inset 0 0 0 1px rgba(37,99,235,.12);
+}
+body > nav .cool-title{
+  font-family:inherit!important;
+  font-weight:950!important;
+  letter-spacing:.02em!important;
+  background:linear-gradient(120deg,#1d4ed8,#4f46e5 58%,#7c3aed)!important;
+  -webkit-background-clip:text!important;
+  color:transparent!important;
+  text-shadow:none!important;
+}
+html.dark body > nav .cool-title{
+  background:linear-gradient(120deg,#93c5fd,#a5b4fc 58%,#c4b5fd)!important;
+  -webkit-background-clip:text!important;
+}
+.nav-btn{
+  border:1px solid transparent!important;
+  border-bottom-width:1px!important;
+  border-radius:10px!important;
+  padding:.52rem .72rem!important;
+  font-size:12px!important;
+  font-weight:850!important;
+  background:transparent!important;
+}
+.nav-btn:hover{
+  border-color:var(--v290-line)!important;
+  background:var(--v290-panel-soft)!important;
+}
+.nav-btn[class*="active-"]{
+  color:#fff!important;
+  border-color:transparent!important;
+  background:linear-gradient(135deg,#2563eb,#4f46e5)!important;
+  box-shadow:0 5px 14px rgba(37,99,235,.22)!important;
+}
+
+/* 每個模組最上方加入資訊標題列 */
+.v290-module-hero{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:1rem;
+  margin:0 0 .85rem;
+  padding:.75rem .9rem;
+  border:1px solid var(--v290-line);
+  border-radius:14px;
+  background:linear-gradient(135deg,rgba(255,255,255,.92),rgba(248,250,252,.86));
+  box-shadow:0 4px 16px rgba(15,23,42,.035);
+}
+html.dark .v290-module-hero{
+  background:linear-gradient(135deg,rgba(17,27,43,.94),rgba(13,23,38,.92));
+}
+.v290-module-hero-main{display:flex;align-items:center;gap:.7rem;min-width:0}
+.v290-module-hero-icon{
+  width:38px;height:38px;flex:0 0 38px;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:11px;
+  background:linear-gradient(135deg,#dbeafe,#e0e7ff);
+  color:#3154c8;
+  box-shadow:inset 0 0 0 1px rgba(59,130,246,.12);
+}
+html.dark .v290-module-hero-icon{background:rgba(49,46,129,.34);color:#a5b4fc}
+.v290-module-hero h1{margin:0;font-size:16px;line-height:1.15;font-weight:950;color:var(--v290-text)}
+.v290-module-hero p{margin:.18rem 0 0;font-size:10.5px;line-height:1.35;color:var(--v290-muted)}
+.v290-module-hero-tag{
+  flex:0 0 auto;
+  display:inline-flex;align-items:center;gap:.35rem;
+  padding:.34rem .55rem;border:1px solid var(--v290-line);
+  border-radius:999px;background:var(--v290-panel-soft);
+  color:var(--v290-muted);font-size:9.5px;font-weight:850;white-space:nowrap;
+}
+
+/* 全站卡片：清楚分層，降低雜訊 */
+.card-panel{
+  background:var(--v290-panel)!important;
+  border-color:var(--v290-line)!important;
+  border-radius:15px!important;
+  box-shadow:var(--v290-shadow)!important;
+}
+.card-panel:hover{box-shadow:var(--v290-shadow-hover)!important}
+.card-panel > :first-child:not(.mobile-card-scroll):not(form){
+  border-color:var(--v290-line-soft)!important;
+}
+
+/* 作戰室：仍保留原功能，但資訊更像 dashboard */
+#journal-war-room{
+  border-top-width:0!important;
+  overflow:visible!important;
+  background:var(--v290-panel)!important;
+}
+#journal-war-room > div:first-child{
+  margin:0;
+  padding:.8rem 1rem!important;
+  border-bottom:1px solid var(--v290-line)!important;
+  border-radius:15px 15px 0 0;
+  background:
+    linear-gradient(120deg,rgba(239,246,255,.95),rgba(245,243,255,.78),rgba(255,247,237,.76))!important;
+}
+html.dark #journal-war-room > div:first-child{
+  background:linear-gradient(120deg,rgba(30,58,138,.20),rgba(76,29,149,.16),rgba(124,45,18,.10))!important;
+}
+#journal-war-room h2{
+  color:#243b86!important;
+  letter-spacing:.01em;
+}
+html.dark #journal-war-room h2{color:#bfdbfe!important}
+#journal-war-room #war-room-stats{gap:.65rem!important}
+#journal-war-room .workbench-stat-card{
+  position:relative;
+  min-height:70px!important;
+  border:1px solid var(--v290-line)!important;
+  border-radius:12px!important;
+  background:var(--v290-panel-soft)!important;
+  box-shadow:none!important;
+}
+#journal-war-room .workbench-stat-card:hover{
+  transform:translateY(-1px);
+  box-shadow:0 7px 18px rgba(15,23,42,.07)!important;
+}
+#journal-war-room .workbench-stat-value{font-size:23px!important}
+#journal-war-room .war-room-ranking-panel{
+  border-color:var(--v290-line)!important;
+  background:var(--v290-panel-soft)!important;
+}
+#journal-war-room #war-room-ranking{padding:.5rem!important}
+#journal-war-room .war-rank-card{
+  border-color:var(--v290-line)!important;
+  background:var(--v290-panel)!important;
+  border-radius:10px!important;
+}
+#journal-war-room .war-rank-card:hover{box-shadow:0 6px 16px rgba(15,23,42,.07)!important}
+
+/* 表單區：標籤與輸入框層級拉開 */
+form label,
+.card-panel label{
+  color:var(--v290-muted);
+}
+.input-base,
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+select,
+textarea{
+  border-color:#cdd7e5!important;
+  background:#fbfdff!important;
+  color:#172033!important;
+  box-shadow:inset 0 1px 2px rgba(15,23,42,.035)!important;
+}
+html.dark .input-base,
+html.dark input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+html.dark select,
+html.dark textarea{
+  border-color:#33445b!important;
+  background:#0e1929!important;
+  color:#f1f5f9!important;
+}
+.input-base:focus,
+input:focus,
+select:focus,
+textarea:focus{
+  border-color:#60a5fa!important;
+  box-shadow:0 0 0 3px rgba(59,130,246,.12)!important;
+}
+
+/* 篩選器：改成清楚的控制面板 */
+.filter-toolbar{
+  gap:.5rem!important;
+}
+.filter-toolbar,
+.copy-toolbar{
+  border-color:var(--v290-line)!important;
+  border-radius:12px!important;
+}
+.copy-section{
+  background:transparent!important;
+}
+.copy-toolbar{
+  background:linear-gradient(180deg,#f8fbff,#f3f7fc)!important;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.6);
+}
+html.dark .copy-toolbar{
+  background:linear-gradient(180deg,#101d30,#0d1828)!important;
+}
+.copy-toolbar .btn-copy,
+.copy-toolbar button{
+  border-radius:8px!important;
+}
+
+/* 表格：強化列欄分隔與數值辨識 */
+.mobile-card-scroll{
+  border:1px solid var(--v290-line)!important;
+  border-radius:12px!important;
+  background:var(--v290-panel)!important;
+}
+table{
+  border-collapse:separate!important;
+  border-spacing:0!important;
+}
+table thead th{
+  background:#edf2f8!important;
+  color:#5f6f85!important;
+  border-bottom:1px solid #cad5e3!important;
+  font-size:10.5px!important;
+  font-weight:900!important;
+  letter-spacing:.01em;
+}
+html.dark table thead th{
+  background:#132034!important;
+  color:#aebbd0!important;
+  border-bottom-color:#34455d!important;
+}
+table tbody td{
+  border-bottom-color:var(--v290-line-soft)!important;
+}
+table tbody tr:nth-child(even) td{
+  background-color:rgba(248,250,252,.62);
+}
+html.dark table tbody tr:nth-child(even) td{
+  background-color:rgba(15,23,42,.26);
+}
+table tbody tr:hover td{
+  background-color:#eff6ff!important;
+}
+html.dark table tbody tr:hover td{
+  background-color:rgba(30,64,175,.18)!important;
+}
+
+/* 策略日誌重點欄：收盤價、目標價、潛在漲幅 */
+#module-journal table :is(th,td):nth-child(4),
+#module-favorites table :is(th,td):nth-child(4){
+  background-image:linear-gradient(rgba(239,246,255,.56),rgba(239,246,255,.56))!important;
+}
+#module-journal table :is(th,td):nth-child(5),
+#module-favorites table :is(th,td):nth-child(5){
+  background-image:linear-gradient(rgba(255,251,235,.72),rgba(255,251,235,.72))!important;
+}
+#module-journal table :is(th,td):nth-child(6),
+#module-favorites table :is(th,td):nth-child(6){
+  background-image:linear-gradient(rgba(240,253,244,.68),rgba(240,253,244,.68))!important;
+}
+html.dark #module-journal table :is(th,td):nth-child(4),
+html.dark #module-favorites table :is(th,td):nth-child(4){
+  background-image:linear-gradient(rgba(30,58,138,.13),rgba(30,58,138,.13))!important;
+}
+html.dark #module-journal table :is(th,td):nth-child(5),
+html.dark #module-favorites table :is(th,td):nth-child(5){
+  background-image:linear-gradient(rgba(120,53,15,.12),rgba(120,53,15,.12))!important;
+}
+html.dark #module-journal table :is(th,td):nth-child(6),
+html.dark #module-favorites table :is(th,td):nth-child(6){
+  background-image:linear-gradient(rgba(20,83,45,.13),rgba(20,83,45,.13))!important;
+}
+
+/* 股票身份資訊 */
+.stock-identity-cell{
+  border-right:1px solid var(--v290-line-soft)!important;
+}
+.stock-identity-code{
+  color:#64748b!important;
+  letter-spacing:.035em;
+}
+.stock-identity-name{
+  color:#172033!important;
+  font-weight:950!important;
+}
+html.dark .stock-identity-name{color:#f4f7fb!important}
+
+/* 小標籤：拉開辨識度 */
+:is(.tag-badge,.strategy-tag,.war-rank-pill,[class*="rounded-full"]){
+  text-rendering:optimizeLegibility;
+}
+
+/* 空資料、提示、狀態 */
+[id$="-empty"]{
+  border-radius:10px;
+}
+#journal-close-price-status{
+  border-radius:999px;
+  padding:.25rem .55rem;
+  background:var(--v290-panel-soft);
+  border:1px solid var(--v290-line);
+}
+
+/* 模組間距 */
+.tab-content > .card-panel,
+.tab-content > section.card-panel{
+  margin-bottom:.85rem!important;
+}
+
+/* 手機：主資訊先看到、卡片不擁擠 */
+@media (max-width:639px){
+  main{padding:.65rem .5rem 5.5rem!important}
+  .v290-module-hero{
+    margin-bottom:.6rem;
+    padding:.6rem .68rem;
+    border-radius:12px;
+  }
+  .v290-module-hero-icon{width:34px;height:34px;flex-basis:34px}
+  .v290-module-hero h1{font-size:14px}
+  .v290-module-hero p{font-size:9.5px}
+  .v290-module-hero-tag{display:none}
+  .card-panel{border-radius:12px!important;box-shadow:0 4px 14px rgba(15,23,42,.055)!important}
+  #journal-war-room > div:first-child{border-radius:12px 12px 0 0;padding:.65rem .75rem!important}
+  #journal-war-room .war-room-body{padding:.5rem!important}
+  #journal-war-room .workbench-stat-card{min-height:61px!important}
+  #journal-war-room .workbench-stat-value{font-size:20px!important}
+  .mobile-card-scroll{
+    border-radius:10px!important;
+    padding:.35rem!important;
+  }
+  html.mobile-view-card table.mobile-card-table tbody{
+    gap:.48rem!important;
+  }
+  html.mobile-view-card table.mobile-card-table tbody tr{
+    border:1px solid var(--v290-line)!important;
+    border-radius:12px!important;
+    box-shadow:0 3px 12px rgba(15,23,42,.055)!important;
+  }
+  html.mobile-view-card table.mobile-card-table tbody td::before{
+    font-size:9px!important;
+    letter-spacing:.03em!important;
+  }
+  .copy-toolbar{
+    padding:.55rem!important;
+  }
+}
+
+/* 桌機：表頭保持可見，長清單閱讀更輕鬆 */
+@media (min-width:1024px){
+  .mobile-card-scroll{
+    max-height:min(70vh,760px);
+    overflow:auto!important;
+  }
+  .mobile-card-scroll table thead th{
+    position:sticky!important;
+    top:0!important;
+    z-index:18!important;
+    box-shadow:0 1px 0 var(--v290-line);
+  }
+  .tab-content > .card-panel{
+    transition:box-shadow .18s ease,border-color .18s ease;
+  }
+}
+</style>
+
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen flex flex-col antialiased">
 <nav class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-50 transition-colors duration-300">
@@ -3587,6 +3995,19 @@ body > #filter-tag-panel-fav.mobile-filter-tag-modal .filter-tag-choice-grid lab
 - 點擊清單中的個股可直接進入「個股總覽」。
 - 再點同一統計卡或 X 可收合清單。
 -->
+<!-- v290 資訊儀表板大改版：
+- 僅改版面、視覺層級與資訊可讀性，不變更任何既有功能邏輯。
+- 全模組新增一致的模組標題列。
+- 卡片、表單、篩選器、複製工具列、表格重新建立資訊層級。
+- 策略日誌特別強化 收盤價／目標價／潛在漲幅 三欄辨識。
+- 桌機表頭 sticky、手機卡片重新強化主次資訊。
+- 今日作戰室改成更清楚的 dashboard 視覺。
+-->
+<!-- v291：
+- 所有 Yahoo 個股連結改為直接開啟該股票的「技術分析」頁。
+- 適用所有使用 data-yahoo-stock-code 的模組與表格。
+- Yahoo URL 格式：/quote/{股票代號}/technical-analysis
+-->
 <!-- 核心 JavaScript -->
 <script>
 const originalDateSetter=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set;
@@ -3851,11 +4272,11 @@ const normalizeYahooStockCode=code=>{
 };
 const getYahooStockUrl=code=>{
     const normalized=normalizeYahooStockCode(code);
-    return normalized?`https://tw.stock.yahoo.com/quote/${encodeURIComponent(normalized)}`:'';
+    return normalized?`https://tw.stock.yahoo.com/quote/${encodeURIComponent(normalized)}/technical-analysis`:'';
 };
 const getYahooStockAttributes=code=>{
     const normalized=normalizeYahooStockCode(code);
-    return normalized?` data-yahoo-stock-code="${escapeHTML(normalized)}" role="link" tabindex="0" title="開啟 Yahoo 股市 ${escapeHTML(normalized)} 走勢圖"`:'';
+    return normalized?` data-yahoo-stock-code="${escapeHTML(normalized)}" role="link" tabindex="0" title="開啟 Yahoo 股市 ${escapeHTML(normalized)} 技術分析"`:'';
 };
 const openYahooStock=code=>{
     const url=getYahooStockUrl(code);
@@ -3877,9 +4298,9 @@ const setYahooStockTarget=(element,code)=>{
     if(!element)return;
     const normalized=normalizeYahooStockCode(code);
     if(!normalized){element.removeAttribute('data-yahoo-stock-code');element.removeAttribute('role');element.removeAttribute('tabindex');return;}
-    element.dataset.yahooStockCode=normalized;element.setAttribute('role','link');element.tabIndex=0;element.title=`開啟 Yahoo 股市 ${normalized} 走勢圖`;
+    element.dataset.yahooStockCode=normalized;element.setAttribute('role','link');element.tabIndex=0;element.title=`開啟 Yahoo 股市 ${normalized} 技術分析`;
 };
-// v191：所有模組只要表格欄位名稱為「代號/股名」，該欄位一律可點擊開啟 Yahoo 股市。
+// v191：所有模組只要表格欄位名稱為「代號/股名」，該欄位一律可點擊開啟 Yahoo 股市技術分析頁。
 // 不再依賴固定 tbody id / 固定第 3 欄，因此未來新增模組也能自動套用。
 const getYahooStockColumnIndex=table=>{
     if(!table)return-1;
@@ -10942,6 +11363,37 @@ document.addEventListener('DOMContentLoaded',()=>{
 </script>
 
 
+
+
+<script id="module-hero-v290">
+(function(){
+  const META={
+    'module-journal':['策略日誌','整合策略、籌碼、目標價與交易觀察','fa-book-journal-whills','核心工作區'],
+    'module-overview':['個股總覽','集中查看單一個股的重要資訊與關聯資料','fa-chart-pie','個股中心'],
+    'module-report':['法人報告','管理法人報告、目標價與研究摘要','fa-file-lines','研究資料'],
+    'module-revenue':['營收籌碼動能','追蹤營收創高、千張大戶與量價條件','fa-chart-line','基本面 × 籌碼'],
+    'module-checklist':['進場查核','進場前條件確認與風險檢查','fa-list-check','交易紀律'],
+    'module-plan':['交易規劃','建立進出場、停損與部位規劃','fa-bullseye','交易計畫'],
+    'module-favorites':['追蹤清單','集中查看需要持續追蹤的股票','fa-star','追蹤'],
+    'module-calculator':['支撐壓力','快速計算大盤與個股支撐壓力參考','fa-calculator','價位工具'],
+    'module-jellystock':['台股擂台賽','分析師績效與持股追蹤','fa-trophy','績效追蹤'],
+    'module-chipradar':['籌碼溫度雷達','觀察籌碼集中、加溫與強度變化','fa-temperature-half','籌碼雷達']
+  };
+  const ensure=()=>{
+    Object.entries(META).forEach(([id,meta])=>{
+      const root=document.getElementById(id);
+      if(!root||root.querySelector(':scope > .v290-module-hero'))return;
+      const [title,desc,icon,tag]=meta;
+      const hero=document.createElement('div');
+      hero.className='v290-module-hero';
+      hero.innerHTML=`<div class="v290-module-hero-main"><span class="v290-module-hero-icon"><i class="fa-solid ${icon}"></i></span><div class="min-w-0"><h1>${title}</h1><p>${desc}</p></div></div><span class="v290-module-hero-tag"><i class="fa-solid fa-circle-info"></i>${tag}</span>`;
+      root.prepend(hero);
+    });
+  };
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',ensure,{once:true});
+  else ensure();
+})();
+</script>
 
 </body>
 </html>
