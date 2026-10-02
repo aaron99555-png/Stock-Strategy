@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="294" name="app-version"/>
+<meta content="296" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -4097,6 +4097,18 @@ html.dark .stock-identity-name{color:#f4f7fb!important}
 - 「一個月內法人目標價」改以目標價更新日判斷，不再用報告日期。
 - 不刪除底層舊資料，只是不顯示沒有更新日的目標價，避免誤用過期或來源日期不明的數值。
 -->
+<!-- v295：
+- 「🌱 快樂農夫與他的韭菜田投資週報」複製時，自動比對前一次週報。
+- 本次有出現、前一次四個會員分類完全沒出現的股票，股名後加「🆕新進榜」。
+- 若只是黑卡／尊耀／頂峰／鐵粉之間換分類，但前一次週報已有該股票，不算新進榜。
+- 沒有前一次週報時，不會把本次全部誤標新進榜。
+- 仍受「標示小標籤 → 🆕新進榜」開關控制。
+-->
+<!-- v296：
+- 移除策略標籤「法人加持」。
+- 標籤挑選、策略分類、複製圖示皆不再顯示。
+- 舊資料若仍含「法人加持」，載入正規化時會自動忽略／清除，不再參與篩選、統計與複製。
+-->
 <!-- 核心 JavaScript -->
 <script>
 const originalDateSetter=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set;
@@ -4264,15 +4276,17 @@ const TAG_CATEGORIES = [
     {title: "🌟 特別關注", theme: "rose", tags: ["特別追蹤", "非凡重點", "總編概念股"]},
     {title: "📊 基本面佳", theme: "blue", tags: ["多頭營收創高", "追風馬", "赤兔馬", "千里馬"]},
     {title: "🔥 動能與型態", theme: "amber", tags: ["一陽指", "金包銀", "披荊斬棘", "破繭而出", "月來越好", "季不可失", "守株待兔", "缺口", "小碎步", "多排上漲"]},
-    {title: "💰 量價與籌碼", theme: "purple", tags: ["量價齊揚", "高成交值", "法人加持", "外資+投信", "外資+自營", "投信+自營", "三法聯手", "1日籌碼集中度", "5日籌碼集中", "20日籌碼集中", "籌碼集中大戶增"]},
+    {title: "💰 量價與籌碼", theme: "purple", tags: ["量價齊揚", "高成交值", "外資+投信", "外資+自營", "投信+自營", "三法聯手", "1日籌碼集中度", "5日籌碼集中", "20日籌碼集中", "籌碼集中大戶增"]},
     {title: "📈 技術指標", theme: "teal", tags: ["OBV突破", "MACD突破", "KD金叉"]},
     {title: "🌱 快樂農夫與他的韭菜田投資週報", theme: "purple", tags: ["黑卡會員", "尊耀會員", "頂峰會員", "鐵粉會員"]}
 ];
 
 const STRATEGY_TAG_ALIASES={'一條根':'一陽指','跳空缺口':'缺口','1日籌碼集中':'1日籌碼集中度','阿婆散步':'小碎步','阿甘步伐':'小碎步','總編認同':'總編概念股','籌碼集中集中大戶增':'籌碼集中大戶增'};
+const DEPRECATED_STRATEGY_TAGS=new Set(['法人加持']);
 const normalizeStrategyTagName=tag=>{
     const raw=String(tag??'').trim();
-    return STRATEGY_TAG_ALIASES[raw]||raw;
+    const normalized=STRATEGY_TAG_ALIASES[raw]||raw;
+    return DEPRECATED_STRATEGY_TAGS.has(normalized)?'':normalized;
 };
 
 const normalizeStrategyTags=items=>{
@@ -7985,7 +7999,7 @@ const orderTagsForCopy=(tags,selectedTags=[])=>{
 };
 const COPY_TAG_ICONS={
     '多頭營收創高':'📈','赤兔馬':'🐎','千里馬':'🏇','追風馬':'🌪️','黑卡會員':'🖤','鐵粉會員':'💗','尊耀會員':'👑','頂峰會員':'🏔️','一陽指':'☝️','金包銀':'🥇','披荊斬棘':'⚔️','破繭而出':'🦋','月來越好':'🌙','季不可失':'🗓️','守株待兔':'🐇','缺口':'🚀','小碎步':'👣','多排上漲':'🧱',
-    '量價齊揚':'📊','高成交值':'💰','法人加持':'🏦','1日籌碼集中度':'1️⃣','5日籌碼集中':'5️⃣','20日籌碼集中':'2️⃣0️⃣','OBV突破':'🌊','MACD突破':'〽️','KD金叉':'✨','大腸包小腸':'🌭'
+    '量價齊揚':'📊','高成交值':'💰','1日籌碼集中度':'1️⃣','5日籌碼集中':'5️⃣','20日籌碼集中':'2️⃣0️⃣','OBV突破':'🌊','MACD突破':'〽️','KD金叉':'✨','大腸包小腸':'🌭'
 };
 const COPY_TAG_ICON_POOL=['🔹','🔸','🔺','🔻','🟠','🟡','🟢','🔵','🟣','⚪','⚫','💠','🔷','🔶','▪️','▫️','♦️','♣️','♠️','♥️','🧩','🧭','🪄','🪙','🛡️','⚡','🔥','🌟','🎯','📌'];
 const buildCopyTagIconMap=tags=>{
@@ -8076,6 +8090,43 @@ const getStrategyCopyStockName=(journal,duplicateCodes,horseTag='')=>{
     const noteText=state.copyMarkNotes!==false&&note?`【備註：${note}】`:'';
     return `${name}${targetText}${noteText}${state.copyMarkNewEntry!==false&&isNew?' 🆕新進榜':''}${appendDuplicateMark(journal,duplicateCodes)}${getCopyMomentumMarks(journal?.code,referenceDate)}`;
 };
+
+// v295：農夫週報複製時，比對「前一次週報」是否曾出現。
+// 本次出現、前一次四個會員分類都沒有出現的股票，才標示 🆕新進榜。
+const getAnalystReportSnapshotCodes=date=>{
+    const target=String(date||'');
+    if(!target)return new Set();
+    return new Set((state.journals||[])
+        .filter(j=>String(j?.date||'')===target&&(j.tags||[]).map(normalizeStrategyTagName).some(tag=>ANALYST_SECTION_TAGS.has(tag)))
+        .map(j=>String(j?.code||'').trim())
+        .filter(Boolean));
+};
+const getPreviousAnalystReportDate=currentDate=>{
+    const current=String(currentDate||'');
+    if(!current)return'';
+    const dates=[...new Set((state.journals||[])
+        .filter(j=>String(j?.date||'')<current&&(j.tags||[]).map(normalizeStrategyTagName).some(tag=>ANALYST_SECTION_TAGS.has(tag)))
+        .map(j=>String(j?.date||''))
+        .filter(Boolean))].sort().reverse();
+    return dates[0]||'';
+};
+const getAnalystReportNewEntryInfo=currentDate=>{
+    const previousDate=getPreviousAnalystReportDate(currentDate);
+    if(!previousDate)return{previousDate:'',newCodes:new Set()};
+    const currentCodes=getAnalystReportSnapshotCodes(currentDate);
+    const previousCodes=getAnalystReportSnapshotCodes(previousDate);
+    return{
+        previousDate,
+        newCodes:new Set([...currentCodes].filter(code=>!previousCodes.has(code)))
+    };
+};
+const getAnalystCopyStockName=(journal,duplicateCodes,newEntryCodes)=>{
+    const base=getStrategyCopyStockName(journal,duplicateCodes);
+    const code=String(journal?.code||'').trim();
+    if(state.copyMarkNewEntry===false||!newEntryCodes?.has(code)||base.includes('🆕新進榜'))return base;
+    return `${base} 🆕新進榜`;
+};
+
 
 const syncCopyLabelToggles=()=>{
     document.querySelectorAll('.copy-compare-duplicates').forEach(cb=>{cb.checked=state.copyCompareDuplicates!==false;cb.disabled=false;});
@@ -8316,12 +8367,16 @@ document.querySelectorAll('.btn-copy').forEach(b=>{b.addEventListener('click',e=
 
         const duplicateCodes=getDuplicateStrategyCodes(sm),tagIcons=buildCopyTagIconMap(Object.keys(sm));
         const hasAnalystCopy=(cf.tags||[]).map(normalizeStrategyTagName).some(tag=>ANALYST_SECTION_TAGS.has(tag));
+        const analystCurrentDate=hasAnalystCopy
+            ? (Object.values(sm).flat().filter(j=>(j.tags||[]).map(normalizeStrategyTagName).some(tag=>ANALYST_SECTION_TAGS.has(tag))).map(j=>String(j.date||'')).filter(Boolean).sort().reverse()[0]||'')
+            : '';
+        const analystNewEntryInfo=hasAnalystCopy?getAnalystReportNewEntryInfo(analystCurrentDate):{previousDate:'',newCodes:new Set()};
         const ord=hasAnalystCopy
             ? ['黑卡會員','尊耀會員','頂峰會員','鐵粉會員',...TAG_CATEGORIES.flatMap(c=>c.tags).filter(tag=>!ANALYST_SECTION_TAGS.has(normalizeStrategyTagName(tag)))]
             : (cf.tags.length?[...cf.tags]:TAG_CATEGORIES.flatMap(c=>c.tags));
         Object.keys(sm).sort((a,b)=>{const iA=ord.indexOf(a),iB=ord.indexOf(b);if(iA!==-1&&iB!==-1)return iA-iB;if(iA!==-1)return -1;if(iB!==-1)return 1;return a.localeCompare(b);}).forEach(s=>{
             tx+=`${tagIcons.get(s)||'🏷️'} [${s}] (共 ${sm[s].length} 檔)\n`;
-            sm[s].forEach(a=>tx+=`${a.code} ${getStrategyCopyStockName(a,duplicateCodes)}\n`);
+            sm[s].forEach(a=>tx+=`${a.code} ${hasAnalystCopy?getAnalystCopyStockName(a,duplicateCodes,analystNewEntryInfo.newCodes):getStrategyCopyStockName(a,duplicateCodes)}\n`);
             tx+='\n';
         });
     }else if(m==='score'){
