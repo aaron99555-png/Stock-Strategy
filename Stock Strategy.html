@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="299" name="app-version"/>
+<meta content="301" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -2776,6 +2776,14 @@ html.dark .cnyes-target-row{
 }
 </style>
 
+
+<style id="reminder-color-expanded-v300">
+#tag-manager-reminder-color{
+  transition:border-color .18s ease,box-shadow .18s ease;
+  padding-left:14px!important;
+}
+</style>
+
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen flex flex-col antialiased">
 <nav class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-50 transition-colors duration-300">
@@ -3107,7 +3115,7 @@ html.dark .cnyes-target-row{
 <button class="flex-shrink-0 btn-copy-base bg-sky-50 dark:bg-sky-900/40 hover:bg-sky-600 border-sky-200 dark:border-sky-700/50 text-sky-700 dark:text-sky-200 btn-copy" data-mode="futures_score">股期分數</button>
 <button class="flex-shrink-0 btn-copy-base bg-orange-50 dark:bg-orange-900/40 hover:bg-orange-600 border-orange-200 dark:border-orange-700/50 text-orange-700 dark:text-orange-200 btn-copy" data-mode="chip">籌碼集中</button>
 <button class="flex-shrink-0 btn-copy-base bg-green-50 dark:bg-green-900/40 hover:bg-green-600 border-green-200 dark:border-green-700/50 text-green-700 dark:text-green-200 btn-copy" data-mode="eps">EPS</button>
-<button class="flex-shrink-0 btn-copy-base bg-amber-50 dark:bg-amber-900/40 hover:bg-amber-600 border-amber-200 dark:border-amber-700/50 text-amber-700 dark:text-amber-200 btn-copy" data-mode="horses" title="追風馬會與上一次追風馬名單比對：本次新增標示 🆕新進榜，上次有本次沒有標示 -剔除；赤兔馬、千里馬維持既有判斷">🏇 精選馬廄</button>
+<button class="flex-shrink-0 btn-copy-base bg-amber-50 dark:bg-amber-900/40 hover:bg-amber-600 border-amber-200 dark:border-amber-700/50 text-amber-700 dark:text-amber-200 btn-copy" data-mode="horses" title="追風馬、赤兔馬、千里馬都與各自上一次名單比對：本次有上次沒有標示 🆕新進榜；上次有本次沒有列入 ✂️剔除並顯示 -✂️剔除">🏇 精選馬廄</button>
 <button class="flex-shrink-0 btn-copy-base bg-rose-50 dark:bg-rose-900/40 hover:bg-rose-600 border-rose-200 dark:border-rose-700/50 text-rose-700 dark:text-rose-200 btn-copy" data-mode="feifan">非凡重點</button>
 </div>
 <div class="flex items-center gap-2 flex-wrap">
@@ -4169,6 +4177,21 @@ html.dark .cnyes-target-row{
 - 若沒有上一次追風馬名單，不會把本次全部誤標為新進榜。
 - 赤兔馬／千里馬維持原本判斷與剔除邏輯。
 - 新進榜標示仍受「標示小標籤 → 🆕新進榜」開關控制。
+-->
+<!-- v300：
+- 「提醒標註顏色」由原本 5 色擴充為 15 色。
+- 可選：紅、橙、琥珀、黃、萊姆綠、綠、青綠、青、天藍、藍、靛藍、紫羅蘭、紫、粉紅、灰藍。
+- 僅擴充提醒顏色，不改變原本標籤主題顏色與其他功能。
+- 新顏色支援儲存、編輯、雲端同步與備份匯入。
+- 顏色選單左側會顯示即時色條預覽。
+-->
+<!-- v301：
+- 精選馬廄中的追風馬、赤兔馬、千里馬改成完全相同的比對規則。
+- 三種馬都各自與「上一次同標籤名單」比對。
+- 本次有、上一次沒有：自動標示「🆕新進榜」。
+- 上一次有、本次沒有：自動列入「✂️ 剔除」，並顯示「-✂️剔除」。
+- 同一檔若同時從多個馬種剔除，合併成一筆並註明原屬馬種。
+- 若某馬種沒有上一次名單，不會把本次全部誤標成新進榜。
 -->
 <!-- 核心 JavaScript -->
 <script>
@@ -8416,9 +8439,10 @@ syncCopyLabelToggles();
 const executeCopy=async t=>{if(navigator.clipboard&&window.isSecureContext){try{const ok=await window.copyTextOptimized(t);if(ok)return showToast('複製成功');}catch(e){console.warn('剪貼簿 API 無法使用，改用相容模式',e);}}fallbackCopy(t);};
 const fallbackCopy=t=>{const x=document.createElement("textarea");x.value=t;x.style.position="fixed";document.body.appendChild(x);x.focus();x.select();try{document.execCommand('copy');showToast('複製成功');}catch(e){showToast('複製失敗','error');}document.body.removeChild(x);};
 
-// v299：追風馬採「本次名單 vs 上一次追風馬名單」逐檔比對。
-// 本次有、上次沒有 => 🆕新進榜；上次有、本次沒有 => -剔除。
-// 若尚無上一次追風馬名單，不會把本次全部誤判為新進榜。
+// v301：精選馬廄三種馬皆採「本次名單 vs 上一次同標籤名單」逐檔比對。
+// 追風馬／赤兔馬／千里馬規則完全一致：
+// 本次有、上次沒有 => 🆕新進榜；上次有、本次沒有 => -✂️剔除。
+// 若尚無上一次同標籤名單，不會把本次全部誤判為新進榜。
 const getHorseTagPreviousSnapshotComparison=(tag,currentItems,filterState,isFavorite=false)=>{
     const wanted=normalizeStrategyTagName(tag);
     const normalizeCode=journal=>String(journal?.code||'').trim();
@@ -8502,7 +8526,7 @@ const getHorseSnapshotCopyName=(journal,duplicateCodes,tag,newCodes)=>{
     const base=getStrategyCopyStockName(journal,duplicateCodes,tag);
     const code=String(journal?.code||'').trim();
     if(
-        normalizeStrategyTagName(tag)!=='追風馬'||
+        !HORSE_NEW_ENTRY_TAGS.has(normalizeStrategyTagName(tag))||
         state.copyMarkNewEntry===false||
         !newCodes?.has(code)||
         base.includes('🆕新進榜')
@@ -8599,43 +8623,36 @@ document.querySelectorAll('.btn-copy').forEach(b=>{b.addEventListener('click',e=
     if(m==='horses'){
         const horseTags=['追風馬','赤兔馬','千里馬'],horseIcons={'追風馬':'🌪️','赤兔馬':'🐎','千里馬':'🏇'},sections=[];
         const duplicateCodes=getDuplicateStrategyCodesFromJournals(d,horseTags);
-        const chaseComparison=getHorseTagPreviousSnapshotComparison('追風馬',d,cf,iF);
+        const horseComparisons=new Map(horseTags.map(tag=>[tag,getHorseTagPreviousSnapshotComparison(tag,d,cf,iF)]));
 
         horseTags.forEach(tag=>{
-            let items=[];
-            if(tag==='追風馬'){
-                items=chaseComparison.currentItems||[];
-            }else{
-                const byCode=new Map();
-                d.filter(j=>journalHasStrategyTag(j,tag)).forEach(j=>{
-                    const code=String(j.code||'').trim();if(!code)return;
-                    const current=byCode.get(code);
-                    if(!current||String(j.date||'')>String(current.date||'')||(String(j.date||'')===String(current.date||'')&&Number(j.createdAt||0)>Number(current.createdAt||0)))byCode.set(code,j);
-                });
-                items=[...byCode.values()].sort((a,b)=>String(a.code||'').localeCompare(String(b.code||''),'zh-Hant',{numeric:true}));
-            }
+            const comparison=horseComparisons.get(tag),items=comparison?.currentItems||[];
             if(!items.length)return;
-
-            const lines=items.map(j=>`${j.code} ${tag==='追風馬'
-                ?getHorseSnapshotCopyName(j,duplicateCodes,tag,chaseComparison.newCodes)
-                :getStrategyCopyStockName(j,duplicateCodes,tag)}`);
+            const lines=items.map(j=>`${j.code} ${getHorseSnapshotCopyName(j,duplicateCodes,tag,comparison.newCodes)}`);
             sections.push(`${horseIcons[tag]} [${tag}] (共 ${items.length} 檔)\n${lines.join('\n')}`);
         });
 
-        // 追風馬：上一次有、本次沒有，獨立列出「追風馬剔除」。
-        if(chaseComparison.removed.length){
-            const removalLines=chaseComparison.removed.map(item=>`${item.code} ${item.name||''} -剔除`.trim());
-            sections.push(`✂️ [追風馬剔除] (共 ${chaseComparison.removed.length} 檔)\n${removalLines.join('\n')}`);
-        }
-
-        // 其他馬種維持原本前兩次聯集剔除邏輯，但排除追風馬，避免重複列出。
-        const removalComparison=getTwoHorseRemovalComparison(d,cf,iF);
-        const otherRemoved=(removalComparison.removed||[])
-            .map(item=>({...item,horseTags:(item.horseTags||[]).filter(tag=>tag!=='追風馬')}))
-            .filter(item=>item.horseTags.length);
-        if(otherRemoved.length){
-            const removalLines=otherRemoved.map(item=>`${item.code} ${item.name||''} -剔除（${item.horseTags.join('、')}）`.trim());
-            sections.push(`✂️ [其他馬種剔除] (共 ${otherRemoved.length} 檔)\n${removalLines.join('\n')}`);
+        // 三種馬皆用同一套「上一次有、本次沒有」的剔除規則。
+        // 同一檔若同時從多個馬種剔除，合併成一筆並列出原屬馬種。
+        const removedByCode=new Map();
+        horseTags.forEach(tag=>{
+            const comparison=horseComparisons.get(tag);
+            (comparison?.removed||[]).forEach(item=>{
+                const code=String(item.code||'').trim();if(!code)return;
+                const existing=removedByCode.get(code)||{
+                    code,
+                    name:item.name||state.codeToName[code]||'',
+                    horseTags:[]
+                };
+                if(!existing.name&&item.name)existing.name=item.name;
+                if(!existing.horseTags.includes(tag))existing.horseTags.push(tag);
+                removedByCode.set(code,existing);
+            });
+        });
+        const removed=[...removedByCode.values()].sort((a,b)=>String(a.code).localeCompare(String(b.code),'zh-Hant',{numeric:true}));
+        if(removed.length){
+            const removalLines=removed.map(item=>`${item.code} ${item.name||''} -✂️剔除${item.horseTags.length?`（${item.horseTags.join('、')}）`:''}`.trim());
+            sections.push(`✂️ [剔除] (共 ${removed.length} 檔)\n${removalLines.join('\n')}`);
         }
 
         if(!sections.length)return showToast('目前沒有追風馬、赤兔馬或千里馬可複製','error');
@@ -10183,6 +10200,7 @@ setChkDirection('long');
 
   var DEFAULT_TAG_CATEGORIES=JSON.parse(JSON.stringify(TAG_CATEGORIES));
   var VALID_THEMES=['rose','blue','amber','purple','teal'];
+  var REMINDER_COLOR_KEYS=['rose','orange','amber','yellow','lime','green','teal','cyan','sky','blue','indigo','violet','purple','pink','slate'];
   var pendingImport=null;
   var IMPORT_RECOVERY_DB='ryan_stock_import_recovery_v1',IMPORT_RECOVERY_STORE='snapshots',IMPORT_RECOVERY_KEY='latestImport',importRecoveryMemory=null;
   var TYPE_CONFIG={
@@ -10257,7 +10275,7 @@ setChkDirection('long');
   function normalizeTagMeta(name,categoryTheme,meta){
     var source=meta&&typeof meta==='object'?meta:{};
     var cadence=['none','daily','weekly'].includes(source.requiredCadence)?source.requiredCadence:'none';
-    var reminderColor=VALID_THEMES.includes(source.reminderColor)?source.reminderColor:'amber';
+    var reminderColor=REMINDER_COLOR_KEYS.includes(source.reminderColor)?source.reminderColor:'amber';
     return{
       isStrategy:source.isStrategy!==undefined?!!source.isStrategy:!NON_STRATEGY_COPY_TAGS.has(name),
       icon:String(source.icon||COPY_TAG_ICONS[name]||'').trim().slice(0,12),
@@ -10439,11 +10457,27 @@ setChkDirection('long');
     var meta=state.tagSettings&&state.tagSettings.meta&&state.tagSettings.meta[tag];
     return meta&&meta.icon?meta.icon:'';
   };
-  var TAG_REMINDER_HEX={rose:'#e11d48',blue:'#2563eb',amber:'#f59e0b',purple:'#7c3aed',teal:'#0d9488'};
+  var TAG_REMINDER_HEX={
+    rose:'#e11d48',
+    orange:'#ea580c',
+    amber:'#f59e0b',
+    yellow:'#eab308',
+    lime:'#65a30d',
+    green:'#16a34a',
+    teal:'#0d9488',
+    cyan:'#0891b2',
+    sky:'#0284c7',
+    blue:'#2563eb',
+    indigo:'#4f46e5',
+    violet:'#7c3aed',
+    purple:'#9333ea',
+    pink:'#db2777',
+    slate:'#64748b'
+  };
   window.getManagedTagRequirement=function(tag){
     var meta=state.tagSettings&&state.tagSettings.meta&&state.tagSettings.meta[tag]||{};
     var cadence=['daily','weekly'].includes(meta.requiredCadence)?meta.requiredCadence:'none';
-    var color=VALID_THEMES.includes(meta.reminderColor)?meta.reminderColor:'amber';
+    var color=REMINDER_COLOR_KEYS.includes(meta.reminderColor)?meta.reminderColor:'amber';
     return{cadence:cadence,color:color,hex:TAG_REMINDER_HEX[color]||TAG_REMINDER_HEX.amber};
   };
   window.renderTagRequirementReminder=function(){
@@ -10523,7 +10557,7 @@ setChkDirection('long');
       '<div><label class="block text-xs font-bold text-gray-500 mb-1">分類</label><select id="tag-manager-category" class="input-base"></select></div>',
       '<div><label class="block text-xs font-bold text-gray-500 mb-1">標籤顏色</label><select id="tag-manager-theme" class="input-base"><option value="rose">紅色</option><option value="blue">藍色</option><option value="amber">橘色</option><option value="purple">紫色</option><option value="teal">綠色</option></select></div>',
       '<div><label class="block text-xs font-bold text-gray-500 mb-1">必填頻率</label><select id="tag-manager-required-cadence" class="input-base"><option value="none">不提醒</option><option value="daily">每天開盤必填</option><option value="weekly">每週必填</option></select></div>',
-      '<div><label class="block text-xs font-bold text-gray-500 mb-1">提醒標註顏色</label><select id="tag-manager-reminder-color" class="input-base"><option value="rose">紅色</option><option value="amber">橘色</option><option value="blue">藍色</option><option value="purple">紫色</option><option value="teal">綠色</option></select></div>',
+      '<div><label class="block text-xs font-bold text-gray-500 mb-1">提醒標註顏色</label><select id="tag-manager-reminder-color" class="input-base"><option value="rose">紅色</option><option value="orange">橙色</option><option value="amber">琥珀色</option><option value="yellow">黃色</option><option value="lime">萊姆綠</option><option value="green">綠色</option><option value="teal">青綠色</option><option value="cyan">青色</option><option value="sky">天藍色</option><option value="blue">藍色</option><option value="indigo">靛藍色</option><option value="violet">紫羅蘭</option><option value="purple">紫色</option><option value="pink">粉紅色</option><option value="slate">灰藍色</option></select></div>',
       '<div class="col-span-2"><label class="block text-xs font-bold text-gray-500 mb-1">複製圖示（選填）</label><input id="tag-manager-icon" maxlength="12" class="input-base" placeholder="例如：🎯"></div>',
       '<label class="col-span-2 flex items-center gap-2 p-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 cursor-pointer"><input type="checkbox" id="tag-manager-strategy" class="w-4 h-4 accent-rose-600" checked><span class="text-xs sm:text-sm font-bold">納入策略計分及一般策略複製</span></label></div>',
       '<div class="flex gap-2 mt-4"><button id="tag-manager-save" type="button" class="flex-1 h-10 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-bold text-sm"><i class="fa-solid fa-floppy-disk mr-1.5"></i>儲存標籤</button><button id="tag-manager-cancel-edit" type="button" class="hidden px-4 h-10 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-200 text-sm font-bold">取消編輯</button></div>',
@@ -10547,6 +10581,15 @@ setChkDirection('long');
     ].join(''));
   }
 
+  function updateReminderColorPreview(){
+    var select=document.getElementById('tag-manager-reminder-color');
+    if(!select)return;
+    var color=REMINDER_COLOR_KEYS.includes(select.value)?select.value:'amber';
+    var hex=(TAG_REMINDER_HEX&&TAG_REMINDER_HEX[color])||'#f59e0b';
+    select.style.borderColor=hex;
+    select.style.boxShadow='inset 5px 0 0 '+hex;
+  }
+
   function resetTagForm(){
     document.getElementById('tag-manager-original').value='';
     document.getElementById('tag-manager-name').value='';
@@ -10558,6 +10601,7 @@ setChkDirection('long');
     document.getElementById('tag-manager-reminder-color').value='amber';
     document.getElementById('tag-manager-cancel-edit').classList.add('hidden');
     document.getElementById('tag-manager-save').innerHTML='<i class="fa-solid fa-plus mr-1.5"></i>新增標籤';
+    updateReminderColorPreview();
   }
 
   function renderTagManager(){
@@ -10637,7 +10681,7 @@ setChkDirection('long');
       updateReferencesForRenamedTag(original,name);
       delete state.tagSettings.meta[original];
     }
-    state.tagSettings.meta[name]={isStrategy:isStrategy,icon:icon.slice(0,12),theme:VALID_THEMES.includes(theme)?theme:target.theme,requiredCadence:['daily','weekly'].includes(requiredCadence)?requiredCadence:'none',reminderColor:VALID_THEMES.includes(reminderColor)?reminderColor:'amber'};
+    state.tagSettings.meta[name]={isStrategy:isStrategy,icon:icon.slice(0,12),theme:VALID_THEMES.includes(theme)?theme:target.theme,requiredCadence:['daily','weekly'].includes(requiredCadence)?requiredCadence:'none',reminderColor:REMINDER_COLOR_KEYS.includes(reminderColor)?reminderColor:'amber'};
     resetTagForm();
     await persistTagSettings(original&&original!==name);
     showToast(original?'標籤已更新':'標籤已新增');
@@ -10653,7 +10697,8 @@ setChkDirection('long');
     document.getElementById('tag-manager-icon').value=meta.icon||'';
     document.getElementById('tag-manager-strategy').checked=!!meta.isStrategy;
     document.getElementById('tag-manager-required-cadence').value=['daily','weekly'].includes(meta.requiredCadence)?meta.requiredCadence:'none';
-    document.getElementById('tag-manager-reminder-color').value=VALID_THEMES.includes(meta.reminderColor)?meta.reminderColor:'amber';
+    document.getElementById('tag-manager-reminder-color').value=REMINDER_COLOR_KEYS.includes(meta.reminderColor)?meta.reminderColor:'amber';
+    updateReminderColorPreview();
     document.getElementById('tag-manager-cancel-edit').classList.remove('hidden');
     document.getElementById('tag-manager-save').innerHTML='<i class="fa-solid fa-floppy-disk mr-1.5"></i>儲存修改';
     document.getElementById('tag-manager-name').focus();
@@ -10857,7 +10902,7 @@ setChkDirection('long');
         var title=String(row['分類']).trim(),tag=String(row['標籤']).trim(),category=categoryMap.get(title),categoryTheme=VALID_THEMES.includes(row['分類主題'])?row['分類主題']:'blue';
         if(!category){category={title:title,theme:categoryTheme,tags:[]};categoryMap.set(title,category);categories.push(category);}
         if(!category.tags.includes(tag))category.tags.push(tag);
-        var cadenceText=String(row['必填頻率']||'').trim(),requiredCadence=cadenceText==='每天開盤必填'?'daily':cadenceText==='每週必填'?'weekly':'none',reminderColor=VALID_THEMES.includes(row['提醒顏色'])?row['提醒顏色']:'amber';
+        var cadenceText=String(row['必填頻率']||'').trim(),requiredCadence=cadenceText==='每天開盤必填'?'daily':cadenceText==='每週必填'?'weekly':'none',reminderColor=REMINDER_COLOR_KEYS.includes(row['提醒顏色'])?row['提醒顏色']:'amber';
         meta[tag]={theme:VALID_THEMES.includes(row['顏色'])?row['顏色']:category.theme,icon:String(row['複製圖示']||'').trim().slice(0,12),isStrategy:String(row['參與策略']||'是').trim()!=='否',requiredCadence:requiredCadence,reminderColor:reminderColor};
       });
       importedTagSettings={version:1,categories:categories,meta:meta,updatedAt:Date.now()};
@@ -11272,6 +11317,7 @@ setChkDirection('long');
     document.getElementById('tag-manager-close').addEventListener('click',function(){document.getElementById('tag-manager-modal').classList.add('hidden');document.getElementById('tag-manager-modal').classList.remove('flex');});
     document.getElementById('tag-manager-save').addEventListener('click',saveManagedTag);
     document.getElementById('tag-manager-cancel-edit').addEventListener('click',resetTagForm);
+    document.getElementById('tag-manager-reminder-color').addEventListener('change',updateReminderColorPreview);
     document.getElementById('tag-manager-category').addEventListener('change',function(){if(document.getElementById('tag-manager-original').value)return;var category=state.tagSettings.categories[parseInt(this.value,10)||0];if(category){document.getElementById('tag-manager-theme').value=category.theme;document.getElementById('tag-manager-strategy').checked=(parseInt(this.value,10)||0)!==0;}});
     document.getElementById('tag-manager-list').addEventListener('click',function(event){
       var button=event.target.closest('[data-tag-action]');if(!button)return;
