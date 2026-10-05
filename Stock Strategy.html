@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="298" name="app-version"/>
+<meta content="299" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -3107,7 +3107,7 @@ html.dark .cnyes-target-row{
 <button class="flex-shrink-0 btn-copy-base bg-sky-50 dark:bg-sky-900/40 hover:bg-sky-600 border-sky-200 dark:border-sky-700/50 text-sky-700 dark:text-sky-200 btn-copy" data-mode="futures_score">股期分數</button>
 <button class="flex-shrink-0 btn-copy-base bg-orange-50 dark:bg-orange-900/40 hover:bg-orange-600 border-orange-200 dark:border-orange-700/50 text-orange-700 dark:text-orange-200 btn-copy" data-mode="chip">籌碼集中</button>
 <button class="flex-shrink-0 btn-copy-base bg-green-50 dark:bg-green-900/40 hover:bg-green-600 border-green-200 dark:border-green-700/50 text-green-700 dark:text-green-200 btn-copy" data-mode="eps">EPS</button>
-<button class="flex-shrink-0 btn-copy-base bg-amber-50 dark:bg-amber-900/40 hover:bg-amber-600 border-amber-200 dark:border-amber-700/50 text-amber-700 dark:text-amber-200 btn-copy" data-mode="horses" title="複製赤兔馬、千里馬與追風馬；🆕新進榜為新進榜，🔁為跨策略重複；比對本次實際精選馬廄名單；前2次任一次曾出現、但本次完全沒出現才標示 -剔除，並註明原屬追風馬／赤兔馬／千里馬">🏇 精選馬廄</button>
+<button class="flex-shrink-0 btn-copy-base bg-amber-50 dark:bg-amber-900/40 hover:bg-amber-600 border-amber-200 dark:border-amber-700/50 text-amber-700 dark:text-amber-200 btn-copy" data-mode="horses" title="追風馬會與上一次追風馬名單比對：本次新增標示 🆕新進榜，上次有本次沒有標示 -剔除；赤兔馬、千里馬維持既有判斷">🏇 精選馬廄</button>
 <button class="flex-shrink-0 btn-copy-base bg-rose-50 dark:bg-rose-900/40 hover:bg-rose-600 border-rose-200 dark:border-rose-700/50 text-rose-700 dark:text-rose-200 btn-copy" data-mode="feifan">非凡重點</button>
 </div>
 <div class="flex items-center gap-2 flex-wrap">
@@ -4161,6 +4161,14 @@ html.dark .cnyes-target-row{
 - 勾選：複製共同策略、策略頻率與每日策略標籤。
 - 取消勾選：只複製股票、連續/出現次數、強度、熱度等主要資訊，不帶策略標籤細節。
 - 開關偏好儲存在本機，下次開啟仍保留。
+-->
+<!-- v299：
+- 精選馬廄中的「追風馬」改為與上一次追風馬名單逐檔比對。
+- 本次有、上一次沒有：股名後標示「🆕新進榜」。
+- 上一次有、本次沒有：新增「✂️ 追風馬剔除」區塊並標示「-剔除」。
+- 若沒有上一次追風馬名單，不會把本次全部誤標為新進榜。
+- 赤兔馬／千里馬維持原本判斷與剔除邏輯。
+- 新進榜標示仍受「標示小標籤 → 🆕新進榜」開關控制。
 -->
 <!-- 核心 JavaScript -->
 <script>
@@ -8408,6 +8416,100 @@ syncCopyLabelToggles();
 const executeCopy=async t=>{if(navigator.clipboard&&window.isSecureContext){try{const ok=await window.copyTextOptimized(t);if(ok)return showToast('複製成功');}catch(e){console.warn('剪貼簿 API 無法使用，改用相容模式',e);}}fallbackCopy(t);};
 const fallbackCopy=t=>{const x=document.createElement("textarea");x.value=t;x.style.position="fixed";document.body.appendChild(x);x.focus();x.select();try{document.execCommand('copy');showToast('複製成功');}catch(e){showToast('複製失敗','error');}document.body.removeChild(x);};
 
+// v299：追風馬採「本次名單 vs 上一次追風馬名單」逐檔比對。
+// 本次有、上次沒有 => 🆕新進榜；上次有、本次沒有 => -剔除。
+// 若尚無上一次追風馬名單，不會把本次全部誤判為新進榜。
+const getHorseTagPreviousSnapshotComparison=(tag,currentItems,filterState,isFavorite=false)=>{
+    const wanted=normalizeStrategyTagName(tag);
+    const normalizeCode=journal=>String(journal?.code||'').trim();
+    const filterEnd=normalizeHorseJournalDate(filterState?.end);
+    const filterStart=normalizeHorseJournalDate(filterState?.start);
+
+    const visibleDates=(currentItems||[])
+        .filter(j=>journalHasStrategyTag(j,wanted))
+        .map(j=>normalizeHorseJournalDate(j.date))
+        .filter(Boolean)
+        .sort();
+
+    const baseDate=visibleDates[visibleDates.length-1]||filterEnd||filterStart||normalizeHorseJournalDate(getToday());
+    if(!baseDate)return{tag:wanted,baseDate:'',previousDate:'',currentItems:[],newCodes:new Set(),removed:[]};
+
+    const getLatestByCode=rows=>{
+        const map=new Map();
+        (rows||[]).forEach(j=>{
+            const code=normalizeCode(j);if(!code)return;
+            const current=map.get(code);
+            if(!current||Number(j.createdAt||0)>Number(current.createdAt||0))map.set(code,j);
+        });
+        return map;
+    };
+
+    const currentRows=(state.journals||[]).filter(j=>
+        normalizeHorseJournalDate(j.date)===baseDate&&
+        journalHasStrategyTag(j,wanted)&&
+        (!isFavorite||j.isFavorite)
+    );
+    const currentByCode=getLatestByCode(currentRows);
+
+    const previousDate=[...new Set((state.journals||[])
+        .filter(j=>journalHasStrategyTag(j,wanted)&&(!isFavorite||j.isFavorite))
+        .map(j=>normalizeHorseJournalDate(j.date))
+        .filter(date=>date&&date<baseDate))]
+        .sort()
+        .reverse()[0]||'';
+
+    if(!previousDate){
+        return{
+            tag:wanted,
+            baseDate,
+            previousDate:'',
+            currentItems:[...currentByCode.values()].sort((a,b)=>String(a.code||'').localeCompare(String(b.code||''),'zh-Hant',{numeric:true})),
+            newCodes:new Set(),
+            removed:[]
+        };
+    }
+
+    const previousRows=(state.journals||[]).filter(j=>
+        normalizeHorseJournalDate(j.date)===previousDate&&
+        journalHasStrategyTag(j,wanted)&&
+        (!isFavorite||j.isFavorite)
+    );
+    const previousByCode=getLatestByCode(previousRows);
+
+    const currentCodes=new Set(currentByCode.keys());
+    const previousCodes=new Set(previousByCode.keys());
+    const newCodes=new Set([...currentCodes].filter(code=>!previousCodes.has(code)));
+    const removed=[...previousByCode.values()]
+        .filter(j=>!currentCodes.has(normalizeCode(j)))
+        .map(j=>({
+            code:normalizeCode(j),
+            name:getCanonicalStockName(normalizeCode(j),j.name)||String(j.name||'').trim(),
+            previousDate
+        }))
+        .sort((a,b)=>String(a.code).localeCompare(String(b.code),'zh-Hant',{numeric:true}));
+
+    return{
+        tag:wanted,
+        baseDate,
+        previousDate,
+        currentItems:[...currentByCode.values()].sort((a,b)=>String(a.code||'').localeCompare(String(b.code||''),'zh-Hant',{numeric:true})),
+        newCodes,
+        removed
+    };
+};
+
+const getHorseSnapshotCopyName=(journal,duplicateCodes,tag,newCodes)=>{
+    const base=getStrategyCopyStockName(journal,duplicateCodes,tag);
+    const code=String(journal?.code||'').trim();
+    if(
+        normalizeStrategyTagName(tag)!=='追風馬'||
+        state.copyMarkNewEntry===false||
+        !newCodes?.has(code)||
+        base.includes('🆕新進榜')
+    )return base;
+    return `${base} 🆕新進榜`;
+};
+
 // v174：精選馬廄複製的「剔除」採前兩次名單聯集判斷。
 // 前兩次只要任一次曾出現，而本次沒有出現，就列為「-剔除」。
 const getTwoHorseRemovalComparison=(currentItems,filterState,isFavorite=false)=>{
@@ -8497,25 +8599,46 @@ document.querySelectorAll('.btn-copy').forEach(b=>{b.addEventListener('click',e=
     if(m==='horses'){
         const horseTags=['追風馬','赤兔馬','千里馬'],horseIcons={'追風馬':'🌪️','赤兔馬':'🐎','千里馬':'🏇'},sections=[];
         const duplicateCodes=getDuplicateStrategyCodesFromJournals(d,horseTags);
+        const chaseComparison=getHorseTagPreviousSnapshotComparison('追風馬',d,cf,iF);
+
         horseTags.forEach(tag=>{
-            const byCode=new Map();
-            d.filter(j=>journalHasStrategyTag(j,tag)).forEach(j=>{
-                const code=String(j.code||'').trim();if(!code)return;
-                const current=byCode.get(code);
-                if(!current||String(j.date||'')>String(current.date||'')||(String(j.date||'')===String(current.date||'')&&Number(j.createdAt||0)>Number(current.createdAt||0)))byCode.set(code,j);
-            });
-            const items=[...byCode.values()].sort((a,b)=>String(a.code||'').localeCompare(String(b.code||''),'zh-Hant',{numeric:true}));
+            let items=[];
+            if(tag==='追風馬'){
+                items=chaseComparison.currentItems||[];
+            }else{
+                const byCode=new Map();
+                d.filter(j=>journalHasStrategyTag(j,tag)).forEach(j=>{
+                    const code=String(j.code||'').trim();if(!code)return;
+                    const current=byCode.get(code);
+                    if(!current||String(j.date||'')>String(current.date||'')||(String(j.date||'')===String(current.date||'')&&Number(j.createdAt||0)>Number(current.createdAt||0)))byCode.set(code,j);
+                });
+                items=[...byCode.values()].sort((a,b)=>String(a.code||'').localeCompare(String(b.code||''),'zh-Hant',{numeric:true}));
+            }
             if(!items.length)return;
-            const lines=items.map(j=>`${j.code} ${getStrategyCopyStockName(j,duplicateCodes,tag)}`);
+
+            const lines=items.map(j=>`${j.code} ${tag==='追風馬'
+                ?getHorseSnapshotCopyName(j,duplicateCodes,tag,chaseComparison.newCodes)
+                :getStrategyCopyStockName(j,duplicateCodes,tag)}`);
             sections.push(`${horseIcons[tag]} [${tag}] (共 ${items.length} 檔)\n${lines.join('\n')}`);
         });
 
-        const removalComparison=getTwoHorseRemovalComparison(d,cf,iF);
-        if(removalComparison.removed.length){
-            const removalLines=removalComparison.removed.map(item=>`${item.code} ${item.name||''} -剔除${item.horseTags?.length?`（${item.horseTags.join('、')}）`:''}`.trim());
-            sections.push(`✂️ [剔除] (共 ${removalComparison.removed.length} 檔)\n${removalLines.join('\n')}`);
+        // 追風馬：上一次有、本次沒有，獨立列出「追風馬剔除」。
+        if(chaseComparison.removed.length){
+            const removalLines=chaseComparison.removed.map(item=>`${item.code} ${item.name||''} -剔除`.trim());
+            sections.push(`✂️ [追風馬剔除] (共 ${chaseComparison.removed.length} 檔)\n${removalLines.join('\n')}`);
         }
-        if(!sections.length)return showToast('目前與前2次皆沒有追風馬、赤兔馬或千里馬資料','error');
+
+        // 其他馬種維持原本前兩次聯集剔除邏輯，但排除追風馬，避免重複列出。
+        const removalComparison=getTwoHorseRemovalComparison(d,cf,iF);
+        const otherRemoved=(removalComparison.removed||[])
+            .map(item=>({...item,horseTags:(item.horseTags||[]).filter(tag=>tag!=='追風馬')}))
+            .filter(item=>item.horseTags.length);
+        if(otherRemoved.length){
+            const removalLines=otherRemoved.map(item=>`${item.code} ${item.name||''} -剔除（${item.horseTags.join('、')}）`.trim());
+            sections.push(`✂️ [其他馬種剔除] (共 ${otherRemoved.length} 檔)\n${removalLines.join('\n')}`);
+        }
+
+        if(!sections.length)return showToast('目前沒有追風馬、赤兔馬或千里馬可複製','error');
         const tx=`| ${ds} 精選馬廄 |\n\n${sections.join('\n\n')}`;
         executeCopy(tx.trim()+copyFootnote);return;
     }
