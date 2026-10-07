@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="304" name="app-version"/>
+<meta content="305" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -4279,6 +4279,14 @@ html.dark #module-journal table :is(th,td):nth-child(7){
 - 新標籤預設為紫色系並參與策略計分／一般策略複製。
 - 舊有使用者的 tagSettings 會自動補上此標籤，不需重設標籤設定。
 - 複製時預設圖示為 🏦，仍可在標籤管理中自行修改。
+-->
+<!-- v305：
+- 「必填頻率」修正為四種：不提醒、尾盤填寫、盤後填寫、每週填寫。
+- 尾盤填寫／盤後填寫皆以當日是否已有該策略標籤紀錄判斷。
+- 每週填寫維持當週至少出現一次的判斷。
+- 休市日不檢查尾盤／盤後填寫；每週填寫仍依當週資料判斷。
+- 舊版「每天開盤必填」自動遷移為「盤後填寫」，避免既有設定遺失。
+- Excel 匯出／匯入同步支援新四種頻率，並相容舊版文字。
 -->
 <!-- 核心 JavaScript -->
 <script>
@@ -9312,7 +9320,7 @@ setChkDirection('long');
             const wsPlan = XLSX.utils.json_to_sheet(state.plans.map(p => ({'進場日期':p.entryDate,'狀態':p.status,'代號':p.stock,'股名':p.name,'部位(張)':p.qty,'進場價':p.entry,'停損防守':p.stop,'停利目標':p.target||'','實際出場':p.exitPrice||'','實現損益':p.pnl||0,'權證/備註':p.note||''})));
             XLSX.utils.book_append_sheet(wb, wsPlan, '交易規劃');
 
-            const tagRows=(state.tagSettings?.categories||TAG_CATEGORIES).flatMap((category,categoryIndex)=>(category.tags||[]).map((tag,tagIndex)=>{const meta=state.tagSettings?.meta?.[tag]||{};return{'分類順序':categoryIndex+1,'分類':category.title,'分類主題':category.theme,'標籤順序':tagIndex+1,'標籤':tag,'顏色':meta.theme||category.theme,'複製圖示':meta.icon||'','參與策略':meta.isStrategy===false?'否':'是','必填頻率':meta.requiredCadence==='daily'?'每天開盤必填':meta.requiredCadence==='weekly'?'每週必填':'','提醒顏色':meta.reminderColor||'amber'};}));
+            const tagRows=(state.tagSettings?.categories||TAG_CATEGORIES).flatMap((category,categoryIndex)=>(category.tags||[]).map((tag,tagIndex)=>{const meta=state.tagSettings?.meta?.[tag]||{};return{'分類順序':categoryIndex+1,'分類':category.title,'分類主題':category.theme,'標籤順序':tagIndex+1,'標籤':tag,'顏色':meta.theme||category.theme,'複製圖示':meta.icon||'','參與策略':meta.isStrategy===false?'否':'是','必填頻率':meta.requiredCadence==='closing'?'尾盤填寫':(meta.requiredCadence==='afterClose'||meta.requiredCadence==='daily')?'盤後填寫':meta.requiredCadence==='weekly'?'每週填寫':'不提醒','提醒顏色':meta.reminderColor||'amber'};}));
             const wsTags=XLSX.utils.json_to_sheet(tagRows);
             XLSX.utils.book_append_sheet(wb,wsTags,'標籤設定');
             
@@ -10474,7 +10482,8 @@ setChkDirection('long');
   }
   function normalizeTagMeta(name,categoryTheme,meta){
     var source=meta&&typeof meta==='object'?meta:{};
-    var cadence=['none','daily','weekly'].includes(source.requiredCadence)?source.requiredCadence:'none';
+    var rawCadence=String(source.requiredCadence||'none');
+    var cadence=rawCadence==='daily'?'afterClose':(['none','closing','afterClose','weekly'].includes(rawCadence)?rawCadence:'none');
     var reminderColor=REMINDER_COLOR_KEYS.includes(source.reminderColor)?source.reminderColor:'amber';
     return{
       isStrategy:source.isStrategy!==undefined?!!source.isStrategy:!NON_STRATEGY_COPY_TAGS.has(name),
@@ -10676,7 +10685,8 @@ setChkDirection('long');
   };
   window.getManagedTagRequirement=function(tag){
     var meta=state.tagSettings&&state.tagSettings.meta&&state.tagSettings.meta[tag]||{};
-    var cadence=['daily','weekly'].includes(meta.requiredCadence)?meta.requiredCadence:'none';
+    var rawCadence=String(meta.requiredCadence||'none');
+    var cadence=rawCadence==='daily'?'afterClose':(['closing','afterClose','weekly'].includes(rawCadence)?rawCadence:'none');
     var color=REMINDER_COLOR_KEYS.includes(meta.reminderColor)?meta.reminderColor:'amber';
     return{cadence:cadence,color:color,hex:TAG_REMINDER_HEX[color]||TAG_REMINDER_HEX.amber};
   };
@@ -10690,31 +10700,34 @@ setChkDirection('long');
     var monday=new Date(date.getTime()-dayOffset*86400000),sunday=new Date(monday.getTime()+6*86400000);
     var iso=d=>`${d.getUTCFullYear()}-${String(d.getUTCMonth()+1).padStart(2,'0')}-${String(d.getUTCDate()).padStart(2,'0')}`;
     var weekStart=iso(monday),weekEnd=iso(sunday);
-    var daily=[],weekly=[];
+    var closing=[],afterClose=[],weekly=[];
     Object.entries(state.tagSettings?.meta||{}).forEach(function(entry){
-      var tag=entry[0],meta=entry[1]||{};
-      if(meta.requiredCadence==='daily')daily.push(tag);
-      else if(meta.requiredCadence==='weekly')weekly.push(tag);
+      var tag=entry[0],meta=entry[1]||{},cadence=meta.requiredCadence==='daily'?'afterClose':meta.requiredCadence;
+      if(cadence==='closing')closing.push(tag);
+      else if(cadence==='afterClose')afterClose.push(tag);
+      else if(cadence==='weekly')weekly.push(tag);
     });
-    if(!daily.length&&!weekly.length){root.classList.add('hidden');return;}
+    if(!closing.length&&!afterClose.length&&!weekly.length){root.classList.add('hidden');return;}
     var hasTagOn=function(tag,start,end){
       return (state.journals||[]).some(function(j){
         var jd=String(j.date||'').slice(0,10);
         return jd>=start&&jd<=end&&(j.tags||[]).map(normalizeStrategyTagName).includes(normalizeStrategyTagName(tag));
       });
     };
-    var missingDaily=(isWeekend||isHoliday)?[]:daily.filter(tag=>!hasTagOn(tag,ref,ref));
+    var missingClosing=(isWeekend||isHoliday)?[]:closing.filter(tag=>!hasTagOn(tag,ref,ref));
+    var missingAfterClose=(isWeekend||isHoliday)?[]:afterClose.filter(tag=>!hasTagOn(tag,ref,ref));
     var missingWeekly=weekly.filter(tag=>!hasTagOn(tag,weekStart,weekEnd));
-    var allDone=!missingDaily.length&&!missingWeekly.length;
+    var allDone=!missingClosing.length&&!missingAfterClose.length&&!missingWeekly.length;
     root.className='mb-3 rounded-xl border px-3 py-2 text-xs sm:text-sm '+(allDone?'border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300':'border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20 text-amber-800 dark:text-amber-200');
     if(allDone){
-      var closedText=(isWeekend||isHoliday)?'（休市日不檢查每日必填）':'';
+      var closedText=(isWeekend||isHoliday)?'（休市日不檢查尾盤／盤後填寫）':'';
       root.innerHTML='<div class="font-black">✅ 必填策略標籤已完成 '+escapeHTML(closedText)+'</div>';
     }else{
       var parts=[];
-      if(missingDaily.length)parts.push('<div><b>📅 今日尚未填：</b>'+missingDaily.map(escapeHTML).join('、')+'</div>');
+      if(missingClosing.length)parts.push('<div><b>⏱️ 尾盤尚未填：</b>'+missingClosing.map(escapeHTML).join('、')+'</div>');
+      if(missingAfterClose.length)parts.push('<div class="mt-1"><b>🌙 盤後尚未填：</b>'+missingAfterClose.map(escapeHTML).join('、')+'</div>');
       if(missingWeekly.length)parts.push('<div class="mt-1"><b>🗓️ 本週尚未填：</b>'+missingWeekly.map(escapeHTML).join('、')+'</div>');
-      if(isWeekend||isHoliday)parts.push('<div class="mt-1 text-[10px] opacity-75">休市日不檢查每日必填。</div>');
+      if(isWeekend||isHoliday)parts.push('<div class="mt-1 text-[10px] opacity-75">休市日不檢查尾盤／盤後填寫。</div>');
       root.innerHTML=parts.join('');
     }
     root.classList.remove('hidden');
@@ -10756,7 +10769,7 @@ setChkDirection('long');
       '<div class="grid grid-cols-2 gap-3"><div class="col-span-2"><label class="block text-xs font-bold text-gray-500 mb-1">標籤名稱</label><input id="tag-manager-name" maxlength="20" class="input-base" placeholder="例如：總編概念股"></div>',
       '<div><label class="block text-xs font-bold text-gray-500 mb-1">分類</label><select id="tag-manager-category" class="input-base"></select></div>',
       '<div><label class="block text-xs font-bold text-gray-500 mb-1">標籤顏色</label><select id="tag-manager-theme" class="input-base"><option value="rose">紅色</option><option value="blue">藍色</option><option value="amber">橘色</option><option value="purple">紫色</option><option value="teal">綠色</option></select></div>',
-      '<div><label class="block text-xs font-bold text-gray-500 mb-1">必填頻率</label><select id="tag-manager-required-cadence" class="input-base"><option value="none">不提醒</option><option value="daily">每天開盤必填</option><option value="weekly">每週必填</option></select></div>',
+      '<div><label class="block text-xs font-bold text-gray-500 mb-1">必填頻率</label><select id="tag-manager-required-cadence" class="input-base"><option value="none">不提醒</option><option value="closing">尾盤填寫</option><option value="afterClose">盤後填寫</option><option value="weekly">每週填寫</option></select></div>',
       '<div><label class="block text-xs font-bold text-gray-500 mb-1">提醒標註顏色</label><select id="tag-manager-reminder-color" class="input-base"><option value="rose">紅色</option><option value="orange">橙色</option><option value="amber">琥珀色</option><option value="yellow">黃色</option><option value="lime">萊姆綠</option><option value="green">綠色</option><option value="teal">青綠色</option><option value="cyan">青色</option><option value="sky">天藍色</option><option value="blue">藍色</option><option value="indigo">靛藍色</option><option value="violet">紫羅蘭</option><option value="purple">紫色</option><option value="pink">粉紅色</option><option value="slate">灰藍色</option></select></div>',
       '<div class="col-span-2"><label class="block text-xs font-bold text-gray-500 mb-1">複製圖示（選填）</label><input id="tag-manager-icon" maxlength="12" class="input-base" placeholder="例如：🎯"></div>',
       '<label class="col-span-2 flex items-center gap-2 p-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 cursor-pointer"><input type="checkbox" id="tag-manager-strategy" class="w-4 h-4 accent-rose-600" checked><span class="text-xs sm:text-sm font-bold">納入策略計分及一般策略複製</span></label></div>',
@@ -10820,7 +10833,7 @@ setChkDirection('long');
       var rows=category.tags.map(function(tag,index){
         var meta=state.tagSettings.meta[tag]||normalizeTagMeta(tag,category.theme,null);
         var encoded=encodeURIComponent(tag);
-        var req=window.getManagedTagRequirement(tag),reqLabel=req.cadence==='daily'?'每天開盤必填':req.cadence==='weekly'?'每週必填':'';
+        var req=window.getManagedTagRequirement(tag),reqLabel=req.cadence==='closing'?'尾盤填寫':req.cadence==='afterClose'?'盤後填寫':req.cadence==='weekly'?'每週填寫':'';
         return '<div class="flex items-center gap-2 p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900/40">'+
           '<span class="w-8 h-8 shrink-0 rounded-lg flex items-center justify-center border text-base '+getTagStyle(tag,true)+'">'+escapeHTML(meta.icon||'🏷️')+'</span>'+
           '<div class="min-w-0 flex-1"><div class="font-bold text-sm truncate">'+escapeHTML(tag)+'</div><div class="flex flex-wrap gap-1 mt-1"><span class="text-[9px] px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-gray-500">'+escapeHTML(meta.theme)+'</span><span class="text-[9px] px-1.5 py-0.5 rounded '+(meta.isStrategy?'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300':'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300')+'">'+(meta.isStrategy?'參與策略':'僅關注')+'</span>'+(reqLabel?'<span class="text-[9px] px-1.5 py-0.5 rounded text-white font-black" style="background:'+req.hex+'">'+escapeHTML(reqLabel)+'</span>':'')+'</div></div>'+
@@ -10881,7 +10894,7 @@ setChkDirection('long');
       updateReferencesForRenamedTag(original,name);
       delete state.tagSettings.meta[original];
     }
-    state.tagSettings.meta[name]={isStrategy:isStrategy,icon:icon.slice(0,12),theme:VALID_THEMES.includes(theme)?theme:target.theme,requiredCadence:['daily','weekly'].includes(requiredCadence)?requiredCadence:'none',reminderColor:REMINDER_COLOR_KEYS.includes(reminderColor)?reminderColor:'amber'};
+    state.tagSettings.meta[name]={isStrategy:isStrategy,icon:icon.slice(0,12),theme:VALID_THEMES.includes(theme)?theme:target.theme,requiredCadence:['closing','afterClose','weekly'].includes(requiredCadence)?requiredCadence:'none',reminderColor:REMINDER_COLOR_KEYS.includes(reminderColor)?reminderColor:'amber'};
     resetTagForm();
     await persistTagSettings(original&&original!==name);
     showToast(original?'標籤已更新':'標籤已新增');
@@ -10896,7 +10909,7 @@ setChkDirection('long');
     document.getElementById('tag-manager-theme').value=meta.theme;
     document.getElementById('tag-manager-icon').value=meta.icon||'';
     document.getElementById('tag-manager-strategy').checked=!!meta.isStrategy;
-    document.getElementById('tag-manager-required-cadence').value=['daily','weekly'].includes(meta.requiredCadence)?meta.requiredCadence:'none';
+    document.getElementById('tag-manager-required-cadence').value=meta.requiredCadence==='daily'?'afterClose':(['closing','afterClose','weekly'].includes(meta.requiredCadence)?meta.requiredCadence:'none');
     document.getElementById('tag-manager-reminder-color').value=REMINDER_COLOR_KEYS.includes(meta.reminderColor)?meta.reminderColor:'amber';
     updateReminderColorPreview();
     document.getElementById('tag-manager-cancel-edit').classList.remove('hidden');
@@ -11102,7 +11115,7 @@ setChkDirection('long');
         var title=String(row['分類']).trim(),tag=String(row['標籤']).trim(),category=categoryMap.get(title),categoryTheme=VALID_THEMES.includes(row['分類主題'])?row['分類主題']:'blue';
         if(!category){category={title:title,theme:categoryTheme,tags:[]};categoryMap.set(title,category);categories.push(category);}
         if(!category.tags.includes(tag))category.tags.push(tag);
-        var cadenceText=String(row['必填頻率']||'').trim(),requiredCadence=cadenceText==='每天開盤必填'?'daily':cadenceText==='每週必填'?'weekly':'none',reminderColor=REMINDER_COLOR_KEYS.includes(row['提醒顏色'])?row['提醒顏色']:'amber';
+        var cadenceText=String(row['必填頻率']||'').trim(),requiredCadence=cadenceText==='尾盤填寫'?'closing':cadenceText==='盤後填寫'?'afterClose':cadenceText==='每週填寫'||cadenceText==='每週必填'?'weekly':cadenceText==='每天開盤必填'?'afterClose':'none',reminderColor=REMINDER_COLOR_KEYS.includes(row['提醒顏色'])?row['提醒顏色']:'amber';
         meta[tag]={theme:VALID_THEMES.includes(row['顏色'])?row['顏色']:category.theme,icon:String(row['複製圖示']||'').trim().slice(0,12),isStrategy:String(row['參與策略']||'是').trim()!=='否',requiredCadence:requiredCadence,reminderColor:reminderColor};
       });
       importedTagSettings={version:1,categories:categories,meta:meta,updatedAt:Date.now()};
