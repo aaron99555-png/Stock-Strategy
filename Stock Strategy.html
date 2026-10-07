@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="308" name="app-version"/>
+<meta content="309" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -2942,6 +2942,176 @@ html.dark #module-journal table :is(th,td):nth-child(7){
 }
 </style>
 
+
+<style id="tag-filter-preset-v309">
+.tag-preset-manager{
+  border:1px solid rgba(99,102,241,.22);
+  border-radius:12px;
+  background:rgba(238,242,255,.58);
+  padding:9px;
+}
+.dark .tag-preset-manager{
+  border-color:rgba(129,140,248,.28);
+  background:rgba(49,46,129,.14);
+}
+.tag-preset-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:8px;
+  color:#4338ca;
+  font-size:11px;
+}
+.dark .tag-preset-head{color:#c7d2fe}
+.tag-preset-save-btn{
+  display:inline-flex;
+  align-items:center;
+  border-radius:8px;
+  padding:6px 9px;
+  background:#4f46e5;
+  color:white;
+  font-size:11px;
+  font-weight:800;
+  transition:.16s ease;
+}
+.tag-preset-save-btn:hover{background:#4338ca}
+.tag-preset-list{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:6px;
+}
+.tag-preset-item{
+  min-width:0;
+  display:flex;
+  align-items:stretch;
+  border:1px solid rgba(129,140,248,.25);
+  border-radius:10px;
+  overflow:hidden;
+  background:white;
+}
+.dark .tag-preset-item{
+  background:rgba(15,23,42,.62);
+  border-color:rgba(129,140,248,.30);
+}
+.tag-preset-main{
+  min-width:0;
+  flex:1 1 auto;
+  padding:7px 8px;
+  text-align:left;
+}
+.tag-preset-main:hover{background:rgba(238,242,255,.9)}
+.dark .tag-preset-main:hover{background:rgba(67,56,202,.18)}
+.tag-preset-name{
+  display:block;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  color:#312e81;
+  font-size:11px;
+  font-weight:900;
+}
+.dark .tag-preset-name{color:#e0e7ff}
+.tag-preset-meta{
+  display:block;
+  margin-top:2px;
+  color:#94a3b8;
+  font-size:9px;
+  font-weight:700;
+}
+.tag-preset-actions{
+  display:flex;
+  align-items:center;
+  border-left:1px solid rgba(129,140,248,.18);
+}
+.tag-preset-actions button{
+  width:28px;
+  height:100%;
+  min-height:38px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  color:#64748b;
+  font-size:10px;
+}
+.tag-preset-actions button:hover{
+  color:#4338ca;
+  background:rgba(238,242,255,.9);
+}
+.tag-preset-actions button:last-child:hover{color:#dc2626;background:rgba(254,226,226,.9)}
+.tag-preset-empty{
+  grid-column:1/-1;
+  padding:8px;
+  text-align:center;
+  color:#94a3b8;
+  font-size:10px;
+}
+.tag-preset-quick-strip{
+  margin-top:8px;
+  min-width:0;
+}
+.tag-preset-quick-scroll{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  overflow-x:auto;
+  padding:2px 0 4px;
+  scrollbar-width:thin;
+}
+.tag-preset-quick-label{
+  flex:0 0 auto;
+  color:#6366f1;
+  font-size:10px;
+  font-weight:900;
+  white-space:nowrap;
+}
+.tag-preset-quick-btn{
+  flex:0 0 auto;
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  min-height:28px;
+  padding:4px 8px;
+  border:1px solid #c7d2fe;
+  border-radius:999px;
+  background:#eef2ff;
+  color:#4338ca;
+  font-size:10px;
+  font-weight:900;
+  white-space:nowrap;
+  transition:.15s ease;
+}
+.tag-preset-quick-btn:hover{
+  background:#4f46e5;
+  border-color:#4f46e5;
+  color:#fff;
+  transform:translateY(-1px);
+}
+.dark .tag-preset-quick-btn{
+  background:rgba(49,46,129,.35);
+  border-color:rgba(129,140,248,.45);
+  color:#c7d2fe;
+}
+.dark .tag-preset-quick-btn:hover{background:#4f46e5;color:white}
+.tag-preset-quick-btn span{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:17px;
+  height:17px;
+  padding:0 4px;
+  border-radius:999px;
+  background:rgba(99,102,241,.14);
+  font-size:9px;
+}
+.tag-preset-quick-btn:hover span{background:rgba(255,255,255,.22)}
+@media(max-width:640px){
+  .tag-preset-list{grid-template-columns:1fr}
+  .tag-preset-head{align-items:flex-start}
+  .tag-preset-save-btn{padding:6px 8px}
+}
+</style>
+
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen flex flex-col antialiased">
 <nav class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-50 transition-colors duration-300">
@@ -3218,11 +3388,13 @@ html.dark #module-journal table :is(th,td):nth-child(7){
 <button class="bg-white dark:bg-gray-900/50 text-gray-900 dark:text-white text-xs sm:text-sm border border-gray-300 dark:border-gray-700/50 rounded-lg px-3 py-1.5 sm:py-2 focus:ring-2 focus:ring-blue-500 outline-none transition hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center justify-between gap-2 shadow-sm whitespace-nowrap" id="filter-tag-btn" type="button"><span>+ 標籤挑選</span><i class="fa-solid fa-chevron-down text-[10px] opacity-70"></i></button><button class="text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-red-600 text-gray-700 dark:text-gray-300 hover:text-white border border-gray-300 dark:border-gray-600 hover:border-red-500 px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center whitespace-nowrap" id="btn-clear-filters" type="button"><i class="fa-solid fa-eraser sm:mr-1.5"></i><span class="hidden sm:inline">清除篩選</span><span class="sm:hidden">清除</span></button>
 <div class="absolute left-0 top-full mt-1.5 w-[calc(100vw-24px)] sm:w-[920px] max-w-[calc(100vw-32px)] bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl shadow-2xl hidden z-50 p-3 max-h-[70vh] overflow-y-auto modal-enter" id="filter-tag-panel">
 <div class="mb-3 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between"><span class="text-xs font-bold text-gray-700 dark:text-gray-300">篩選邏輯</span><div class="flex items-center bg-gray-100 dark:bg-gray-900 p-1 rounded-lg"><button class="logic-btn px-2 py-1 text-[10px] sm:text-xs rounded font-medium transition-colors bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm" data-logic="OR" id="btn-logic-or" type="button">符合任一 (OR)</button><button class="logic-btn px-2 py-1 text-[10px] sm:text-xs rounded font-medium transition-colors text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" data-logic="AND" id="btn-logic-and" type="button">完全符合 (AND)</button></div></div>
+<div class="tag-preset-manager mb-3" id="tag-preset-manager-journal"></div>
 <div id="filter-tags-container"></div>
 <div class="sm:hidden sticky bottom-0 pt-3 mt-2 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"><button class="w-full min-h-[42px] rounded-lg bg-blue-600 text-white text-sm font-black shadow-sm" data-close-filter-tags="" type="button">完成標籤挑選</button></div>
 </div>
 </div></div>
 <div class="journal-filter-tags-display-row">
+<div class="tag-preset-quick-strip hidden w-full" id="tag-preset-quick-journal"></div>
 <div class="flex flex-wrap gap-1.5 w-full md:w-auto mt-2 lg:mt-0" id="filter-tags-display"></div>
 </div>
 </div>
@@ -3905,10 +4077,12 @@ html.dark #module-journal table :is(th,td):nth-child(7){
 <button class="logic-btn-fav px-2 py-1 text-[10px] sm:text-xs rounded font-medium transition-colors text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" data-logic="AND" id="btn-logic-and-fav" type="button">完全符合 (AND)</button>
 </div>
 </div>
+<div class="tag-preset-manager mb-3" id="tag-preset-manager-fav"></div>
 <div id="filter-tags-container-fav"></div>
 <div class="sm:hidden sticky bottom-0 pt-3 mt-2 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"><button class="w-full min-h-[42px] rounded-lg bg-blue-600 text-white text-sm font-black shadow-sm" data-close-filter-tags="" type="button">完成標籤挑選</button></div>
 </div>
 </div>
+<div class="tag-preset-quick-strip hidden w-full" id="tag-preset-quick-fav"></div>
 <div class="flex flex-wrap gap-1.5 w-full md:w-auto mt-2 lg:mt-0" id="filter-tags-display-fav"></div>
 </div>
 </div>
@@ -4418,6 +4592,16 @@ html.dark #module-journal table :is(th,td):nth-child(7){
 - 多筆快速輸入期間，完整表格重渲染會延後 180ms 並合併成一次，避免每筆都重算整張表。
 - Firebase 寫入改為背景排隊同步，本機先保存，不再阻塞下一筆輸入。
 - 股名輸入防抖由 60ms 降為 35ms；未知股票警示仍保留 60ms，避免 5／6 碼輸入途中誤響。
+-->
+<!-- v309：
+- 「標籤挑選」新增「⚡ 快速組合」功能。
+- 可把目前勾選的多個策略標籤 + OR/AND 邏輯儲存成一組自訂組合。
+- 最多可儲存 12 組，可自行命名。
+- 之後可直接點組合名稱，一鍵切換整組標籤，不必重新逐一勾選。
+- 策略日誌與追蹤清單沿用原本同步標籤設計，因此快速組合切換會同步套用兩邊。
+- 標籤挑選視窗內可：套用、用目前選項覆蓋、重新命名、刪除。
+- 標籤挑選視窗外新增快速組合 Chips，不必重新開啟標籤挑選視窗也能直接切換。
+- 組合儲存在目前瀏覽器 localStorage，不影響股票資料與雲端主資料。
 -->
 <!-- 核心 JavaScript -->
 <script>
@@ -5721,6 +5905,175 @@ const rememberJournalFormTag=tag=>{
     }catch(error){}
 };
 
+// v309：標籤挑選可儲存多組「快速組合」，一鍵切換選取標籤 + OR/AND。
+const TAG_FILTER_PRESET_KEY='ryan_tag_filter_presets_v1';
+const TAG_FILTER_PRESET_MAX=12;
+let tagFilterPresets=[];
+
+const getAllManagedFilterTags=()=>new Set(TAG_CATEGORIES.flatMap(category=>category.tags||[]).map(normalizeStrategyTagName).filter(Boolean));
+const normalizeTagFilterPreset=preset=>{
+    if(!preset||typeof preset!=='object')return null;
+    const known=getAllManagedFilterTags();
+    const name=String(preset.name||'').trim().slice(0,20);
+    const tags=[...new Set((Array.isArray(preset.tags)?preset.tags:[]).map(normalizeStrategyTagName).filter(tag=>tag&&known.has(tag)))];
+    const logic=preset.logic==='AND'?'AND':'OR';
+    if(!name||!tags.length)return null;
+    return{id:String(preset.id||`tagpreset_${Date.now()}_${Math.random().toString(36).slice(2,7)}`),name,tags,logic,updatedAt:Number(preset.updatedAt)||Date.now()};
+};
+const loadTagFilterPresets=()=>{
+    try{
+        const raw=JSON.parse(localStorage.getItem(TAG_FILTER_PRESET_KEY)||'[]');
+        tagFilterPresets=(Array.isArray(raw)?raw:[]).map(normalizeTagFilterPreset).filter(Boolean).slice(0,TAG_FILTER_PRESET_MAX);
+    }catch(error){tagFilterPresets=[];}
+};
+const saveTagFilterPresets=()=>{
+    try{localStorage.setItem(TAG_FILTER_PRESET_KEY,JSON.stringify(tagFilterPresets.slice(0,TAG_FILTER_PRESET_MAX)));}catch(error){}
+};
+const getActiveTagPresetScope=scope=>scope==='fav'?'fav':'journal';
+const getPresetSourceFilter=scope=>getActiveTagPresetScope(scope)==='fav'?state.favFilters:state.filters;
+
+const refreshFilterTagCheckboxes=()=>{
+    document.querySelectorAll('#filter-tags-container .filter-tag-cb').forEach(cb=>cb.checked=(state.filters.tags||[]).includes(cb.value));
+    document.querySelectorAll('#filter-tags-container-fav .filter-tag-cb').forEach(cb=>cb.checked=(state.favFilters.tags||[]).includes(cb.value));
+};
+
+const applyTagFilterPreset=preset=>{
+    const normalized=normalizeTagFilterPreset(preset);if(!normalized)return;
+    const tags=[...normalized.tags];
+    // 現有設計中策略日誌 / 追蹤清單的標籤勾選本來就是同步，因此快速組合也同步切換。
+    state.filters.tags=[...tags];
+    state.favFilters.tags=[...tags];
+    state.filters.tagLogic=normalized.logic;
+    state.favFilters.tagLogic=normalized.logic;
+    refreshFilterTagCheckboxes();
+    applyFilterLogicState(normalized.logic,'.logic-btn');
+    applyFilterLogicState(normalized.logic,'.logic-btn-fav');
+    renderFilterTags();
+    renderJournalFilterViews();
+    renderFavorites();
+    renderTagFilterPresetUI();
+    showToast(`已切換：${normalized.name}（${tags.length} 個標籤／${normalized.logic}）`);
+};
+
+const openTagPresetNamePrompt=(title,initial,callback)=>{
+    if(typeof window.openPromptModal==='function'){
+        window.openPromptModal(title,initial||'',value=>callback(value));
+        return;
+    }
+    const value=window.prompt(title,initial||'');
+    callback(value);
+};
+
+const createTagFilterPreset=scope=>{
+    const source=getPresetSourceFilter(scope),tags=[...new Set((source.tags||[]).map(normalizeStrategyTagName).filter(Boolean))];
+    if(!tags.length)return showToast('請先勾選要儲存的策略標籤','error');
+    if(tagFilterPresets.length>=TAG_FILTER_PRESET_MAX)return showToast(`最多可儲存 ${TAG_FILTER_PRESET_MAX} 組快速組合`,'error');
+    openTagPresetNamePrompt('命名這組標籤組合','',value=>{
+        const name=String(value||'').trim();
+        if(!name)return;
+        const existing=tagFilterPresets.find(item=>item.name===name);
+        if(existing)return showToast('已有相同名稱的快速組合','error');
+        tagFilterPresets.push({id:`tagpreset_${Date.now()}_${Math.random().toString(36).slice(2,7)}`,name:name.slice(0,20),tags,logic:source.tagLogic==='AND'?'AND':'OR',updatedAt:Date.now()});
+        saveTagFilterPresets();renderTagFilterPresetUI();showToast(`已儲存快速組合：${name}`);
+    });
+};
+
+const renameTagFilterPreset=id=>{
+    const preset=tagFilterPresets.find(item=>item.id===id);if(!preset)return;
+    openTagPresetNamePrompt('重新命名快速組合',preset.name,value=>{
+        const name=String(value||'').trim();
+        if(!name)return;
+        if(tagFilterPresets.some(item=>item.id!==id&&item.name===name))return showToast('已有相同名稱的快速組合','error');
+        preset.name=name.slice(0,20);preset.updatedAt=Date.now();
+        saveTagFilterPresets();renderTagFilterPresetUI();
+    });
+};
+
+const overwriteTagFilterPreset=(id,scope)=>{
+    const preset=tagFilterPresets.find(item=>item.id===id),source=getPresetSourceFilter(scope);if(!preset)return;
+    const tags=[...new Set((source.tags||[]).map(normalizeStrategyTagName).filter(Boolean))];
+    if(!tags.length)return showToast('目前沒有勾選標籤，無法覆蓋組合','error');
+    preset.tags=tags;preset.logic=source.tagLogic==='AND'?'AND':'OR';preset.updatedAt=Date.now();
+    saveTagFilterPresets();renderTagFilterPresetUI();showToast(`已更新組合：${preset.name}`);
+};
+
+const deleteTagFilterPreset=id=>{
+    const preset=tagFilterPresets.find(item=>item.id===id);if(!preset)return;
+    const remove=()=>{tagFilterPresets=tagFilterPresets.filter(item=>item.id!==id);saveTagFilterPresets();renderTagFilterPresetUI();showToast(`已刪除組合：${preset.name}`);};
+    if(typeof window.openConfirmModal==='function')window.openConfirmModal(`確定刪除快速組合「${preset.name}」嗎？`,remove);
+    else if(window.confirm(`確定刪除快速組合「${preset.name}」嗎？`))remove();
+};
+
+const getTagPresetButtonHTML=(preset,compact=false)=>{
+    const count=preset.tags.length,logic=preset.logic==='AND'?'AND':'OR';
+    if(compact){
+        return`<button type="button" class="tag-preset-quick-btn" data-tag-preset-apply="${escapeHTML(preset.id)}" title="${escapeHTML(preset.tags.join('、'))}">${escapeHTML(preset.name)}<span>${count}</span></button>`;
+    }
+    return`<div class="tag-preset-item">
+        <button type="button" class="tag-preset-main" data-tag-preset-apply="${escapeHTML(preset.id)}" title="${escapeHTML(preset.tags.join('、'))}">
+            <span class="tag-preset-name">${escapeHTML(preset.name)}</span>
+            <span class="tag-preset-meta">${logic} · ${count} 個</span>
+        </button>
+        <div class="tag-preset-actions">
+            <button type="button" data-tag-preset-overwrite="${escapeHTML(preset.id)}" title="用目前勾選內容覆蓋"><i class="fa-solid fa-arrows-rotate"></i></button>
+            <button type="button" data-tag-preset-rename="${escapeHTML(preset.id)}" title="重新命名"><i class="fa-solid fa-pen"></i></button>
+            <button type="button" data-tag-preset-delete="${escapeHTML(preset.id)}" title="刪除"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+    </div>`;
+};
+
+const renderTagFilterPresetUI=()=>{
+    ['journal','fav'].forEach(scope=>{
+        const manager=document.getElementById(`tag-preset-manager-${scope}`);
+        if(manager){
+            const presets=tagFilterPresets.map(item=>getTagPresetButtonHTML(item,false)).join('');
+            manager.innerHTML=`<div class="tag-preset-head">
+                <div><span class="font-black"><i class="fa-solid fa-bolt mr-1"></i>快速組合</span><span class="ml-2 opacity-70">${tagFilterPresets.length}/${TAG_FILTER_PRESET_MAX}</span></div>
+                <button type="button" class="tag-preset-save-btn" data-tag-preset-save="${scope}"><i class="fa-solid fa-plus mr-1"></i>儲存目前組合</button>
+            </div>
+            <div class="tag-preset-list">${presets||'<div class="tag-preset-empty">尚未建立組合。先勾選標籤，再按「儲存目前組合」。</div>'}</div>`;
+        }
+        const quick=document.getElementById(`tag-preset-quick-${scope}`);
+        if(quick){
+            if(tagFilterPresets.length){
+                quick.classList.remove('hidden');
+                quick.innerHTML=`<div class="tag-preset-quick-scroll"><span class="tag-preset-quick-label"><i class="fa-solid fa-bolt"></i> 快速組合</span>${tagFilterPresets.map(item=>getTagPresetButtonHTML(item,true)).join('')}</div>`;
+            }else{
+                quick.classList.add('hidden');quick.innerHTML='';
+            }
+        }
+    });
+};
+
+loadTagFilterPresets();
+
+document.addEventListener('click',event=>{
+    const saveButton=event.target.closest('[data-tag-preset-save]');
+    if(saveButton){event.preventDefault();createTagFilterPreset(saveButton.dataset.tagPresetSave);return;}
+
+    const applyButton=event.target.closest('[data-tag-preset-apply]');
+    if(applyButton){
+        event.preventDefault();
+        const preset=tagFilterPresets.find(item=>item.id===applyButton.dataset.tagPresetApply);
+        if(preset)applyTagFilterPreset(preset);
+        return;
+    }
+
+    const overwriteButton=event.target.closest('[data-tag-preset-overwrite]');
+    if(overwriteButton){
+        event.preventDefault();
+        const scope=overwriteButton.closest('#tag-preset-manager-fav')?'fav':'journal';
+        overwriteTagFilterPreset(overwriteButton.dataset.tagPresetOverwrite,scope);
+        return;
+    }
+
+    const renameButton=event.target.closest('[data-tag-preset-rename]');
+    if(renameButton){event.preventDefault();renameTagFilterPreset(renameButton.dataset.tagPresetRename);return;}
+
+    const deleteButton=event.target.closest('[data-tag-preset-delete]');
+    if(deleteButton){event.preventDefault();deleteTagFilterPreset(deleteButton.dataset.tagPresetDelete);return;}
+});
+
 function renderDynamicTags(){
     const fc=document.getElementById('form-tags-container');
     const currentFormTag=fc?.querySelector('.tag-input:checked')?.value||rememberedJournalFormTag;
@@ -5785,6 +6138,7 @@ function renderDynamicTags(){
         });
     });
     if(typeof renderStreakStrategyOptions==='function')renderStreakStrategyOptions();
+    renderTagFilterPresetUI();
 }
 
 window.removeFilterTag=tag=>{
