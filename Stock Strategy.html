@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="309" name="app-version"/>
+<meta content="312" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -3112,6 +3112,244 @@ html.dark #module-journal table :is(th,td):nth-child(7){
 }
 </style>
 
+
+<style id="tag-preset-visible-entry-v310">
+.tag-preset-entry-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:2px;
+  min-height:34px;
+  padding:6px 10px;
+  border:1px solid #c4b5fd;
+  border-radius:9px;
+  background:#f5f3ff;
+  color:#7c3aed;
+  font-size:12px;
+  font-weight:900;
+  box-shadow:0 1px 2px rgba(15,23,42,.05);
+  white-space:nowrap;
+  transition:.16s ease;
+}
+.tag-preset-entry-btn:hover{
+  background:#7c3aed;
+  border-color:#7c3aed;
+  color:white;
+  transform:translateY(-1px);
+}
+.dark .tag-preset-entry-btn{
+  background:rgba(76,29,149,.24);
+  border-color:rgba(167,139,250,.55);
+  color:#ddd6fe;
+}
+.dark .tag-preset-entry-btn:hover{
+  background:#7c3aed;
+  color:#fff;
+}
+.tag-preset-count-badge{
+  min-width:18px;
+  height:18px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  margin-left:3px;
+  padding:0 4px;
+  border-radius:999px;
+  background:rgba(124,58,237,.14);
+  font-size:9px;
+  font-weight:900;
+}
+.tag-preset-entry-btn:hover .tag-preset-count-badge{background:rgba(255,255,255,.22)}
+.tag-preset-empty-strip{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  min-height:34px;
+  padding:6px 8px;
+  border:1px dashed #c4b5fd;
+  border-radius:10px;
+  background:rgba(245,243,255,.7);
+  color:#7c3aed;
+  font-size:10px;
+  font-weight:800;
+}
+.dark .tag-preset-empty-strip{
+  background:rgba(76,29,149,.12);
+  border-color:rgba(167,139,250,.45);
+  color:#c4b5fd;
+}
+.tag-preset-empty-strip button{
+  flex:0 0 auto;
+  min-height:26px;
+  padding:4px 8px;
+  border-radius:7px;
+  background:#7c3aed;
+  color:white;
+  font-size:10px;
+  font-weight:900;
+}
+.tag-preset-quick-add{
+  flex:0 0 auto;
+  width:28px;
+  height:28px;
+  border-radius:999px;
+  border:1px solid #c4b5fd;
+  background:#fff;
+  color:#7c3aed;
+}
+.dark .tag-preset-quick-add{
+  background:#1e1b4b;
+  border-color:rgba(167,139,250,.45);
+  color:#c4b5fd;
+}
+@keyframes tagPresetPulse{
+  0%{box-shadow:0 0 0 0 rgba(124,58,237,.38)}
+  55%{box-shadow:0 0 0 7px rgba(124,58,237,0)}
+  100%{box-shadow:0 0 0 0 rgba(124,58,237,0)}
+}
+.tag-preset-pulse{animation:tagPresetPulse .8s ease-out}
+@media(max-width:640px){
+  .tag-preset-entry-btn{
+    min-height:32px;
+    padding:5px 8px;
+    font-size:11px;
+  }
+}
+</style>
+
+
+<style id="streak-compact-layout-v311">
+#streak-filter-panel{
+  padding:10px 14px!important;
+}
+#streak-search-form{
+  gap:6px!important;
+}
+#streak-search-form label.block{
+  margin-bottom:3px!important;
+  line-height:1.15!important;
+}
+#streak-search-form .input-base{
+  min-height:38px!important;
+  height:38px!important;
+  padding-top:5px!important;
+  padding-bottom:5px!important;
+}
+#streak-holiday-toggle-btn{
+  height:38px!important;
+}
+#streak-action-controls{
+  margin-top:0!important;
+  padding-top:2px;
+}
+#streak-action-controls > button,
+#streak-action-controls > label{
+  flex:0 0 auto!important;
+}
+#streak-tag-filter-details > summary{
+  height:38px!important;
+}
+#streak-search-form > .col-span-12.mt-1{
+  margin-top:0!important;
+  padding-top:6px!important;
+}
+#streak-search-form .streak-data-filter{
+  width:14px!important;
+  height:14px!important;
+}
+#streak-search-form label:has(.streak-data-filter){
+  padding:5px 8px!important;
+  gap:5px!important;
+}
+#streak-search-form label:has(.streak-data-filter) span{
+  font-size:11px!important;
+}
+#streak-results{
+  align-items:start!important;
+}
+#streak-results .streak-result-card{
+  align-self:start!important;
+}
+#streak-results .streak-result-card .mt-3{
+  margin-top:8px!important;
+}
+#streak-results .streak-result-card .mb-2{
+  margin-bottom:6px!important;
+}
+#streak-results .streak-result-card .py-1\.5{
+  padding-top:4px!important;
+  padding-bottom:4px!important;
+}
+#streak-results .streak-result-card > div:last-child{
+  margin-top:8px!important;
+  padding-top:8px!important;
+}
+#streak-stats{
+  align-items:stretch;
+}
+@media(min-width:1024px){
+  #streak-filter-panel{
+    padding:10px 16px!important;
+  }
+}
+@media(max-width:640px){
+  #streak-filter-panel{
+    padding:9px 10px!important;
+  }
+  #streak-summary{
+    padding-left:10px!important;
+    padding-right:10px!important;
+  }
+  #streak-stats,
+  #streak-results-header,
+  #streak-results{
+    padding-left:10px!important;
+    padding-right:10px!important;
+  }
+}
+</style>
+
+
+<style id="copy-toolbar-two-row-v312">
+.copy-toolbar{
+  flex-wrap:wrap!important;
+  overflow-x:visible!important;
+  row-gap:7px!important;
+}
+.copy-toolbar .copy-small-label-controls{
+  max-width:calc(100% - 92px);
+  overflow-x:auto;
+  scrollbar-width:thin;
+}
+.copy-toolbar-break{
+  flex:0 0 100%;
+  width:100%;
+  height:0;
+  margin:0;
+  padding:0;
+}
+.copy-toolbar-break ~ .btn-copy{
+  flex:0 0 auto;
+}
+@media(max-width:640px){
+  .copy-toolbar{
+    gap:6px!important;
+  }
+  .copy-toolbar .copy-small-label-controls{
+    flex:1 1 calc(100% - 78px);
+    max-width:none;
+    overflow-x:auto;
+  }
+  .copy-toolbar > span:first-child{
+    flex:0 0 auto;
+  }
+  .copy-toolbar-break ~ .btn-copy{
+    min-height:32px;
+  }
+}
+</style>
+
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen flex flex-col antialiased">
 <nav class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-50 transition-colors duration-300">
@@ -3245,9 +3483,9 @@ html.dark #module-journal table :is(th,td):nth-child(7){
 </div>
 <div id="streak-panel-content">
 <div class="px-4 sm:px-5 py-4 bg-violet-50/30 dark:bg-violet-900/5 border-b border-violet-100 dark:border-violet-900/40" id="streak-filter-panel">
-<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-<p class="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 lg:max-w-xs" id="streak-mode-description">連續模式會找出最近 N 個有效交易日每天都有訊號的股票；週末及休市日不計入。</p>
-<form action="javascript:void(0);" class="grid grid-cols-12 gap-2 w-full lg:flex-1" id="streak-search-form">
+<div class="block">
+<p class="hidden text-[11px] sm:text-xs text-gray-500 dark:text-gray-400" id="streak-mode-description"></p>
+<form action="javascript:void(0);" class="grid grid-cols-12 gap-1.5 w-full" id="streak-search-form">
 <div class="col-span-6 sm:col-span-4 lg:col-span-2"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">基準日</label><input class="input-base text-center" id="streak-base-date" type="date"/></div>
 <div class="col-span-6 sm:col-span-4 lg:col-span-2">
 <label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium"><i class="fa-solid fa-magnifying-glass mr-1 text-violet-500"></i>個股搜尋</label>
@@ -3261,7 +3499,7 @@ html.dark #module-journal table :is(th,td):nth-child(7){
 <div class="col-span-6 sm:col-span-4 lg:col-span-1"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium" id="streak-day-count-label">連續日數</label><input aria-describedby="streak-mode-description" class="input-base text-center" id="streak-min-days" inputmode="numeric" max="60" min="2" step="1" type="number" value="2"/></div>
 <div class="hidden col-span-6 sm:col-span-4 lg:col-span-1" id="streak-min-occurrences-wrap"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">至少幾次</label><input aria-label="至少出現次數" class="input-base text-center" id="streak-min-occurrences" inputmode="numeric" max="2" min="2" step="1" type="number" value="2"/></div>
 <div class="col-span-12 sm:col-span-4 lg:col-span-2"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">追風馬／赤兔馬／千里馬</label><select class="input-base text-center text-xs" id="streak-horse-mode"><option value="excludeStock">整檔排除</option><option selected="" value="ignoreTags">只忽略馬標籤</option><option value="include">不排除</option></select></div>
-<div class="col-span-12 sm:col-span-8 lg:col-span-2 flex flex-wrap items-end gap-2"><button class="flex-1 min-w-0 h-[42px] bg-white dark:bg-gray-800 hover:bg-violet-50 dark:hover:bg-violet-900/30 text-violet-700 dark:text-violet-300 rounded-lg font-bold text-xs sm:text-sm border border-violet-300 dark:border-violet-700 transition shadow-sm active:scale-95" id="streak-reset-btn" title="還原策略訊號雷達預設條件" type="button"><i class="fa-solid fa-rotate-left mr-1"></i>還原預設</button><button type="button" id="streak-jump-results-btn" class="h-10 px-4 rounded-xl border border-violet-300 dark:border-violet-700 bg-white dark:bg-gray-900 text-violet-700 dark:text-violet-300 text-xs font-bold hover:bg-violet-50 dark:hover:bg-violet-900/30 transition"><i class="fa-solid fa-arrow-down mr-1.5"></i>看結果</button><button class="flex-1 min-w-0 h-[42px] bg-violet-600 hover:bg-violet-500 text-white rounded-lg font-bold text-xs sm:text-sm border border-violet-600 transition active:scale-95 disabled:bg-gray-100 dark:disabled:bg-gray-700 disabled:text-gray-400 disabled:border-gray-300 dark:disabled:border-gray-600 disabled:cursor-not-allowed disabled:opacity-60" disabled="" id="streak-copy-btn" type="button"><i class="fa-solid fa-copy mr-1"></i>複製</button><label class="streak-copy-tag-toggle w-full min-h-[34px] px-2.5 py-1.5 rounded-lg border border-violet-200 dark:border-violet-800/70 bg-white dark:bg-gray-900/60 text-[10px] sm:text-xs font-bold text-violet-700 dark:text-violet-300 inline-flex items-center justify-center gap-2 cursor-pointer select-none" title="控制複製結果是否包含共同策略、策略頻率與每日策略標籤"><input id="streak-copy-show-tags" type="checkbox" class="rounded border-violet-300 dark:border-violet-700 accent-violet-600 w-3.5 h-3.5" checked/><span>複製顯示策略標籤</span></label></div>
+<div class="col-span-12 flex flex-wrap items-center justify-end gap-1.5" id="streak-action-controls"><button class="h-[38px] px-3 bg-white dark:bg-gray-800 hover:bg-violet-50 dark:hover:bg-violet-900/30 text-violet-700 dark:text-violet-300 rounded-lg font-bold text-xs sm:text-sm border border-violet-300 dark:border-violet-700 transition shadow-sm active:scale-95" id="streak-reset-btn" title="還原策略訊號雷達預設條件" type="button"><i class="fa-solid fa-rotate-left mr-1"></i>還原預設</button><button type="button" id="streak-jump-results-btn" class="h-[38px] px-3 rounded-lg border border-violet-300 dark:border-violet-700 bg-white dark:bg-gray-900 text-violet-700 dark:text-violet-300 text-xs font-bold hover:bg-violet-50 dark:hover:bg-violet-900/30 transition"><i class="fa-solid fa-arrow-down mr-1.5"></i>看結果</button><button class="h-[38px] px-3 bg-violet-600 hover:bg-violet-500 text-white rounded-lg font-bold text-xs sm:text-sm border border-violet-600 transition active:scale-95 disabled:bg-gray-100 dark:disabled:bg-gray-700 disabled:text-gray-400 disabled:border-gray-300 dark:disabled:border-gray-600 disabled:cursor-not-allowed disabled:opacity-60" disabled="" id="streak-copy-btn" type="button"><i class="fa-solid fa-copy mr-1"></i>複製</button><label class="streak-copy-tag-toggle min-h-[38px] px-2.5 py-1.5 rounded-lg border border-violet-200 dark:border-violet-800/70 bg-white dark:bg-gray-900/60 text-[10px] sm:text-xs font-bold text-violet-700 dark:text-violet-300 inline-flex items-center justify-center gap-2 cursor-pointer select-none" title="控制複製結果是否包含共同策略、策略頻率與每日策略標籤"><input id="streak-copy-show-tags" type="checkbox" class="rounded border-violet-300 dark:border-violet-700 accent-violet-600 w-3.5 h-3.5" checked/><span>複製顯示策略標籤</span></label></div>
 <div class="col-span-12 mt-1 pt-2 border-t border-violet-100 dark:border-violet-900/40 grid grid-cols-12 gap-2 items-start">
 <div class="col-span-12 sm:col-span-4 lg:col-span-3"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium"><i class="fa-solid fa-tags mr-1 text-violet-500"></i>策略標籤</label><select class="input-base text-center" id="streak-tag-filter-mode"><option value="all" selected>不限策略</option><option value="include">包含任一所選策略</option><option value="matchAll">完全符合所選策略</option><option value="exclude">排除所選策略</option></select></div>
 <details class="col-span-12 sm:col-span-8 lg:col-span-9 rounded-lg border border-violet-200 dark:border-violet-800/70 bg-white dark:bg-gray-800 overflow-hidden" id="streak-tag-filter-details">
@@ -3326,14 +3564,14 @@ html.dark #module-journal table :is(th,td):nth-child(7){
 </form>
 </div>
 </div>
-<div class="px-4 sm:px-5 py-3 text-xs sm:text-sm text-gray-500 dark:text-gray-400" id="streak-summary">條件變更後會自動即時篩選。</div>
+<div class="px-4 sm:px-5 py-2 text-[11px] sm:text-xs text-gray-500 dark:text-gray-400" id="streak-summary">條件變更後會自動即時篩選。</div>
 
-<div class="hidden px-4 sm:px-5 pt-2 pb-1 flex items-center justify-between gap-2" id="streak-results-header">
+<div class="hidden grid grid-cols-3 sm:grid-cols-6 gap-1.5 px-4 sm:px-5 pt-1 pb-2" id="streak-stats"></div>
+<div class="hidden px-4 sm:px-5 pt-1 pb-1.5 flex items-center justify-between gap-2" id="streak-results-header">
   <div class="text-sm font-black text-violet-700 dark:text-violet-300"><i class="fa-solid fa-list-check mr-1.5"></i>篩選結果 <span id="streak-results-count" class="ml-1 text-xs font-bold text-gray-500 dark:text-gray-400"></span></div>
   <button type="button" id="streak-back-filters-btn" class="h-8 px-3 rounded-lg border border-violet-200 dark:border-violet-700 bg-white dark:bg-gray-800 text-[11px] font-bold text-violet-700 dark:text-violet-300"><i class="fa-solid fa-arrow-up mr-1"></i>回篩選</button>
 </div>
-<div class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 px-4 sm:px-5 pb-5 max-h-[640px] lg:max-h-[75vh] overflow-y-auto" id="streak-results"></div>
-<div class="hidden grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 px-4 sm:px-5 pb-3" id="streak-stats"></div>
+<div class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-5 gap-2 px-4 sm:px-5 pb-3 max-h-[640px] lg:max-h-[75vh] overflow-y-auto items-start" id="streak-results"></div>
 </div>
 </div>
 <div class="card-panel border-t-4 border-t-blue-500 flex flex-col h-full min-h-[500px]">
@@ -3385,7 +3623,7 @@ html.dark #module-journal table :is(th,td):nth-child(7){
 </select><select class="filter-journal-quick bg-white dark:bg-gray-900/50 text-gray-900 dark:text-white text-base sm:text-sm border border-gray-300 dark:border-gray-700/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 focus:ring-2 focus:ring-blue-500 outline-none transition hover:bg-gray-50 dark:hover:bg-gray-800" id="filter-journal-quick">
 <option value="all">全部訊號</option><option value="today">今日新增</option><option value="resonance">多重訊號</option><option value="basicResonance">🔥 基本籌碼共振</option><option value="pendingReview">尚未複盤</option><option value="overdue">逾期未處理</option><option value="issues">資料異常</option>
 </select><div class="journal-filter-tag-cell relative">
-<button class="bg-white dark:bg-gray-900/50 text-gray-900 dark:text-white text-xs sm:text-sm border border-gray-300 dark:border-gray-700/50 rounded-lg px-3 py-1.5 sm:py-2 focus:ring-2 focus:ring-blue-500 outline-none transition hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center justify-between gap-2 shadow-sm whitespace-nowrap" id="filter-tag-btn" type="button"><span>+ 標籤挑選</span><i class="fa-solid fa-chevron-down text-[10px] opacity-70"></i></button><button class="text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-red-600 text-gray-700 dark:text-gray-300 hover:text-white border border-gray-300 dark:border-gray-600 hover:border-red-500 px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center whitespace-nowrap" id="btn-clear-filters" type="button"><i class="fa-solid fa-eraser sm:mr-1.5"></i><span class="hidden sm:inline">清除篩選</span><span class="sm:hidden">清除</span></button>
+<button class="bg-white dark:bg-gray-900/50 text-gray-900 dark:text-white text-xs sm:text-sm border border-gray-300 dark:border-gray-700/50 rounded-lg px-3 py-1.5 sm:py-2 focus:ring-2 focus:ring-blue-500 outline-none transition hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center justify-between gap-2 shadow-sm whitespace-nowrap" id="filter-tag-btn" type="button"><span>+ 標籤挑選</span><i class="fa-solid fa-chevron-down text-[10px] opacity-70"></i></button><button class="tag-preset-entry-btn" data-open-tag-presets="journal" type="button" title="開啟快速組合設定"><i class="fa-solid fa-bolt mr-1"></i><span>組合</span><span class="tag-preset-count-badge" data-tag-preset-count>0</span></button><button class="text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-red-600 text-gray-700 dark:text-gray-300 hover:text-white border border-gray-300 dark:border-gray-600 hover:border-red-500 px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center whitespace-nowrap" id="btn-clear-filters" type="button"><i class="fa-solid fa-eraser sm:mr-1.5"></i><span class="hidden sm:inline">清除篩選</span><span class="sm:hidden">清除</span></button>
 <div class="absolute left-0 top-full mt-1.5 w-[calc(100vw-24px)] sm:w-[920px] max-w-[calc(100vw-32px)] bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl shadow-2xl hidden z-50 p-3 max-h-[70vh] overflow-y-auto modal-enter" id="filter-tag-panel">
 <div class="mb-3 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between"><span class="text-xs font-bold text-gray-700 dark:text-gray-300">篩選邏輯</span><div class="flex items-center bg-gray-100 dark:bg-gray-900 p-1 rounded-lg"><button class="logic-btn px-2 py-1 text-[10px] sm:text-xs rounded font-medium transition-colors bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm" data-logic="OR" id="btn-logic-or" type="button">符合任一 (OR)</button><button class="logic-btn px-2 py-1 text-[10px] sm:text-xs rounded font-medium transition-colors text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" data-logic="AND" id="btn-logic-and" type="button">完全符合 (AND)</button></div></div>
 <div class="tag-preset-manager mb-3" id="tag-preset-manager-journal"></div>
@@ -3436,6 +3674,7 @@ html.dark #module-journal table :is(th,td):nth-child(7){
 <span>📝備註</span>
 </label>
 </div>
+<div class="copy-toolbar-break" aria-hidden="true"></div>
 <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="selected">獨選</button>
 <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="strategy">策略</button>
 <button class="flex-shrink-0 btn-copy-base bg-fuchsia-50 dark:bg-fuchsia-900/40 hover:bg-fuchsia-600 border-fuchsia-200 dark:border-fuchsia-700/50 text-fuchsia-700 dark:text-fuchsia-200 btn-copy" data-mode="copy_a" title="破繭而出、月來越好、季不可失、OBV突破、MACD突破">複製A</button>
@@ -4068,6 +4307,7 @@ html.dark #module-journal table :is(th,td):nth-child(7){
 </select>
 <div class="flex items-center gap-2 relative">
 <button class="bg-white dark:bg-gray-900/50 text-gray-900 dark:text-white text-xs sm:text-sm border border-gray-300 dark:border-gray-700/50 rounded-lg px-3 py-1.5 sm:py-2 focus:ring-2 focus:ring-blue-500 outline-none transition hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center justify-between gap-2 shadow-sm whitespace-nowrap" id="filter-tag-btn-fav" type="button"><span>+ 標籤挑選</span><i class="fa-solid fa-chevron-down text-[10px] opacity-70"></i></button>
+<button class="tag-preset-entry-btn" data-open-tag-presets="fav" type="button" title="開啟快速組合設定"><i class="fa-solid fa-bolt mr-1"></i><span>組合</span><span class="tag-preset-count-badge" data-tag-preset-count>0</span></button>
 <button class="text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-red-600 text-gray-700 dark:text-gray-300 hover:text-white border border-gray-300 dark:border-gray-600 hover:border-red-500 px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center whitespace-nowrap" id="btn-clear-filters-fav" type="button"><i class="fa-solid fa-eraser sm:mr-1.5"></i><span class="hidden sm:inline">清除篩選</span></button>
 <div class="absolute left-0 top-full mt-1.5 w-[calc(100vw-24px)] sm:w-[920px] max-w-[calc(100vw-32px)] bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl shadow-2xl hidden z-50 p-3 max-h-[70vh] overflow-y-auto modal-enter" id="filter-tag-panel-fav">
 <div class="mb-3 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
@@ -4121,6 +4361,7 @@ html.dark #module-journal table :is(th,td):nth-child(7){
 <span>📝備註</span>
 </label>
 </div>
+<div class="copy-toolbar-break" aria-hidden="true"></div>
 <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="selected">獨選</button>
 <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="strategy">策略</button>
 <button class="flex-shrink-0 btn-copy-base bg-fuchsia-50 dark:bg-fuchsia-900/40 hover:bg-fuchsia-600 border-fuchsia-200 dark:border-fuchsia-700/50 text-fuchsia-700 dark:text-fuchsia-200 btn-copy" data-mode="copy_a" title="破繭而出、月來越好、季不可失、OBV突破、MACD突破">複製A</button>
@@ -4602,6 +4843,27 @@ html.dark #module-journal table :is(th,td):nth-child(7){
 - 標籤挑選視窗內可：套用、用目前選項覆蓋、重新命名、刪除。
 - 標籤挑選視窗外新增快速組合 Chips，不必重新開啟標籤挑選視窗也能直接切換。
 - 組合儲存在目前瀏覽器 localStorage，不影響股票資料與雲端主資料。
+-->
+<!-- v310：
+- 修正 v309「快速組合入口不明顯」問題。
+- 「+ 標籤挑選」旁新增常駐「⚡ 組合 0/1/2…」按鈕，尚未建立任何組合也會顯示。
+- 點「⚡ 組合」會直接開啟標籤挑選視窗，並自動捲到「快速組合」區。
+- 尚未建立組合時，標籤列下方也會固定顯示「快速組合尚未建立／建立組合」提示。
+- 已建立組合後，快速組合 Chips 會直接顯示在篩選列下方，旁邊保留齒輪管理入口。
+-->
+<!-- v311：
+- 策略訊號雷達篩選區改為全寬緊湊版，縮小格子間距、控制項高度與不必要留白。
+- 操作按鈕「還原預設／看結果／複製／複製顯示策略標籤」改成獨立緊湊列，不再擠在狹窄小格造成多餘高度。
+- 連續模式的額外文字說明已移除；連續模式不再顯示說明列。
+- 「符合條件／目前顯示／平均強度／新進雷達／升溫／降溫」統計列由最底部移到「篩選結果」標題正上方。
+- 統計卡與結果卡同步縮小 padding、間距；2XL 螢幕結果可顯示 5 欄，降低大螢幕空白浪費。
+-->
+<!-- v312：
+- 「複製功能」區塊重新排版。
+- 第一排顯示「標示小標籤」控制項。
+- 所有複製按鈕（獨選、策略、複製A、複製B、分數、股期、籌碼集中、EPS、精選馬廄、非凡重點等）固定從第二排開始。
+- 策略日誌與追蹤清單同步套用。
+- 手機版小標籤區可橫向滑動，避免與第二排複製按鈕擠在同一列。
 -->
 <!-- 核心 JavaScript -->
 <script>
@@ -6035,13 +6297,12 @@ const renderTagFilterPresetUI=()=>{
         }
         const quick=document.getElementById(`tag-preset-quick-${scope}`);
         if(quick){
-            if(tagFilterPresets.length){
-                quick.classList.remove('hidden');
-                quick.innerHTML=`<div class="tag-preset-quick-scroll"><span class="tag-preset-quick-label"><i class="fa-solid fa-bolt"></i> 快速組合</span>${tagFilterPresets.map(item=>getTagPresetButtonHTML(item,true)).join('')}</div>`;
-            }else{
-                quick.classList.add('hidden');quick.innerHTML='';
-            }
+            quick.classList.remove('hidden');
+            quick.innerHTML=tagFilterPresets.length
+                ?`<div class="tag-preset-quick-scroll"><span class="tag-preset-quick-label"><i class="fa-solid fa-bolt"></i> 快速組合</span>${tagFilterPresets.map(item=>getTagPresetButtonHTML(item,true)).join('')}<button type="button" class="tag-preset-quick-add" data-open-tag-presets="${scope}" title="管理快速組合"><i class="fa-solid fa-gear"></i></button></div>`
+                :`<div class="tag-preset-empty-strip"><span><i class="fa-solid fa-bolt mr-1"></i>快速組合尚未建立</span><button type="button" data-open-tag-presets="${scope}"><i class="fa-solid fa-plus mr-1"></i>建立組合</button></div>`;
         }
+        document.querySelectorAll('[data-tag-preset-count]').forEach(badge=>badge.textContent=String(tagFilterPresets.length));
     });
 };
 
@@ -6216,6 +6477,30 @@ const openMobileFilterTagPanel=panel=>{
 
     requestAnimationFrame(()=>panel.scrollTo({top:0,behavior:'auto'}));
 };
+
+// v310：常駐「⚡ 組合」按鈕，直接開啟快速組合區。
+document.addEventListener('click',event=>{
+    const button=event.target.closest('[data-open-tag-presets]');
+    if(!button)return;
+    event.preventDefault();
+    event.stopPropagation();
+    const scope=button.dataset.openTagPresets==='fav'?'fav':'journal';
+    const panel=document.getElementById(scope==='fav'?'filter-tag-panel-fav':'filter-tag-panel');
+    if(!panel)return;
+
+    if(panel.classList.contains('hidden'))openMobileFilterTagPanel(panel);
+
+    requestAnimationFrame(()=>{
+        const manager=document.getElementById(`tag-preset-manager-${scope}`);
+        manager?.scrollIntoView({behavior:'smooth',block:'start'});
+        if(manager){
+            manager.classList.remove('tag-preset-pulse');
+            void manager.offsetWidth;
+            manager.classList.add('tag-preset-pulse');
+            setTimeout(()=>manager.classList.remove('tag-preset-pulse'),900);
+        }
+    });
+});
 
 ['', '-fav'].forEach(suffix=>{
     const button=document.getElementById('filter-tag-btn'+suffix);
@@ -7395,8 +7680,11 @@ const updateStreakModeUI=()=>{
     if(!modeInput||!daysLabel||!description||!daysInput)return;
     const mode=normalizeStreakMode(modeInput.value),isWindow=mode==='window';
     daysLabel.textContent=isWindow?'觀察日數':'連續日數';
-    description.textContent=isWindow?'重複模式會統計最近 N 個有效交易日，列出至少出現 M 次的股票；週末及休市日不計入。':'連續模式會依完整交易日序列判定；任何未出現訊號的交易日都會中斷連續紀錄。';
+    description.textContent=isWindow?'重複模式會統計最近 N 個有效交易日，列出至少出現 M 次的股票；週末及休市日不計入。':'';
+    description.classList.toggle('hidden',!isWindow);
     daysInput.setAttribute('aria-label',isWindow?'觀察交易日數':'連續交易日數');
+    const daysWrap=daysInput.closest('div');
+    if(daysWrap)daysWrap.style.gridColumn=isWindow?'':'span 2 / span 2';
     if(occurrencesWrap)occurrencesWrap.classList.toggle('hidden',!isWindow);
     if(occurrencesInput){const days=Math.max(2,Math.min(60,parseInt(daysInput.value)||2));occurrencesInput.disabled=!isWindow;occurrencesInput.max=String(days);occurrencesInput.value=String(Math.max(2,Math.min(days,parseInt(occurrencesInput.value)||2)));}
 };
@@ -7539,7 +7827,7 @@ const renderStreakStats=(analysis,qualifiedResults)=>{
     const root=document.getElementById('streak-stats');if(!root)return;
     if(!analysis?.baseDate){root.innerHTML='';root.classList.add('hidden');root.classList.remove('streak-has-results');document.getElementById('streak-results-header')?.classList.add('hidden');return;}
     const source=qualifiedResults||[],average=source.length?Math.round(source.reduce((sum,item)=>sum+item.score,0)/source.length):0,stats=[['符合條件',source.length,'text-violet-600 dark:text-violet-300'],['目前顯示',analysis.results.length,'text-blue-600 dark:text-blue-300'],['平均強度',`${average}分`,'text-orange-600 dark:text-orange-300'],['新進雷達',source.filter(item=>item.heat==='新進雷達').length,'text-cyan-600 dark:text-cyan-300'],['升溫',source.filter(item=>item.heat==='升溫').length,'text-red-600 dark:text-red-300'],['降溫',source.filter(item=>item.heat==='降溫').length,'text-blue-600 dark:text-blue-300']];
-    root.innerHTML=stats.map(([label,value,tone])=>`<div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900/40 px-2.5 py-2 text-center"><div class="text-[10px] text-gray-400 dark:text-gray-500">${label}</div><div class="mt-0.5 text-sm font-black ${tone}">${value}</div></div>`).join('');root.classList.remove('hidden');
+    root.innerHTML=stats.map(([label,value,tone])=>`<div class="rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900/40 px-2 py-1.5 text-center"><div class="text-[9px] sm:text-[10px] leading-tight text-gray-400 dark:text-gray-500">${label}</div><div class="mt-0.5 text-[13px] sm:text-sm leading-tight font-black ${tone}">${value}</div></div>`).join('');root.classList.remove('hidden');
 };
 const renderStreakStockInfoIcons=(code,referenceDate=getToday())=>{
     const normalizedCode=String(code||'').trim(),hasReport=(state.reports||[]).some(report=>String(report.code||'').trim()===normalizedCode),hasRevenueHigh=(state.revenueRecords||[]).some(record=>String(record.code||'').trim()===normalizedCode),chip=getChipRadarForCode(normalizedCode);
@@ -7721,7 +8009,7 @@ function renderJournalStreaks(){
                 }).join('');
             }
 
-            return `<article class="rounded-xl border border-violet-200 dark:border-violet-800/60 bg-white dark:bg-gray-900/35 p-3 sm:p-4 shadow-sm">
+            return `<article class="streak-result-card rounded-xl border border-violet-200 dark:border-violet-800/60 bg-white dark:bg-gray-900/35 p-2.5 sm:p-3 shadow-sm">
                 <div class="flex items-start justify-between gap-2">
                     <div class="min-w-0 flex flex-wrap items-center gap-1">
                         <span class="font-black text-violet-700 dark:text-violet-300 cursor-pointer hover:underline hover:text-blue-600 dark:hover:text-blue-300 transition" data-yahoo-stock-code="${safeCode}" role="link" tabindex="0" title="開啟 Yahoo 股市 ${safeCode}">${safeCode}</span>
