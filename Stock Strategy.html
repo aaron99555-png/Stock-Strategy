@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="307" name="app-version"/>
+<meta content="308" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -2919,6 +2919,29 @@ html.dark #module-journal table :is(th,td):nth-child(7){
 }
 </style>
 
+
+<style id="journal-column-index-fix-v308">
+/* v302 新增漲幅%後的正確順序：
+   4 收盤價 / 5 漲幅% / 6 目標價 / 7 潛在漲幅 / 8 25EPS / 9 26EPS / 10 成長率 / 11 分數 */
+#module-journal table :is(th,td):nth-child(6){
+  width:76px!important;min-width:76px!important;max-width:76px!important;
+  padding-left:.375rem!important;padding-right:.375rem!important;text-align:center!important;
+}
+#module-journal table :is(th,td):nth-child(8),
+#module-journal table :is(th,td):nth-child(9){
+  width:76px!important;min-width:76px!important;max-width:76px!important;
+  padding-left:.375rem!important;padding-right:.375rem!important;text-align:center!important;
+}
+#module-journal table :is(th,td):nth-child(10){
+  width:80px!important;min-width:80px!important;max-width:80px!important;
+  padding-left:.375rem!important;padding-right:.375rem!important;text-align:center!important;
+}
+#module-journal table :is(th,td):nth-child(11){
+  width:66px!important;min-width:66px!important;max-width:66px!important;
+  padding-left:.25rem!important;padding-right:.25rem!important;text-align:center!important;
+}
+</style>
+
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen flex flex-col antialiased">
 <nav class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-50 transition-colors duration-300">
@@ -3015,7 +3038,7 @@ html.dark #module-journal table :is(th,td):nth-child(7){
 </div>
 <div class="grid grid-cols-12 gap-1.5 sm:gap-3 items-end">
 <div class="col-span-4 md:col-span-2"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">日期</label><input class="input-base text-center sm:text-left" id="j-date" required="" type="date"/></div>
-<div class="col-span-4 md:col-span-2"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">代號</label><input autocomplete="off" class="input-base text-center sm:text-left" enterkeyhint="next" id="j-code" placeholder="如: 2330" required="" spellcheck="false" type="text"/></div>
+<div class="col-span-4 md:col-span-2"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">代號</label><input autocomplete="off" class="input-base text-center sm:text-left" enterkeyhint="done" id="j-code" placeholder="如: 2330" required="" spellcheck="false" title="輸入股票代號後按 Enter 可快速加入並接著輸入下一檔" type="text"/></div>
 <div class="col-span-4 md:col-span-2"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">股名</label><input autocomplete="off" class="input-base text-center sm:text-left" enterkeyhint="next" id="j-name" list="stock-names-list" placeholder="自動帶入" required="" type="text"/></div>
 <div class="col-span-4 md:col-span-2"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">訊號狀態</label><select class="input-base text-center text-xs sm:text-sm" id="j-status"><option value="新訊號">新訊號</option><option value="觀察中">觀察中</option><option value="已進場">已進場</option><option value="已失效">已失效</option><option value="已結案">已結案</option></select></div>
 <div class="col-span-5 md:col-span-3"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 font-medium">備註紀錄</label><input autocomplete="off" class="input-base text-xs sm:text-sm" enterkeyhint="send" id="j-notes" placeholder="輸入內容..." type="text"/></div>
@@ -4379,6 +4402,23 @@ html.dark #module-journal table :is(th,td):nth-child(7){
 - 策略日誌、追蹤清單、營收籌碼、個股總覽、參考資料等使用 formatTargetPrice 的位置同步生效。
 - 複製內容同步改為「目標價：XXX｜已達標」，保留原始目標價數字。
 -->
+<!-- v308：
+【效能／BUG 檢查】
+- 單檔 HTML 約 1MB，確實已有累積肥大；主要來自完整功能 JS、累積樣式與股票主檔，不是單一記憶體洩漏。
+- 移除已無任何呼叫的舊版「前兩次馬廄剔除」函式，避免 dead code 持續累積。
+- 修正 v302 新增「漲幅%」後，手機卡片欄位索引沒有同步位移的 BUG。
+- 修正連續輸入同一股票時，bindAutoFill 的 lastNotifiedCode 沒有歸零，可能造成參考資料不重新更新的問題。
+- 修正新增策略日誌時必須等待完整表格／作戰室／雷達重算與 Firebase 寫入後，才清空代號欄位的延遲。
+
+【快速連續輸入】
+- 已知股票代號仍為即時辨識、即時帶入股名。
+- 在策略日誌代號欄輸入完整代號後按 Enter，可直接快速加入。
+- 成功加入後立即清空代號／股名／備註，立即把游標放回代號欄。
+- 日期與已選策略標籤維持不變，適合連續輸入同一批策略股票。
+- 多筆快速輸入期間，完整表格重渲染會延後 180ms 並合併成一次，避免每筆都重算整張表。
+- Firebase 寫入改為背景排隊同步，本機先保存，不再阻塞下一筆輸入。
+- 股名輸入防抖由 60ms 降為 35ms；未知股票警示仍保留 60ms，避免 5／6 碼輸入途中誤響。
+-->
 <!-- 核心 JavaScript -->
 <script>
 const originalDateSetter=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set;
@@ -5524,8 +5564,15 @@ const bindAutoFill=(cId,nId,cb=null,strict=false)=>{
         }
         if(e.key==='Enter'){
             e.preventDefault();
+            if(e.repeat)return;
             cancelCodeLookup();
-            if(/^\d{4,6}[A-Z]?$/i.test(raw))syncFromCode(true,true);
+            if(/^\d{4,6}[A-Z]?$/i.test(raw)){
+                const resolvedCode=syncFromCode(true,true);
+                if(cId==='j-code'&&resolvedCode){
+                    const form=codeInput.closest('form');
+                    setTimeout(()=>form?.requestSubmit?.(),0);
+                }
+            }
         }
     });
     // 股名搜尋也改成延後處理，避免中文輸入法組字時一直同步。
@@ -5533,7 +5580,7 @@ const bindAutoFill=(cId,nId,cb=null,strict=false)=>{
     const scheduleNameLookup=()=>{
         clearTimeout(nameLookupTimer);
         if(isComposingName)return;
-        nameLookupTimer=setTimeout(()=>syncFromName(false),60);
+        nameLookupTimer=setTimeout(()=>syncFromName(false),35);
     };
     nameInput.addEventListener('compositionstart',()=>{isComposingName=true;clearTimeout(nameLookupTimer);});
     nameInput.addEventListener('compositionend',()=>{isComposingName=false;scheduleNameLookup();});
@@ -7826,6 +7873,53 @@ document.getElementById('journal-reference-only')?.addEventListener('change',syn
 document.getElementById('j-date')?.addEventListener('change',()=>window.renderTagRequirementReminder?.());
 syncJournalReferenceMode();
 
+// v308：策略日誌快速連續輸入。
+// 本機資料先落地，輸入框立即清空並回到代號欄；重渲染與雲端同步不再卡住下一筆輸入。
+let journalFastEntryRenderTimer=null;
+let journalCloudWriteQueue=Promise.resolve();
+
+const resetJournalFastEntryFields=()=>{
+    const code=document.getElementById('j-code');
+    const name=document.getElementById('j-name');
+    const notes=document.getElementById('j-notes');
+    const status=document.getElementById('j-status');
+
+    if(code){
+        code.value='';
+        // 觸發 bindAutoFill 的空值流程，順便把 lastNotifiedCode 歸零。
+        // 這樣連續輸入同一檔股票時，參考資料仍會重新更新，不會被舊快取狀態擋住。
+        code.dispatchEvent(new Event('input',{bubbles:true}));
+    }
+    if(name)name.value='';
+    if(notes)notes.value='';
+    if(status)status.value='新訊號';
+
+    requestAnimationFrame(()=>{
+        try{code?.focus({preventScroll:true});}
+        catch(error){code?.focus();}
+    });
+};
+
+const scheduleJournalFastEntryRender=()=>{
+    clearTimeout(journalFastEntryRenderTimer);
+    journalFastEntryRenderTimer=setTimeout(()=>{
+        journalFastEntryRenderTimer=null;
+        processAndRenderJournals();
+        if(document.getElementById('module-favorites')?.classList.contains('active'))renderFavorites();
+        window.renderTagRequirementReminder?.();
+    },180);
+};
+
+const queueJournalCloudWrite=(path,payload)=>{
+    let snapshot=payload;
+    try{snapshot=JSON.parse(JSON.stringify(payload));}catch(error){}
+    journalCloudWriteQueue=journalCloudWriteQueue
+        .catch(()=>true)
+        .then(()=>putDataToCloud(path,snapshot))
+        .catch(error=>{console.error('策略日誌背景同步失敗',error);return false;});
+    return journalCloudWriteQueue;
+};
+
 document.getElementById('journal-form')?.addEventListener('submit', async e => {
     e.preventDefault();
     const d = document.getElementById('j-date').value;
@@ -7878,9 +7972,9 @@ document.getElementById('journal-form')?.addEventListener('submit', async e => {
         existing.updatedAt = Date.now();
         
         saveLocalData();
-        processAndRenderJournals();
-        if (document.getElementById('module-favorites').classList.contains('active')) renderFavorites();
-        await putDataToCloud(`journals/${existing.id}`, existing);
+        resetJournalFastEntryFields();
+        scheduleJournalFastEntryRender();
+        queueJournalCloudWrite(`journals/${existing.id}`,existing);
         showToast(duplicateStrategy?'同策略已存在，已更新備註／狀態':'策略標籤已合併至同一列',duplicateStrategy?'error':'success');
         if(HORSE_NEW_ENTRY_TAGS.has(normalizedSelectedTag)){
             showHorseNewEntryNotice(existing,normalizedSelectedTag);
@@ -7903,22 +7997,17 @@ document.getElementById('journal-form')?.addEventListener('submit', async e => {
         };
         state.journals.push(p);
         saveLocalData();
-        processAndRenderJournals();
-        if (document.getElementById('module-favorites').classList.contains('active')) renderFavorites();
-        await putDataToCloud(`journals/${id}`, p);
+        resetJournalFastEntryFields();
+        scheduleJournalFastEntryRender();
+        queueJournalCloudWrite(`journals/${id}`,p);
         showToast('策略日誌已加入');
         if(HORSE_NEW_ENTRY_TAGS.has(normalizedSelectedTag)){
             showHorseNewEntryNotice(p,normalizedSelectedTag);
         }
     }
     
-    window.renderTagRequirementReminder?.();
-    document.getElementById('j-code').value = '';
-    document.getElementById('j-name').value = '';
-    document.getElementById('j-notes').value = '';
-    document.getElementById('j-status').value = '新訊號';
-    updatePreview('', 'j-preview', 'blue');
-    setTimeout(() => document.getElementById('j-code').focus(), 15);
+    // 成功新增／更新時，resetJournalFastEntryFields 已先處理清空與 focus。
+    // 重渲染與提醒由 scheduleJournalFastEntryRender 批次更新。
 });
 
 const syncMomentumFormType=()=>{const type=document.getElementById('r-type')?.value||'revenue',monthWrap=document.getElementById('r-month-wrap'),dateWrap=document.getElementById('r-date-wrap'),month=document.getElementById('r-month'),date=document.getElementById('r-date'),dateLabel=document.getElementById('r-date-label'),usesDate=type==='largeHolder'||type==='highTurnoverRevenue';monthWrap?.classList.toggle('hidden',type!=='revenue');dateWrap?.classList.toggle('hidden',!usesDate);if(month)month.required=type==='revenue';if(date)date.required=usesDate;if(dateLabel)dateLabel.textContent=type==='highTurnoverRevenue'?'出現日期':'增加日期';if(usesDate&&date&&!date.value)date.value=getToday();};
@@ -8847,74 +8936,6 @@ const getHorseSnapshotCopyName=(journal,duplicateCodes,tag,newCodes)=>{
     return `${base} 🆕新進榜`;
 };
 
-// v174：精選馬廄複製的「剔除」採前兩次名單聯集判斷。
-// 前兩次只要任一次曾出現，而本次沒有出現，就列為「-剔除」。
-const getTwoHorseRemovalComparison=(currentItems,filterState,isFavorite=false)=>{
-    const horseTags=['追風馬','赤兔馬','千里馬'];
-    const hasHorse=journal=>horseTags.some(tag=>journalHasStrategyTag(journal,tag));
-    const normalizeCode=journal=>String(journal?.code||'').trim();
-    const getHorseTags=journal=>horseTags.filter(tag=>journalHasStrategyTag(journal,tag));
-
-    const visibleHorseDates=(currentItems||[])
-        .filter(hasHorse)
-        .map(j=>normalizeHorseJournalDate(j.date))
-        .filter(Boolean)
-        .sort();
-    const filterEnd=normalizeHorseJournalDate(filterState?.end);
-    const filterStart=normalizeHorseJournalDate(filterState?.start);
-    const baseDate=visibleHorseDates[visibleHorseDates.length-1]||filterEnd||filterStart||normalizeHorseJournalDate(getToday());
-    if(!baseDate)return{baseDate:'',dates:[],removed:[]};
-
-    const currentRows=(state.journals||[]).filter(j=>{
-        if(normalizeHorseJournalDate(j.date)!==baseDate||!hasHorse(j))return false;
-        if(isFavorite&&!j.isFavorite)return false;
-        return true;
-    });
-    const currentCodes=new Set(currentRows.map(normalizeCode).filter(Boolean));
-
-    const priorDates=[...new Set((state.journals||[])
-        .filter(j=>hasHorse(j)&&(!isFavorite||j.isFavorite))
-        .map(j=>normalizeHorseJournalDate(j.date))
-        .filter(date=>date&&date<baseDate))]
-        .sort()
-        .reverse()
-        .slice(0,2);
-
-    const previousByCode=new Map();
-    priorDates.forEach(date=>{
-        (state.journals||[])
-            .filter(j=>normalizeHorseJournalDate(j.date)===date&&hasHorse(j)&&(!isFavorite||j.isFavorite))
-            .forEach(j=>{
-                const code=normalizeCode(j);
-                if(!code)return;
-                const matchedHorseTags=getHorseTags(j);
-                const existing=previousByCode.get(code);
-                if(!existing){
-                    previousByCode.set(code,{
-                        code,
-                        name:String(j.name||'').trim(),
-                        lastDate:date,
-                        horseTags:new Set(matchedHorseTags)
-                    });
-                }else{
-                    if(!existing.name&&j.name)existing.name=String(j.name||'').trim();
-                    matchedHorseTags.forEach(tag=>existing.horseTags.add(tag));
-                }
-            });
-    });
-
-    const removed=[...previousByCode.values()]
-        .filter(item=>item.code&&!currentCodes.has(item.code))
-        .map(item=>({
-            ...item,
-            name:getCanonicalStockName(item.code,item.name)||item.name,
-            horseTags:[...item.horseTags]
-        }))
-        .sort((a,b)=>String(a.code).localeCompare(String(b.code),'zh-Hant',{numeric:true}));
-
-    return{baseDate,dates:priorDates,removed};
-};
-
 document.querySelectorAll('.btn-copy').forEach(b=>{b.addEventListener('click',e=>{
     const m=e.currentTarget.dataset.mode,at=document.querySelector('.tab-content.active').id,iF=at==='module-favorites',cf=iF?state.favFilters:state.filters,lt=iF?'fav':'journal';
     let d=getFilteredAndSortedData(state.journals,cf,iF?state.favSortConfig:state.sortConfig);
@@ -9450,7 +9471,7 @@ setChkDirection('long');
   'use strict';
   const MOBILE_VIEW_KEY='ryan_mobile_view_mode_v1';
   const mobileWideColumns={
-    'module-journal':[10,11],
+    'module-journal':[11,12],
     'module-favorites':[9],
     'module-revenue':[7],
     'module-report':[3],
@@ -9458,9 +9479,9 @@ setChkDirection('long');
     'module-plan':[]
   };
   const mobileDetailColumns={
-    // v266 手機卡片第一層保留「收盤價＋目標價＋潛在漲幅」，方便直接比對。
-    // 25EPS、成長率、分數、備註收進「詳情」。
-    'module-journal':[6,8,9,12],
+    // v308：v302 新增「漲幅%」後，手機欄位索引同步位移。
+    // 第一層保留「收盤價＋漲幅%＋目標價＋潛在漲幅」；25EPS、成長率、分數、備註收進「詳情」。
+    'module-journal':[7,9,10,13],
     'module-favorites':[3,5,6,7],
     'module-revenue':[3,4,5,6,7],
     'module-report':[],
