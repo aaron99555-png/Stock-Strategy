@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="305" name="app-version"/>
+<meta content="306" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -2840,6 +2840,61 @@ html.dark #module-journal table :is(th,td):nth-child(7){
 }
 </style>
 
+
+<style id="journal-tag-card-match-farmer-v306">
+.journal-tag-category-card{
+  border:1px solid rgba(168,85,247,.28);
+  border-radius:14px;
+  overflow:hidden;
+  background:rgba(250,245,255,.72);
+  box-shadow:0 6px 18px rgba(88,28,135,.06);
+}
+.dark .journal-tag-category-card{
+  border-color:rgba(168,85,247,.34);
+  background:rgba(88,28,135,.10);
+  box-shadow:0 6px 18px rgba(0,0,0,.12);
+}
+.journal-tag-category-title{
+  min-height:44px;
+  padding:10px 14px;
+  background:linear-gradient(90deg,rgba(243,232,255,.92),rgba(250,245,255,.64));
+  border-bottom:1px solid rgba(168,85,247,.20);
+}
+.dark .journal-tag-category-title{
+  background:linear-gradient(90deg,rgba(107,33,168,.22),rgba(88,28,135,.10));
+  border-bottom-color:rgba(168,85,247,.24);
+}
+.journal-tag-category-body{
+  padding:12px 14px 14px;
+  background:rgba(255,255,255,.74);
+}
+.dark .journal-tag-category-body{
+  background:rgba(17,24,39,.38);
+}
+#form-tags-container > .journal-tag-category-card{
+  margin-top:2px;
+}
+#form-tags-container > .journal-tag-category-card + *{
+  margin-top:12px;
+}
+#toggle-tags-btn #strategy-tags-pin-btn{
+  color:#a855f7;
+}
+#toggle-tags-btn:hover #tags-chevron,
+#toggle-tags-btn:focus-visible #tags-chevron{
+  color:#9333ea!important;
+}
+@media(max-width:640px){
+  .journal-tag-category-title{
+    min-height:42px;
+    padding:9px 11px;
+  }
+  .journal-tag-category-body{
+    padding:10px 11px 12px;
+  }
+}
+</style>
+
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen flex flex-col antialiased">
 <nav class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-50 transition-colors duration-300">
@@ -2943,15 +2998,15 @@ html.dark #module-journal table :is(th,td):nth-child(7){
 <div class="col-span-3 md:col-span-1"><button class="w-full h-[42px] bg-blue-600 hover:bg-blue-500 text-white text-base sm:text-sm font-bold rounded-lg transition shadow-md active:scale-95" id="btn-journal-submit" type="submit"><i class="fa-solid fa-plus mr-1" id="btn-journal-submit-icon"></i><span id="btn-journal-submit-text">加入</span></button></div>
 <div class="col-span-12 bg-blue-50 dark:bg-sky-900/40 p-3 rounded-lg border border-blue-200 dark:border-sky-700/50 hidden flex-wrap items-center gap-x-4 gap-y-2 shadow-inner mt-1 text-sm" id="j-preview"></div>
 </div>
-<div class="bg-gray-50 dark:bg-gray-900/40 px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700/50 flex flex-col shadow-inner">
-<div aria-controls="form-tags-wrapper" aria-expanded="false" class="flex justify-between items-center w-full cursor-pointer group" id="toggle-tags-btn" role="button" tabindex="0">
-<span class="block text-xs text-gray-500 dark:text-gray-400 font-medium tracking-wide group-hover:text-blue-500 transition-colors select-none pointer-events-none">策略標籤 <span class="text-gray-400 dark:text-gray-500 font-normal ml-1">(單選，可不選)</span><span class="text-[10px] sm:text-xs text-gray-400 dark:text-gray-500 font-normal ml-2">(點擊展開/收合)</span></span>
+<div class="journal-tag-category-card journal-tag-category-card-purple flex flex-col">
+<div aria-controls="form-tags-wrapper" aria-expanded="false" class="journal-tag-category-title flex justify-between items-center w-full cursor-pointer group" id="toggle-tags-btn" role="button" tabindex="0">
+<span class="block text-xs sm:text-sm font-black text-purple-700 dark:text-purple-200 tracking-wide group-hover:text-purple-600 dark:group-hover:text-purple-100 transition-colors select-none pointer-events-none">策略標籤 <span class="text-purple-500/80 dark:text-purple-300/80 font-medium ml-1">(單選，可不選)</span><span class="text-[10px] sm:text-xs text-purple-400 dark:text-purple-300/70 font-normal ml-2">(點擊展開/收合)</span></span>
 <div class="flex items-center gap-1">
 <button aria-label="釘選策略標籤" aria-pressed="false" class="w-7 h-7 rounded-lg text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition active:scale-95" id="strategy-tags-pin-btn" title="釘選常駐" type="button"><i class="fa-solid fa-thumbtack pointer-events-none text-xs"></i></button>
 <div class="p-1 pointer-events-none"><i class="fa-solid fa-chevron-down text-gray-400 transition-transform duration-300 group-hover:text-blue-500" id="tags-chevron"></i></div>
 </div>
 </div>
-<div class="hidden overflow-hidden transition-all duration-300 mt-2 border-t border-gray-200 dark:border-gray-700/50 pt-3" id="form-tags-wrapper">
+<div class="journal-tag-category-body hidden overflow-hidden transition-all duration-300" id="form-tags-wrapper">
 <div id="tag-required-reminder" class="hidden mb-3 rounded-xl border px-3 py-2 text-xs sm:text-sm"></div>
 <div class="space-y-3" id="form-tags-container"></div>
 </div>
@@ -4288,6 +4343,12 @@ html.dark #module-journal table :is(th,td):nth-child(7){
 - 舊版「每天開盤必填」自動遷移為「盤後填寫」，避免既有設定遺失。
 - Excel 匯出／匯入同步支援新四種頻率，並相容舊版文字。
 -->
+<!-- v306：
+- 策略日誌「策略標籤（單選，可不選）（點擊展開/收合）」外框格式，改成與「🌱 快樂農夫與他的韭菜田投資週報」分類完全相同的卡片格式。
+- 兩者共用相同的紫色系圓角邊框、標題列、背景、內距與深色模式樣式。
+- 展開／收合、釘選、單選與可不選功能完全不變。
+- 同步修正 v305 新必填頻率在策略標籤上的小標示：尾盤／盤後／每週。
+-->
 <!-- 核心 JavaScript -->
 <script>
 const originalDateSetter=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set;
@@ -5583,7 +5644,20 @@ function renderDynamicTags(){
     const fc=document.getElementById('form-tags-container');
     const currentFormTag=fc?.querySelector('.tag-input:checked')?.value||rememberedJournalFormTag;
     if(currentFormTag)rememberJournalFormTag(currentFormTag);
-    if(fc)fc.innerHTML=TAG_CATEGORIES.map(c=>`<div><div class="text-xs font-bold text-gray-500 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 pb-1 mb-2">${escapeHTML(c.title)}</div><div class="flex flex-wrap gap-2">${c.tags.map(t=>{const theme=window.getManagedTagTheme?.(t,c.theme)||c.theme,req=window.getManagedTagRequirement?.(t)||{cadence:'none',color:'amber',hex:'#f59e0b'},required=req.cadence==='daily'||req.cadence==='weekly',badge=req.cadence==='daily'?'每日':req.cadence==='weekly'?'每週':'';return`<label class="cursor-pointer relative"><input type="checkbox" value="${escapeHTML(t)}" class="hidden tag-input" data-theme="${theme}"><div class="px-3 py-1.5 rounded-lg text-xs font-bold border transition active:scale-95 ${THEME_MAP[theme].inactive}" ${required?`style="box-shadow:0 0 0 2px ${req.hex} inset,0 0 0 1px ${req.hex};"`:''}>${escapeHTML(t)}${required?`<span class="ml-1.5 inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-black text-white align-middle" style="background:${req.hex}">${badge}</span>`:''}</div></label>`;}).join('')}</div></div>`).join('');
+    if(fc)fc.innerHTML=TAG_CATEGORIES.map(c=>{
+        const isFarmer=String(c.title||'')==='🌱 快樂農夫與他的韭菜田投資週報';
+        const content=c.tags.map(t=>{
+            const theme=window.getManagedTagTheme?.(t,c.theme)||c.theme;
+            const req=window.getManagedTagRequirement?.(t)||{cadence:'none',color:'amber',hex:'#f59e0b'};
+            const required=['closing','afterClose','weekly'].includes(req.cadence);
+            const badge=req.cadence==='closing'?'尾盤':req.cadence==='afterClose'?'盤後':req.cadence==='weekly'?'每週':'';
+            return`<label class="cursor-pointer relative"><input type="checkbox" value="${escapeHTML(t)}" class="hidden tag-input" data-theme="${theme}"><div class="px-3 py-1.5 rounded-lg text-xs font-bold border transition active:scale-95 ${THEME_MAP[theme].inactive}" ${required?`style="box-shadow:0 0 0 2px ${req.hex} inset,0 0 0 1px ${req.hex};"`:''}>${escapeHTML(t)}${required?`<span class="ml-1.5 inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-black text-white align-middle" style="background:${req.hex}">${badge}</span>`:''}</div></label>`;
+        }).join('');
+        if(isFarmer){
+            return`<div class="journal-tag-category-card journal-tag-category-card-purple"><div class="journal-tag-category-title"><div class="text-xs sm:text-sm font-black text-purple-700 dark:text-purple-200">${escapeHTML(c.title)}</div></div><div class="journal-tag-category-body"><div class="flex flex-wrap gap-2">${content}</div></div></div>`;
+        }
+        return`<div><div class="text-xs font-bold text-gray-500 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 pb-1 mb-2">${escapeHTML(c.title)}</div><div class="flex flex-wrap gap-2">${content}</div></div>`;
+    }).join('');
     window.renderTagRequirementReminder?.();
     
     document.querySelectorAll('#filter-tags-container, #filter-tags-container-fav').forEach(container=>{
