@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="306" name="app-version"/>
+<meta content="307" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -2895,6 +2895,30 @@ html.dark #module-journal table :is(th,td):nth-child(7){
 }
 </style>
 
+
+<style id="target-achieved-show-price-v307">
+.target-achieved-wrap{
+  line-height:1.05;
+  vertical-align:middle;
+}
+.target-achieved-price{
+  width:100%;
+  text-align:right;
+  font-size:13px;
+}
+.target-achieved-badge{
+  width:max-content;
+}
+@media(max-width:640px){
+  .target-achieved-price{
+    font-size:12px;
+  }
+  .target-achieved-wrap{
+    gap:3px!important;
+  }
+}
+</style>
+
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen flex flex-col antialiased">
 <nav class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-50 transition-colors duration-300">
@@ -4349,6 +4373,12 @@ html.dark #module-journal table :is(th,td):nth-child(7){
 - 展開／收合、釘選、單選與可不選功能完全不變。
 - 同步修正 v305 新必填頻率在策略標籤上的小標示：尾盤／盤後／每週。
 -->
+<!-- v307：
+- 法人目標價若已達標，不再只顯示「已達標」。
+- 已達標時改為：上方顯示原本目標價，下方顯示「✓ 已達標」。
+- 策略日誌、追蹤清單、營收籌碼、個股總覽、參考資料等使用 formatTargetPrice 的位置同步生效。
+- 複製內容同步改為「目標價：XXX｜已達標」，保留原始目標價數字。
+-->
 <!-- 核心 JavaScript -->
 <script>
 const originalDateSetter=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set;
@@ -4898,9 +4928,13 @@ const markTargetPriceAchieved=(code,closePrice,quoteDate)=>{
     data.targetPriceAchievedClose=close;
     return true;
 };
-const formatTargetPrice=(val,achieved=false)=>achieved
-    ?'<span class="inline-flex items-center justify-center rounded-md bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 text-[11px] sm:text-xs font-black whitespace-nowrap">✓ 已達標</span>'
-    :(val==null||val==='-'||val===''||isNaN(val))?'':`<span class="font-bold text-yellow-600 dark:text-yellow-400">${escapeHTML(val)}</span>`;
+const formatTargetPrice=(val,achieved=false)=>{
+    if(val==null||val==='-'||val===''||isNaN(val))return'';
+    if(achieved){
+        return`<div class="target-achieved-wrap inline-flex flex-col items-end gap-1"><span class="target-achieved-price font-black text-yellow-600 dark:text-yellow-400 tabular-nums">${escapeHTML(val)}</span><span class="target-achieved-badge inline-flex items-center justify-center rounded-md bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 text-[11px] sm:text-xs font-black whitespace-nowrap">✓ 已達標</span></div>`;
+    }
+    return`<span class="font-bold text-yellow-600 dark:text-yellow-400">${escapeHTML(val)}</span>`;
+};
 const getEpsInfo=(c,j)=>{
     const e=state.epsData[c]||{},validTarget=getValidTargetPriceValue(e),targetAchieved=isTargetPriceAchieved(c,e);
     return{eps2025:e.eps2025??j?.eps2025??null,eps2026:e.eps2026??j?.eps2026??null,epsGrowth:e.epsGrowth??j?.epsGrowth??null,futures:e.futures==='●'||j?.futures==='●',targetPrice:validTarget,targetAchieved,broker:e.broker??j?.broker??null,reportDate:e.reportDate??j?.reportDate??null};
@@ -5366,7 +5400,7 @@ window.copyPreviewData=c=>{
 25 EPS: ${d.eps2025??'-'}
 預26 EPS: ${d.eps2026??'-'}
 EPS成長率: ${d.epsGrowth!=null?(d.epsGrowth*100).toFixed(2)+'%':'-'}
-法人最高目標價: ${validTarget?(targetAchieved?'已達標':validTarget):''}
+法人最高目標價: ${validTarget?`${validTarget}${targetAchieved?'（已達標）':''}`:''}
 目標價更新日: ${updatedDate.date?updatedDate.date.replace(/-/g,'/'):'-'}${updatedDate.label&&updatedDate.date?'（'+updatedDate.label+'）':''}
 券商: ${d.broker??'-'}
 報告日期: ${d.reportDate??'-'}
@@ -8605,7 +8639,7 @@ const getStrategyCopyStockName=(journal,duplicateCodes,horseTag='')=>{
     const referenceDate=journal?.date||getToday();
     const isNew=horseTag?isHorseTagNewEntry(journal,horseTag):isHorseNewEntryJournal(journal);
     const recentTarget=state.copyMarkTargetPrice!==false?getRecentBrokerTargetPrice(journal?.code,referenceDate):null;
-    const targetText=recentTarget?`【目標價：${recentTarget.achieved?'已達標':formatCopyTargetPrice(recentTarget.targetPrice)}】`:'';
+    const targetText=recentTarget?`【目標價：${formatCopyTargetPrice(recentTarget.targetPrice)}${recentTarget.achieved?'｜已達標':''}】`:'';
     const note=String(journal?.notes||'').trim().replace(/\s*\n+\s*/g,'；');
     const noteText=state.copyMarkNotes!==false&&note?`【備註：${note}】`:'';
     return `${name}${targetText}${noteText}${state.copyMarkNewEntry!==false&&isNew?' 🆕新進榜':''}${appendDuplicateMark(journal,duplicateCodes)}${getCopyMomentumMarks(journal?.code,referenceDate)}`;
