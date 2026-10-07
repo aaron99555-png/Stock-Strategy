@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="312" name="app-version"/>
+<meta content="313" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -3350,6 +3350,340 @@ html.dark #module-journal table :is(th,td):nth-child(7){
 }
 </style>
 
+
+<style id="mobile-layout-rebuild-v313">
+/* =========================
+   圖一：策略日誌手機篩選重排
+   ========================= */
+@media(max-width:430px){
+  #module-journal .journal-fixed-filter-toolbar{
+    display:flex!important;
+    flex-direction:column!important;
+    gap:8px!important;
+    width:100%!important;
+    min-width:0!important;
+  }
+
+  #module-journal .journal-mobile-row,
+  #module-journal .journal-filter-tags-display-row{
+    display:block!important;
+    width:100%!important;
+    min-width:0!important;
+    position:relative!important;
+    float:none!important;
+    clear:both!important;
+  }
+
+  /* 日期：固定一整排 */
+  #module-journal .journal-filter-row-date .date-range-fast{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+    gap:8px!important;
+    width:100%!important;
+    padding:6px!important;
+    min-height:56px!important;
+  }
+  #module-journal .journal-filter-row-date .date-field-shift{
+    grid-template-columns:34px minmax(0,1fr) 34px!important;
+    gap:3px!important;
+    height:44px!important;
+  }
+  #module-journal .journal-filter-row-date .date-shift-btn{
+    width:34px!important;
+    min-width:34px!important;
+    height:40px!important;
+  }
+  #module-journal .journal-filter-row-date input[type="date"]{
+    height:40px!important;
+    font-size:12px!important;
+  }
+
+  /* 搜尋：獨立一整排，不再預留不存在的清除按鈕空間 */
+  #module-journal .journal-filter-row-search-clear{
+    display:block!important;
+  }
+  #module-journal .journal-filter-row-search-clear > div:first-child{
+    width:100%!important;
+    height:48px!important;
+    min-height:48px!important;
+    padding:4px 10px!important;
+  }
+  #module-journal .journal-filter-row-search-clear #filter-code{
+    font-size:14px!important;
+  }
+
+  /* 第一組條件：三格平均，不重疊 */
+  #module-journal .journal-filter-row-conditions-1{
+    display:grid!important;
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:7px!important;
+  }
+  #module-journal .journal-filter-row-conditions-1 > label{
+    min-height:48px!important;
+    height:auto!important;
+    padding:7px 5px!important;
+    justify-content:center!important;
+    overflow:visible!important;
+  }
+  #module-journal .journal-filter-row-conditions-1 > label span{
+    font-size:10.5px!important;
+    line-height:1.2!important;
+    white-space:normal!important;
+    word-break:keep-all!important;
+  }
+
+  /* 主要篩選：改成 2 欄，避免文字被壓成直排 */
+  #module-journal .journal-filter-row-grid-6{
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:7px!important;
+    width:100%!important;
+  }
+  #module-journal .journal-filter-row-grid-6 > label,
+  #module-journal .journal-filter-row-grid-6 > select{
+    width:100%!important;
+    min-width:0!important;
+    max-width:none!important;
+    min-height:46px!important;
+    height:46px!important;
+    margin:0!important;
+  }
+  #module-journal .journal-filter-row-grid-6 > label{
+    justify-content:flex-start!important;
+    padding:6px 8px!important;
+    overflow:visible!important;
+  }
+  #module-journal .journal-filter-row-grid-6 > label span{
+    font-size:11px!important;
+    line-height:1.2!important;
+    white-space:normal!important;
+    word-break:keep-all!important;
+    text-align:left!important;
+  }
+  #module-journal .journal-filter-row-grid-6 > select{
+    font-size:12px!important;
+    padding:5px 8px!important;
+  }
+
+  /* 標籤挑選 / 組合 / 清除：獨立一整排三格 */
+  #module-journal .journal-filter-row-grid-6 > .journal-filter-tag-cell{
+    grid-column:1 / -1!important;
+    display:grid!important;
+    grid-template-columns:minmax(0,1.25fr) minmax(0,.9fr) minmax(0,.8fr)!important;
+    gap:7px!important;
+    width:100%!important;
+    min-width:0!important;
+    height:auto!important;
+    min-height:46px!important;
+    position:relative!important;
+    align-items:stretch!important;
+  }
+  #module-journal .journal-filter-tag-cell #filter-tag-btn,
+  #module-journal .journal-filter-tag-cell .tag-preset-entry-btn,
+  #module-journal .journal-filter-tag-cell #btn-clear-filters{
+    position:static!important;
+    width:100%!important;
+    min-width:0!important;
+    height:46px!important;
+    min-height:46px!important;
+    margin:0!important;
+    padding:5px 7px!important;
+    justify-content:center!important;
+    border-radius:11px!important;
+    font-size:11px!important;
+    white-space:nowrap!important;
+  }
+  #module-journal .journal-filter-tag-cell #filter-tag-panel{
+    position:fixed!important;
+  }
+
+  /* 快速組合列一定排在下面，不再跑到條件格旁邊 */
+  #module-journal .journal-filter-tags-display-row{
+    grid-column:1 / -1!important;
+    margin:0!important;
+  }
+  #module-journal #tag-preset-quick-journal{
+    display:block!important;
+    width:100%!important;
+    min-width:0!important;
+    margin:0!important;
+  }
+  #module-journal .tag-preset-empty-strip{
+    width:100%!important;
+    min-height:42px!important;
+    box-sizing:border-box!important;
+  }
+  #module-journal #filter-tags-display{
+    width:100%!important;
+    margin-top:6px!important;
+  }
+}
+
+/* =========================
+   圖二：策略訊號雷達手機緊湊重排
+   ========================= */
+@media(max-width:640px){
+  #streak-filter-panel{
+    padding:8px!important;
+  }
+  #streak-search-form{
+    display:grid!important;
+    grid-template-columns:repeat(12,minmax(0,1fr))!important;
+    gap:6px!important;
+  }
+
+  /* 第1排：基準日 + 個股搜尋 */
+  #streak-search-form .streak-field-base,
+  #streak-search-form .streak-field-stock{
+    grid-column:span 6 / span 6!important;
+  }
+
+  /* 第2排：休市日 + 判定方式 + 日數，盡量吃滿整排 */
+  #streak-search-form .streak-field-holiday{
+    grid-column:span 4 / span 4!important;
+  }
+  #streak-search-form .streak-field-mode{
+    grid-column:span 5 / span 5!important;
+  }
+  #streak-search-form .streak-field-days{
+    grid-column:span 3 / span 3!important;
+  }
+
+  /* 重複模式時改成兩排，避免欄位太窄遮字 */
+  #streak-search-form.streak-window-mode .streak-field-holiday{
+    grid-column:span 4 / span 4!important;
+  }
+  #streak-search-form.streak-window-mode .streak-field-mode{
+    grid-column:span 8 / span 8!important;
+  }
+  #streak-search-form.streak-window-mode .streak-field-days,
+  #streak-search-form.streak-window-mode .streak-field-occurrences{
+    grid-column:span 6 / span 6!important;
+  }
+
+  #streak-search-form .streak-field-horse{
+    grid-column:1 / -1!important;
+  }
+
+  /* 操作按鈕：3 顆一排，勾選列獨立滿版，不留右側大空白 */
+  #streak-action-controls{
+    grid-column:1 / -1!important;
+    display:grid!important;
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:6px!important;
+    width:100%!important;
+    padding-top:0!important;
+  }
+  #streak-action-controls > button{
+    width:100%!important;
+    min-width:0!important;
+    height:38px!important;
+    padding:4px 6px!important;
+    font-size:11px!important;
+  }
+  #streak-action-controls .streak-copy-tag-toggle{
+    grid-column:1 / -1!important;
+    width:100%!important;
+    min-height:36px!important;
+    padding:5px 8px!important;
+    margin:0!important;
+    justify-content:center!important;
+  }
+
+  /* 策略標籤：模式 + 選擇框同一排，文字仍保留完整 */
+  #streak-search-form .streak-tag-filter-row{
+    gap:6px!important;
+    padding-top:6px!important;
+  }
+  #streak-search-form .streak-field-tag-mode{
+    grid-column:span 5 / span 5!important;
+  }
+  #streak-search-form #streak-tag-filter-details{
+    grid-column:span 7 / span 7!important;
+    align-self:end!important;
+  }
+  #streak-search-form #streak-tag-filter-details > summary{
+    min-height:38px!important;
+    height:38px!important;
+    padding:0 9px!important;
+  }
+
+  /* 資料條件：維持自動換行，但縮小空隙 */
+  #streak-search-form .streak-tag-filter-row + .col-span-12{
+    padding-top:6px!important;
+  }
+  #streak-search-form label:has(.streak-data-filter){
+    min-height:36px!important;
+    padding:5px 8px!important;
+  }
+
+  /* 最下排：四個下拉 2×2；快速條件獨立滿版 */
+  #streak-search-form .streak-field-chipradar,
+  #streak-search-form .streak-field-sort,
+  #streak-search-form .streak-field-heat,
+  #streak-search-form .streak-field-strength{
+    grid-column:span 6 / span 6!important;
+  }
+  #streak-search-form .streak-field-presets{
+    grid-column:1 / -1!important;
+  }
+
+  #streak-search-form .input-base,
+  #streak-holiday-toggle-btn{
+    min-height:40px!important;
+    height:40px!important;
+    font-size:12px!important;
+  }
+  #streak-search-form .streak-field-mode .input-base,
+  #streak-search-form .streak-field-horse .input-base{
+    font-size:11.5px!important;
+  }
+
+  #streak-search-form label.block{
+    margin-bottom:3px!important;
+    font-size:10.5px!important;
+    line-height:1.15!important;
+  }
+
+  /* 縮小區塊間的垂直浪費 */
+  #streak-summary{
+    padding-top:6px!important;
+    padding-bottom:6px!important;
+  }
+  #streak-stats{
+    padding-top:2px!important;
+    padding-bottom:6px!important;
+  }
+  #streak-results-header{
+    padding-top:2px!important;
+  }
+}
+
+/* 非常窄的手機再保守一點，避免字被擠掉 */
+@media(max-width:375px){
+  #module-journal .journal-filter-row-grid-6{
+    grid-template-columns:1fr!important;
+  }
+  #module-journal .journal-filter-row-grid-6 > .journal-filter-tag-cell{
+    grid-column:1!important;
+    grid-template-columns:1fr 1fr!important;
+  }
+  #module-journal .journal-filter-tag-cell #filter-tag-btn{
+    grid-column:1 / -1!important;
+  }
+
+  #streak-search-form .streak-field-holiday{
+    grid-column:span 5 / span 5!important;
+  }
+  #streak-search-form .streak-field-mode{
+    grid-column:span 7 / span 7!important;
+  }
+  #streak-search-form .streak-field-days{
+    grid-column:span 6 / span 6!important;
+  }
+}
+</style>
+
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen flex flex-col antialiased">
 <nav class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-50 transition-colors duration-300">
@@ -3486,22 +3820,22 @@ html.dark #module-journal table :is(th,td):nth-child(7){
 <div class="block">
 <p class="hidden text-[11px] sm:text-xs text-gray-500 dark:text-gray-400" id="streak-mode-description"></p>
 <form action="javascript:void(0);" class="grid grid-cols-12 gap-1.5 w-full" id="streak-search-form">
-<div class="col-span-6 sm:col-span-4 lg:col-span-2"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">基準日</label><input class="input-base text-center" id="streak-base-date" type="date"/></div>
-<div class="col-span-6 sm:col-span-4 lg:col-span-2">
+<div class="streak-field-base col-span-6 sm:col-span-4 lg:col-span-2"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">基準日</label><input class="input-base text-center" id="streak-base-date" type="date"/></div>
+<div class="streak-field-stock col-span-6 sm:col-span-4 lg:col-span-2">
 <label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium"><i class="fa-solid fa-magnifying-glass mr-1 text-violet-500"></i>個股搜尋</label>
 <div class="relative">
 <input autocomplete="off" class="input-base !pr-9 text-center" id="streak-stock-search" placeholder="代號／股名" spellcheck="false" type="text"/>
 <button aria-label="清除個股搜尋" class="absolute right-1 top-1/2 -translate-y-1/2 w-7 h-7 rounded-md text-gray-400 hover:text-red-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition hidden" id="streak-stock-search-clear" title="清除個股搜尋" type="button"><i class="fa-solid fa-xmark"></i></button>
 </div>
 </div>
-<div class="col-span-6 sm:col-span-4 lg:col-span-2 flex items-end" id="streak-holiday-controls"><button aria-controls="streak-holiday-manager" aria-expanded="false" class="w-full h-[42px] rounded-lg border border-amber-300 dark:border-amber-700 bg-white dark:bg-gray-800 text-amber-700 dark:text-amber-300 text-xs sm:text-sm font-bold hover:bg-amber-50 dark:hover:bg-amber-900/30 transition shadow-sm active:scale-95" id="streak-holiday-toggle-btn" title="展開休市日設定" type="button"><i class="fa-solid fa-calendar-xmark mr-1.5"></i>休市日 <i class="fa-solid fa-chevron-down ml-1 text-[10px]" id="streak-holiday-toggle-icon"></i></button></div>
-<div class="col-span-6 sm:col-span-4 lg:col-span-2"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">判定方式</label><select class="input-base text-center" id="streak-mode"><option value="consecutive">N 日連續出現</option><option value="window">N 日內重複出現</option></select></div>
-<div class="col-span-6 sm:col-span-4 lg:col-span-1"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium" id="streak-day-count-label">連續日數</label><input aria-describedby="streak-mode-description" class="input-base text-center" id="streak-min-days" inputmode="numeric" max="60" min="2" step="1" type="number" value="2"/></div>
-<div class="hidden col-span-6 sm:col-span-4 lg:col-span-1" id="streak-min-occurrences-wrap"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">至少幾次</label><input aria-label="至少出現次數" class="input-base text-center" id="streak-min-occurrences" inputmode="numeric" max="2" min="2" step="1" type="number" value="2"/></div>
-<div class="col-span-12 sm:col-span-4 lg:col-span-2"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">追風馬／赤兔馬／千里馬</label><select class="input-base text-center text-xs" id="streak-horse-mode"><option value="excludeStock">整檔排除</option><option selected="" value="ignoreTags">只忽略馬標籤</option><option value="include">不排除</option></select></div>
+<div class="streak-field-holiday col-span-6 sm:col-span-4 lg:col-span-2 flex items-end" id="streak-holiday-controls"><button aria-controls="streak-holiday-manager" aria-expanded="false" class="w-full h-[42px] rounded-lg border border-amber-300 dark:border-amber-700 bg-white dark:bg-gray-800 text-amber-700 dark:text-amber-300 text-xs sm:text-sm font-bold hover:bg-amber-50 dark:hover:bg-amber-900/30 transition shadow-sm active:scale-95" id="streak-holiday-toggle-btn" title="展開休市日設定" type="button"><i class="fa-solid fa-calendar-xmark mr-1.5"></i>休市日 <i class="fa-solid fa-chevron-down ml-1 text-[10px]" id="streak-holiday-toggle-icon"></i></button></div>
+<div class="streak-field-mode col-span-6 sm:col-span-4 lg:col-span-2"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">判定方式</label><select class="input-base text-center" id="streak-mode"><option value="consecutive">N 日連續出現</option><option value="window">N 日內重複出現</option></select></div>
+<div class="streak-field-days col-span-6 sm:col-span-4 lg:col-span-1"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium" id="streak-day-count-label">連續日數</label><input aria-describedby="streak-mode-description" class="input-base text-center" id="streak-min-days" inputmode="numeric" max="60" min="2" step="1" type="number" value="2"/></div>
+<div class="streak-field-occurrences hidden col-span-6 sm:col-span-4 lg:col-span-1" id="streak-min-occurrences-wrap"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">至少幾次</label><input aria-label="至少出現次數" class="input-base text-center" id="streak-min-occurrences" inputmode="numeric" max="2" min="2" step="1" type="number" value="2"/></div>
+<div class="streak-field-horse col-span-12 sm:col-span-4 lg:col-span-2"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">追風馬／赤兔馬／千里馬</label><select class="input-base text-center text-xs" id="streak-horse-mode"><option value="excludeStock">整檔排除</option><option selected="" value="ignoreTags">只忽略馬標籤</option><option value="include">不排除</option></select></div>
 <div class="col-span-12 flex flex-wrap items-center justify-end gap-1.5" id="streak-action-controls"><button class="h-[38px] px-3 bg-white dark:bg-gray-800 hover:bg-violet-50 dark:hover:bg-violet-900/30 text-violet-700 dark:text-violet-300 rounded-lg font-bold text-xs sm:text-sm border border-violet-300 dark:border-violet-700 transition shadow-sm active:scale-95" id="streak-reset-btn" title="還原策略訊號雷達預設條件" type="button"><i class="fa-solid fa-rotate-left mr-1"></i>還原預設</button><button type="button" id="streak-jump-results-btn" class="h-[38px] px-3 rounded-lg border border-violet-300 dark:border-violet-700 bg-white dark:bg-gray-900 text-violet-700 dark:text-violet-300 text-xs font-bold hover:bg-violet-50 dark:hover:bg-violet-900/30 transition"><i class="fa-solid fa-arrow-down mr-1.5"></i>看結果</button><button class="h-[38px] px-3 bg-violet-600 hover:bg-violet-500 text-white rounded-lg font-bold text-xs sm:text-sm border border-violet-600 transition active:scale-95 disabled:bg-gray-100 dark:disabled:bg-gray-700 disabled:text-gray-400 disabled:border-gray-300 dark:disabled:border-gray-600 disabled:cursor-not-allowed disabled:opacity-60" disabled="" id="streak-copy-btn" type="button"><i class="fa-solid fa-copy mr-1"></i>複製</button><label class="streak-copy-tag-toggle min-h-[38px] px-2.5 py-1.5 rounded-lg border border-violet-200 dark:border-violet-800/70 bg-white dark:bg-gray-900/60 text-[10px] sm:text-xs font-bold text-violet-700 dark:text-violet-300 inline-flex items-center justify-center gap-2 cursor-pointer select-none" title="控制複製結果是否包含共同策略、策略頻率與每日策略標籤"><input id="streak-copy-show-tags" type="checkbox" class="rounded border-violet-300 dark:border-violet-700 accent-violet-600 w-3.5 h-3.5" checked/><span>複製顯示策略標籤</span></label></div>
-<div class="col-span-12 mt-1 pt-2 border-t border-violet-100 dark:border-violet-900/40 grid grid-cols-12 gap-2 items-start">
-<div class="col-span-12 sm:col-span-4 lg:col-span-3"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium"><i class="fa-solid fa-tags mr-1 text-violet-500"></i>策略標籤</label><select class="input-base text-center" id="streak-tag-filter-mode"><option value="all" selected>不限策略</option><option value="include">包含任一所選策略</option><option value="matchAll">完全符合所選策略</option><option value="exclude">排除所選策略</option></select></div>
+<div class="streak-tag-filter-row col-span-12 mt-1 pt-2 border-t border-violet-100 dark:border-violet-900/40 grid grid-cols-12 gap-2 items-start">
+<div class="streak-field-tag-mode col-span-12 sm:col-span-4 lg:col-span-3"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium"><i class="fa-solid fa-tags mr-1 text-violet-500"></i>策略標籤</label><select class="input-base text-center" id="streak-tag-filter-mode"><option value="all" selected>不限策略</option><option value="include">包含任一所選策略</option><option value="matchAll">完全符合所選策略</option><option value="exclude">排除所選策略</option></select></div>
 <details class="col-span-12 sm:col-span-8 lg:col-span-9 rounded-lg border border-violet-200 dark:border-violet-800/70 bg-white dark:bg-gray-800 overflow-hidden" id="streak-tag-filter-details">
 <summary class="h-[42px] px-3 flex items-center justify-between cursor-pointer text-xs font-bold text-violet-700 dark:text-violet-300 select-none"><span id="streak-tag-filter-label">選擇策略（0）</span><span class="text-[10px] font-normal text-violet-500">點擊選擇</span></summary>
 <div class="border-t border-violet-100 dark:border-violet-900/40 p-3"><div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1.5" id="streak-tag-options"></div><div class="mt-2 flex justify-end"><button class="h-8 px-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-[11px] font-bold text-gray-500 dark:text-gray-300 hover:text-red-500 transition" id="streak-clear-tags-btn" type="button">清除策略條件</button></div></div>
@@ -3540,12 +3874,12 @@ html.dark #module-journal table :is(th,td):nth-child(7){
 </label>
 </div>
 </div>
-<div class="col-span-12 grid grid-cols-12 gap-2 items-end">
-<div class="col-span-6 sm:col-span-4 lg:col-span-3"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">籌碼雷達</label><select class="input-base text-center text-xs" id="streak-chipradar-filter"><option value="all">不限</option><option value="strong">🔥 強度 70+</option><option value="warming">🌡️ 加溫 70+</option><option value="stealth">🕵️ 潛伏吸籌</option></select></div>
-<div class="col-span-6 sm:col-span-4 lg:col-span-3"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">結果排序</label><select class="input-base text-center text-xs" id="streak-result-sort"><option selected="" value="latestDate">最新日期</option><option value="strength">訊號強度</option><option value="occurrences">出現次數</option><option value="streak">連續日數</option><option value="epsGrowth">EPS成長率</option><option value="heat">訊號熱度</option><option value="code">股票代號</option></select></div>
-<div class="col-span-6 sm:col-span-4 lg:col-span-3"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">熱度篩選</label><select class="input-base text-center text-xs" id="streak-heat-filter"><option value="all">全部熱度</option><option value="新進雷達">新進雷達</option><option value="升溫">升溫</option><option value="持續">持續</option><option value="降溫">降溫</option><option value="資料不足">資料不足</option></select></div>
-<div class="col-span-6 sm:col-span-4 lg:col-span-2"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">最低強度</label><select class="input-base text-center text-xs" id="streak-min-strength"><option value="0">不限</option><option value="50">50分以上</option><option value="65">65分以上</option><option value="80">80分以上</option></select></div>
-<div class="col-span-6 sm:col-span-12 lg:col-span-4"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">快速條件</label><div class="grid grid-cols-3 gap-1.5"><button class="h-[42px] rounded-lg border border-violet-200 dark:border-violet-700 bg-white dark:bg-gray-800 text-[10px] sm:text-[11px] font-bold text-violet-700 dark:text-violet-300 hover:bg-violet-50 dark:hover:bg-violet-900/30 transition" data-streak-preset="consecutive-2" type="button">2日連續</button><button class="h-[42px] rounded-lg border border-violet-200 dark:border-violet-700 bg-white dark:bg-gray-800 text-[10px] sm:text-[11px] font-bold text-violet-700 dark:text-violet-300 hover:bg-violet-50 dark:hover:bg-violet-900/30 transition" data-streak-preset="window-5-3" type="button">5日3次</button><button class="h-[42px] rounded-lg border border-violet-200 dark:border-violet-700 bg-white dark:bg-gray-800 text-[10px] sm:text-[11px] font-bold text-violet-700 dark:text-violet-300 hover:bg-violet-50 dark:hover:bg-violet-900/30 transition" data-streak-preset="window-10-4" type="button">10日4次</button></div></div>
+<div class="streak-bottom-filter-row col-span-12 grid grid-cols-12 gap-2 items-end">
+<div class="streak-field-chipradar col-span-6 sm:col-span-4 lg:col-span-3"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">籌碼雷達</label><select class="input-base text-center text-xs" id="streak-chipradar-filter"><option value="all">不限</option><option value="strong">🔥 強度 70+</option><option value="warming">🌡️ 加溫 70+</option><option value="stealth">🕵️ 潛伏吸籌</option></select></div>
+<div class="streak-field-sort col-span-6 sm:col-span-4 lg:col-span-3"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">結果排序</label><select class="input-base text-center text-xs" id="streak-result-sort"><option selected="" value="latestDate">最新日期</option><option value="strength">訊號強度</option><option value="occurrences">出現次數</option><option value="streak">連續日數</option><option value="epsGrowth">EPS成長率</option><option value="heat">訊號熱度</option><option value="code">股票代號</option></select></div>
+<div class="streak-field-heat col-span-6 sm:col-span-4 lg:col-span-3"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">熱度篩選</label><select class="input-base text-center text-xs" id="streak-heat-filter"><option value="all">全部熱度</option><option value="新進雷達">新進雷達</option><option value="升溫">升溫</option><option value="持續">持續</option><option value="降溫">降溫</option><option value="資料不足">資料不足</option></select></div>
+<div class="streak-field-strength col-span-6 sm:col-span-4 lg:col-span-2"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">最低強度</label><select class="input-base text-center text-xs" id="streak-min-strength"><option value="0">不限</option><option value="50">50分以上</option><option value="65">65分以上</option><option value="80">80分以上</option></select></div>
+<div class="streak-field-presets col-span-6 sm:col-span-12 lg:col-span-4"><label class="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">快速條件</label><div class="grid grid-cols-3 gap-1.5"><button class="h-[42px] rounded-lg border border-violet-200 dark:border-violet-700 bg-white dark:bg-gray-800 text-[10px] sm:text-[11px] font-bold text-violet-700 dark:text-violet-300 hover:bg-violet-50 dark:hover:bg-violet-900/30 transition" data-streak-preset="consecutive-2" type="button">2日連續</button><button class="h-[42px] rounded-lg border border-violet-200 dark:border-violet-700 bg-white dark:bg-gray-800 text-[10px] sm:text-[11px] font-bold text-violet-700 dark:text-violet-300 hover:bg-violet-50 dark:hover:bg-violet-900/30 transition" data-streak-preset="window-5-3" type="button">5日3次</button><button class="h-[42px] rounded-lg border border-violet-200 dark:border-violet-700 bg-white dark:bg-gray-800 text-[10px] sm:text-[11px] font-bold text-violet-700 dark:text-violet-300 hover:bg-violet-50 dark:hover:bg-violet-900/30 transition" data-streak-preset="window-10-4" type="button">10日4次</button></div></div>
 </div>
 <div class="hidden col-span-12 mt-1 rounded-xl border border-amber-200 dark:border-amber-800/70 bg-amber-50/60 dark:bg-amber-900/10 p-3" id="streak-holiday-manager">
 <div class="flex items-center justify-between gap-2 mb-3">
@@ -4864,6 +5198,22 @@ html.dark #module-journal table :is(th,td):nth-child(7){
 - 所有複製按鈕（獨選、策略、複製A、複製B、分數、股期、籌碼集中、EPS、精選馬廄、非凡重點等）固定從第二排開始。
 - 策略日誌與追蹤清單同步套用。
 - 手機版小標籤區可橫向滑動，避免與第二排複製按鈕擠在同一列。
+-->
+<!-- v313：
+【手機版策略日誌】
+- 依使用者截圖重新排列手機篩選區，解決 checkbox、select、標籤挑選、快速組合互相重疊問題。
+- 日期固定第一排、搜尋第二排、三個基本條件第三排。
+- 千張大戶增／高成交值高營收／分數／等級／狀態／訊號改為 2 欄整齊排列，避免文字被壓成直排。
+- 「+ 標籤挑選／⚡組合／清除」改成獨立滿版三格。
+- 快速組合提示固定排在所有篩選條件下方，不再穿插到其他格子。
+
+【手機版策略訊號雷達】
+- 基準日／個股搜尋維持 2 欄。
+- 休市日／判定方式／連續日數重新分配寬度，吃滿整排。
+- 操作按鈕改為 3 顆同排，「複製顯示策略標籤」獨立滿版，消除右側大量空白。
+- 策略條件改成「策略模式 5/12 + 選擇策略 7/12」同排。
+- 籌碼雷達／結果排序／熱度／最低強度改為 2×2；快速條件獨立滿版。
+- 保持文字可完整辨識，不以縮得過小換取空間。
 -->
 <!-- 核心 JavaScript -->
 <script>
@@ -7683,8 +8033,7 @@ const updateStreakModeUI=()=>{
     description.textContent=isWindow?'重複模式會統計最近 N 個有效交易日，列出至少出現 M 次的股票；週末及休市日不計入。':'';
     description.classList.toggle('hidden',!isWindow);
     daysInput.setAttribute('aria-label',isWindow?'觀察交易日數':'連續交易日數');
-    const daysWrap=daysInput.closest('div');
-    if(daysWrap)daysWrap.style.gridColumn=isWindow?'':'span 2 / span 2';
+    document.getElementById('streak-search-form')?.classList.toggle('streak-window-mode',isWindow);
     if(occurrencesWrap)occurrencesWrap.classList.toggle('hidden',!isWindow);
     if(occurrencesInput){const days=Math.max(2,Math.min(60,parseInt(daysInput.value)||2));occurrencesInput.disabled=!isWindow;occurrencesInput.max=String(days);occurrencesInput.value=String(Math.max(2,Math.min(days,parseInt(occurrencesInput.value)||2)));}
 };
