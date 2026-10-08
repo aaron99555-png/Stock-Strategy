@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="316" name="app-version"/>
+<meta content="317" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -3684,6 +3684,47 @@ html.dark #module-journal table :is(th,td):nth-child(7){
 }
 </style>
 
+
+<style id="journal-tag-filled-state-v317">
+#form-tags-container .journal-form-tag-btn{
+  position:relative;
+}
+#form-tags-container .tag-input:not(:checked) + .journal-form-tag-btn.journal-tag-filled{
+  background:#dcfce7!important;
+  border-color:#22c55e!important;
+  color:#166534!important;
+  box-shadow:0 0 0 1px rgba(34,197,94,.18),0 2px 7px rgba(22,101,52,.08)!important;
+}
+.dark #form-tags-container .tag-input:not(:checked) + .journal-form-tag-btn.journal-tag-filled{
+  background:rgba(20,83,45,.48)!important;
+  border-color:#22c55e!important;
+  color:#bbf7d0!important;
+}
+#form-tags-container .journal-tag-filled-badge{
+  background:#16a34a;
+  color:#fff;
+  box-shadow:0 1px 2px rgba(22,101,52,.18);
+}
+#form-tags-container .tag-input:checked + .journal-form-tag-btn.journal-tag-filled .journal-tag-filled-badge{
+  background:rgba(255,255,255,.92);
+  color:#15803d;
+}
+.dark #form-tags-container .tag-input:checked + .journal-form-tag-btn.journal-tag-filled .journal-tag-filled-badge{
+  background:rgba(255,255,255,.9);
+  color:#166534;
+}
+@media(max-width:640px){
+  #form-tags-container .journal-form-tag-btn{
+    padding-left:9px!important;
+    padding-right:9px!important;
+  }
+  #form-tags-container .journal-tag-filled-badge{
+    margin-left:5px!important;
+    font-size:8.5px!important;
+  }
+}
+</style>
+
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen flex flex-col antialiased">
 <nav class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-50 transition-colors duration-300">
@@ -5234,6 +5275,14 @@ html.dark #module-journal table :is(th,td):nth-child(7){
 - 不再顯示：目前顯示、新訊號、觀察中、已進場、多重訊號、逾期未處理、尚未確認、資料異常、提醒達率等統計格。
 - 下方篩選、標籤挑選、複製功能與資料表功能維持不變。
 -->
+<!-- v317：
+- 策略日誌「策略標籤」新增當日已填狀態提示。
+- 以策略日誌目前選擇的日期（j-date）為基準，只要該策略標籤當天已有任何股票填寫，按鈕底色會自動變成綠色。
+- 已填標籤會顯示「✓ 已填」；若當天該策略有多檔，顯示「✓ 已填 N」。
+- 尚未填寫的策略維持原本底色，方便一眼分辨已填／未填。
+- 切換日期時會立即重新判斷；新增或合併策略日誌後也會立即更新，不必重新整理頁面。
+- 使用者目前點選中的策略標籤仍保留原本選中色，並同時顯示已填 badge，避免混淆「已填」與「目前選取」。
+-->
 <!-- 核心 JavaScript -->
 <script>
 const originalDateSetter=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set;
@@ -6704,6 +6753,36 @@ document.addEventListener('click',event=>{
     if(deleteButton){event.preventDefault();deleteTagFilterPreset(deleteButton.dataset.tagPresetDelete);return;}
 });
 
+
+const getJournalTagFilledCountsForDate=(dateValue=document.getElementById('j-date')?.value)=>{
+    const date=String(dateValue||'').slice(0,10),counts=new Map();
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(date))return counts;
+    (state.journals||[]).forEach(journal=>{
+        if(String(journal?.date||'').slice(0,10)!==date)return;
+        const seen=new Set((journal?.tags||[]).map(normalizeStrategyTagName).filter(Boolean));
+        seen.forEach(tag=>counts.set(tag,(counts.get(tag)||0)+1));
+    });
+    return counts;
+};
+
+const updateJournalTagFilledState=()=>{
+    const counts=getJournalTagFilledCountsForDate();
+    document.querySelectorAll('#form-tags-container .tag-input').forEach(input=>{
+        const tag=normalizeStrategyTagName(input.value),button=input.nextElementSibling;
+        if(!button)return;
+        const count=counts.get(tag)||0,filled=count>0;
+        button.classList.toggle('journal-tag-filled',filled);
+        button.dataset.filledCount=String(count);
+        const badge=button.querySelector('.journal-tag-filled-badge');
+        if(badge){
+            badge.classList.toggle('hidden',!filled);
+            badge.textContent=count>1?`✓ 已填 ${count}`:'✓ 已填';
+        }
+        button.title=filled?`${tag}｜${document.getElementById('j-date')?.value||''} 已填寫 ${count} 檔`:`${tag}｜目前日期尚未填寫`;
+    });
+};
+window.updateJournalTagFilledState=updateJournalTagFilledState;
+
 function renderDynamicTags(){
     const fc=document.getElementById('form-tags-container');
     const currentFormTag=fc?.querySelector('.tag-input:checked')?.value||rememberedJournalFormTag;
@@ -6715,7 +6794,7 @@ function renderDynamicTags(){
             const req=window.getManagedTagRequirement?.(t)||{cadence:'none',color:'amber',hex:'#f59e0b'};
             const required=['closing','afterClose','weekly'].includes(req.cadence);
             const badge=req.cadence==='closing'?'尾盤':req.cadence==='afterClose'?'盤後':req.cadence==='weekly'?'每週':'';
-            return`<label class="cursor-pointer relative"><input type="checkbox" value="${escapeHTML(t)}" class="hidden tag-input" data-theme="${theme}"><div class="px-3 py-1.5 rounded-lg text-xs font-bold border transition active:scale-95 ${THEME_MAP[theme].inactive}" ${required?`style="box-shadow:0 0 0 2px ${req.hex} inset,0 0 0 1px ${req.hex};"`:''}>${escapeHTML(t)}${required?`<span class="ml-1.5 inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-black text-white align-middle" style="background:${req.hex}">${badge}</span>`:''}</div></label>`;
+            return`<label class="cursor-pointer relative"><input type="checkbox" value="${escapeHTML(t)}" class="hidden tag-input" data-theme="${theme}"><div class="journal-form-tag-btn px-3 py-1.5 rounded-lg text-xs font-bold border transition active:scale-95 ${THEME_MAP[theme].inactive}" ${required?`style="box-shadow:0 0 0 2px ${req.hex} inset,0 0 0 1px ${req.hex};"`:''}>${escapeHTML(t)}${required?`<span class="ml-1.5 inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-black text-white align-middle" style="background:${req.hex}">${badge}</span>`:''}<span class="journal-tag-filled-badge hidden ml-1.5 inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-black align-middle">✓ 已填</span></div></label>`;
         }).join('');
         if(isFarmer){
             return`<div class="journal-tag-category-card journal-tag-category-card-purple"><div class="journal-tag-category-title"><div class="text-xs sm:text-sm font-black text-purple-700 dark:text-purple-200">${escapeHTML(c.title)}</div></div><div class="journal-tag-category-body"><div class="flex flex-wrap gap-2">${content}</div></div></div>`;
@@ -6769,6 +6848,7 @@ function renderDynamicTags(){
     });
     if(typeof renderStreakStrategyOptions==='function')renderStreakStrategyOptions();
     renderTagFilterPresetUI();
+    updateJournalTagFilledState();
 }
 
 window.removeFilterTag=tag=>{
@@ -8895,7 +8975,10 @@ const syncJournalReferenceMode=()=>{
     wrap?.classList.toggle('dark:ring-amber-700',enabled);
 };
 document.getElementById('journal-reference-only')?.addEventListener('change',syncJournalReferenceMode);
-document.getElementById('j-date')?.addEventListener('change',()=>window.renderTagRequirementReminder?.());
+document.getElementById('j-date')?.addEventListener('change',()=>{
+    window.renderTagRequirementReminder?.();
+    window.updateJournalTagFilledState?.();
+});
 syncJournalReferenceMode();
 
 // v308：策略日誌快速連續輸入。
@@ -8932,6 +9015,7 @@ const scheduleJournalFastEntryRender=()=>{
         processAndRenderJournals();
         if(document.getElementById('module-favorites')?.classList.contains('active'))renderFavorites();
         window.renderTagRequirementReminder?.();
+        window.updateJournalTagFilledState?.();
     },180);
 };
 
@@ -8997,6 +9081,7 @@ document.getElementById('journal-form')?.addEventListener('submit', async e => {
         existing.updatedAt = Date.now();
         
         saveLocalData();
+        window.updateJournalTagFilledState?.();
         resetJournalFastEntryFields();
         scheduleJournalFastEntryRender();
         queueJournalCloudWrite(`journals/${existing.id}`,existing);
@@ -9022,6 +9107,7 @@ document.getElementById('journal-form')?.addEventListener('submit', async e => {
         };
         state.journals.push(p);
         saveLocalData();
+        window.updateJournalTagFilledState?.();
         resetJournalFastEntryFields();
         scheduleJournalFastEntryRender();
         queueJournalCloudWrite(`journals/${id}`,p);
