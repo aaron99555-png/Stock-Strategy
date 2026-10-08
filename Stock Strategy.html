@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="317" name="app-version"/>
+<meta content="318" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -3690,28 +3690,28 @@ html.dark #module-journal table :is(th,td):nth-child(7){
   position:relative;
 }
 #form-tags-container .tag-input:not(:checked) + .journal-form-tag-btn.journal-tag-filled{
-  background:#dcfce7!important;
-  border-color:#22c55e!important;
-  color:#166534!important;
-  box-shadow:0 0 0 1px rgba(34,197,94,.18),0 2px 7px rgba(22,101,52,.08)!important;
+  background:#ede9fe!important;
+  border-color:#8b5cf6!important;
+  color:#5b21b6!important;
+  box-shadow:0 0 0 1px rgba(139,92,246,.16),0 2px 7px rgba(91,33,182,.08)!important;
 }
 .dark #form-tags-container .tag-input:not(:checked) + .journal-form-tag-btn.journal-tag-filled{
-  background:rgba(20,83,45,.48)!important;
-  border-color:#22c55e!important;
-  color:#bbf7d0!important;
+  background:rgba(76,29,149,.42)!important;
+  border-color:#8b5cf6!important;
+  color:#ddd6fe!important;
 }
 #form-tags-container .journal-tag-filled-badge{
-  background:#16a34a;
+  background:#7c3aed;
   color:#fff;
-  box-shadow:0 1px 2px rgba(22,101,52,.18);
+  box-shadow:0 1px 2px rgba(91,33,182,.18);
 }
 #form-tags-container .tag-input:checked + .journal-form-tag-btn.journal-tag-filled .journal-tag-filled-badge{
   background:rgba(255,255,255,.92);
-  color:#15803d;
+  color:#6d28d9;
 }
 .dark #form-tags-container .tag-input:checked + .journal-form-tag-btn.journal-tag-filled .journal-tag-filled-badge{
   background:rgba(255,255,255,.9);
-  color:#166534;
+  color:#5b21b6;
 }
 @media(max-width:640px){
   #form-tags-container .journal-form-tag-btn{
@@ -5282,6 +5282,13 @@ html.dark #module-journal table :is(th,td):nth-child(7){
 - 尚未填寫的策略維持原本底色，方便一眼分辨已填／未填。
 - 切換日期時會立即重新判斷；新增或合併策略日誌後也會立即更新，不必重新整理頁面。
 - 使用者目前點選中的策略標籤仍保留原本選中色，並同時顯示已填 badge，避免混淆「已填」與「目前選取」。
+-->
+<!-- v318：
+- 策略標籤「已填」狀態底色由綠色改為紫色系。
+- 淺色模式：淡紫底＋紫色邊框／文字。
+- 深色模式：深紫半透明底＋亮紫邊框。
+- 「✓ 已填」標示同步改為紫色。
+- 已填判斷邏輯與即時更新功能不變。
 -->
 <!-- 核心 JavaScript -->
 <script>
