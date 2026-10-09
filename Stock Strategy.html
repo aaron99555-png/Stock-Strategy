@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="328" name="app-version"/>
+<meta content="329" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -5845,6 +5845,15 @@ html.dark #watchlist-picker-modal .watchlist-picker-group:has(.watchlist-picker-
 - 相同標籤已存在時，直接顯示是哪一個標籤重複。
 - 未選策略標籤時，明確顯示「未選策略標籤」。
 -->
+<!-- v329：
+【修復 v328 按鈕失效】
+- 找到 v328 新增「加入追蹤清單」視窗時再次引入的 Runtime Error。
+- 「儲存追蹤」事件直接引用 saveWatchlistPicker，但該 const function 在程式後段才初始化。
+- 瀏覽器載入到此處會觸發 Temporal Dead Zone (TDZ) ReferenceError，導致後續 JavaScript 停止執行，因此會出現大量按鈕沒反應。
+- 已改成延遲 callback：只有實際點擊時才呼叫 saveWatchlistPicker，此時 function 已完成初始化。
+- 額外加入靜態檢查：掃描所有 addEventListener 的 bare function callback，確認沒有其他「先綁事件、後初始化 const」的同類問題。
+- 保留 v328 的追蹤分組選擇、複選清單、星等與策略標籤 Toast 功能。
+-->
 <!-- 核心 JavaScript -->
 <script>
 const originalDateSetter=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set;
@@ -8008,7 +8017,7 @@ document.getElementById('watchlist-group-tabs')?.addEventListener('click',event=
     const button=event.target.closest('[data-watchlist-group-id]');if(!button)return;
     setActiveWatchlistGroup(button.dataset.watchlistGroupId);
 });
-document.getElementById('watchlist-picker-save')?.addEventListener('click',saveWatchlistPicker);
+document.getElementById('watchlist-picker-save')?.addEventListener('click',()=>saveWatchlistPicker());
 ['watchlist-picker-close','watchlist-picker-cancel'].forEach(id=>document.getElementById(id)?.addEventListener('click',()=>setWatchlistPickerOpen(false)));
 document.getElementById('watchlist-picker-modal')?.addEventListener('click',event=>{if(event.target.id==='watchlist-picker-modal')setWatchlistPickerOpen(false);});
 document.getElementById('watchlist-picker-new-group')?.addEventListener('click',()=>{
