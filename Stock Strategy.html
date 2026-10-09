@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="323" name="app-version"/>
+<meta content="325" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -3808,6 +3808,211 @@ html.dark #module-journal table :is(th,td):nth-child(7){
 }
 </style>
 
+
+<style id="watchlist-workspace-v324">
+#module-favorites .card-panel{
+  border-top:0!important;
+  overflow:hidden;
+  background:linear-gradient(180deg,#fffdf5 0,#ffffff 220px);
+}
+.dark #module-favorites .card-panel{
+  background:linear-gradient(180deg,rgba(120,53,15,.12) 0,rgba(17,24,39,.98) 240px);
+}
+.watchlist-workspace-header{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding:16px 18px;
+  border-bottom:1px solid #fde68a;
+  background:linear-gradient(135deg,#fffbeb 0%,#fff 52%,#f8fafc 100%);
+}
+.dark .watchlist-workspace-header{
+  border-color:rgba(180,83,9,.38);
+  background:linear-gradient(135deg,rgba(120,53,15,.22),rgba(17,24,39,.96) 58%,rgba(15,23,42,.96));
+}
+.watchlist-main-icon{width:42px;height:42px;display:inline-flex;align-items:center;justify-content:center;border-radius:13px;background:#f59e0b;color:#fff;box-shadow:0 8px 20px rgba(245,158,11,.18);font-size:17px}
+.watchlist-main-title{font-size:18px;line-height:1.15;font-weight:950;color:#92400e}
+.dark .watchlist-main-title{color:#fcd34d}
+.watchlist-main-desc{margin-top:4px;font-size:11px;color:#64748b;line-height:1.45}
+.dark .watchlist-main-desc{color:#94a3b8}
+.watchlist-header-btn,.watchlist-small-btn{
+  height:35px;padding:0 11px;border-radius:9px;border:1px solid #e2e8f0;background:#fff;color:#475569;
+  font-size:11px;font-weight:850;white-space:nowrap;transition:.15s;
+}
+.watchlist-header-btn:hover,.watchlist-small-btn:hover{background:#f8fafc;border-color:#cbd5e1}
+.watchlist-header-btn-primary{background:#f59e0b;border-color:#d97706;color:#fff}
+.watchlist-header-btn-primary:hover{background:#d97706}
+.dark .watchlist-header-btn,.dark .watchlist-small-btn{background:#111827;border-color:#374151;color:#e5e7eb}
+.dark .watchlist-header-btn-primary{background:#d97706;border-color:#b45309;color:#fff}
+.watchlist-group-zone{padding:13px 16px 10px;border-bottom:1px solid #e5e7eb;background:rgba(248,250,252,.72)}
+.dark .watchlist-group-zone{border-color:#374151;background:rgba(15,23,42,.48)}
+.watchlist-group-zone-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px}
+.watchlist-group-total{font-size:10px;font-weight:900;color:#92400e;background:#fef3c7;border:1px solid #fde68a;border-radius:999px;padding:3px 8px}
+.dark .watchlist-group-total{color:#fcd34d;background:rgba(120,53,15,.35);border-color:#92400e}
+.watchlist-group-tabs{display:flex;align-items:stretch;gap:8px;overflow-x:auto;padding:1px 1px 5px;scroll-snap-type:x proximity}
+.watchlist-group-tab{
+  min-width:145px;max-width:210px;flex:0 0 auto;scroll-snap-align:start;
+  display:grid;grid-template-columns:34px minmax(0,1fr) auto;align-items:center;gap:8px;
+  padding:9px 10px;border-radius:12px;border:1px solid #e2e8f0;background:#fff;text-align:left;
+  transition:.16s;box-shadow:0 1px 2px rgba(15,23,42,.035);
+}
+.watchlist-group-tab:hover{border-color:#f59e0b;transform:translateY(-1px)}
+.watchlist-group-tab.active{border-color:#f59e0b;background:#fffbeb;box-shadow:0 0 0 2px rgba(245,158,11,.12)}
+.dark .watchlist-group-tab{background:#111827;border-color:#374151}
+.dark .watchlist-group-tab.active{background:rgba(120,53,15,.28);border-color:#d97706}
+.watchlist-group-tab-icon{width:34px;height:34px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;background:#fef3c7;color:#d97706}
+.watchlist-group-tab.active .watchlist-group-tab-icon{background:#f59e0b;color:#fff}
+.watchlist-group-tab-name{display:block;font-size:11px;font-weight:950;color:#334155;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dark .watchlist-group-tab-name{color:#e5e7eb}
+.watchlist-group-tab-meta{display:block;margin-top:2px;font-size:9px;color:#94a3b8}
+.watchlist-group-tab-count{min-width:24px;height:24px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;padding:0 6px;background:#f1f5f9;color:#64748b;font-size:10px;font-weight:950}
+.watchlist-group-tab.active .watchlist-group-tab-count{background:#f59e0b;color:#fff}
+.dark .watchlist-group-tab-count{background:#1f2937;color:#cbd5e1}
+.watchlist-active-bar{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:12px 16px;border-bottom:1px solid #e5e7eb;background:#fff;
+}
+.dark .watchlist-active-bar{background:#111827;border-color:#374151}
+.watchlist-active-folder{width:30px;height:30px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;background:#fef3c7;color:#d97706}
+.watchlist-active-name{font-size:15px;font-weight:950;color:#1f2937}
+.dark .watchlist-active-name{color:#f9fafb}
+.watchlist-active-count{font-size:10px;font-weight:950;color:#92400e;background:#fffbeb;border:1px solid #fde68a;border-radius:999px;padding:3px 7px}
+.dark .watchlist-active-count{color:#fcd34d;background:rgba(120,53,15,.25);border-color:#92400e}
+.watchlist-active-desc{margin-top:4px;font-size:10px;color:#94a3b8}
+.watchlist-active-actions{display:flex;align-items:center;gap:6px}
+.watchlist-danger-btn{color:#dc2626;border-color:#fecaca}
+.dark .watchlist-danger-btn{color:#fca5a5;border-color:#7f1d1d}
+.watchlist-small-btn:disabled{opacity:.4;cursor:not-allowed}
+.watchlist-summary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:10px 16px;border-bottom:1px solid #e5e7eb;background:#f8fafc}
+.dark .watchlist-summary-grid{border-color:#374151;background:#0f172a}
+.watchlist-summary-card{min-height:64px;border:1px solid #e2e8f0;border-radius:11px;background:#fff;padding:9px 11px;display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto;align-items:center}
+.dark .watchlist-summary-card{background:#111827;border-color:#374151}
+.watchlist-summary-card span{font-size:9px;color:#64748b;font-weight:850}
+.watchlist-summary-card strong{grid-row:1/3;grid-column:2;font-size:22px;line-height:1;font-weight:950;color:#d97706}
+.watchlist-summary-card small{font-size:9px;color:#94a3b8}
+.watchlist-advanced-panel{box-shadow:inset 0 1px 0 rgba(255,255,255,.5)}
+#watchlist-advanced-filters .date-range-fast{display:none!important}
+.watchlist-batch-bar{
+  padding:9px 14px;border-bottom:1px solid #fde68a;background:#fffbeb;
+  align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+}
+.watchlist-batch-bar:not(.hidden){display:flex}
+.dark .watchlist-batch-bar{background:rgba(120,53,15,.18);border-color:#92400e}
+.watchlist-batch-count{font-size:11px;font-weight:850;color:#92400e}
+.dark .watchlist-batch-count{color:#fcd34d}
+.watchlist-batch-actions{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.watchlist-batch-select{height:32px;min-width:150px;border-radius:8px;border:1px solid #d1d5db;background:#fff;padding:0 8px;font-size:11px;font-weight:750;color:#374151}
+.dark .watchlist-batch-select{background:#111827;border-color:#4b5563;color:#e5e7eb}
+.watchlist-batch-btn{height:32px;border-radius:8px;padding:0 10px;font-size:10px;font-weight:900;border:1px solid transparent}
+.watchlist-batch-add{background:#2563eb;color:#fff;border-color:#1d4ed8}
+.watchlist-batch-remove{background:#fff;color:#dc2626;border-color:#fecaca}
+.dark .watchlist-batch-remove{background:#111827;border-color:#7f1d1d;color:#fca5a5}
+.watchlist-stock-groups{display:flex;flex-wrap:wrap;gap:3px;margin-top:4px}
+.watchlist-stock-group-badge{display:inline-flex;align-items:center;max-width:88px;border-radius:999px;padding:2px 6px;background:#fef3c7;color:#92400e;font-size:8px;font-weight:900;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dark .watchlist-stock-group-badge{background:rgba(120,53,15,.28);color:#fcd34d}
+#module-favorites .copy-section{border-top:1px solid #dbeafe}
+#module-favorites .mobile-card-scroll{max-height:62vh}
+#module-favorites #fav-empty{white-space:normal;padding-left:24px;padding-right:24px;line-height:1.6}
+@media(max-width:760px){
+  .watchlist-workspace-header{align-items:flex-start;padding:13px 12px;flex-direction:column}
+  .watchlist-workspace-header>div:last-child{width:100%;display:grid;grid-template-columns:1fr 1fr}
+  .watchlist-header-btn{width:100%}
+  .watchlist-main-desc{font-size:10px}
+  .watchlist-group-zone{padding:11px 10px 7px}
+  .watchlist-group-tab{min-width:138px;padding:8px}
+  .watchlist-active-bar{padding:10px 11px;align-items:flex-start;flex-direction:column}
+  .watchlist-active-actions{width:100%;display:grid;grid-template-columns:1fr 1fr}
+  .watchlist-small-btn{width:100%}
+  .watchlist-summary-grid{grid-template-columns:repeat(2,minmax(0,1fr));padding:8px 10px;gap:6px}
+  .watchlist-summary-card{min-height:58px;padding:8px}
+  .watchlist-summary-card strong{font-size:19px}
+  .watchlist-batch-bar{align-items:stretch}
+  .watchlist-batch-actions{width:100%;display:grid;grid-template-columns:1fr 1fr}
+  .watchlist-batch-select{grid-column:1/-1;width:100%}
+  #module-favorites .copy-section{padding-left:10px!important;padding-right:10px!important}
+}
+</style>
+
+
+<style id="watchlist-price-v325">
+.watchlist-price-update-btn{
+  background:#2563eb!important;
+  border-color:#1d4ed8!important;
+  color:#fff!important;
+}
+.watchlist-price-update-btn:hover{background:#1d4ed8!important}
+.watchlist-price-update-btn:disabled{opacity:.55;cursor:wait}
+.watchlist-price-status{
+  min-height:29px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 16px;
+  border-bottom:1px solid #dbeafe;
+  background:#eff6ff;
+  color:#1d4ed8;
+  font-size:10px;
+  font-weight:800;
+}
+.watchlist-price-status::before{content:'●';font-size:8px}
+.watchlist-price-status.is-success{background:#ecfdf5;border-color:#a7f3d0;color:#047857}
+.watchlist-price-status.is-error{background:#fff7ed;border-color:#fed7aa;color:#c2410c}
+.dark .watchlist-price-status{background:rgba(30,58,138,.2);border-color:#1e3a8a;color:#93c5fd}
+.dark .watchlist-price-status.is-success{background:rgba(6,78,59,.22);border-color:#065f46;color:#6ee7b7}
+.dark .watchlist-price-status.is-error{background:rgba(124,45,18,.22);border-color:#7c2d12;color:#fdba74}
+
+#module-favorites table :is(th,td):nth-child(4){
+  width:82px!important;min-width:82px!important;max-width:82px!important;
+  text-align:right!important;
+  background-image:linear-gradient(rgba(239,246,255,.72),rgba(239,246,255,.72))!important;
+}
+#module-favorites table :is(th,td):nth-child(5){
+  width:76px!important;min-width:76px!important;max-width:76px!important;
+  text-align:right!important;
+  background-image:linear-gradient(rgba(255,251,235,.78),rgba(255,251,235,.78))!important;
+}
+#module-favorites table :is(th,td):nth-child(6),
+#module-favorites table :is(th,td):nth-child(7){
+  width:76px!important;min-width:76px!important;max-width:76px!important;text-align:center!important;
+}
+#module-favorites table :is(th,td):nth-child(8){
+  width:82px!important;min-width:82px!important;max-width:82px!important;text-align:center!important;
+}
+#module-favorites table :is(th,td):nth-child(9){
+  width:66px!important;min-width:66px!important;max-width:66px!important;text-align:center!important;
+}
+#module-favorites table :is(th,td):nth-child(10){
+  width:82px!important;min-width:82px!important;max-width:82px!important;text-align:right!important;
+}
+html.dark #module-favorites table :is(th,td):nth-child(4){
+  background-image:linear-gradient(rgba(30,58,138,.20),rgba(30,58,138,.20))!important;
+}
+html.dark #module-favorites table :is(th,td):nth-child(5){
+  background-image:linear-gradient(rgba(120,53,15,.18),rgba(120,53,15,.18))!important;
+}
+.watchlist-current-price-cell>div:first-child{font-size:15px!important}
+#module-favorites .watchlist-current-change-cell{font-weight:950}
+@media(max-width:760px){
+  .watchlist-workspace-header .watchlist-header-actions{
+    width:100%;
+    display:grid!important;
+    grid-template-columns:1fr 1fr 1fr!important;
+  }
+  .watchlist-price-status{padding:6px 10px;white-space:normal;line-height:1.4}
+  html.mobile-view-card #module-favorites table.mobile-card-table tbody td:nth-child(4),
+  html.mobile-view-card #module-favorites table.mobile-card-table tbody td:nth-child(5){
+    border-radius:.6rem!important;
+    padding:.5rem!important;
+    min-height:58px!important;
+    justify-content:center!important;
+  }
+  html.mobile-view-card #module-favorites table.mobile-card-table tbody td:nth-child(4)::before{content:'目前股價';}
+  html.mobile-view-card #module-favorites table.mobile-card-table tbody td:nth-child(5)::before{content:'漲跌%';}
+  html.mobile-view-card #module-favorites table.mobile-card-table tbody td:nth-child(12){
+    grid-column:1/-1!important;
+    padding-top:.15rem!important;
+  }
+}
+</style>
+
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen flex flex-col antialiased">
 <nav class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-50 transition-colors duration-300">
@@ -4710,11 +4915,54 @@ html.dark #module-journal table :is(th,td):nth-child(7){
 <!-- 追蹤清單 -->
 <div class="tab-content" id="module-favorites">
 <div class="card-panel border-t-4 border-yellow-500 flex flex-col min-h-[500px]">
-<div class="p-4 border-b border-gray-200 dark:border-gray-700/50 bg-gray-50/80 dark:bg-gray-800/80 rounded-t-xl flex justify-between items-center">
-<h2 class="font-bold text-yellow-600 dark:text-yellow-400 text-lg sm:text-xl flex items-center"><div class="bg-yellow-500/10 dark:bg-yellow-500/20 p-1.5 rounded mr-2"><i class="fa-solid fa-star"></i></div> 追蹤清單</h2>
-<span class="text-xs sm:text-sm text-gray-400 bg-white dark:bg-gray-900/50 px-2 sm:px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700/50 shadow-inner">清單與主日誌同步連動</span>
+<div class="watchlist-workspace-header">
+<div class="min-w-0">
+<div class="flex items-center gap-2">
+<span class="watchlist-main-icon"><i class="fa-solid fa-layer-group"></i></span>
+<div class="min-w-0">
+<h2 class="watchlist-main-title">多組追蹤清單</h2>
+<p class="watchlist-main-desc">把追蹤股票依題材、策略、波段計畫或觀察優先級分成多個獨立清單。</p>
 </div>
-<div class="p-4 border-b border-gray-200 dark:border-gray-700/50 bg-gray-50/80 dark:bg-gray-800/80 w-full">
+</div>
+</div>
+<div class="flex items-center gap-2 flex-shrink-0 watchlist-header-actions">
+<button class="watchlist-header-btn watchlist-price-update-btn" id="watchlist-update-prices" type="button" title="更新目前清單中所有股票的最新可取得行情"><i class="fa-solid fa-arrows-rotate mr-1.5"></i><span>更新股價</span></button>
+<button class="watchlist-header-btn watchlist-header-btn-primary" id="watchlist-add-group-btn" type="button"><i class="fa-solid fa-folder-plus mr-1.5"></i>新增清單</button>
+<button class="watchlist-header-btn" id="watchlist-toggle-filters" type="button" aria-expanded="false"><i class="fa-solid fa-sliders mr-1.5"></i>進階篩選</button>
+</div>
+</div>
+<div class="watchlist-group-zone">
+<div class="watchlist-group-zone-head">
+<div>
+<div class="text-xs font-black text-slate-700 dark:text-slate-200"><i class="fa-solid fa-folder-tree mr-1.5 text-amber-500"></i>我的清單</div>
+<div class="text-[10px] text-slate-400 mt-0.5">點選清單即可切換內容；同一檔股票可存在多個清單。</div>
+</div>
+<span class="watchlist-group-total" id="watchlist-group-total">0 組</span>
+</div>
+<div class="watchlist-group-tabs scrollbar-hide" id="watchlist-group-tabs"></div>
+</div>
+<div class="watchlist-active-bar">
+<div class="min-w-0">
+<div class="flex items-center gap-2 flex-wrap">
+<span class="watchlist-active-folder"><i class="fa-solid fa-folder-open"></i></span>
+<h3 class="watchlist-active-name" id="watchlist-active-name">全部追蹤</h3>
+<span class="watchlist-active-count" id="watchlist-active-count">0 檔</span>
+</div>
+<p class="watchlist-active-desc" id="watchlist-active-desc">彙整所有追蹤清單中的股票，並以每檔股票最新一筆策略日誌作為顯示內容。</p>
+</div>
+<div class="watchlist-active-actions">
+<button class="watchlist-small-btn" id="watchlist-rename-group" type="button"><i class="fa-solid fa-pen mr-1"></i>改名</button>
+<button class="watchlist-small-btn watchlist-danger-btn" id="watchlist-delete-group" type="button"><i class="fa-solid fa-trash mr-1"></i>刪除清單</button>
+</div>
+</div>
+<div class="watchlist-summary-grid" id="watchlist-summary-grid">
+<div class="watchlist-summary-card"><span>目前清單</span><strong id="watchlist-summary-total">0</strong><small>追蹤股票</small></div>
+<div class="watchlist-summary-card"><span>A 級強度</span><strong id="watchlist-summary-a">0</strong><small>強勢標的</small></div>
+<div class="watchlist-summary-card"><span>近一週大戶增</span><strong id="watchlist-summary-holder">0</strong><small>籌碼加溫</small></div>
+<div class="watchlist-summary-card"><span>有法人目標價</span><strong id="watchlist-summary-target">0</strong><small>研究覆蓋</small></div>
+</div>
+<div class="watchlist-price-status hidden" id="watchlist-price-status" aria-live="polite"></div>
+<div class="watchlist-advanced-panel hidden p-3 sm:p-4 border-b border-gray-200 dark:border-gray-700/50 bg-slate-50/80 dark:bg-gray-800/80 w-full" id="watchlist-advanced-filters">
 <div class="filter-toolbar flex flex-wrap items-center gap-2 sm:gap-3 w-full">
 <div class="date-range-fast flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 h-[38px] sm:h-auto box-border" data-date-range="fav">
 <span class="text-xs text-gray-500 dark:text-gray-400 px-1 sm:px-2 hidden xl:inline"><i class="fa-solid fa-filter mr-1"></i>區間</span>
@@ -4838,30 +5086,36 @@ html.dark #module-journal table :is(th,td):nth-child(7){
 <span class="copy-stock-count inline-flex items-center gap-1.5 rounded-full bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-800/70 px-3 py-1.5 text-xs sm:text-sm font-bold text-yellow-600 dark:text-yellow-300 shadow-sm whitespace-nowrap" id="fav-stock-count"><i class="fa-solid fa-chart-simple"></i>目前顯示 0 檔股票</span>
 </div>
 </div>
-<div class="hidden bg-red-50 dark:bg-red-900/20 border-b border-gray-200 dark:border-gray-700/50 p-2 sm:p-3 justify-between items-center transition-all" id="batch-bar-fav">
-<span class="text-xs sm:text-sm text-red-600 dark:text-red-400 font-medium"><i class="fa-solid fa-check-double mr-1.5"></i>已選擇 <span class="font-bold" id="batch-count-fav">0</span> 筆資料</span>
-<button class="bg-red-600 hover:bg-red-500 text-white text-xs sm:text-sm font-medium px-3 sm:px-4 py-1.5 rounded-lg transition shadow-sm active:scale-95" data-batch-delete-type="fav" type="button">批次刪除</button>
+<div class="hidden watchlist-batch-bar" id="batch-bar-fav">
+<div class="watchlist-batch-count"><i class="fa-solid fa-check-double mr-1.5"></i>已選擇 <span class="font-black" id="batch-count-fav">0</span> 檔</div>
+<div class="watchlist-batch-actions">
+<select class="watchlist-batch-select" id="watchlist-batch-target-group" aria-label="目標追蹤清單"></select>
+<button class="watchlist-batch-btn watchlist-batch-add" id="watchlist-add-selected-to-group" type="button"><i class="fa-solid fa-folder-plus mr-1"></i>加入清單</button>
+<button class="watchlist-batch-btn watchlist-batch-remove" id="watchlist-remove-selected-from-group" type="button"><i class="fa-solid fa-folder-minus mr-1"></i>移出目前清單</button>
+</div>
 </div>
 <div class="mobile-card-scroll overflow-x-auto overflow-y-auto max-h-[65vh] 2xl:max-h-[70vh] flex-grow relative rounded-b-xl w-full">
 <table class="mobile-card-table min-w-full text-left text-sm whitespace-nowrap table-auto w-full">
 <thead class="bg-gray-50/95 dark:bg-gray-900/95 backdrop-blur-md text-gray-500 dark:text-gray-400 sticky top-0 z-30 shadow-sm font-medium border-b border-gray-200 dark:border-gray-700">
 <tr>
 <th class="py-3 px-2 w-[40px] text-center sticky left-0 top-0 bg-gray-50 dark:bg-gray-900 z-40"><input class="select-all-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" data-type="fav" type="checkbox"/></th>
-<th class="py-3 px-1 sm:px-2 w-[55px] text-center sticky left-[40px] top-0 bg-gray-50 dark:bg-gray-900 z-40 sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-module="fav" data-sort="date">日期 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
-<th class="py-3 px-2 sm:px-3 w-[95px] sticky left-[95px] top-0 bg-gray-50 dark:bg-gray-900 z-40 border-r border-gray-200 dark:border-gray-700 sortable cursor-pointer" data-module="fav" data-sort="code">代號/股名 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+<th class="py-3 px-1 sm:px-2 w-[55px] text-center sticky left-[40px] top-0 bg-gray-50 dark:bg-gray-900 z-40 sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-module="fav" data-sort="date">最新訊號 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+<th class="py-3 px-2 sm:px-3 w-[95px] sticky left-[95px] top-0 bg-gray-50 dark:bg-gray-900 z-40 border-r border-gray-200 dark:border-gray-700 sortable cursor-pointer" data-module="fav" data-sort="code">追蹤股票 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+<th class="watchlist-price-col py-3 px-2 sm:px-3 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-module="fav" data-sort="closePrice" title="最新可取得行情">目前股價 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+<th class="watchlist-change-col py-3 px-2 sm:px-3 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-module="fav" data-sort="dailyChangePercent" title="相較前一交易日漲跌幅">漲跌% <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
 <th class="py-3 px-2 sm:px-3 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-module="fav" data-sort="eps2025">25 EPS <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
 <th class="py-3 px-2 sm:px-3 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-module="fav" data-sort="eps2026">預26 EPS <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
 <th class="py-3 px-3 sm:px-4 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-module="fav" data-sort="epsGrowth">成長率 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
-<th class="py-3 px-3 sm:px-4 text-center sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-module="fav" data-sort="score">分數 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
+<th class="py-3 px-3 sm:px-4 text-center sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-module="fav" data-sort="score">強度分數 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
 <th class="py-3 px-3 sm:px-4 text-right sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-module="fav" data-sort="targetPrice">目標價 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
 <th class="py-3 px-3 w-[100px] text-center sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-module="fav" data-sort="revenueHigh">營收／籌碼 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
 <th class="py-3 px-3 lg:w-[320px] lg:min-w-[320px] xl:w-[380px] xl:min-w-[380px] sortable hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer" data-module="fav" data-sort="tags">策略標籤 <i class="fa-solid fa-sort ml-1 text-xs opacity-50"></i></th>
-<th class="py-3 px-3 text-center">操作</th>
+<th class="py-3 px-3 text-center">追蹤操作</th>
 </tr>
 </thead>
 <tbody class="divide-y divide-gray-200 dark:divide-gray-700/50 text-gray-900 dark:text-gray-100" id="fav-table-body"></tbody>
 </table>
-<div class="text-center py-16 text-gray-400 dark:text-gray-500 hidden absolute inset-0 flex items-center justify-center bg-white dark:bg-gray-800 text-sm z-0" id="fav-empty">目前尚無追蹤標的。</div>
+<div class="text-center py-16 text-gray-400 dark:text-gray-500 hidden absolute inset-0 flex items-center justify-center bg-white dark:bg-gray-800 text-sm z-0" id="fav-empty">這個追蹤清單目前沒有股票。可先從「策略日誌」按星號加入追蹤，再分配到不同清單。</div>
 </div>
 </div>
 </div>
@@ -5439,6 +5693,39 @@ html.dark #module-journal table :is(th,td):nth-child(7){
 - 套用範圍：獨選、策略、複製A、複製B、分數、股期、股期分數、籌碼集中、EPS、精選馬廄。
 - 新增 X 清除按鈕，可快速恢復原本預設標題。
 -->
+<!-- v324：
+【追蹤清單整體重新規劃】
+- 追蹤清單由「策略日誌的星號篩選頁」改成真正的「多組追蹤清單工作區」。
+- 新增「全部追蹤」＋多個自訂清單；可新增、改名、刪除清單，最多 20 組。
+- 預設保留「我的追蹤」清單；舊版所有已追蹤股票會自動遷移到「我的追蹤」，不會遺失。
+- 同一檔股票可以同時存在多個清單。
+- 清單切換採卡片式導覽，顯示每組股票數量。
+- 追蹤清單改成「每檔股票只顯示一次」，採該股票最新一筆策略日誌作為內容，不再像日誌一樣重複列出同股不同日期。
+- 每檔股票下方顯示目前所屬追蹤清單分組。
+- 新增清單摘要：目前股票數、A級強度、近一週千張大戶增加、有法人目標價。
+- 原本複雜篩選預設收合為「進階篩選」，保留原有策略／籌碼／標籤篩選能力。
+- 追蹤清單不再受策略日誌當日日期區間限制，開啟清單即可看到整組追蹤股票。
+- 批次操作改為「加入清單／移出目前清單」，不會再用追蹤清單頁面誤刪策略日誌。
+- 「全部追蹤」批次移出＝取消所選股票全部追蹤；自訂清單批次移出只會移出該分組。
+- 刪除自訂清單不會刪除策略日誌；若股票沒有其他清單，會自動回到「我的追蹤」。
+- 星號追蹤等級改為股票層級同步，同一股票不同策略日誌不再出現追蹤狀態不一致。
+- 新增策略日誌時，若該股票原本已在追蹤清單，會自動承接星等與分組。
+- 分組資料支援 localStorage 與 Firebase 雲端同步；Excel 策略日誌匯出新增「追蹤清單」欄位。
+-->
+<!-- v325：
+【追蹤清單目前股價】
+- 追蹤清單新增「目前股價」與「漲跌%」兩個欄位。
+- 行情資料與策略日誌歷史收盤價分離，不會因更新追蹤清單而改寫歷史策略日誌價格。
+- 目前股價優先使用追蹤清單專用行情快取，並顯示行情日期／來源。
+
+【更新股價】
+- 追蹤清單右上新增「更新股價」按鈕。
+- 只更新目前選擇的追蹤清單；若在「全部追蹤」則更新全部追蹤股票。
+- 行情來源沿用既有多層備援：TWSE／TPEx 官方來源 → 官方備援 → FinMind → Yahoo／MIS。
+- 更新過程顯示檔數、完成狀態、行情日期與失敗檔數。
+- 行情快取獨立儲存在瀏覽器 localStorage，不寫入策略日誌，也不額外增加 Firebase 主資料負擔。
+- 若最新行情達到法人目標價，仍會沿用既有目標價達標判定。
+-->
 <!-- 核心 JavaScript -->
 <script>
 const originalDateSetter=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set;
@@ -5454,7 +5741,7 @@ const ADMIN_SESSION_STORAGE_KEY='ryan_admin_session_v1';
 const XLSX_CDN_URL='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
 const getSyncPath=()=>DIRECT_SYNC_PATH;
 const isCloudMode=()=>true;
-let cloudSyncInterval=null, state={journals:[],plans:[],revenueRecords:[],reports:[],checklists:[],trash:[],deletionTombstones:{},tagSettings:null,epsData:{},codeToName:{},nameToCode:{},customMarketHolidays:[],journalClosePrices:{},copyCompareDuplicates:false,copyMarkRevenueHigh:true,copyMarkLargeHolder:true,copyMarkLargeHolder3W:true,copyMarkNewEntry:true,copyMarkTargetPrice:true,copyMarkNotes:true,filters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,largeHolder14:false,largeHolderConsecutive:false,highTurnoverRevenue:false,tags:[],minScore:0,strengthGrade:'all',tagLogic:'OR',status:'all',quick:'all'},favFilters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,largeHolder14:false,largeHolderConsecutive:false,highTurnoverRevenue:false,tags:[],minScore:0,strengthGrade:'all',tagLogic:'OR',status:'all',quick:'all'},revenueFilters:{month:'',code:'',type:'all',revenuePattern:'none',revenueN:3,revenueCount:2,holderPattern:'none',holderN:3,holderCount:2,minMomentum:0},reportFilters:{start:'',end:'',code:''},sortConfig:{key:'createdAt',asc:false},favSortConfig:{key:'createdAt',asc:false},planSortConfig:{key:'createdAt',asc:false},revenueSortConfig:{key:'month',asc:false},reportSortConfig:{key:'date',asc:false},checklistSortConfig:{key:'createdAt',asc:false}};
+let cloudSyncInterval=null, state={journals:[],plans:[],revenueRecords:[],reports:[],checklists:[],trash:[],deletionTombstones:{},tagSettings:null,epsData:{},codeToName:{},nameToCode:{},customMarketHolidays:[],journalClosePrices:{},watchlistPrices:{},watchlistGroups:[],activeWatchlistGroupId:'watch-all',copyCompareDuplicates:false,copyMarkRevenueHigh:true,copyMarkLargeHolder:true,copyMarkLargeHolder3W:true,copyMarkNewEntry:true,copyMarkTargetPrice:true,copyMarkNotes:true,filters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,largeHolder14:false,largeHolderConsecutive:false,highTurnoverRevenue:false,tags:[],minScore:0,strengthGrade:'all',tagLogic:'OR',status:'all',quick:'all'},favFilters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,largeHolder14:false,largeHolderConsecutive:false,highTurnoverRevenue:false,tags:[],minScore:0,strengthGrade:'all',tagLogic:'OR',status:'all',quick:'all'},revenueFilters:{month:'',code:'',type:'all',revenuePattern:'none',revenueN:3,revenueCount:2,holderPattern:'none',holderN:3,holderCount:2,minMomentum:0},reportFilters:{start:'',end:'',code:''},sortConfig:{key:'createdAt',asc:false},favSortConfig:{key:'createdAt',asc:false},planSortConfig:{key:'createdAt',asc:false},revenueSortConfig:{key:'month',asc:false},reportSortConfig:{key:'date',asc:false},checklistSortConfig:{key:'createdAt',asc:false}};
 const selectedIds={journal:new Set(),fav:new Set(),plan:new Set(),revenue:new Set(),report:new Set(),checklist:new Set()};
 
 const escapeHTML=str=>(!str&&str!==0)?'':String(str).replace(/[&<>'"]/g,tag=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[tag]||tag));
@@ -7170,7 +7457,7 @@ document.addEventListener('keydown',event=>{
 let lastLocalSaveErrorAt=0;
 const getPersistableState=()=>{
     const persisted=hasStoredAdminAccess()?{...state}:{...state,journals:(state.journals||[]).map(sanitizeJournalForViewer),plans:[],trash:[]};
-    ['filters','favFilters','revenueFilters','reportFilters','journalFiltersDefaultTodayV1','reportFiltersDefaultAllV1','codeToName','nameToCode','journalClosePrices'].forEach(key=>delete persisted[key]);
+    ['filters','favFilters','revenueFilters','reportFilters','journalFiltersDefaultTodayV1','reportFiltersDefaultAllV1','codeToName','nameToCode','journalClosePrices','watchlistPrices'].forEach(key=>delete persisted[key]);
     return persisted;
 };
 function saveLocalData(){
@@ -7252,7 +7539,7 @@ async function flushPendingCloudWrites(showError=false){
     }catch(error){console.error(error);window.updateCloudHealthUI?.('pending');if(showError)showToast('仍有資料等待同步，請稍後再試','error');return false;}
 }
 const cloudCollection=v=>Array.isArray(v)?v.filter(Boolean):(v&&typeof v==='object'?Object.values(v).filter(Boolean):[]);
-const cloudSnapshot=()=>({journals:Object.fromEntries(state.journals.map(x=>[x.id,x])),publicJournals:Object.fromEntries(state.journals.map(x=>[x.id,sanitizeJournalForViewer(x)])),plans:Object.fromEntries(state.plans.map(x=>[x.id,x])),revenueRecords:Object.fromEntries(state.revenueRecords.map(x=>[x.id,x])),reports:Object.fromEntries(state.reports.map(x=>[x.id,x])),checklists:Object.fromEntries(state.checklists.map(x=>[x.id,x])),trash:Object.fromEntries((state.trash||[]).map(x=>[x.id,x])),deletionTombstones:state.deletionTombstones||{},tagSettings:state.tagSettings||null,epsData:state.epsData||{},customMarketHolidaySettings:{dates:[...(state.customMarketHolidays||[])],updatedAt:Date.now()}});
+const cloudSnapshot=()=>({journals:Object.fromEntries(state.journals.map(x=>[x.id,x])),publicJournals:Object.fromEntries(state.journals.map(x=>[x.id,sanitizeJournalForViewer(x)])),plans:Object.fromEntries(state.plans.map(x=>[x.id,x])),revenueRecords:Object.fromEntries(state.revenueRecords.map(x=>[x.id,x])),reports:Object.fromEntries(state.reports.map(x=>[x.id,x])),checklists:Object.fromEntries(state.checklists.map(x=>[x.id,x])),trash:Object.fromEntries((state.trash||[]).map(x=>[x.id,x])),deletionTombstones:state.deletionTombstones||{},tagSettings:state.tagSettings||null,epsData:state.epsData||{},customMarketHolidaySettings:{dates:[...(state.customMarketHolidays||[])],updatedAt:Date.now()},watchlistGroups:Object.fromEntries((state.watchlistGroups||[]).map(group=>[group.id,group]))});
 const sanitizeCloudJournalPayload=value=>{
     if(Array.isArray(value))return value.map(item=>item?sanitizeJournalForViewer(item):item);
     if(value&&typeof value==='object')return Object.fromEntries(Object.entries(value).map(([id,item])=>[id,item?sanitizeJournalForViewer(item):item]));
@@ -7286,7 +7573,7 @@ const fetchCloudPayload=async adminAccess=>{
     return{data:payload,notModified:entries.every(([,resource])=>resource.notModified),signature:`viewer|${entries.map(([key,resource])=>`${key}:${resource.signature}`).join('|')}`};
 };
 const hasCollectionRecords=value=>Array.isArray(value)?value.some(Boolean):!!(value&&typeof value==='object'&&Object.keys(value).length);
-const hasSyncPayload=data=>!!(data&&(hasCollectionRecords(data.journals)||hasCollectionRecords(data.plans)||hasCollectionRecords(data.revenueRecords)||hasCollectionRecords(data.reports)||hasCollectionRecords(data.checklists)||hasCollectionRecords(data.trash)||hasCollectionRecords(data.deletionTombstones)||hasCollectionRecords(data.epsData)||hasCollectionRecords(data.tagSettings?.categories)||hasCollectionRecords(data.customMarketHolidaySettings?.dates)));
+const hasSyncPayload=data=>!!(data&&(hasCollectionRecords(data.journals)||hasCollectionRecords(data.plans)||hasCollectionRecords(data.revenueRecords)||hasCollectionRecords(data.reports)||hasCollectionRecords(data.checklists)||hasCollectionRecords(data.trash)||hasCollectionRecords(data.deletionTombstones)||hasCollectionRecords(data.epsData)||hasCollectionRecords(data.tagSettings?.categories)||hasCollectionRecords(data.customMarketHolidaySettings?.dates)||hasCollectionRecords(data.watchlistGroups)));
 const hasLocalSyncData=()=>hasSyncPayload(cloudSnapshot());
 async function migrateLegacyCloudData(){
     if(!hasStoredAdminAccess()||!LEGACY_SYNC_KEY||LEGACY_SYNC_KEY===DIRECT_SYNC_PATH)return false;
@@ -7316,7 +7603,8 @@ async function performCloudLoad(showError,forceApply,adminAccess){
             state.journals=filterDeletedCloudRecords('journals',d.journals).map(item=>adminAccess?item:sanitizeJournalForViewer(item));
             const migratedStrategyTags=normalizeStrategyTags(state.journals),migratedJournalLifecycle=state.journals.reduce((changed,item)=>normalizeJournalLifecycle(item)||changed,false);
             state.plans=adminAccess?filterDeletedCloudRecords('plans',d.plans):[];const mergedRevenueRecords=mergeRevenueRecordsNewest(state.revenueRecords,d.revenueRecords),repairRevenueCloud=adminAccess&&revenueRecordsNeedCloudRepair(mergedRevenueRecords,d.revenueRecords);state.revenueRecords=mergedRevenueRecords;const normalizedCloudReports=normalizeReportRecords(filterDeletedCloudRecords('reports',d.reports));state.reports=normalizedCloudReports.records;state.checklists=filterDeletedCloudRecords('checklists',d.checklists);state.trash=adminAccess?cloudCollection(d.trash):[];if(d.tagSettings)state.tagSettings=d.tagSettings;state.epsData=d.epsData||{};
-            state.customMarketHolidays=d.customMarketHolidaySettings?normalizeCustomMarketHolidays(cloudCollection(d.customMarketHolidaySettings.dates)):[];
+            state.customMarketHolidays=d.customMarketHolidaySettings?normalizeCustomMarketHolidays(cloudCollection(d.customMarketHolidaySettings.dates)):[];state.watchlistGroups=adminAccess?cloudCollection(d.watchlistGroups):[];
+            const migratedWatchlists=adminAccess?ensureWatchlistState():false;
             const stockNameRepairs=rebuildStockLookup();
             const migratedManagedTags=window.ensureOptimizationState?.();window.syncCustomTagSettings?.();window.renderTrashManager?.();
             if(adminAccess){
@@ -7328,6 +7616,8 @@ async function performCloudLoad(showError,forceApply,adminAccess){
                 if(stockNameRepairs.plans)await putDataToCloud('plans',Object.fromEntries(state.plans.map(x=>[x.id,x])));
                 if(stockNameRepairs.epsData)await patchDataToCloud('epsData',state.epsData);
                 if((!d.tagSettings||migratedManagedTags)&&state.tagSettings)await putDataToCloud('tagSettings',state.tagSettings);
+                if((!d.watchlistGroups||migratedWatchlists)&&state.watchlistGroups?.length)await putDataToCloud('watchlistGroups',Object.fromEntries(state.watchlistGroups.map(x=>[x.id,x])));
+                if(migratedWatchlists)await putDataToCloud('journals',Object.fromEntries(state.journals.map(x=>[x.id,x])));
                 if(d.trash===undefined&&state.trash?.length)await putDataToCloud('trash',Object.fromEntries(state.trash.map(x=>[x.id,x])));
             }
         }else{
@@ -7413,8 +7703,9 @@ function loadLocalData(){
     if(!state.reportSortConfig)state.reportSortConfig={key:'date',asc:false}; if(!state.checklistSortConfig)state.checklistSortConfig={key:'date',asc:false};
     const removedAdminLocalData=!hasStoredAdminAccess()&&((state.plans||[]).length||(state.trash||[]).length||(state.journals||[]).some(item=>Object.prototype.hasOwnProperty.call(item||{},'isFavorite')));
     if(!hasStoredAdminAccess())stripAdminState();
+    const migratedLocalWatchlists=ensureWatchlistState();
     const localStockNameRepairs=rebuildStockLookup();
-    if(migratedStrategyTags||migratedJournalLifecycle||migratedMarketHolidays||normalizedLocalReports.changed||removedAdminLocalData||hasStockNameRepairs(localStockNameRepairs))saveLocalData();
+    if(migratedStrategyTags||migratedJournalLifecycle||migratedMarketHolidays||migratedLocalWatchlists||normalizedLocalReports.changed||removedAdminLocalData||hasStockNameRepairs(localStockNameRepairs))saveLocalData();
     applyFilterLogicState(state.filters.tagLogic,'.logic-btn'); applyFilterLogicState(state.favFilters.tagLogic,'.logic-btn-fav');
 }
 
@@ -7534,7 +7825,7 @@ const renderTableRows=(data,tbId,emId,isFav=false)=>{
         let fl=i.isFavorite===true?1:(parseInt(i.isFavorite)||0),fc='text-gray-400 dark:text-gray-500 hover:text-yellow-500',fi='<i class="fa-solid fa-star pointer-events-none"></i>',ft='加入追蹤';
         if(fl===1){fc='text-yellow-500';ft='一星追蹤';}else if(fl===2){fc='text-orange-500';fi='<i class="fa-solid fa-star pointer-events-none"></i><span class="ml-1 text-[10px] font-bold pointer-events-none">2</span>';ft='二次追蹤';}else if(fl===3){fc='text-red-500';fi='<i class="fa-solid fa-star pointer-events-none"></i><span class="ml-1 text-[10px] font-bold pointer-events-none">3</span>';ft='三次追蹤';}
         const fd=i.date?i.date.replace(/-/g,'/'):'',closePriceValue=Number(i.closePrice),closePriceDate=String(i.closePriceDate||''),closePriceSource=String(i.closePriceSource||''),closePriceHtml=Number.isFinite(closePriceValue)&&closePriceValue>0?`<div class="font-black text-[13px] sm:text-sm text-gray-800 dark:text-gray-100 tabular-nums" title="${escapeHTML(closePriceSource?`來源：${closePriceSource}`:'')}">${escapeHTML(formatMarketPrice(closePriceValue))}</div>${closePriceDate?`<div class="mt-0.5 text-[9px] text-gray-400 tabular-nums">${escapeHTML(closePriceDate.replace(/-/g,'/'))}</div>`:''}`:'<span class="text-gray-300 dark:text-gray-600">—</span>',dailyChangePercentValue=Number(i.dailyChangePercent),dailyPreviousClose=Number(i.dailyPreviousClose),dailyChangePercentHtml=`<div title="${Number.isFinite(dailyPreviousClose)&&dailyPreviousClose>0?`前一交易日收盤：${escapeHTML(formatMarketPrice(dailyPreviousClose))}`:''}">${formatDailyChangePercent(Number.isFinite(dailyChangePercentValue)?dailyChangePercentValue:null)}</div>`,potentialUpside=getPotentialUpsidePercent(ei.targetPrice,closePriceValue),potentialUpsideHtml=formatPotentialUpside(potentialUpside),rbh=getRevenueMonthsHtml(i.code,i.date||getToday()),hr=hasReportForCode(i.code),rb=hr?renderReportIndicator(i.code,i.date||''):'',futuresBadge=ei.futures?'<span class="shrink-0 bg-sky-600 text-white text-[9px] px-1 rounded ml-1">期</span>':'',resonance=getJournalResonance(i),resonanceBadge=resonance.isMultiple?`<span class="inline-flex items-center rounded-md bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-200 px-1.5 py-0.5 text-[10px] font-black mr-1 mb-1" title="共振來源：${escapeHTML(resonance.sources.join('、'))}"><i class="fa-solid fa-bolt mr-1"></i>${escapeHTML(resonance.sources.join('＋'))}</span>`:'',th=renderStockStrengthBadges(i.code,i.date||getToday())+resonanceBadge+tagHtml,statusBadge=getJournalStatusBadge(i.status),overdueBadge=isJournalOverdue(i)?`<span class="inline-flex items-center rounded-md bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-200 px-1.5 py-0.5 text-[10px] font-black ml-1"><i class="fa-solid fa-clock mr-1"></i>逾期 ${journalTradingAge(i.date)} 日</span>`:'',returnValue=getJournalReturn(i),reviewBadge=i.review?.reviewDate?`<div class="mt-1 text-[10px] font-bold ${returnValue===null?'text-gray-500 dark:text-gray-400':returnValue>=0?'tw-red':'tw-green'}">複盤 ${escapeHTML(i.review.outcome||'未判定')}${returnValue===null?'':`｜${returnValue>=0?'+':''}${returnValue.toFixed(1)}%`}</div>`:'',dataIssues=getJournalDataIssues(i),issueBadge=dataIssues.length?`<div class="mt-1 inline-flex items-center rounded-md bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-200 px-1.5 py-0.5 text-[10px] font-black" title="${escapeHTML(dataIssues.join('；'))}"><i class="fa-solid fa-triangle-exclamation mr-1"></i>異常 ${dataIssues.length} 項</div>`:'',notesHtml=`<div class="mb-1">${statusBadge}${overdueBadge}</div>${reviewBadge}${issueBadge}<div class="mt-1">${escapeHTML(i.notes||'')}</div>`;
-        rh+=`<tr class="table-row-hover transition border-b border-gray-200 dark:border-gray-700/50 text-gray-900 dark:text-white text-sm ${ei.futures?"bg-sky-50 dark:bg-sky-900 hover:bg-sky-100 dark:hover:bg-sky-800":"bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800"}"><td class="table-sticky-bg py-3 px-2 w-[40px] min-w-[40px] max-w-[40px] text-center sticky left-0 z-20 ${ei.futures?"!bg-sky-50 dark:!bg-sky-900":""}"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${i.id}" data-type="${lt}" ${selectedIds[lt].has(i.id)?'checked':''}></td><td class="table-sticky-bg py-3 px-1 sm:px-2 w-[85px] min-w-[85px] max-w-[85px] text-center sticky left-[40px] z-20 font-medium whitespace-nowrap text-xs sm:text-sm text-gray-600 dark:text-gray-400 ${ei.futures?"!bg-sky-50 dark:!bg-sky-900":""}">${escapeHTML(fd)}</td><td class="table-sticky-bg py-2 px-2 sm:px-3 w-[95px] min-w-[95px] max-w-[95px] sticky left-[125px] z-20 border-r border-gray-200 dark:border-gray-700/50 overflow-hidden ${ei.futures?"!bg-sky-50 dark:!bg-sky-900":""}"${getYahooStockAttributes(i.code)}><div class="text-[10px] sm:text-[11px] text-gray-500 dark:text-gray-400 mb-0.5 leading-none flex items-center">${escapeHTML(i.code)}${rb}</div><div class="font-bold text-[14px] sm:text-[15px] leading-tight tracking-wide text-gray-800 dark:text-gray-200 flex items-center min-w-0"><span class="truncate">${escapeHTML(i.name)}</span>${futuresBadge}</div>${horseNewTags.length?'<div class="horse-new-stock-row"><span class="horse-new-badge" title="🆕新進榜：同股往前一個月內未出現相同馬標籤">🆕新進榜</span></div>':''}</td>${!isFav?`<td class="journal-close-price-cell py-2 px-2 sm:px-3 text-right align-middle">${closePriceHtml}</td><td class="journal-change-percent-cell py-2 px-2 sm:px-3 text-right align-middle">${dailyChangePercentHtml}</td><td class="py-3 px-3 sm:px-4 text-right">${formatTargetPrice(ei.targetPrice,ei.targetAchieved)}</td><td class="journal-upside-cell py-3 px-2 sm:px-3 text-right">${potentialUpsideHtml}</td>`:''}<td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2025)}</td><td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2026)}</td><td class="py-3 px-3 sm:px-4 text-right">${formatNumColor(ei.epsGrowth,true)}</td><td class="py-3 px-3 sm:px-4 text-center font-bold">${sc}</td>${isFav?`<td class="py-3 px-3 sm:px-4 text-right">${formatTargetPrice(ei.targetPrice,ei.targetAchieved)}</td>`:''}<td class="py-2 px-3 whitespace-normal w-[100px] min-w-[100px] text-center">${rbh}</td><td class="py-2 px-3 align-top whitespace-normal min-w-[120px] sm:min-w-[140px] lg:w-[320px] lg:min-w-[320px] xl:w-[380px] xl:min-w-[380px] lg:max-w-[460px]">${th}</td>${!isFav?`<td class="py-3 px-3 align-top text-gray-600 dark:text-gray-300 max-w-[110px] sm:max-w-[180px] lg:w-[220px] lg:min-w-[220px] lg:max-w-[250px] whitespace-normal break-words text-xs leading-relaxed" title="${escapeHTML(i.notes||'')}">${notesHtml}</td>`:''}<td class="journal-action-cell py-3 px-3 text-center whitespace-normal"><div class="journal-action-grid"><button class="hover:scale-110 text-emerald-600 dark:text-emerald-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="review-journal" data-id="${i.id}" title="訊號狀態與複盤"><i class="fa-solid fa-clipboard-check pointer-events-none"></i></button><button class="hover:scale-110 text-green-600 dark:text-green-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="add-plan" data-code="${escapeHTML(i.code)}" title="加入交易規劃"><i class="fa-solid fa-chess-knight pointer-events-none"></i></button><button class="hover:scale-110 ${fc} bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="toggle-fav" data-id="${i.id}" title="${ft}">${fi}</button><button class="hover:scale-110 text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="edit-notes" data-id="${i.id}" title="修改備註"><i class="fa-solid fa-comment-dots pointer-events-none"></i></button><button class="text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="delete-journal" data-id="${i.id}" title="刪除"><i class="fa-solid fa-trash pointer-events-none"></i></button></div></td></tr>`;
+        rh+=`<tr class="table-row-hover transition border-b border-gray-200 dark:border-gray-700/50 text-gray-900 dark:text-white text-sm ${ei.futures?"bg-sky-50 dark:bg-sky-900 hover:bg-sky-100 dark:hover:bg-sky-800":"bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800"}"><td class="table-sticky-bg py-3 px-2 w-[40px] min-w-[40px] max-w-[40px] text-center sticky left-0 z-20 ${ei.futures?"!bg-sky-50 dark:!bg-sky-900":""}"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${i.id}" data-type="${lt}" ${selectedIds[lt].has(i.id)?'checked':''}></td><td class="table-sticky-bg py-3 px-1 sm:px-2 w-[85px] min-w-[85px] max-w-[85px] text-center sticky left-[40px] z-20 font-medium whitespace-nowrap text-xs sm:text-sm text-gray-600 dark:text-gray-400 ${ei.futures?"!bg-sky-50 dark:!bg-sky-900":""}">${escapeHTML(fd)}</td><td class="table-sticky-bg py-2 px-2 sm:px-3 w-[95px] min-w-[95px] max-w-[95px] sticky left-[125px] z-20 border-r border-gray-200 dark:border-gray-700/50 overflow-hidden ${ei.futures?"!bg-sky-50 dark:!bg-sky-900":""}"${getYahooStockAttributes(i.code)}><div class="text-[10px] sm:text-[11px] text-gray-500 dark:text-gray-400 mb-0.5 leading-none flex items-center">${escapeHTML(i.code)}${rb}</div><div class="font-bold text-[14px] sm:text-[15px] leading-tight tracking-wide text-gray-800 dark:text-gray-200 flex items-center min-w-0"><span class="truncate">${escapeHTML(i.name)}</span>${futuresBadge}</div>${horseNewTags.length?'<div class="horse-new-stock-row"><span class="horse-new-badge" title="🆕新進榜：同股往前一個月內未出現相同馬標籤">🆕新進榜</span></div>':''}${isFav?renderWatchlistGroupBadges(i.code):''}</td>${!isFav?`<td class="journal-close-price-cell py-2 px-2 sm:px-3 text-right align-middle">${closePriceHtml}</td><td class="journal-change-percent-cell py-2 px-2 sm:px-3 text-right align-middle">${dailyChangePercentHtml}</td><td class="py-3 px-3 sm:px-4 text-right">${formatTargetPrice(ei.targetPrice,ei.targetAchieved)}</td><td class="journal-upside-cell py-3 px-2 sm:px-3 text-right">${potentialUpsideHtml}</td>`:`<td class="watchlist-current-price-cell py-2 px-2 sm:px-3 text-right align-middle">${closePriceHtml}</td><td class="watchlist-current-change-cell py-2 px-2 sm:px-3 text-right align-middle">${dailyChangePercentHtml}</td>`}<td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2025)}</td><td class="py-3 px-2 sm:px-3 text-right">${formatNumColor(ei.eps2026)}</td><td class="py-3 px-3 sm:px-4 text-right">${formatNumColor(ei.epsGrowth,true)}</td><td class="py-3 px-3 sm:px-4 text-center font-bold">${sc}</td>${isFav?`<td class="py-3 px-3 sm:px-4 text-right">${formatTargetPrice(ei.targetPrice,ei.targetAchieved)}</td>`:''}<td class="py-2 px-3 whitespace-normal w-[100px] min-w-[100px] text-center">${rbh}</td><td class="py-2 px-3 align-top whitespace-normal min-w-[120px] sm:min-w-[140px] lg:w-[320px] lg:min-w-[320px] xl:w-[380px] xl:min-w-[380px] lg:max-w-[460px]">${th}</td>${!isFav?`<td class="py-3 px-3 align-top text-gray-600 dark:text-gray-300 max-w-[110px] sm:max-w-[180px] lg:w-[220px] lg:min-w-[220px] lg:max-w-[250px] whitespace-normal break-words text-xs leading-relaxed" title="${escapeHTML(i.notes||'')}">${notesHtml}</td>`:''}<td class="journal-action-cell py-3 px-3 text-center whitespace-normal"><div class="journal-action-grid"><button class="hover:scale-110 text-emerald-600 dark:text-emerald-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="review-journal" data-id="${i.id}" title="訊號狀態與複盤"><i class="fa-solid fa-clipboard-check pointer-events-none"></i></button><button class="hover:scale-110 text-green-600 dark:text-green-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="add-plan" data-code="${escapeHTML(i.code)}" title="加入交易規劃"><i class="fa-solid fa-chess-knight pointer-events-none"></i></button><button class="hover:scale-110 ${fc} bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="toggle-fav" data-id="${i.id}" title="${ft}">${fi}</button><button class="hover:scale-110 text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="edit-notes" data-id="${i.id}" title="修改備註"><i class="fa-solid fa-comment-dots pointer-events-none"></i></button>${isFav?`<button class="text-amber-600 dark:text-amber-400 hover:scale-110 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="remove-from-watchlist" data-id="${i.id}" title="移出目前追蹤清單"><i class="fa-solid fa-folder-minus pointer-events-none"></i></button>`:`<button class="text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition" data-action="delete-journal" data-id="${i.id}" title="刪除"><i class="fa-solid fa-trash pointer-events-none"></i></button>`}</div></td></tr>`;
     });
     setHTMLIfChanged(tb,rh); updateBatchUI(lt);
 };
@@ -7571,11 +7862,61 @@ const handleJournalTableAction=async(e)=>{
     if(a==='review-journal'){openJournalReviewModal(id);}
     else if(a==='remove-tag'){if(!window.isAdminMode||!window.isAdminMode())return showToast('移除策略標籤僅限管理者使用','error');const t=b.dataset.tag,j=state.journals.find(x=>x.id===id);if(j&&j.tags){j.tags=j.tags.filter(x=>x!==t);j.updatedAt=Date.now();saveLocalData();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();await putDataToCloud(`journals/${id}`,j);showToast(`已移除標籤: ${t}`);}}
     else if(a==='add-plan'){const c=b.dataset.code;document.querySelector('[data-target="module-plan"]').click();document.getElementById('p-stock').value=c;if(state.codeToName[c])document.getElementById('p-name').value=state.codeToName[c];document.getElementById('p-entry').focus();showToast('已代入股號與股名');}
-    else if(a==='toggle-fav'){const j=state.journals.find(x=>x.id===id);if(j){let n=((j.isFavorite===true?1:(parseInt(j.isFavorite)||0))+1)%4;j.isFavorite=n;j.updatedAt=Date.now();saveLocalData();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();await putDataToCloud(`journals/${id}`,j);showToast(['已取消追蹤','已加入一星追蹤','已升級二次追蹤','已升級三次追蹤'][n]);}}
+    else if(a==='toggle-fav'){const j=state.journals.find(x=>x.id===id);if(j)await cycleWatchlistPriority(j);}
+    else if(a==='remove-from-watchlist'){
+        const j=state.journals.find(x=>x.id===id);if(!j)return;
+        const groupId=state.activeWatchlistGroupId;
+        let changed=[];
+        if(groupId===WATCHLIST_ALL_GROUP_ID)changed=setCodeWatchlistPriority(j.code,0);
+        else changed=setCodeWatchlistGroupMembership(j.code,groupId,false);
+        await syncWatchlistJournalTracking(changed);
+        selectedIds.fav.delete(String(id));
+        showToast(groupId===WATCHLIST_ALL_GROUP_ID?'已取消此股票全部追蹤':`已移出「${getWatchlistGroupName(groupId)}」`);
+    }
     else if(a==='edit-notes'){const j=state.journals.find(x=>x.id===id);if(!j)return;window.openPromptModal("修改備註說明",j.notes||"",async(nn)=>{if(nn!==null){j.notes=nn.trim();j.updatedAt=Date.now();saveLocalData();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();await putDataToCloud(`journals/${id}`,j);showToast("備註修改成功");}});}
     else if(a==='delete-journal'){window.openConfirmModal('確定要刪除這筆紀錄嗎？',async()=>{state.journals=state.journals.filter(x=>x.id!==id);saveLocalData();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();await recordDeletionTombstone('journals',id);await deleteDataFromCloud(`journals/${id}`);showToast('紀錄已刪除');});}
 };
 document.getElementById('journal-table-body')?.addEventListener('click',handleJournalTableAction); document.getElementById('fav-table-body')?.addEventListener('click',handleJournalTableAction);
+
+document.getElementById('watchlist-group-tabs')?.addEventListener('click',event=>{
+    const button=event.target.closest('[data-watchlist-group-id]');if(!button)return;
+    setActiveWatchlistGroup(button.dataset.watchlistGroupId);
+});
+document.getElementById('watchlist-update-prices')?.addEventListener('click',()=>updateWatchlistPrices());
+document.getElementById('watchlist-add-group-btn')?.addEventListener('click',openCreateWatchlistGroup);
+document.getElementById('watchlist-rename-group')?.addEventListener('click',renameActiveWatchlistGroup);
+document.getElementById('watchlist-delete-group')?.addEventListener('click',deleteActiveWatchlistGroup);
+document.getElementById('watchlist-toggle-filters')?.addEventListener('click',event=>{
+    const panel=document.getElementById('watchlist-advanced-filters'),button=event.currentTarget;if(!panel)return;
+    const open=panel.classList.contains('hidden');panel.classList.toggle('hidden',!open);
+    button.setAttribute('aria-expanded',String(open));
+    button.innerHTML=open?'<i class="fa-solid fa-chevron-up mr-1.5"></i>收合篩選':'<i class="fa-solid fa-sliders mr-1.5"></i>進階篩選';
+});
+
+document.getElementById('watchlist-add-selected-to-group')?.addEventListener('click',async()=>{
+    if(!window.isAdminMode?.())return showToast('分組操作僅限管理者使用','error');
+    const target=document.getElementById('watchlist-batch-target-group')?.value;
+    if(!target)return showToast('請選擇目標清單','error');
+    const codes=[...new Set([...selectedIds.fav].map(id=>state.journals.find(j=>String(j.id)===String(id))?.code).filter(Boolean))];
+    if(!codes.length)return showToast('請先勾選追蹤股票','error');
+    const changed=[];codes.forEach(code=>changed.push(...setCodeWatchlistGroupMembership(code,target,true)));
+    selectedIds.fav.clear();await syncWatchlistJournalTracking(changed);
+    showToast(`已加入「${getWatchlistGroupName(target)}」`);
+});
+
+document.getElementById('watchlist-remove-selected-from-group')?.addEventListener('click',async()=>{
+    if(!window.isAdminMode?.())return showToast('分組操作僅限管理者使用','error');
+    const codes=[...new Set([...selectedIds.fav].map(id=>state.journals.find(j=>String(j.id)===String(id))?.code).filter(Boolean))];
+    if(!codes.length)return showToast('請先勾選追蹤股票','error');
+    const groupId=state.activeWatchlistGroupId,changed=[];
+    codes.forEach(code=>{
+        if(groupId===WATCHLIST_ALL_GROUP_ID)changed.push(...setCodeWatchlistPriority(code,0));
+        else changed.push(...setCodeWatchlistGroupMembership(code,groupId,false));
+    });
+    selectedIds.fav.clear();await syncWatchlistJournalTracking(changed);
+    showToast(groupId===WATCHLIST_ALL_GROUP_ID?'已取消所選股票全部追蹤':`已移出「${getWatchlistGroupName(groupId)}」`);
+});
+
 
 // v136：將目前生效的篩選條件轉為可直接移除的 Chips。
 const filterChipHtml=(label,key,tone='slate')=>{
@@ -8070,6 +8411,422 @@ const autoUpdateJournalClosePricesOnOpen=async()=>{
     return updateJournalClosePrices({auto:true,silent:true});
 };
 
+
+
+const WATCHLIST_PRICE_CACHE_KEY='ryan_watchlist_price_cache_v1';
+let watchlistPriceCacheLoaded=false;
+
+const loadWatchlistPriceCache=()=>{
+    if(watchlistPriceCacheLoaded)return state.watchlistPrices||{};
+    watchlistPriceCacheLoaded=true;
+    try{
+        const parsed=JSON.parse(localStorage.getItem(WATCHLIST_PRICE_CACHE_KEY)||'{}');
+        state.watchlistPrices=parsed&&typeof parsed==='object'&&!Array.isArray(parsed)?parsed:{};
+    }catch(error){state.watchlistPrices={};}
+    return state.watchlistPrices;
+};
+
+const saveWatchlistPriceCache=()=>{
+    try{localStorage.setItem(WATCHLIST_PRICE_CACHE_KEY,JSON.stringify(state.watchlistPrices||{}));}
+    catch(error){console.warn('追蹤清單行情快取儲存失敗',error);}
+};
+
+const getWatchlistQuote=code=>{
+    loadWatchlistPriceCache();
+    const quote=state.watchlistPrices?.[String(code||'').trim()];
+    if(!quote||!Number.isFinite(Number(quote.price)))return null;
+    return quote;
+};
+
+const applyWatchlistQuoteToRow=row=>{
+    const quote=getWatchlistQuote(row?.code);
+    if(!quote)return row;
+    return {
+        ...row,
+        closePrice:Number(quote.price),
+        closePriceDate:String(quote.date||''),
+        closePriceSource:String(quote.source||''),
+        dailyPreviousClose:Number.isFinite(Number(quote.previousClose))?Number(quote.previousClose):null,
+        dailyChangePercent:Number.isFinite(Number(quote.changePercent))?Number(quote.changePercent):null,
+        dailyChangeSource:String(quote.changeSource||quote.source||''),
+        watchlistPriceUpdatedAt:Number(quote.updatedAt)||0
+    };
+};
+
+const renderWatchlistPriceStatus=(message='',type='normal')=>{
+    const el=document.getElementById('watchlist-price-status');if(!el)return;
+    if(!message){el.classList.add('hidden');el.textContent='';return;}
+    el.classList.remove('hidden','is-error','is-success');
+    if(type==='error')el.classList.add('is-error');
+    if(type==='success')el.classList.add('is-success');
+    el.textContent=message;
+};
+
+const updateWatchlistPrices=async(options={})=>{
+    const silent=options?.silent===true;
+    if(!window.isAdminMode?.()){
+        if(!silent)showToast('更新股價僅限管理者使用','error');
+        return false;
+    }
+    ensureWatchlistState();
+    const button=document.getElementById('watchlist-update-prices');
+    if(button?.disabled)return false;
+
+    const codes=[...new Set(getWatchlistCodesForGroup(state.activeWatchlistGroupId))]
+        .filter(code=>code&&code!=='TX00');
+
+    if(!codes.length){
+        renderWatchlistPriceStatus('目前清單沒有可更新的股票','error');
+        if(!silent)showToast('目前清單沒有可更新的股票','error');
+        return false;
+    }
+
+    if(button){
+        button.disabled=true;
+        button.innerHTML='<i class="fa-solid fa-spinner fa-spin mr-1.5"></i><span>更新中…</span>';
+    }
+    renderWatchlistPriceStatus(`正在更新「${getWatchlistGroupName(state.activeWatchlistGroupId)}」共 ${codes.length} 檔股票…`);
+
+    try{
+        const statusEl=document.getElementById('watchlist-price-status');
+        const {map:priceMap,diagnostics}=await fetchLatestClosePriceMap(codes,statusEl);
+        const now=Date.now(),targetAchievementCodes=new Set();
+
+        loadWatchlistPriceCache();
+        codes.forEach(code=>{
+            const quote=priceMap.get(code);if(!quote)return;
+            state.watchlistPrices[code]={
+                price:Number(quote.price),
+                date:String(quote.date||''),
+                source:String(quote.source||''),
+                previousClose:Number.isFinite(Number(quote.previousClose))?Number(quote.previousClose):null,
+                changePercent:Number.isFinite(Number(quote.changePercent))?Number(quote.changePercent):null,
+                changeSource:String(quote.changeSource||quote.source||''),
+                updatedAt:now
+            };
+            if(markTargetPriceAchieved(code,quote.price,quote.date||getToday()))targetAchievementCodes.add(code);
+        });
+        saveWatchlistPriceCache();
+
+        if(targetAchievementCodes.size){
+            const epsPatch=Object.fromEntries([...targetAchievementCodes]
+                .map(code=>[code,state.epsData[code]])
+                .filter(([,value])=>value));
+            if(Object.keys(epsPatch).length)await patchDataToCloud('epsData',epsPatch);
+        }
+
+        renderFavorites();
+
+        const updatedCodes=codes.filter(code=>priceMap.has(code));
+        const failedCodes=codes.filter(code=>!priceMap.has(code));
+        const priceDates=[...new Set(updatedCodes.map(code=>String(priceMap.get(code)?.date||'')).filter(Boolean))].sort().reverse();
+        const latestDate=priceDates[0]||'';
+
+        if(!updatedCodes.length){
+            renderWatchlistPriceStatus(`行情更新失敗｜${diagnostics.join('｜')}`,'error');
+            if(!silent)showToast('目前清單皆未取得股價','error');
+            return false;
+        }
+
+        const successText=`已更新 ${updatedCodes.length}/${codes.length} 檔${latestDate?`｜行情 ${latestDate.replace(/-/g,'/')}`:''}`;
+        renderWatchlistPriceStatus(successText+(failedCodes.length?`｜未取得 ${failedCodes.length} 檔`:''),failedCodes.length?'normal':'success');
+
+        if(!silent){
+            if(failedCodes.length)showToast(`已更新 ${updatedCodes.length} 檔，${failedCodes.length} 檔未取得行情`,'error');
+            else showToast(`追蹤清單股價更新完成，共 ${updatedCodes.length} 檔`);
+        }
+        return true;
+    }catch(error){
+        console.error('追蹤清單更新股價失敗',error);
+        renderWatchlistPriceStatus(`更新失敗：${error?.message||'行情來源無法連線'}`,'error');
+        if(!silent)showToast(`更新股價失敗：${error?.message||'來源無法連線'}`,'error');
+        return false;
+    }finally{
+        if(button){
+            button.disabled=false;
+            button.innerHTML='<i class="fa-solid fa-arrows-rotate mr-1.5"></i><span>更新股價</span>';
+        }
+    }
+};
+
+const WATCHLIST_ALL_GROUP_ID='watch-all';
+const WATCHLIST_DEFAULT_GROUP_ID='watch-default';
+const WATCHLIST_ACTIVE_GROUP_KEY='ryan_watchlist_active_group_v1';
+
+const normalizeWatchlistGroupIds=value=>[...new Set((Array.isArray(value)?value:[]).map(String).filter(Boolean))];
+
+const ensureWatchlistState=()=>{
+    loadWatchlistPriceCache();
+    let changed=false;
+    if(!Array.isArray(state.watchlistGroups))state.watchlistGroups=[];
+    const normalized=[],seen=new Set();
+    state.watchlistGroups.forEach(group=>{
+        if(!group||typeof group!=='object')return;
+        const id=String(group.id||'').trim(),name=String(group.name||'').trim().slice(0,24);
+        if(!id||!name||seen.has(id))return;
+        seen.add(id);normalized.push({id,name,createdAt:Number(group.createdAt)||Date.now(),updatedAt:Number(group.updatedAt)||Number(group.createdAt)||Date.now()});
+    });
+    if(!seen.has(WATCHLIST_DEFAULT_GROUP_ID)){
+        normalized.unshift({id:WATCHLIST_DEFAULT_GROUP_ID,name:'我的追蹤',createdAt:Date.now(),updatedAt:Date.now()});
+        changed=true;
+    }
+    if(JSON.stringify(normalized)!==JSON.stringify(state.watchlistGroups)){state.watchlistGroups=normalized;changed=true;}
+
+    const validIds=new Set(state.watchlistGroups.map(group=>group.id));
+    (state.journals||[]).forEach(journal=>{
+        const level=journal.isFavorite===true?1:(parseInt(journal.isFavorite)||0);
+        let ids=normalizeWatchlistGroupIds(journal.favoriteGroupIds).filter(id=>validIds.has(id));
+        if(level>0&&!ids.length){ids=[WATCHLIST_DEFAULT_GROUP_ID];changed=true;}
+        if(ids.length&&level<=0){journal.isFavorite=1;changed=true;}
+        if(JSON.stringify(ids)!==JSON.stringify(journal.favoriteGroupIds||[])){journal.favoriteGroupIds=ids;changed=true;}
+    });
+
+    let active=String(state.activeWatchlistGroupId||'');
+    try{active=localStorage.getItem(WATCHLIST_ACTIVE_GROUP_KEY)||active;}catch(error){}
+    if(active!==WATCHLIST_ALL_GROUP_ID&&!validIds.has(active))active=WATCHLIST_ALL_GROUP_ID;
+    if(!active)active=WATCHLIST_ALL_GROUP_ID;
+    state.activeWatchlistGroupId=active;
+    return changed;
+};
+
+const getWatchlistGroupById=id=>(state.watchlistGroups||[]).find(group=>group.id===id)||null;
+const getWatchlistGroupName=id=>id===WATCHLIST_ALL_GROUP_ID?'全部追蹤':(getWatchlistGroupById(id)?.name||'未分類');
+
+const getCodeWatchlistState=code=>{
+    const c=String(code||'').trim(),rows=(state.journals||[]).filter(j=>String(j.code||'').trim()===c);
+    const groupIds=new Set(),levels=[];
+    rows.forEach(j=>{
+        normalizeWatchlistGroupIds(j.favoriteGroupIds).forEach(id=>groupIds.add(id));
+        levels.push(j.isFavorite===true?1:(parseInt(j.isFavorite)||0));
+    });
+    const priority=Math.max(0,...levels);
+    if(priority>0&&!groupIds.size)groupIds.add(WATCHLIST_DEFAULT_GROUP_ID);
+    return{code:c,rows,groupIds:[...groupIds],priority};
+};
+
+const isCodeInWatchlistGroup=(code,groupId=state.activeWatchlistGroupId)=>{
+    const info=getCodeWatchlistState(code);
+    if(info.priority<=0&&!info.groupIds.length)return false;
+    return groupId===WATCHLIST_ALL_GROUP_ID?true:info.groupIds.includes(groupId);
+};
+
+const isJournalInActiveWatchlistGroup=journal=>isCodeInWatchlistGroup(journal?.code,state.activeWatchlistGroupId);
+
+const getWatchlistRows=(groupId=state.activeWatchlistGroupId)=>{
+    ensureWatchlistState();
+    const latestByCode=new Map();
+    (state.journals||[]).forEach(journal=>{
+        const code=String(journal.code||'').trim();if(!code)return;
+        const existing=latestByCode.get(code);
+        const isNewer=!existing||String(journal.date||'')>String(existing.date||'')||
+            (String(journal.date||'')===String(existing.date||'')&&Number(journal.createdAt||0)>Number(existing.createdAt||0));
+        if(isNewer)latestByCode.set(code,journal);
+    });
+    const rows=[];
+    latestByCode.forEach((latest,code)=>{
+        const info=getCodeWatchlistState(code);
+        if(info.priority<=0&&!info.groupIds.length)return;
+        if(groupId!==WATCHLIST_ALL_GROUP_ID&&!info.groupIds.includes(groupId))return;
+        rows.push(applyWatchlistQuoteToRow({...latest,isFavorite:Math.max(1,info.priority),favoriteGroupIds:[...info.groupIds]}));
+    });
+    return rows;
+};
+
+const getWatchlistCodesForGroup=groupId=>getWatchlistRows(groupId).map(row=>String(row.code||'').trim()).filter(Boolean);
+
+const renderWatchlistGroupBadges=code=>{
+    const ids=getCodeWatchlistState(code).groupIds;
+    if(!ids.length)return'';
+    return `<div class="watchlist-stock-groups">${ids.slice(0,3).map(id=>`<span class="watchlist-stock-group-badge" title="${escapeHTML(getWatchlistGroupName(id))}"><i class="fa-solid fa-folder mr-1"></i>${escapeHTML(getWatchlistGroupName(id))}</span>`).join('')}${ids.length>3?`<span class="watchlist-stock-group-badge">+${ids.length-3}</span>`:''}</div>`;
+};
+
+const syncWatchlistJournalTracking=async(changedRows,options={})=>{
+    const unique=[...new Map((changedRows||[]).map(row=>[String(row.id),row])).values()];
+    if(!unique.length)return false;
+    saveLocalData();
+    processAndRenderJournals();
+    if(document.getElementById('module-favorites')?.classList.contains('active'))renderFavorites();
+    if(options.cloud!==false){
+        await Promise.all(unique.map(row=>putDataToCloud(`journals/${row.id}`,row)));
+    }
+    return true;
+};
+
+const setCodeWatchlistGroupMembership=(code,groupId,enabled)=>{
+    const info=getCodeWatchlistState(code),changed=[];
+    if(!info.rows.length)return changed;
+    info.rows.forEach(row=>{
+        const before=JSON.stringify({favoriteGroupIds:row.favoriteGroupIds||[],isFavorite:row.isFavorite});
+        let ids=normalizeWatchlistGroupIds(row.favoriteGroupIds);
+        if(enabled){
+            if(!ids.includes(groupId))ids.push(groupId);
+            if((row.isFavorite===true?1:(parseInt(row.isFavorite)||0))<=0)row.isFavorite=1;
+        }else{
+            ids=ids.filter(id=>id!==groupId);
+        }
+        row.favoriteGroupIds=ids;
+        row.updatedAt=Date.now();
+        const after=JSON.stringify({favoriteGroupIds:row.favoriteGroupIds||[],isFavorite:row.isFavorite});
+        if(before!==after)changed.push(row);
+    });
+
+    if(!enabled){
+        const remaining=new Set();
+        info.rows.forEach(row=>normalizeWatchlistGroupIds(row.favoriteGroupIds).forEach(id=>remaining.add(id)));
+        if(!remaining.size){
+            info.rows.forEach(row=>{
+                if((row.isFavorite===true?1:(parseInt(row.isFavorite)||0))!==0){
+                    row.isFavorite=0;row.updatedAt=Date.now();if(!changed.includes(row))changed.push(row);
+                }
+            });
+        }
+    }
+    return changed;
+};
+
+const setCodeWatchlistPriority=(code,priority,preferredGroupId='')=>{
+    const info=getCodeWatchlistState(code),changed=[];
+    if(!info.rows.length)return changed;
+    const next=Math.max(0,Math.min(3,Number(priority)||0));
+    let groupIds=[...info.groupIds];
+    if(next>0&&!groupIds.length){
+        const groupId=preferredGroupId&&preferredGroupId!==WATCHLIST_ALL_GROUP_ID?preferredGroupId:WATCHLIST_DEFAULT_GROUP_ID;
+        groupIds=[groupId];
+    }
+    info.rows.forEach(row=>{
+        const before=JSON.stringify({favoriteGroupIds:row.favoriteGroupIds||[],isFavorite:row.isFavorite});
+        row.isFavorite=next;
+        row.favoriteGroupIds=next>0?[...groupIds]:[];
+        row.updatedAt=Date.now();
+        const after=JSON.stringify({favoriteGroupIds:row.favoriteGroupIds||[],isFavorite:row.isFavorite});
+        if(before!==after)changed.push(row);
+    });
+    return changed;
+};
+
+const cycleWatchlistPriority=async journal=>{
+    if(!journal)return false;
+    const code=String(journal.code||'').trim(),info=getCodeWatchlistState(code),next=(info.priority+1)%4;
+    const favoritesActive=document.getElementById('module-favorites')?.classList.contains('active');
+    const preferred=favoritesActive&&state.activeWatchlistGroupId!==WATCHLIST_ALL_GROUP_ID?state.activeWatchlistGroupId:WATCHLIST_DEFAULT_GROUP_ID;
+    const changed=setCodeWatchlistPriority(code,next,preferred);
+    await syncWatchlistJournalTracking(changed);
+    showToast(['已取消追蹤','已加入一星追蹤','已升級二次追蹤','已升級三次追蹤'][next]);
+    return true;
+};
+
+const persistWatchlistGroups=async()=>{
+    state.watchlistGroups=(state.watchlistGroups||[]).map(group=>({...group,updatedAt:Number(group.updatedAt)||Date.now()}));
+    saveLocalData();
+    renderFavorites();
+    await putDataToCloud('watchlistGroups',Object.fromEntries(state.watchlistGroups.map(group=>[group.id,group])));
+};
+
+const setActiveWatchlistGroup=id=>{
+    ensureWatchlistState();
+    const valid=id===WATCHLIST_ALL_GROUP_ID||!!getWatchlistGroupById(id);
+    state.activeWatchlistGroupId=valid?id:WATCHLIST_ALL_GROUP_ID;
+    try{localStorage.setItem(WATCHLIST_ACTIVE_GROUP_KEY,state.activeWatchlistGroupId);}catch(error){}
+    selectedIds.fav.clear();
+    renderFavorites();
+};
+
+const renderWatchlistWorkspace=(filteredRows=[])=>{
+    ensureWatchlistState();
+    const tabs=document.getElementById('watchlist-group-tabs');if(!tabs)return;
+    const allCount=getWatchlistRows(WATCHLIST_ALL_GROUP_ID).length;
+    const groups=[{id:WATCHLIST_ALL_GROUP_ID,name:'全部追蹤',virtual:true},...(state.watchlistGroups||[])];
+    tabs.innerHTML=groups.map((group,index)=>{
+        const count=group.id===WATCHLIST_ALL_GROUP_ID?allCount:getWatchlistRows(group.id).length;
+        const active=group.id===state.activeWatchlistGroupId;
+        return `<button type="button" class="watchlist-group-tab ${active?'active':''}" data-watchlist-group-id="${escapeHTML(group.id)}"><span class="watchlist-group-tab-icon"><i class="fa-solid ${group.id===WATCHLIST_ALL_GROUP_ID?'fa-layer-group':'fa-folder'}"></i></span><span class="min-w-0"><span class="watchlist-group-tab-name">${escapeHTML(group.name)}</span><span class="watchlist-group-tab-meta">${group.id===WATCHLIST_ALL_GROUP_ID?'所有清單彙整':group.id===WATCHLIST_DEFAULT_GROUP_ID?'預設清單':'自訂清單'}</span></span><span class="watchlist-group-tab-count">${count}</span></button>`;
+    }).join('');
+
+    const activeGroup=state.activeWatchlistGroupId===WATCHLIST_ALL_GROUP_ID?null:getWatchlistGroupById(state.activeWatchlistGroupId);
+    const name=activeGroup?.name||'全部追蹤',rawRows=getWatchlistRows(state.activeWatchlistGroupId);
+    const nameEl=document.getElementById('watchlist-active-name'),countEl=document.getElementById('watchlist-active-count'),descEl=document.getElementById('watchlist-active-desc');
+    if(nameEl)nameEl.textContent=name;
+    if(countEl)countEl.textContent=`${rawRows.length} 檔`;
+    if(descEl)descEl.textContent=state.activeWatchlistGroupId===WATCHLIST_ALL_GROUP_ID
+        ?'彙整所有清單，每檔股票只顯示一次，並採用最新一筆策略日誌。'
+        :`目前顯示「${name}」中的追蹤股票；同一檔股票可同時加入其他清單。`;
+
+    const rename=document.getElementById('watchlist-rename-group'),del=document.getElementById('watchlist-delete-group');
+    if(rename)rename.disabled=state.activeWatchlistGroupId===WATCHLIST_ALL_GROUP_ID;
+    if(del)del.disabled=[WATCHLIST_ALL_GROUP_ID,WATCHLIST_DEFAULT_GROUP_ID].includes(state.activeWatchlistGroupId);
+
+    const totalEl=document.getElementById('watchlist-group-total');
+    if(totalEl)totalEl.textContent=`${state.watchlistGroups.length} 組`;
+
+    const target=document.getElementById('watchlist-batch-target-group');
+    if(target){
+        const previous=target.value;
+        target.innerHTML=(state.watchlistGroups||[]).map(group=>`<option value="${escapeHTML(group.id)}">${escapeHTML(group.name)}</option>`).join('');
+        if((state.watchlistGroups||[]).some(group=>group.id===previous))target.value=previous;
+        else if(state.activeWatchlistGroupId!==WATCHLIST_ALL_GROUP_ID)target.value=state.activeWatchlistGroupId;
+        else target.value=WATCHLIST_DEFAULT_GROUP_ID;
+    }
+
+    const rows=Array.isArray(filteredRows)?filteredRows:rawRows;
+    const aCount=rows.filter(row=>getStockStrengthMetrics(row.code,row.date||getToday()).grade==='A').length;
+    const holderCount=rows.filter(row=>hasLatestLargeHolderIncrease(row.code,row.date||getToday())).length;
+    const targetCount=rows.filter(row=>Number(getEpsInfo(row.code,row).targetPrice)>0).length;
+    const set=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=String(value);};
+    set('watchlist-summary-total',rows.length);set('watchlist-summary-a',aCount);set('watchlist-summary-holder',holderCount);set('watchlist-summary-target',targetCount);
+    const favCount=document.getElementById('fav-stock-count');if(favCount)favCount.innerHTML=`<i class="fa-solid fa-chart-simple"></i>目前顯示 ${rows.length} 檔股票`;
+};
+
+const openCreateWatchlistGroup=()=>{
+    if(!window.isAdminMode?.())return showToast('新增追蹤清單僅限管理者使用','error');
+    if((state.watchlistGroups||[]).length>=20)return showToast('最多建立 20 組追蹤清單','error');
+    window.openPromptModal('新增追蹤清單',`清單 ${state.watchlistGroups.length+1}`,async value=>{
+        const name=String(value||'').trim().replace(/\s+/g,' ').slice(0,24);if(!name)return;
+        if(state.watchlistGroups.some(group=>group.name===name))return showToast('已有同名清單','error');
+        const id=`watch-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,6)}`;
+        state.watchlistGroups.push({id,name,createdAt:Date.now(),updatedAt:Date.now()});
+        state.activeWatchlistGroupId=id;try{localStorage.setItem(WATCHLIST_ACTIVE_GROUP_KEY,id);}catch(error){}
+        await persistWatchlistGroups();showToast(`已新增追蹤清單「${name}」`);
+    });
+};
+
+const renameActiveWatchlistGroup=()=>{
+    const group=getWatchlistGroupById(state.activeWatchlistGroupId);if(!group)return;
+    window.openPromptModal('重新命名追蹤清單',group.name,async value=>{
+        const name=String(value||'').trim().replace(/\s+/g,' ').slice(0,24);if(!name||name===group.name)return;
+        if(state.watchlistGroups.some(item=>item.id!==group.id&&item.name===name))return showToast('已有同名清單','error');
+        group.name=name;group.updatedAt=Date.now();await persistWatchlistGroups();showToast('追蹤清單已重新命名');
+    });
+};
+
+const deleteActiveWatchlistGroup=()=>{
+    const group=getWatchlistGroupById(state.activeWatchlistGroupId);
+    if(!group||group.id===WATCHLIST_DEFAULT_GROUP_ID)return;
+    window.openConfirmModal(`確定刪除追蹤清單「${group.name}」？清單內股票不會刪除策略日誌；若股票沒有其他分組，會移回「我的追蹤」。`,async()=>{
+        const changed=[];
+        const codes=getWatchlistCodesForGroup(group.id);
+        codes.forEach(code=>{
+            const info=getCodeWatchlistState(code);
+            const otherIds=info.groupIds.filter(id=>id!==group.id);
+            info.rows.forEach(row=>{
+                row.favoriteGroupIds=normalizeWatchlistGroupIds(row.favoriteGroupIds).filter(id=>id!==group.id);
+                if(!otherIds.length&&!row.favoriteGroupIds.includes(WATCHLIST_DEFAULT_GROUP_ID))row.favoriteGroupIds.push(WATCHLIST_DEFAULT_GROUP_ID);
+                if((row.isFavorite===true?1:(parseInt(row.isFavorite)||0))<=0)row.isFavorite=1;
+                row.updatedAt=Date.now();changed.push(row);
+            });
+        });
+        state.watchlistGroups=state.watchlistGroups.filter(item=>item.id!==group.id);
+        state.activeWatchlistGroupId=WATCHLIST_DEFAULT_GROUP_ID;
+        try{localStorage.setItem(WATCHLIST_ACTIVE_GROUP_KEY,state.activeWatchlistGroupId);}catch(error){}
+        saveLocalData();
+        await Promise.all([
+            putDataToCloud('watchlistGroups',Object.fromEntries(state.watchlistGroups.map(item=>[item.id,item]))),
+            ...[...new Map(changed.map(row=>[row.id,row])).values()].map(row=>putDataToCloud(`journals/${row.id}`,row))
+        ]);
+        renderFavorites();processAndRenderJournals();showToast('追蹤清單已刪除，股票已保留');
+    });
+};
+
+
 function renderJournalPrimaryView(){refreshJournalInsightCache();const data=getFilteredAndSortedData(state.journals,state.filters,state.sortConfig);renderTableRows(data,'journal-table-body','journal-empty');renderJournalActiveFilterChips();renderJournalDashboard(data);return data;}
 function processAndRenderJournals(){
     const data=renderJournalPrimaryView();
@@ -8080,7 +8837,15 @@ function processAndRenderJournals(){
     }
     return data;
 }
-function renderFavorites(){renderTableRows(getFilteredAndSortedData(state.journals,state.favFilters,state.favSortConfig).filter(j=>j.isFavorite),'fav-table-body','fav-empty',true);}
+function renderFavorites(){
+    ensureWatchlistState();
+    const source=getWatchlistRows(state.activeWatchlistGroupId);
+    const filterState={...state.favFilters,start:'',end:''};
+    const rows=getFilteredAndSortedData(source,filterState,state.favSortConfig);
+    renderTableRows(rows,'fav-table-body','fav-empty',true);
+    renderWatchlistWorkspace(rows);
+    return rows;
+}
 const renderJournalFilterViews=()=>{
     const journalActive=document.getElementById('module-journal')?.classList.contains('active');
     const favoritesActive=document.getElementById('module-favorites')?.classList.contains('active');
@@ -8937,7 +9702,7 @@ document.getElementById('streak-results')?.addEventListener('click',async e=>{
     if(button.dataset.streakAction==='favorite'){
         if(!window.isAdminMode||!window.isAdminMode())return showToast('加入追蹤僅限管理者使用','error');
         const journal=state.journals.find(item=>String(item.id)===String(button.dataset.id));if(!journal)return showToast('找不到對應的策略日誌','error');
-        const next=((journal.isFavorite===true?1:(parseInt(journal.isFavorite)||0))+1)%4;journal.isFavorite=next;journal.updatedAt=Date.now();saveLocalData();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();await putDataToCloud(`journals/${journal.id}`,journal);showToast(['已取消追蹤','已加入一星追蹤','已升級二次追蹤','已升級三次追蹤'][next]);
+        await cycleWatchlistPriority(journal);
     }
 });
 const getVisibleRowCheckboxes=t=>Array.from(document.querySelectorAll(`.row-cb[data-type="${t}"]`));
@@ -9271,7 +10036,8 @@ document.getElementById('journal-form')?.addEventListener('submit', async e => {
             tags: tags,
             status,
             statusUpdatedAt: Date.now(),
-            isFavorite: 0,
+            isFavorite: getCodeWatchlistState(c).priority,
+            favoriteGroupIds: getCodeWatchlistState(c).groupIds,
             createdAt: Date.now(),
             updatedAt: Date.now()
         };
@@ -10276,12 +11042,12 @@ const getHorseTagPreviousSnapshotComparison=(tag,currentItems,filterState,isFavo
     const currentRows=(state.journals||[]).filter(j=>
         normalizeHorseJournalDate(j.date)===baseDate&&
         journalHasStrategyTag(j,wanted)&&
-        (!isFavorite||j.isFavorite)
+        (!isFavorite||isJournalInActiveWatchlistGroup(j))
     );
     const currentByCode=getLatestByCode(currentRows);
 
     const previousDate=[...new Set((state.journals||[])
-        .filter(j=>journalHasStrategyTag(j,wanted)&&(!isFavorite||j.isFavorite))
+        .filter(j=>journalHasStrategyTag(j,wanted)&&(!isFavorite||isJournalInActiveWatchlistGroup(j)))
         .map(j=>normalizeHorseJournalDate(j.date))
         .filter(date=>date&&date<baseDate))]
         .sort()
@@ -10301,7 +11067,7 @@ const getHorseTagPreviousSnapshotComparison=(tag,currentItems,filterState,isFavo
     const previousRows=(state.journals||[]).filter(j=>
         normalizeHorseJournalDate(j.date)===previousDate&&
         journalHasStrategyTag(j,wanted)&&
-        (!isFavorite||j.isFavorite)
+        (!isFavorite||isJournalInActiveWatchlistGroup(j))
     );
     const previousByCode=getLatestByCode(previousRows);
 
@@ -10341,9 +11107,10 @@ const getHorseSnapshotCopyName=(journal,duplicateCodes,tag,newCodes)=>{
 
 document.querySelectorAll('.btn-copy').forEach(b=>{b.addEventListener('click',e=>{
     const m=e.currentTarget.dataset.mode,at=document.querySelector('.tab-content.active').id,iF=at==='module-favorites',cf=iF?state.favFilters:state.filters,lt=iF?'fav':'journal';
-    let d=getFilteredAndSortedData(state.journals,cf,iF?state.favSortConfig:state.sortConfig);
-    if(iF)d=d.filter(j=>j.isFavorite);
-    let ds=cf.start===cf.end?(cf.start?cf.start.replace(/-/g,'/'):'全區間'):`${cf.start.replace(/-/g,'/')}~${cf.end.replace(/-/g,'/')}`,
+    let d=iF
+        ?getFilteredAndSortedData(getWatchlistRows(state.activeWatchlistGroupId),{...cf,start:'',end:''},state.favSortConfig)
+        :getFilteredAndSortedData(state.journals,cf,state.sortConfig);
+    let ds=iF?getToday().replace(/-/g,'/'):(cf.start===cf.end?(cf.start?cf.start.replace(/-/g,'/'):'全區間'):`${cf.start.replace(/-/g,'/')}~${cf.end.replace(/-/g,'/')}`),
         ts=cf.tags.length>0?` [標籤條件: ${cf.tags.join(cf.tagLogic==='AND'?' 且 ':' 或 ')}]`:'';
 
     if(m==='selected'){
@@ -10840,7 +11607,7 @@ setChkDirection('long');
             await ensureXLSXLoaded();
             const wb = XLSX.utils.book_new();
             
-            const wsJournals = XLSX.utils.json_to_sheet(state.journals.map(j => ({'日期':j.date,'代號':j.code,'股名':j.name,'策略標籤':j.tags?j.tags.join(', '):'','訊號狀態':normalizeJournalStatus(j.status),'追蹤等級':j.isFavorite===true?1:(j.isFavorite||0),'備註':j.notes||'','複盤日期':j.review?.reviewDate||'','進場價':j.review?.entryPrice??'','出場價':j.review?.exitPrice??'','目標價':j.review?.targetPrice??'','停損價':j.review?.stopPrice??'','複盤結果':j.review?.outcome||'','失效／結案原因':j.review?.reason||''})));
+            const wsJournals = XLSX.utils.json_to_sheet(state.journals.map(j => ({'日期':j.date,'代號':j.code,'股名':j.name,'策略標籤':j.tags?j.tags.join(', '):'','訊號狀態':normalizeJournalStatus(j.status),'追蹤等級':j.isFavorite===true?1:(j.isFavorite||0),'追蹤清單':normalizeWatchlistGroupIds(j.favoriteGroupIds).map(getWatchlistGroupName).join(', '),'備註':j.notes||'','複盤日期':j.review?.reviewDate||'','進場價':j.review?.entryPrice??'','出場價':j.review?.exitPrice??'','目標價':j.review?.targetPrice??'','停損價':j.review?.stopPrice??'','複盤結果':j.review?.outcome||'','失效／結案原因':j.review?.reason||''})));
             XLSX.utils.book_append_sheet(wb, wsJournals, '策略日誌');
             
             const wsRevenue = XLSX.utils.json_to_sheet(state.revenueRecords.map(r => ({'類型':getMomentumTypeLabel(normalizeMomentumRecordType(r)),'日期／月份':getMomentumRecordDate(r),'創高月份':r.month||'','增加日期':r.date||'','代號':r.code,'股名':r.name,'備註':r.notes||''})));
@@ -13696,7 +14463,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     'module-revenue':['營收籌碼動能','追蹤營收創高、千張大戶與量價條件','fa-chart-line','基本面 × 籌碼'],
     'module-checklist':['進場查核','進場前條件確認與風險檢查','fa-list-check','交易紀律'],
     'module-plan':['交易規劃','建立進出場、停損與部位規劃','fa-bullseye','交易計畫'],
-    'module-favorites':['追蹤清單','集中查看需要持續追蹤的股票','fa-star','追蹤'],
+    'module-favorites':['追蹤清單','建立多組觀察名單，依題材、策略或交易計畫分組追蹤','fa-layer-group','多清單追蹤'],
     'module-calculator':['支撐壓力','快速計算大盤與個股支撐壓力參考','fa-calculator','價位工具'],
     'module-jellystock':['台股擂台賽','分析師績效與持股追蹤','fa-trophy','績效追蹤'],
     'module-chipradar':['籌碼溫度雷達','觀察籌碼集中、加溫與強度變化','fa-temperature-half','籌碼雷達']
