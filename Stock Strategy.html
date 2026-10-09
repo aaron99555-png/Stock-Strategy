@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="327" name="app-version"/>
+<meta content="328" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -4038,6 +4038,23 @@ html.dark #module-favorites table :is(th,td):nth-child(5){
 }
 </style>
 
+
+<style id="watchlist-picker-v328">
+#watchlist-picker-modal .watchlist-picker-group:has(.watchlist-picker-group-cb:checked){
+  border-color:#f59e0b!important;
+  background:#fffbeb!important;
+  box-shadow:0 0 0 1px rgba(245,158,11,.08);
+}
+html.dark #watchlist-picker-modal .watchlist-picker-group:has(.watchlist-picker-group-cb:checked){
+  border-color:#d97706!important;
+  background:rgba(120,53,15,.25)!important;
+}
+@media(max-width:640px){
+  #watchlist-picker-modal{align-items:flex-end!important;padding:0!important}
+  #watchlist-picker-modal>div{max-width:none!important;border-radius:1.25rem 1.25rem 0 0!important;max-height:88vh;overflow-y:auto}
+}
+</style>
+
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen flex flex-col antialiased">
 <nav class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-50 transition-colors duration-300">
@@ -4946,7 +4963,7 @@ html.dark #module-favorites table :is(th,td):nth-child(5){
 <span class="watchlist-main-icon"><i class="fa-solid fa-layer-group"></i></span>
 <div class="min-w-0">
 <h2 class="watchlist-main-title">多組追蹤清單</h2>
-<p class="watchlist-main-desc">把追蹤股票依題材、策略、波段計畫或觀察優先級分成多個獨立清單。</p>
+<p class="watchlist-main-desc">把追蹤股票依題材、策略、波段計畫或觀察優先級分組。從策略日誌按 ★ 加入追蹤時，可直接勾選要加入的清單。</p>
 </div>
 </div>
 </div>
@@ -5192,6 +5209,41 @@ html.dark #module-favorites table :is(th,td):nth-child(5){
 <label class="relative block"><i class="fa-solid fa-search absolute left-4 top-1/2 -translate-y-1/2 text-blue-500"></i><input autocomplete="off" class="input-base !h-12 !pl-11 !pr-12 text-base" enterkeyhint="search" id="global-search-input" placeholder="例如：2330 或 台積電" spellcheck="false" type="search"/><span class="hidden sm:inline absolute right-3 top-1/2 -translate-y-1/2 rounded border border-gray-300 dark:border-gray-600 px-1.5 py-0.5 text-[10px] text-gray-400">ESC</span></label>
 <div aria-live="polite" class="mt-3 text-xs text-gray-400" id="global-search-summary">輸入代號或股名開始查詢</div>
 <div class="mt-3 grid max-h-[58vh] gap-2 overflow-y-auto overscroll-contain pr-1" id="global-search-results"></div>
+</div>
+</div>
+</div>
+
+<div aria-hidden="true" aria-labelledby="watchlist-picker-title" aria-modal="true" class="fixed inset-0 z-[180] hidden items-center justify-center bg-black/60 backdrop-blur-sm p-3" id="watchlist-picker-modal" role="dialog">
+<div class="w-full max-w-lg overflow-hidden rounded-2xl border border-amber-200 dark:border-amber-800 bg-white dark:bg-gray-900 shadow-2xl modal-enter">
+<div class="flex items-start justify-between gap-3 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-amber-50 via-white to-slate-50 dark:from-amber-950/25 dark:via-gray-900 dark:to-slate-950/20 px-4 py-3.5">
+<div class="min-w-0">
+<h2 class="font-black text-amber-700 dark:text-amber-300" id="watchlist-picker-title"><i class="fa-solid fa-folder-plus mr-2"></i>加入追蹤清單</h2>
+<p class="mt-1 text-[11px] text-gray-500 dark:text-gray-400" id="watchlist-picker-stock">選擇要加入的分組</p>
+</div>
+<button aria-label="關閉" class="w-9 h-9 shrink-0 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-500 hover:text-red-500 transition" id="watchlist-picker-close" type="button"><i class="fa-solid fa-xmark"></i></button>
+</div>
+<div class="p-4">
+<input id="watchlist-picker-journal-id" type="hidden"/>
+<div class="mb-3">
+<div class="flex items-center justify-between gap-2 mb-2">
+<label class="text-xs font-black text-gray-700 dark:text-gray-200"><i class="fa-solid fa-folder-tree mr-1.5 text-amber-500"></i>追蹤分組</label>
+<button class="text-[10px] font-black text-blue-600 dark:text-blue-300 hover:underline" id="watchlist-picker-new-group" type="button"><i class="fa-solid fa-plus mr-1"></i>新增清單</button>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[32vh] overflow-y-auto pr-1" id="watchlist-picker-groups"></div>
+<p class="mt-2 text-[10px] text-gray-400">可同時加入多個清單；若全部取消勾選，儲存後會取消追蹤。</p>
+</div>
+<div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/60 p-3">
+<div class="text-xs font-black text-gray-700 dark:text-gray-200 mb-2"><i class="fa-solid fa-star mr-1.5 text-amber-500"></i>追蹤優先級</div>
+<div class="grid grid-cols-3 gap-2" id="watchlist-picker-priority">
+<label class="cursor-pointer"><input class="peer sr-only" name="watchlist-priority" type="radio" value="1"/><span class="flex min-h-[42px] items-center justify-center rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-xs font-black text-gray-600 dark:text-gray-300 peer-checked:border-yellow-500 peer-checked:bg-yellow-50 peer-checked:text-yellow-700 dark:peer-checked:bg-yellow-900/30 dark:peer-checked:text-yellow-300">★ 一星</span></label>
+<label class="cursor-pointer"><input class="peer sr-only" name="watchlist-priority" type="radio" value="2"/><span class="flex min-h-[42px] items-center justify-center rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-xs font-black text-gray-600 dark:text-gray-300 peer-checked:border-orange-500 peer-checked:bg-orange-50 peer-checked:text-orange-700 dark:peer-checked:bg-orange-900/30 dark:peer-checked:text-orange-300">★★ 二星</span></label>
+<label class="cursor-pointer"><input class="peer sr-only" name="watchlist-priority" type="radio" value="3"/><span class="flex min-h-[42px] items-center justify-center rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-xs font-black text-gray-600 dark:text-gray-300 peer-checked:border-red-500 peer-checked:bg-red-50 peer-checked:text-red-700 dark:peer-checked:bg-red-900/30 dark:peer-checked:text-red-300">★★★ 三星</span></label>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-end gap-2 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-950/40 px-4 py-3">
+<button class="h-10 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 text-xs font-black text-gray-600 dark:text-gray-300" id="watchlist-picker-cancel" type="button">取消</button>
+<button class="h-10 rounded-lg bg-amber-500 hover:bg-amber-600 px-4 text-xs font-black text-white shadow-sm" id="watchlist-picker-save" type="button"><i class="fa-solid fa-check mr-1.5"></i>儲存追蹤</button>
 </div>
 </div>
 </div>
@@ -5777,6 +5829,21 @@ html.dark #module-favorites table :is(th,td):nth-child(5){
 - 區間左右箭頭改為一般日曆日 ±1，因此也能停在假日。
 - 系統仍保留「最近開盤日／休市日」判斷給預設日期、策略訊號雷達等需要交易日邏輯的功能，不影響原本雷達計算。
 - TWSE 休市日 API 或自訂休市日更新時，不再改寫已選擇的區間日期。
+-->
+<!-- v328：
+【追蹤分組加入流程】
+- 從策略日誌、策略訊號雷達或追蹤清單點擊 ★ 追蹤時，改為開啟「加入追蹤清單」視窗。
+- 可勾選一個或多個分組，並設定一星／二星／三星優先級。
+- 股票已追蹤時再按 ★，可直接修改所屬分組與星等。
+- 所有分組取消勾選後儲存，等同取消追蹤。
+- 追蹤完成的右下角通知會顯示實際加入的分組名稱與星等。
+- 追蹤清單頁仍保留「勾選股票 → 批次加入清單」，因此單檔與批次兩種方式都可使用。
+
+【策略日誌輸入通知】
+- 每次成功新增股票時，右下角臨時通知顯示「股票代號／股名＋此次加入的策略標籤」。
+- 同日同股新增不同策略時，通知顯示「已加入標籤：XXX」。
+- 相同標籤已存在時，直接顯示是哪一個標籤重複。
+- 未選策略標籤時，明確顯示「未選策略標籤」。
 -->
 <!-- 核心 JavaScript -->
 <script>
@@ -7941,6 +8008,13 @@ document.getElementById('watchlist-group-tabs')?.addEventListener('click',event=
     const button=event.target.closest('[data-watchlist-group-id]');if(!button)return;
     setActiveWatchlistGroup(button.dataset.watchlistGroupId);
 });
+document.getElementById('watchlist-picker-save')?.addEventListener('click',saveWatchlistPicker);
+['watchlist-picker-close','watchlist-picker-cancel'].forEach(id=>document.getElementById(id)?.addEventListener('click',()=>setWatchlistPickerOpen(false)));
+document.getElementById('watchlist-picker-modal')?.addEventListener('click',event=>{if(event.target.id==='watchlist-picker-modal')setWatchlistPickerOpen(false);});
+document.getElementById('watchlist-picker-new-group')?.addEventListener('click',()=>{
+    setWatchlistPickerOpen(false);
+    openCreateWatchlistGroup();
+});
 document.getElementById('watchlist-update-prices')?.addEventListener('click',()=>updateWatchlistPrices());
 document.getElementById('watchlist-add-group-btn')?.addEventListener('click',()=>openCreateWatchlistGroup());
 document.getElementById('watchlist-rename-group')?.addEventListener('click',()=>renameActiveWatchlistGroup());
@@ -8816,14 +8890,80 @@ const setCodeWatchlistPriority=(code,priority,preferredGroupId='')=>{
     return changed;
 };
 
+const setWatchlistPickerOpen=open=>{
+    const modal=document.getElementById('watchlist-picker-modal');if(!modal)return;
+    modal.classList.toggle('hidden',!open);modal.classList.toggle('flex',open);
+    modal.setAttribute('aria-hidden',String(!open));
+};
+
+const renderWatchlistPickerGroups=(selectedIds=[])=>{
+    ensureWatchlistState();
+    const root=document.getElementById('watchlist-picker-groups');if(!root)return;
+    const selected=new Set(normalizeWatchlistGroupIds(selectedIds));
+    root.innerHTML=(state.watchlistGroups||[]).map(group=>{
+        const checked=selected.has(group.id);
+        return `<label class="watchlist-picker-group cursor-pointer rounded-xl border ${checked?'border-amber-400 bg-amber-50 dark:border-amber-600 dark:bg-amber-900/20':'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900'} p-3 transition hover:border-amber-300">
+            <span class="flex items-center gap-2.5">
+                <input class="watchlist-picker-group-cb rounded border-gray-300 dark:border-gray-600 text-amber-500 focus:ring-amber-500" type="checkbox" value="${escapeHTML(group.id)}" ${checked?'checked':''}/>
+                <span class="min-w-0 flex-1"><span class="block truncate text-xs font-black text-gray-800 dark:text-gray-100">${escapeHTML(group.name)}</span><span class="mt-0.5 block text-[9px] text-gray-400">${group.id===WATCHLIST_DEFAULT_GROUP_ID?'預設清單':'自訂清單'}</span></span>
+                <span class="text-[10px] font-black text-gray-400">${getWatchlistCodesForGroup(group.id).length}</span>
+            </span>
+        </label>`;
+    }).join('');
+};
+
+const openWatchlistPicker=journal=>{
+    if(!window.isAdminMode?.())return showToast('加入追蹤僅限管理者使用','error');
+    if(!journal)return showToast('找不到對應的策略日誌','error');
+    ensureWatchlistState();
+    const code=String(journal.code||'').trim(),info=getCodeWatchlistState(code);
+    const defaultGroups=info.groupIds.length?info.groupIds:[WATCHLIST_DEFAULT_GROUP_ID];
+    const priority=info.priority>0?info.priority:1;
+    const idInput=document.getElementById('watchlist-picker-journal-id'),stock=document.getElementById('watchlist-picker-stock');
+    if(idInput)idInput.value=String(journal.id||'');
+    if(stock)stock.textContent=`${code} ${journal.name||''}｜選擇要加入的追蹤清單`;
+    renderWatchlistPickerGroups(defaultGroups);
+    document.querySelectorAll('input[name="watchlist-priority"]').forEach(input=>input.checked=Number(input.value)===priority);
+    setWatchlistPickerOpen(true);
+};
+
+const saveWatchlistPicker=async()=>{
+    const id=document.getElementById('watchlist-picker-journal-id')?.value||'',
+          journal=state.journals.find(row=>String(row.id)===String(id));
+    if(!journal)return showToast('找不到對應的策略日誌','error');
+    const code=String(journal.code||'').trim();
+    const selectedGroups=[...document.querySelectorAll('.watchlist-picker-group-cb:checked')].map(input=>input.value);
+    const priority=Number(document.querySelector('input[name="watchlist-priority"]:checked')?.value||1);
+    const info=getCodeWatchlistStateFresh(code),changed=[];
+
+    info.rows.forEach(row=>{
+        const before=JSON.stringify({favoriteGroupIds:row.favoriteGroupIds||[],isFavorite:row.isFavorite});
+        row.favoriteGroupIds=[...selectedGroups];
+        row.isFavorite=selectedGroups.length?Math.max(1,Math.min(3,priority)):0;
+        row.updatedAt=Date.now();
+        const after=JSON.stringify({favoriteGroupIds:row.favoriteGroupIds||[],isFavorite:row.isFavorite});
+        if(before!==after)changed.push(row);
+    });
+
+    setWatchlistPickerOpen(false);
+    if(!changed.length){
+        return showToast(selectedGroups.length
+            ?`追蹤設定未變更｜${selectedGroups.map(getWatchlistGroupName).join('、')}`
+            :'目前未追蹤');
+    }
+
+    await syncWatchlistJournalTracking(changed);
+    if(selectedGroups.length){
+        const names=selectedGroups.map(getWatchlistGroupName).filter(Boolean);
+        showToast(`${code} ${journal.name||''} 已加入追蹤｜${names.join('、')}｜${'★'.repeat(Math.max(1,Math.min(3,priority)))}`);
+    }else{
+        showToast(`${code} ${journal.name||''} 已取消追蹤`);
+    }
+};
+
 const cycleWatchlistPriority=async journal=>{
     if(!journal)return false;
-    const code=String(journal.code||'').trim(),info=getCodeWatchlistState(code),next=(info.priority+1)%4;
-    const favoritesActive=document.getElementById('module-favorites')?.classList.contains('active');
-    const preferred=favoritesActive&&state.activeWatchlistGroupId!==WATCHLIST_ALL_GROUP_ID?state.activeWatchlistGroupId:WATCHLIST_DEFAULT_GROUP_ID;
-    const changed=setCodeWatchlistPriority(code,next,preferred);
-    await syncWatchlistJournalTracking(changed);
-    showToast(['已取消追蹤','已加入一星追蹤','已升級二次追蹤','已升級三次追蹤'][next]);
+    openWatchlistPicker(journal);
     return true;
 };
 
@@ -10123,7 +10263,10 @@ document.getElementById('journal-form')?.addEventListener('submit', async e => {
         const duplicateStrategy=Boolean(selectedTag&&(existing.tags||[]).includes(normalizedSelectedTag));
         const exactTag=!selectedTag||duplicateStrategy,exactNote=!nt||String(existing.notes||'').includes(nt),exactStatus=normalizeJournalStatus(existing.status)===status;
         if(duplicateStrategy)playStockNoticeSound('duplicate',`journal-duplicate:${d}:${c}:${normalizedSelectedTag}`);
-        if(exactTag&&exactNote&&exactStatus)return showToast(`同日同股${selectedTag?'同策略':''}已存在，未重複新增`,'error');
+        if(exactTag&&exactNote&&exactStatus){
+            const tagNotice=normalizedSelectedTag||'未選策略標籤';
+            return showToast(`${c} ${n}｜${tagNotice} 已存在，未重複新增`,'error');
+        }
         if(tags.length)existing.tags=[...new Set([...(existing.tags||[]),normalizeStrategyTagName(tags[0])])];
         
         if (nt && existing.notes !== nt && !(existing.notes || '').includes(nt)) {
@@ -10137,7 +10280,15 @@ document.getElementById('journal-form')?.addEventListener('submit', async e => {
         resetJournalFastEntryFields();
         scheduleJournalFastEntryRender();
         queueJournalCloudWrite(`journals/${existing.id}`,existing);
-        showToast(duplicateStrategy?'同策略已存在，已更新備註／狀態':'策略標籤已合併至同一列',duplicateStrategy?'error':'success');
+        {
+            const tagNotice=normalizedSelectedTag||'未選策略標籤';
+            showToast(
+                duplicateStrategy
+                    ?`${c} ${n}｜${tagNotice} 已存在，已更新備註／狀態`
+                    :`${c} ${n}｜已加入標籤：${tagNotice}`,
+                duplicateStrategy?'error':'success'
+            );
+        }
         if(HORSE_NEW_ENTRY_TAGS.has(normalizedSelectedTag)){
             showHorseNewEntryNotice(existing,normalizedSelectedTag);
         }
@@ -10164,7 +10315,10 @@ document.getElementById('journal-form')?.addEventListener('submit', async e => {
         resetJournalFastEntryFields();
         scheduleJournalFastEntryRender();
         queueJournalCloudWrite(`journals/${id}`,p);
-        showToast('策略日誌已加入');
+        {
+            const tagNotice=normalizedSelectedTag||'未選策略標籤';
+            showToast(`${c} ${n}｜策略日誌已加入｜標籤：${tagNotice}`);
+        }
         if(HORSE_NEW_ENTRY_TAGS.has(normalizedSelectedTag)){
             showHorseNewEntryNotice(p,normalizedSelectedTag);
         }
