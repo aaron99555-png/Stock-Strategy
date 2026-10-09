@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="326" name="app-version"/>
+<meta content="327" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -4262,7 +4262,7 @@ html.dark #module-favorites table :is(th,td):nth-child(5){
 <div class="card-panel border-t-4 border-t-blue-500 flex flex-col h-full min-h-[500px]">
 <div class="p-4 border-b border-gray-200 dark:border-gray-700/50 bg-gray-50/80 dark:bg-gray-800/80 rounded-t-xl">
 <div class="filter-toolbar journal-fixed-filter-toolbar flex flex-wrap items-center gap-2 sm:gap-3 w-full">
-<div class="journal-mobile-row journal-filter-row-date"><div class="date-range-fast flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 h-[38px] sm:h-auto box-border" data-date-range="journal">
+<div class="journal-mobile-row journal-filter-row-date"><div class="date-range-fast flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 h-[38px] sm:h-auto box-border" data-date-range="journal" title="區間起訖日期可選擇週末與休市日">
 <span class="text-xs text-gray-500 dark:text-gray-400 px-1 sm:px-2 hidden xl:inline"><i class="fa-solid fa-filter mr-1"></i>區間</span>
 <div class="date-field-shift">
 <button class="date-shift-btn" data-date-field="start" data-range-scope="journal" data-range-shift="-1" title="前一個開盤日" type="button"><i class="fa-solid fa-chevron-left"></i></button>
@@ -4775,7 +4775,7 @@ html.dark #module-favorites table :is(th,td):nth-child(5){
 </div>
 <div class="p-4 border-b border-gray-200 dark:border-gray-700/50 bg-gray-50/80 dark:bg-gray-800/80 flex flex-col lg:flex-row items-start lg:items-center gap-4 w-full justify-between" data-mobile-toolbar="report">
 <div class="flex flex-wrap items-center gap-2 sm:gap-3 w-full lg:w-auto">
-<div class="date-range-fast flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 h-[38px] sm:h-auto box-border" data-date-range="report">
+<div class="date-range-fast flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 h-[38px] sm:h-auto box-border" data-date-range="report" title="區間起訖日期可選擇週末與休市日">
 <span class="text-xs text-gray-500 dark:text-gray-400 px-1 sm:px-2 hidden xl:inline"><i class="fa-solid fa-filter mr-1"></i>區間</span>
 <div class="date-field-shift">
 <button class="date-shift-btn" data-date-field="start" data-range-scope="report" data-range-shift="-1" title="前一個開盤日" type="button"><i class="fa-solid fa-chevron-left"></i></button>
@@ -4989,7 +4989,7 @@ html.dark #module-favorites table :is(th,td):nth-child(5){
 <div class="watchlist-price-status hidden" id="watchlist-price-status" aria-live="polite"></div>
 <div class="watchlist-advanced-panel hidden p-3 sm:p-4 border-b border-gray-200 dark:border-gray-700/50 bg-slate-50/80 dark:bg-gray-800/80 w-full" id="watchlist-advanced-filters">
 <div class="filter-toolbar flex flex-wrap items-center gap-2 sm:gap-3 w-full">
-<div class="date-range-fast flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 h-[38px] sm:h-auto box-border" data-date-range="fav">
+<div class="date-range-fast flex items-center bg-white dark:bg-gray-900/50 rounded-lg p-1 border border-gray-300 dark:border-gray-700/50 h-[38px] sm:h-auto box-border" data-date-range="fav" title="區間起訖日期可選擇週末與休市日">
 <span class="text-xs text-gray-500 dark:text-gray-400 px-1 sm:px-2 hidden xl:inline"><i class="fa-solid fa-filter mr-1"></i>區間</span>
 <div class="date-field-shift">
 <button class="date-shift-btn" data-date-field="start" data-range-scope="fav" data-range-shift="-1" title="前一個開盤日" type="button"><i class="fa-solid fa-chevron-left"></i></button>
@@ -5769,6 +5769,14 @@ html.dark #module-favorites table :is(th,td):nth-child(5){
 - 追蹤清單更新股價的目標價達標同步改為背景執行，不阻塞畫面。
 - 新增／改名／刪除追蹤清單皆先立即更新畫面，再背景同步 Firebase，不再等待網路才有反應。
 - 修正 v325 新增「目前股價／漲跌%」後手機版欄位索引未同步位移，避免目標價、策略標籤與操作欄排版錯位。
+-->
+<!-- v327：
+【區間日期可選假日】
+- 策略日誌、法人報告與追蹤清單的區間起訖日期可直接選擇週六、週日與休市日。
+- 手動選到假日後不再自動退回前一個開盤日。
+- 區間左右箭頭改為一般日曆日 ±1，因此也能停在假日。
+- 系統仍保留「最近開盤日／休市日」判斷給預設日期、策略訊號雷達等需要交易日邏輯的功能，不影響原本雷達計算。
+- TWSE 休市日 API 或自訂休市日更新時，不再改寫已選擇的區間日期。
 -->
 <!-- 核心 JavaScript -->
 <script>
@@ -9968,7 +9976,8 @@ const shiftDateField=(scope,field,days)=>{
     const id=field==='end'?cfg.end:cfg.start;
     const el=document.getElementById(id);if(!el)return;
     const base=el.value||getToday();
-    const next=window.ryanShiftTradingDate?.(base,days)||shiftISODate(base,days);
+    // v327：區間日期允許停在週末／休市日，因此左右箭頭改為一般日曆日 ±1。
+    const next=shiftISODate(base,days);
     el.value=next;
 
     if(cfg.type==='journal'){
@@ -14322,12 +14331,10 @@ document.addEventListener('DOMContentLoaded',()=>{
 (()=>{
   'use strict';
 
-  // v260：區間日期統一停留在最近實際開盤日。
-  // 規則來源：
-  // 1. 週六、週日
-  // 2. TWSE 官方開休市日期（線上自動抓取）
-  // 3. 使用者在策略訊號雷達設定的自訂休市日
-  // 若 TWSE API 暫時無法連線，仍保留 2026 官方休市日做離線備援。
+  // v327：區間日期允許選擇週末／休市日。
+  // 交易日判斷仍保留給預設日期、雷達與其他需要「最近開盤日」的功能使用，
+  // 但不再自動把「區間」的手動選擇改成前一個開盤日。
+  // 休市來源仍包含週末、TWSE 官方休市日與使用者自訂休市日。
 
   const TWSE_HOLIDAY_API='https://openapi.twse.com.tw/v1/holidaySchedule/holidaySchedule';
   const CACHE_KEY='ryan_twse_holiday_schedule_v260';
@@ -14404,25 +14411,13 @@ document.addEventListener('DOMContentLoaded',()=>{
     ['filter-rep-start','filter-rep-end'].includes(el.id)
   ));
 
+  // v327：區間欄位只驗證/保留使用者選擇，不再退回前一開盤日。
   const normalizeDateInput=(el,dispatch=false)=>{
     if(!isRangeDateInput(el)||!el.value)return false;
-    const fixed=previousTradingDay(el.value);
-    if(!fixed||fixed===el.value)return false;
-    el.value=fixed;
-    if(dispatch)el.dispatchEvent(new Event('change',{bubbles:true}));
-    return true;
+    return false;
   };
 
-  const normalizeAll=(dispatch=false)=>{
-    if(normalizing)return;
-    normalizing=true;
-    try{
-      document.querySelectorAll('.filter-start,.filter-end,#filter-rep-start,#filter-rep-end')
-        .forEach(el=>normalizeDateInput(el,dispatch));
-    }finally{
-      normalizing=false;
-    }
-  };
+  const normalizeAll=(dispatch=false)=>false;
 
   const rocToIso=raw=>{
     const digits=String(raw||'').replace(/\D/g,'');
@@ -14463,27 +14458,16 @@ document.addEventListener('DOMContentLoaded',()=>{
       const rows=await response.json();
       if(applyHolidayRows(rows)){
         try{localStorage.setItem(CACHE_KEY,JSON.stringify({time:Date.now(),rows}));}catch(e){}
-        // API 回來後若目前剛好停在休市日，立即退回前一開盤日並重跑篩選。
-        normalizeAll(true);
+        // v327：API 回來後只更新休市日資料，不改寫使用者目前的區間日期。
       }
     }catch(error){
       console.warn('TWSE 開休市日期讀取失敗，使用內建/快取休市日',error);
     }
   };
 
-  // 手動選日期時，在既有篩選 change handler 執行前就先改成最近開盤日。
-  document.addEventListener('change',event=>{
-    if(normalizing||!isRangeDateInput(event.target))return;
-    const el=event.target;
-    const fixed=previousTradingDay(el.value);
-    if(fixed&&fixed!==el.value){
-      el.value=fixed;
-    }
-  },true);
-
+  // v327：手動選擇區間日期時完全保留原日期，包括週六、週日與休市日。
   document.addEventListener('DOMContentLoaded',()=>{
     loadCache();
-    normalizeAll(true);
     fetchTwseHolidays();
   });
 
@@ -14491,7 +14475,8 @@ document.addEventListener('DOMContentLoaded',()=>{
   window.ryanIsMarketClosed=isClosed;
   window.ryanLastTradingDay=previousTradingDay;
   window.ryanShiftTradingDate=shiftTradingDate;
-  window.ryanNormalizeRangeDates=()=>normalizeAll(true);
+  // 相容舊呼叫：保留 API，但 v327 起不再改寫區間日期。
+  window.ryanNormalizeRangeDates=()=>false;
 })();
 </script>
 
