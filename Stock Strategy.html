@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="322" name="app-version"/>
+<meta content="323" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -3725,6 +3725,89 @@ html.dark #module-journal table :is(th,td):nth-child(7){
 }
 </style>
 
+
+<style id="copy-custom-title-v323">
+.copy-title-row{
+  flex:0 0 100%;
+  width:100%;
+  display:flex;
+  align-items:center;
+  gap:7px;
+  min-width:0;
+}
+.copy-title-label{
+  flex:0 0 auto;
+  display:inline-flex;
+  align-items:center;
+  font-size:11px;
+  font-weight:900;
+  color:#2563eb;
+  white-space:nowrap;
+}
+.dark .copy-title-label{color:#93c5fd;}
+.copy-title-input{
+  flex:0 1 420px;
+  width:min(420px,100%);
+  min-width:180px;
+  height:34px;
+  padding:0 10px;
+  border:1px solid #bfdbfe;
+  border-radius:9px;
+  background:#fff;
+  color:#111827;
+  font-size:12px;
+  font-weight:700;
+  outline:none;
+  transition:border-color .15s,box-shadow .15s,background .15s;
+}
+.copy-title-input:focus{
+  border-color:#3b82f6;
+  box-shadow:0 0 0 2px rgba(59,130,246,.14);
+}
+.dark .copy-title-input{
+  background:#111827;
+  color:#f9fafb;
+  border-color:#1e40af;
+}
+.dark .copy-title-input::placeholder{color:#6b7280;}
+.copy-title-clear{
+  flex:0 0 32px;
+  width:32px;
+  height:32px;
+  border-radius:9px;
+  border:1px solid #dbeafe;
+  background:#eff6ff;
+  color:#3b82f6;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  transition:.15s;
+}
+.copy-title-clear:hover{background:#dbeafe;color:#1d4ed8;}
+.dark .copy-title-clear{
+  background:rgba(30,64,175,.22);
+  border-color:#1e40af;
+  color:#93c5fd;
+}
+@media(max-width:640px){
+  .copy-title-row{
+    display:grid;
+    grid-template-columns:auto minmax(0,1fr) 32px;
+    gap:6px;
+  }
+  .copy-title-label{
+    font-size:10.5px;
+  }
+  .copy-title-input{
+    width:100%;
+    min-width:0;
+    max-width:none;
+    height:34px;
+    font-size:11.5px;
+  }
+}
+</style>
+
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen flex flex-col antialiased">
 <nav class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-50 transition-colors duration-300">
@@ -4045,6 +4128,12 @@ html.dark #module-journal table :is(th,td):nth-child(7){
 <input class="copy-mark-notes rounded border-slate-300 dark:border-slate-600 accent-slate-600 w-3.5 h-3.5" type="checkbox"/>
 <span>📝備註</span>
 </label>
+</div>
+<div class="copy-toolbar-break" aria-hidden="true"></div>
+<div class="copy-title-row">
+<label class="copy-title-label"><i class="fa-solid fa-heading mr-1.5"></i>複製標題</label>
+<input class="copy-title-input" type="text" maxlength="50" placeholder="可輸入自訂標題；留白則使用原本標題" autocomplete="off"/>
+<button class="copy-title-clear" type="button" title="清除自訂複製標題" aria-label="清除自訂複製標題"><i class="fa-solid fa-xmark"></i></button>
 </div>
 <div class="copy-toolbar-break" aria-hidden="true"></div>
 <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="selected">獨選</button>
@@ -4729,6 +4818,12 @@ html.dark #module-journal table :is(th,td):nth-child(7){
 </label>
 </div>
 <div class="copy-toolbar-break" aria-hidden="true"></div>
+<div class="copy-title-row">
+<label class="copy-title-label"><i class="fa-solid fa-heading mr-1.5"></i>複製標題</label>
+<input class="copy-title-input" type="text" maxlength="50" placeholder="可輸入自訂標題；留白則使用原本標題" autocomplete="off"/>
+<button class="copy-title-clear" type="button" title="清除自訂複製標題" aria-label="清除自訂複製標題"><i class="fa-solid fa-xmark"></i></button>
+</div>
+<div class="copy-toolbar-break" aria-hidden="true"></div>
 <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="selected">獨選</button>
 <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="strategy">策略</button>
 <button class="flex-shrink-0 btn-copy-base bg-fuchsia-50 dark:bg-fuchsia-900/40 hover:bg-fuchsia-600 border-fuchsia-200 dark:border-fuchsia-700/50 text-fuchsia-700 dark:text-fuchsia-200 btn-copy" data-mode="copy_a" title="破繭而出、月來越好、季不可失、OBV突破、MACD突破">複製A</button>
@@ -5334,6 +5429,15 @@ html.dark #module-journal table :is(th,td):nth-child(7){
    - 並且往前至少連續 2 個週期都有增加才符合。
 - 兩個條件可以單獨勾選，也可以同時勾選；同時勾選時需同時符合。
 - 生效條件 Chip、清除篩選、策略日誌／追蹤清單同步與手機篩選狀態同步支援新條件。
+-->
+<!-- v323：
+- 策略日誌與追蹤清單的「複製功能」新增「複製標題」輸入欄。
+- 可直接輸入最多 50 字的自訂標題；策略日誌與追蹤清單兩邊會同步。
+- 輸入內容會記憶在目前瀏覽器 localStorage，下次開啟仍保留。
+- 留白時維持原本各複製模式標題，例如：多重濾網／精選馬廄／籌碼集中漏斗／快樂農夫投資週報。
+- 有輸入自訂標題時，會取代原本標題，但日期／日期區間與原有篩選條件文字仍保留。
+- 套用範圍：獨選、策略、複製A、複製B、分數、股期、股期分數、籌碼集中、EPS、精選馬廄。
+- 新增 X 清除按鈕，可快速恢復原本預設標題。
 -->
 <!-- 核心 JavaScript -->
 <script>
@@ -10083,6 +10187,60 @@ document.querySelectorAll('.copy-mark-notes').forEach(cb=>{
     });
 });
 syncCopyLabelToggles();
+const COPY_CUSTOM_TITLE_KEY='ryan_copy_custom_title_v1';
+const sanitizeCopyCustomTitle=value=>String(value||'')
+    .replace(/[\r\n\t]+/g,' ')
+    .replace(/\|/g,'｜')
+    .replace(/\s+/g,' ')
+    .trim()
+    .slice(0,50);
+
+const getCopyCustomTitle=()=>{
+    const active=document.querySelector('.tab-content.active .copy-title-input');
+    const any=active||document.querySelector('.copy-title-input');
+    return sanitizeCopyCustomTitle(any?.value||'');
+};
+
+const buildCopyHeader=(dateText,defaultTitle,filterSuffix='')=>{
+    const custom=getCopyCustomTitle();
+    const title=custom||defaultTitle;
+    return `| ${dateText} ${title}${filterSuffix||''} |`;
+};
+
+const syncCopyCustomTitleInputs=(value,persist=true)=>{
+    const normalized=sanitizeCopyCustomTitle(value);
+    document.querySelectorAll('.copy-title-input').forEach(input=>{
+        if(input.value!==normalized)input.value=normalized;
+    });
+    if(persist){
+        try{
+            if(normalized)localStorage.setItem(COPY_CUSTOM_TITLE_KEY,normalized);
+            else localStorage.removeItem(COPY_CUSTOM_TITLE_KEY);
+        }catch(error){}
+    }
+    return normalized;
+};
+
+(()=>{
+    let stored='';
+    try{stored=localStorage.getItem(COPY_CUSTOM_TITLE_KEY)||'';}catch(error){}
+    syncCopyCustomTitleInputs(stored,false);
+
+    document.querySelectorAll('.copy-title-input').forEach(input=>{
+        input.addEventListener('input',event=>syncCopyCustomTitleInputs(event.target.value,true));
+        input.addEventListener('change',event=>syncCopyCustomTitleInputs(event.target.value,true));
+    });
+
+    document.querySelectorAll('.copy-title-clear').forEach(button=>{
+        button.addEventListener('click',()=>{
+            syncCopyCustomTitleInputs('',true);
+            const active=document.querySelector('.tab-content.active .copy-title-input')||document.querySelector('.copy-title-input');
+            active?.focus();
+            showToast('已清除自訂複製標題');
+        });
+    });
+})();
+
 const executeCopy=async t=>{if(navigator.clipboard&&window.isSecureContext){try{const ok=await window.copyTextOptimized(t);if(ok)return showToast('複製成功');}catch(e){console.warn('剪貼簿 API 無法使用，改用相容模式',e);}}fallbackCopy(t);};
 const fallbackCopy=t=>{const x=document.createElement("textarea");x.value=t;x.style.position="fixed";document.body.appendChild(x);x.focus();x.select();try{document.execCommand('copy');showToast('複製成功');}catch(e){showToast('複製失敗','error');}document.body.removeChild(x);};
 
@@ -10194,7 +10352,7 @@ document.querySelectorAll('.btn-copy').forEach(b=>{b.addEventListener('click',e=
         d=d.filter(j=>ci.has(j.id));
         d.sort((a,b)=>{const dt=new Date(a.date)-new Date(b.date);return dt!==0?dt:(a.createdAt||0)-(b.createdAt||0);});
         const duplicateCodes=getDuplicateStrategyCodesFromJournals(d,cf.tags);
-        let tx=`| ${ds} 多重濾網${ts} |\n\n`;
+        let tx=`${buildCopyHeader(ds,'多重濾網',ts)}\n\n`;
         d.forEach(j=>tx+=`${j.code} ${getStrategyCopyStockName(j,duplicateCodes)}\n`);
         executeCopy(tx.trim()+copyFootnote);return;
     }
@@ -10235,7 +10393,7 @@ document.querySelectorAll('.btn-copy').forEach(b=>{b.addEventListener('click',e=
         }
 
         if(!sections.length)return showToast('目前沒有追風馬、赤兔馬或千里馬可複製','error');
-        const tx=`| ${ds} 精選馬廄 |\n\n${sections.join('\n\n')}`;
+        const tx=`${buildCopyHeader(ds,'精選馬廄')}\n\n${sections.join('\n\n')}`;
         executeCopy(tx.trim()+copyFootnote);return;
     }
 
@@ -10261,13 +10419,13 @@ document.querySelectorAll('.btn-copy').forEach(b=>{b.addEventListener('click',e=
             sections.push(`${icon} [${tag}] (共 ${items.length} 檔)\n${items.map(j=>`${j.code} ${getStrategyCopyStockName(j,duplicateCodes,tag)}`).join('\n')}`);
         });
         if(!sections.length)return showToast(m==='copy_a'?'複製A目前無符合標的':'複製B目前無符合標的','error');
-        const tx=`| ${ds} 多重濾網 |\n\n${sections.join('\n\n')}`;
+        const tx=`${buildCopyHeader(ds,'多重濾網')}\n\n${sections.join('\n\n')}`;
         executeCopy(tx.trim()+copyFootnote);return;
     }
 
     if(d.length===0)return showToast('清單為空','error');
     const allDuplicateCodes=getDuplicateStrategyCodesFromJournals(d,cf.tags);
-    let tx=`| ${ds} 多重濾網${ts} |\n\n`;
+    let tx=`${buildCopyHeader(ds,'多重濾網',ts)}\n\n`;
 
     if(m==='strategy'){
         const sm={};
@@ -10279,7 +10437,7 @@ document.querySelectorAll('.btn-copy').forEach(b=>{b.addEventListener('click',e=
             const analystCopyOrder=['黑卡會員','尊耀會員','頂峰會員','鐵粉會員'];
             const analystRows=d.filter(j=>(j.tags||[]).map(normalizeStrategyTagName).some(tag=>ANALYST_SECTION_TAGS.has(tag)));
             const latestAnalystDate=analystRows.map(j=>String(j.date||'')).filter(Boolean).sort().reverse()[0]||cf.end||cf.start||getToday();
-            tx=`| ${String(latestAnalystDate).replace(/-/g,'/')} 🌱 快樂農夫與他的韭菜田投資週報 |\n\n`;
+            tx=`${buildCopyHeader(String(latestAnalystDate).replace(/-/g,'/'),'🌱 快樂農夫與他的韭菜田投資週報')}\n\n`;
 
             // 重新建立分析師四會員資料，不受目前只勾哪一個會員限制。
             analystCopyOrder.forEach(tag=>{
@@ -10385,7 +10543,7 @@ document.querySelectorAll('.btn-copy').forEach(b=>{b.addEventListener('click',e=
 
         if(cd.length===0)return showToast('無籌碼集中標的','error');
 
-        tx=`| ${ds} 籌碼集中漏斗 |\n\n`;
+        tx=`${buildCopyHeader(ds,'籌碼集中漏斗')}\n\n`;
         cd.forEach(j=>{
             const chipTags=orderTagsForCopy([...j._chipTags],cf.tags);
             tx+=`${j.code} ${getStrategyCopyStockName(j,allDuplicateCodes)} [${chipTags.join('+')}]\n`;
