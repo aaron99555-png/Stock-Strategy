@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="325" name="app-version"/>
+<meta content="326" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -4013,6 +4013,31 @@ html.dark #module-favorites table :is(th,td):nth-child(5){
 }
 </style>
 
+
+<style id="watchlist-mobile-column-fix-v326">
+@media(max-width:640px){
+  /* v325 新增兩欄後，舊 v145/v313 的 favorites nth-child 規則會誤套到目標價等欄位。 */
+  html.mobile-view-card #module-favorites table.mobile-card-table tbody td:nth-child(10){
+    grid-column:auto!important;
+    padding-top:.42rem!important;
+  }
+  html.mobile-view-card #module-favorites table.mobile-card-table tbody td:nth-child(12){
+    grid-column:1/-1!important;
+    padding-top:.15rem!important;
+  }
+  html.mobile-view-card #module-favorites table.mobile-card-table tbody td:nth-child(13){
+    grid-column:1/-1!important;
+    padding-top:.15rem!important;
+  }
+  html.mobile-view-card #module-favorites table.mobile-card-table tbody td:nth-child(9){
+    background:transparent!important;
+  }
+  html.dark.mobile-view-card #module-favorites table.mobile-card-table tbody td:nth-child(9){
+    background:transparent!important;
+  }
+}
+</style>
+
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen flex flex-col antialiased">
 <nav class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-50 transition-colors duration-300">
@@ -5725,6 +5750,25 @@ html.dark #module-favorites table :is(th,td):nth-child(5){
 - 更新過程顯示檔數、完成狀態、行情日期與失敗檔數。
 - 行情快取獨立儲存在瀏覽器 localStorage，不寫入策略日誌，也不額外增加 Firebase 主資料負擔。
 - 若最新行情達到法人目標價，仍會沿用既有目標價達標判定。
+-->
+<!-- v326：
+【全面修復：按鈕失效】
+- 找到 v324 引入的致命 Runtime Error：追蹤清單的「新增清單／改名／刪除清單」事件在 function 尚未初始化前就直接綁定，觸發 JavaScript TDZ ReferenceError。
+- 該錯誤會讓主程式從中途停止執行，因此錯誤點後方的大量按鈕、排序、表單與初始化事件都沒有完成綁定。
+- v326 改成延遲事件解析，主程式可完整載入。
+
+【全面效能檢查】
+- 找到追蹤清單 v324 的主要卡頓來源：getWatchlistRows 對每檔股票再次掃描完整 journals，群組統計又對每一組重做一次，資料量增加後接近 O(N²)。
+- 新增 watchlistIndex：同一資料版本只建立一次「股票 → 日誌／最新紀錄／星等／群組」索引。
+- 分組數量直接由索引 groupCounts 取得，不再為每個清單重新跑完整清單。
+- 每列顯示群組 Badge 不再重新掃描所有策略日誌。
+- 追蹤清單 render 不再每次都執行完整 migration / normalize。
+- 追蹤分組操作只重畫目前可見模組，不再同步重畫隱藏中的整張策略日誌。
+- 雲端同步完成後只更新目前正在看的模組，不再每 60 秒同時重畫日誌、追蹤、交易規劃、動能、報告、查核。
+- pageshow 只重畫目前模組，不再一次重畫四個大型模組。
+- 追蹤清單更新股價的目標價達標同步改為背景執行，不阻塞畫面。
+- 新增／改名／刪除追蹤清單皆先立即更新畫面，再背景同步 Firebase，不再等待網路才有反應。
+- 修正 v325 新增「目前股價／漲跌%」後手機版欄位索引未同步位移，避免目標價、策略標籤與操作欄排版錯位。
 -->
 <!-- 核心 JavaScript -->
 <script>
@@ -7628,8 +7672,15 @@ async function performCloudLoad(showError,forceApply,adminAccess){
         }
         if(!adminAccess)stripAdminState();
         lastAppliedCloudSignature=signature;
-        renderCustomMarketHolidays();processAndRenderJournals();renderFavorites();renderPlans();renderRevenueRecords();renderReports();renderChecklists();
-        if(document.getElementById('module-overview')?.classList.contains('active'))renderStockOverview();
+        renderCustomMarketHolidays();
+        const activeModuleId=document.querySelector('.tab-content.active')?.id||'module-journal';
+        if(activeModuleId==='module-journal')processAndRenderJournals();
+        else if(activeModuleId==='module-favorites')renderFavorites();
+        else if(activeModuleId==='module-plan')renderPlans();
+        else if(activeModuleId==='module-revenue')renderRevenueRecords();
+        else if(activeModuleId==='module-report')renderReports();
+        else if(activeModuleId==='module-checklist')renderChecklists();
+        else if(activeModuleId==='module-overview')renderStockOverview();
         saveLocalData();
         markCloudSyncSuccess();
         return true;
@@ -7883,9 +7934,9 @@ document.getElementById('watchlist-group-tabs')?.addEventListener('click',event=
     setActiveWatchlistGroup(button.dataset.watchlistGroupId);
 });
 document.getElementById('watchlist-update-prices')?.addEventListener('click',()=>updateWatchlistPrices());
-document.getElementById('watchlist-add-group-btn')?.addEventListener('click',openCreateWatchlistGroup);
-document.getElementById('watchlist-rename-group')?.addEventListener('click',renameActiveWatchlistGroup);
-document.getElementById('watchlist-delete-group')?.addEventListener('click',deleteActiveWatchlistGroup);
+document.getElementById('watchlist-add-group-btn')?.addEventListener('click',()=>openCreateWatchlistGroup());
+document.getElementById('watchlist-rename-group')?.addEventListener('click',()=>renameActiveWatchlistGroup());
+document.getElementById('watchlist-delete-group')?.addEventListener('click',()=>deleteActiveWatchlistGroup());
 document.getElementById('watchlist-toggle-filters')?.addEventListener('click',event=>{
     const panel=document.getElementById('watchlist-advanced-filters'),button=event.currentTarget;if(!panel)return;
     const open=panel.classList.contains('hidden');panel.classList.toggle('hidden',!open);
@@ -8349,7 +8400,7 @@ const updateJournalClosePrices=async(options={})=>{
             await patchDataToCloud('journals',patch);
             if(targetAchievementCodes.size){
                 const epsPatch=Object.fromEntries([...targetAchievementCodes].map(code=>[code,state.epsData[code]]).filter(([,value])=>value));
-                if(Object.keys(epsPatch).length)await patchDataToCloud('epsData',epsPatch);
+                if(Object.keys(epsPatch).length)patchDataToCloud('epsData',epsPatch).catch(error=>console.error('目標價達標背景同步失敗',error));
             }
         }
 
@@ -8592,16 +8643,66 @@ const ensureWatchlistState=()=>{
 const getWatchlistGroupById=id=>(state.watchlistGroups||[]).find(group=>group.id===id)||null;
 const getWatchlistGroupName=id=>id===WATCHLIST_ALL_GROUP_ID?'全部追蹤':(getWatchlistGroupById(id)?.name||'未分類');
 
-const getCodeWatchlistState=code=>{
-    const c=String(code||'').trim(),rows=(state.journals||[]).filter(j=>String(j.code||'').trim()===c);
+// v326：追蹤清單建立一次性索引，避免每個股票／每個群組都重新掃描整份策略日誌。
+// 舊版 getWatchlistRows → getCodeWatchlistState 會形成 O(股票數 × 日誌數)；群組卡再重複呼叫後會明顯卡住 UI。
+let watchlistIndexVersion=-1,watchlistIndexGroupSignature='',watchlistIndexCache=null;
+
+const getWatchlistGroupSignature=()=>JSON.stringify((state.watchlistGroups||[]).map(group=>[group.id,group.name,group.updatedAt||0]));
+
+const buildWatchlistInfoFromRows=(code,rows)=>{
     const groupIds=new Set(),levels=[];
-    rows.forEach(j=>{
+    (rows||[]).forEach(j=>{
         normalizeWatchlistGroupIds(j.favoriteGroupIds).forEach(id=>groupIds.add(id));
         levels.push(j.isFavorite===true?1:(parseInt(j.isFavorite)||0));
     });
     const priority=Math.max(0,...levels);
     if(priority>0&&!groupIds.size)groupIds.add(WATCHLIST_DEFAULT_GROUP_ID);
-    return{code:c,rows,groupIds:[...groupIds],priority};
+
+    let latest=null;
+    (rows||[]).forEach(journal=>{
+        if(!latest||
+           String(journal.date||'')>String(latest.date||'')||
+           (String(journal.date||'')===String(latest.date||'')&&Number(journal.createdAt||0)>Number(latest.createdAt||0))){
+            latest=journal;
+        }
+    });
+    return{code:String(code||'').trim(),rows:rows||[],groupIds:[...groupIds],priority,latest};
+};
+
+const getWatchlistIndex=()=>{
+    const groupSignature=getWatchlistGroupSignature();
+    if(watchlistIndexCache&&watchlistIndexVersion===analysisCacheVersion&&watchlistIndexGroupSignature===groupSignature)return watchlistIndexCache;
+
+    const journalsByCode=getAnalysisDataIndex().journalsByCode;
+    const byCode=new Map(),groupCounts=new Map();
+    let trackedCount=0;
+
+    journalsByCode.forEach((rows,code)=>{
+        const info=buildWatchlistInfoFromRows(code,rows);
+        byCode.set(String(code),info);
+        const tracked=info.priority>0||info.groupIds.length>0;
+        if(!tracked)return;
+        trackedCount++;
+        info.groupIds.forEach(groupId=>groupCounts.set(groupId,(groupCounts.get(groupId)||0)+1));
+    });
+
+    watchlistIndexCache={byCode,groupCounts,trackedCount};
+    watchlistIndexVersion=analysisCacheVersion;
+    watchlistIndexGroupSignature=groupSignature;
+    return watchlistIndexCache;
+};
+
+const getCodeWatchlistState=code=>{
+    const c=String(code||'').trim();
+    const cached=getWatchlistIndex().byCode.get(c);
+    if(cached)return cached;
+    const rows=getAnalysisDataIndex().journalsByCode.get(c)||[];
+    return buildWatchlistInfoFromRows(c,rows);
+};
+
+const getCodeWatchlistStateFresh=code=>{
+    const c=String(code||'').trim(),rows=getAnalysisDataIndex().journalsByCode.get(c)||[];
+    return buildWatchlistInfoFromRows(c,rows);
 };
 
 const isCodeInWatchlistGroup=(code,groupId=state.activeWatchlistGroupId)=>{
@@ -8613,26 +8714,24 @@ const isCodeInWatchlistGroup=(code,groupId=state.activeWatchlistGroupId)=>{
 const isJournalInActiveWatchlistGroup=journal=>isCodeInWatchlistGroup(journal?.code,state.activeWatchlistGroupId);
 
 const getWatchlistRows=(groupId=state.activeWatchlistGroupId)=>{
-    ensureWatchlistState();
-    const latestByCode=new Map();
-    (state.journals||[]).forEach(journal=>{
-        const code=String(journal.code||'').trim();if(!code)return;
-        const existing=latestByCode.get(code);
-        const isNewer=!existing||String(journal.date||'')>String(existing.date||'')||
-            (String(journal.date||'')===String(existing.date||'')&&Number(journal.createdAt||0)>Number(existing.createdAt||0));
-        if(isNewer)latestByCode.set(code,journal);
-    });
     const rows=[];
-    latestByCode.forEach((latest,code)=>{
-        const info=getCodeWatchlistState(code);
-        if(info.priority<=0&&!info.groupIds.length)return;
+    getWatchlistIndex().byCode.forEach(info=>{
+        if((info.priority<=0&&!info.groupIds.length)||!info.latest)return;
         if(groupId!==WATCHLIST_ALL_GROUP_ID&&!info.groupIds.includes(groupId))return;
-        rows.push(applyWatchlistQuoteToRow({...latest,isFavorite:Math.max(1,info.priority),favoriteGroupIds:[...info.groupIds]}));
+        rows.push(applyWatchlistQuoteToRow({...info.latest,isFavorite:Math.max(1,info.priority),favoriteGroupIds:[...info.groupIds]}));
     });
     return rows;
 };
 
-const getWatchlistCodesForGroup=groupId=>getWatchlistRows(groupId).map(row=>String(row.code||'').trim()).filter(Boolean);
+const getWatchlistCodesForGroup=groupId=>{
+    const index=getWatchlistIndex(),codes=[];
+    index.byCode.forEach((info,code)=>{
+        if(info.priority<=0&&!info.groupIds.length)return;
+        if(groupId!==WATCHLIST_ALL_GROUP_ID&&!info.groupIds.includes(groupId))return;
+        codes.push(code);
+    });
+    return codes;
+};
 
 const renderWatchlistGroupBadges=code=>{
     const ids=getCodeWatchlistState(code).groupIds;
@@ -8644,16 +8743,21 @@ const syncWatchlistJournalTracking=async(changedRows,options={})=>{
     const unique=[...new Map((changedRows||[]).map(row=>[String(row.id),row])).values()];
     if(!unique.length)return false;
     saveLocalData();
-    processAndRenderJournals();
-    if(document.getElementById('module-favorites')?.classList.contains('active'))renderFavorites();
+
+    const journalActive=document.getElementById('module-journal')?.classList.contains('active');
+    const favoritesActive=document.getElementById('module-favorites')?.classList.contains('active');
+    if(journalActive)processAndRenderJournals();
+    if(favoritesActive)renderFavorites();
+
     if(options.cloud!==false){
-        await Promise.all(unique.map(row=>putDataToCloud(`journals/${row.id}`,row)));
+        // 背景同步，不讓雲端等待卡住本機按鈕反應。
+        Promise.all(unique.map(row=>putDataToCloud(`journals/${row.id}`,row))).catch(error=>console.error('追蹤清單背景同步失敗',error));
     }
     return true;
 };
 
 const setCodeWatchlistGroupMembership=(code,groupId,enabled)=>{
-    const info=getCodeWatchlistState(code),changed=[];
+    const info=getCodeWatchlistStateFresh(code),changed=[];
     if(!info.rows.length)return changed;
     info.rows.forEach(row=>{
         const before=JSON.stringify({favoriteGroupIds:row.favoriteGroupIds||[],isFavorite:row.isFavorite});
@@ -8685,7 +8789,7 @@ const setCodeWatchlistGroupMembership=(code,groupId,enabled)=>{
 };
 
 const setCodeWatchlistPriority=(code,priority,preferredGroupId='')=>{
-    const info=getCodeWatchlistState(code),changed=[];
+    const info=getCodeWatchlistStateFresh(code),changed=[];
     if(!info.rows.length)return changed;
     const next=Math.max(0,Math.min(3,Number(priority)||0));
     let groupIds=[...info.groupIds];
@@ -8718,8 +8822,10 @@ const cycleWatchlistPriority=async journal=>{
 const persistWatchlistGroups=async()=>{
     state.watchlistGroups=(state.watchlistGroups||[]).map(group=>({...group,updatedAt:Number(group.updatedAt)||Date.now()}));
     saveLocalData();
-    renderFavorites();
-    await putDataToCloud('watchlistGroups',Object.fromEntries(state.watchlistGroups.map(group=>[group.id,group])));
+    if(document.getElementById('module-favorites')?.classList.contains('active'))renderFavorites();
+    putDataToCloud('watchlistGroups',Object.fromEntries(state.watchlistGroups.map(group=>[group.id,group])))
+        .catch(error=>console.error('追蹤清單背景同步失敗',error));
+    return true;
 };
 
 const setActiveWatchlistGroup=id=>{
@@ -8734,10 +8840,10 @@ const setActiveWatchlistGroup=id=>{
 const renderWatchlistWorkspace=(filteredRows=[])=>{
     ensureWatchlistState();
     const tabs=document.getElementById('watchlist-group-tabs');if(!tabs)return;
-    const allCount=getWatchlistRows(WATCHLIST_ALL_GROUP_ID).length;
+    const watchIndex=getWatchlistIndex(),allCount=watchIndex.trackedCount;
     const groups=[{id:WATCHLIST_ALL_GROUP_ID,name:'全部追蹤',virtual:true},...(state.watchlistGroups||[])];
     tabs.innerHTML=groups.map((group,index)=>{
-        const count=group.id===WATCHLIST_ALL_GROUP_ID?allCount:getWatchlistRows(group.id).length;
+        const count=group.id===WATCHLIST_ALL_GROUP_ID?allCount:(watchIndex.groupCounts.get(group.id)||0);
         const active=group.id===state.activeWatchlistGroupId;
         return `<button type="button" class="watchlist-group-tab ${active?'active':''}" data-watchlist-group-id="${escapeHTML(group.id)}"><span class="watchlist-group-tab-icon"><i class="fa-solid ${group.id===WATCHLIST_ALL_GROUP_ID?'fa-layer-group':'fa-folder'}"></i></span><span class="min-w-0"><span class="watchlist-group-tab-name">${escapeHTML(group.name)}</span><span class="watchlist-group-tab-meta">${group.id===WATCHLIST_ALL_GROUP_ID?'所有清單彙整':group.id===WATCHLIST_DEFAULT_GROUP_ID?'預設清單':'自訂清單'}</span></span><span class="watchlist-group-tab-count">${count}</span></button>`;
     }).join('');
@@ -8818,11 +8924,13 @@ const deleteActiveWatchlistGroup=()=>{
         state.activeWatchlistGroupId=WATCHLIST_DEFAULT_GROUP_ID;
         try{localStorage.setItem(WATCHLIST_ACTIVE_GROUP_KEY,state.activeWatchlistGroupId);}catch(error){}
         saveLocalData();
-        await Promise.all([
+        if(document.getElementById('module-favorites')?.classList.contains('active'))renderFavorites();
+        if(document.getElementById('module-journal')?.classList.contains('active'))processAndRenderJournals();
+        showToast('追蹤清單已刪除，股票已保留');
+        Promise.all([
             putDataToCloud('watchlistGroups',Object.fromEntries(state.watchlistGroups.map(item=>[item.id,item]))),
             ...[...new Map(changed.map(row=>[row.id,row])).values()].map(row=>putDataToCloud(`journals/${row.id}`,row))
-        ]);
-        renderFavorites();processAndRenderJournals();showToast('追蹤清單已刪除，股票已保留');
+        ]).catch(error=>console.error('追蹤清單刪除背景同步失敗',error));
     });
 };
 
@@ -8838,7 +8946,7 @@ function processAndRenderJournals(){
     return data;
 }
 function renderFavorites(){
-    ensureWatchlistState();
+    if(!Array.isArray(state.watchlistGroups)||!state.watchlistGroups.length)ensureWatchlistState();
     const source=getWatchlistRows(state.activeWatchlistGroupId);
     const filterState={...state.favFilters,start:'',end:''};
     const rows=getFilteredAndSortedData(source,filterState,state.favSortConfig);
@@ -11573,9 +11681,16 @@ document.addEventListener('DOMContentLoaded',async()=>{
 
     window.addEventListener('pageshow',()=>requestAnimationFrame(()=>{
         resetSessionFiltersToDefaults(true);clearTransientSearchFields();
-        processAndRenderJournals();renderFavorites();renderRevenueRecords();renderReports();
-        // v244：pageshow 不清空策略雷達；若已曾產生結果則維持顯示。
-        if(lastJournalStreakResult)renderJournalStreaks();
+        const activeModuleId=document.querySelector('.tab-content.active')?.id||'module-journal';
+        if(activeModuleId==='module-journal')processAndRenderJournals();
+        else if(activeModuleId==='module-favorites')renderFavorites();
+        else if(activeModuleId==='module-revenue')renderRevenueRecords();
+        else if(activeModuleId==='module-report')renderReports();
+        else if(activeModuleId==='module-plan')renderPlans();
+        else if(activeModuleId==='module-checklist')renderChecklists();
+        else if(activeModuleId==='module-overview')renderStockOverview();
+        // v244：pageshow 不清空策略雷達；只在策略日誌頁需要時重畫。
+        if(activeModuleId==='module-journal'&&lastJournalStreakResult)renderJournalStreaks();
     }));
 
 setChkDirection('long');
@@ -11645,7 +11760,8 @@ setChkDirection('long');
   const MOBILE_VIEW_KEY='ryan_mobile_view_mode_v1';
   const mobileWideColumns={
     'module-journal':[11,12],
-    'module-favorites':[9],
+    // v326：追蹤清單新增目前股價／漲跌%後，策略標籤由 index 9 位移到 11。
+    'module-favorites':[11],
     'module-revenue':[7],
     'module-report':[3],
     'module-checklist':[4],
@@ -11655,7 +11771,8 @@ setChkDirection('long');
     // v308：v302 新增「漲幅%」後，手機欄位索引同步位移。
     // 第一層保留「收盤價＋漲幅%＋目標價＋潛在漲幅」；25EPS、成長率、分數、備註收進「詳情」。
     'module-journal':[7,9,10,13],
-    'module-favorites':[3,5,6,7],
+    // 追蹤清單：目前股價(3)／漲跌%(4)保留第一層；25EPS、成長率、分數、目標價收進詳情。
+    'module-favorites':[5,7,8,9],
     'module-revenue':[3,4,5,6,7],
     'module-report':[],
     'module-checklist':[4,5],
