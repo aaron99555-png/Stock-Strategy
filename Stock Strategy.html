@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="336" name="app-version"/>
+<meta content="337" name="app-version"/>
 <script id="startup-performance-bootstrap">
 window.__ryanStartupPerf={start:performance.now(),localReady:0,firstRender:0,cloudStart:0,cloudEnd:0,cloudOk:null};
 </script>
@@ -4198,6 +4198,75 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 @media(max-width:640px){.report-reader-continuous-toggle{padding-left:7px!important;padding-right:7px!important}.report-reader-toggle-dot{width:20px;height:20px}}
 </style>
 
+
+<style id="top-nav-spacing-v337">
+/* v337：桌機頂部模組列重新收斂高度，按鈕不再貼上方／下方留大塊空白 */
+@media (min-width:1024px){
+  /* 導覽主列本身就是 64px，所有模組按鈕必須收在這個高度內 */
+  nav > div > .flex.items-center.justify-between.h-16{
+    height:64px!important;
+    min-height:64px!important;
+    align-items:center!important;
+  }
+
+  nav .nav-btn{
+    min-height:54px!important;
+    height:54px!important;
+    padding:5px 7px!important;
+    margin:0!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:3px!important;
+    line-height:1.12!important;
+    border-radius:10px!important;
+    transform:translateY(2px);
+  }
+
+  nav .nav-btn i{
+    margin:0!important;
+    font-size:14px!important;
+    line-height:1!important;
+    flex:0 0 auto!important;
+  }
+
+  /* 長名稱允許兩行，但不再靠按鈕超高撐開 */
+  nav .nav-btn{
+    white-space:normal!important;
+    text-align:center!important;
+    word-break:keep-all!important;
+  }
+
+  /* 導覽列下方內容往上收，消除原本桌機 py-6 造成的大段空白 */
+  body > main{
+    padding-top:8px!important;
+  }
+}
+
+/* 1024~1279：空間較窄時再稍微縮小，避免文字換行後撐高 */
+@media (min-width:1024px) and (max-width:1279px){
+  nav .nav-btn{
+    min-width:64px!important;
+    min-height:52px!important;
+    height:52px!important;
+    padding:4px 6px!important;
+    font-size:11px!important;
+    gap:2px!important;
+  }
+}
+
+/* 1280 以上仍維持舒適尺寸，但不超過導覽列 */
+@media (min-width:1280px){
+  nav .nav-btn{
+    min-width:70px!important;
+    min-height:54px!important;
+    height:54px!important;
+    font-size:12px!important;
+  }
+}
+</style>
+
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen flex flex-col antialiased">
 <nav class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-50 transition-colors duration-300">
@@ -5594,6 +5663,15 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 - 新增 CDN preconnect。
 - 系統自檢新增「首畫面可操作時間／本機初始化／背景雲端同步」效能指標。
 - 收盤價仍維持純手動更新。
+-->
+<!-- v337：
+【頂部導覽列間距整理】
+- 修正舊版 nav 按鈕 min-height 74~78px 大於導覽列本身 64px，造成按鈕往外溢出與下方留白。
+- 桌機模組按鈕高度統一收斂至 52~54px，完整放在 64px 導覽列內。
+- 按鈕內容改為垂直置中並向下微調 2px，不再貼著導覽列上緣。
+- 圖示／文字間距縮小，長名稱仍可自然換行。
+- 桌機主內容上方 padding 由原本 sm:py-6 的約 24px 收斂為 8px，讓導覽列與第一個內容區塊更緊湊。
+- 手機版導覽列不受此調整影響。
 -->
 <!-- 核心 JavaScript -->
 <script>
