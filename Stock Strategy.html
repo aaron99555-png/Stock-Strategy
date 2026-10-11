@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="332" name="app-version"/>
+<meta content="334" name="app-version"/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -149,6 +149,7 @@ html.viewer-mode #streak-holiday-manager,
 html.viewer-mode [data-remove-holiday],
 html.viewer-mode #btn-tag-manager,
 html.viewer-mode #btn-trash-manager,
+html.viewer-mode #btn-clean-old-journals,
 html.viewer-mode #btn-undo-import,
 html.viewer-mode #btn-db-upload,
 html.viewer-mode #btn-import-backup,
@@ -4172,6 +4173,23 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 }
 </style>
 
+
+<style id="report-reader-continuous-v333">
+.report-reader-wake-status{border-color:#bbf7d0;background:#f0fdf4;color:#15803d}
+.dark .report-reader-wake-status{border-color:#166534;background:rgba(20,83,45,.28);color:#86efac}
+.report-reader-wake-status.is-pending{border-color:#fde68a;background:#fffbeb;color:#a16207}
+.dark .report-reader-wake-status.is-pending{border-color:#854d0e;background:rgba(113,63,18,.28);color:#fde68a}
+.report-reader-wake-status.is-unsupported,.report-reader-wake-status.is-error{border-color:#fecaca;background:#fef2f2;color:#b91c1c}
+.dark .report-reader-wake-status.is-unsupported,.dark .report-reader-wake-status.is-error{border-color:#7f1d1d;background:rgba(127,29,29,.25);color:#fca5a5}
+.report-reader-continuous-toggle{position:relative}
+.report-reader-toggle-dot{width:22px;height:22px;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;background:#ede9fe;color:#7c3aed;transition:.15s ease}
+.dark .report-reader-toggle-dot{background:rgba(91,33,182,.35);color:#c4b5fd}
+.report-reader-continuous-toggle:has(#report-reader-continuous:checked){border-color:#8b5cf6!important;background:#f5f3ff!important;color:#6d28d9!important;box-shadow:0 0 0 2px rgba(139,92,246,.10)}
+.dark .report-reader-continuous-toggle:has(#report-reader-continuous:checked){border-color:#7c3aed!important;background:rgba(76,29,149,.34)!important;color:#ddd6fe!important}
+.report-reader-continuous-toggle:has(#report-reader-continuous:checked) .report-reader-toggle-dot{background:#7c3aed;color:#fff;transform:scale(1.05)}
+@media(max-width:640px){.report-reader-continuous-toggle{padding-left:7px!important;padding-right:7px!important}.report-reader-toggle-dot{width:20px;height:20px}}
+</style>
+
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen flex flex-col antialiased">
 <nav class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-50 transition-colors duration-300">
@@ -4512,6 +4530,7 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 </div>
 <div class="flex items-center gap-2 flex-wrap">
 <button class="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:text-gray-500 text-white px-3 py-1.5 text-xs sm:text-sm font-bold shadow-sm transition active:scale-95 disabled:cursor-wait" id="btn-update-journal-close-prices" title="開啟網頁時會自動更新；也可手動重新更新最新一個策略日誌日期的收盤價與漲幅%，更早歷史紀錄不變" type="button"><i class="fa-solid fa-arrows-rotate"></i><span>更新收盤價</span></button>
+<button class="inline-flex items-center gap-1.5 rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/25 hover:bg-red-600 dark:hover:bg-red-600 hover:text-white text-red-700 dark:text-red-300 px-3 py-1.5 text-xs sm:text-sm font-black shadow-sm transition active:scale-95 disabled:opacity-45 disabled:cursor-not-allowed" id="btn-clean-old-journals" title="永久清除日期早於三個月前的策略日誌；目前追蹤股票若只剩舊紀錄，會自動保留最新一筆避免追蹤分組消失" type="button"><i class="fa-solid fa-broom"></i><span>清除3個月前</span><span class="min-w-[20px] h-5 px-1.5 rounded-full bg-red-600 text-white text-[10px] inline-flex items-center justify-center tabular-nums" id="journal-old-data-count">0</span></button>
 <span class="hidden text-[10px] sm:text-xs text-gray-400 dark:text-gray-500 whitespace-nowrap cursor-help" id="journal-close-price-status" title="收盤價來源狀態"></span>
 </div>
 </div>
@@ -5417,9 +5436,10 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 <div class="flex items-center justify-between gap-3 mb-3">
 <div class="min-w-0 flex items-center gap-2.5 sm:gap-3">
 <span class="w-10 h-10 sm:w-11 sm:h-11 shrink-0 rounded-xl bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300 flex items-center justify-center shadow-sm"><i class="fa-solid fa-file-lines text-lg sm:text-xl"></i></span>
-<div class="min-w-0"><div class="font-black text-sm sm:text-lg text-gray-800 dark:text-gray-100 leading-tight truncate">法人報告閱讀模式</div><div class="hidden sm:block text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">可使用方向鍵或左右滑動切換報告</div></div>
+<div class="min-w-0"><div class="font-black text-sm sm:text-lg text-gray-800 dark:text-gray-100 leading-tight truncate">法人報告閱讀模式</div><div class="hidden sm:block text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">閱讀時自動保持螢幕長亮｜可使用方向鍵或左右滑動切換報告</div></div>
 </div>
 <div class="shrink-0 flex items-center gap-1.5 sm:gap-2">
+<span aria-live="polite" class="report-reader-wake-status h-9 sm:h-10 inline-flex items-center gap-1.5 rounded-lg border px-2 sm:px-2.5 text-[10px] sm:text-[11px] font-black transition" id="report-reader-wake-status" title="閱讀模式開啟時自動保持螢幕長亮"><i class="fa-solid fa-sun"></i><span class="hidden sm:inline" id="report-reader-wake-label">長亮</span></span>
 <span aria-live="polite" class="h-9 sm:h-10 inline-flex items-center rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-[11px] sm:text-sm font-black text-gray-600 dark:text-gray-300 px-2.5 sm:px-3 tabular-nums" id="report-reader-counter"></span>
 <button aria-label="複製目前報告" class="w-9 h-9 sm:w-10 sm:h-10 inline-flex items-center justify-center rounded-lg border border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/70 transition active:scale-95" id="report-reader-copy-btn" title="複製目前報告" type="button"><i class="fa-solid fa-copy"></i></button>
 <button aria-label="關閉全螢幕" class="w-9 h-9 sm:w-10 sm:h-10 inline-flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-300 hover:bg-red-100 hover:text-red-600 hover:border-red-200 dark:hover:bg-red-900/40 dark:hover:text-red-300 transition active:scale-95" id="report-reader-close-btn" title="關閉全螢幕" type="button"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -5441,6 +5461,11 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 <button aria-label="朗讀目前法人報告" class="h-9 sm:h-10 px-2.5 sm:px-3 rounded-lg border border-sky-200 bg-sky-50 text-sky-700 hover:bg-sky-100 text-xs sm:text-sm font-black inline-flex items-center justify-center gap-1.5 transition active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed" id="report-reader-speak-btn" title="朗讀目前法人報告" type="button"><i class="fa-solid fa-volume-high" id="report-reader-speak-icon"></i><span id="report-reader-speak-label">朗讀</span></button>
 <label class="h-9 sm:h-10 inline-flex items-center gap-1 rounded-lg border border-sky-200 bg-white px-2 text-[10px] sm:text-xs font-bold text-sky-700" title="調整朗讀速度"><span class="hidden sm:inline">語速</span><select aria-label="朗讀速度" class="bg-transparent outline-none font-black text-sky-700 cursor-pointer" id="report-reader-speech-rate"><option value="0.75">0.75×</option><option value="1">1.0×</option><option value="1.25">1.25×</option><option value="1.5">1.5×</option><option value="2">2.0×</option></select></label>
 <button aria-label="停止朗讀" class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg border border-gray-200 bg-gray-100 text-gray-500 hover:bg-red-50 hover:border-red-200 hover:text-red-600 inline-flex items-center justify-center transition active:scale-95 disabled:opacity-35 disabled:cursor-not-allowed" disabled="" id="report-reader-speech-stop-btn" title="停止朗讀" type="button"><i class="fa-solid fa-stop"></i></button>
+<label class="report-reader-continuous-toggle h-9 sm:h-10 inline-flex items-center gap-1.5 rounded-lg border border-violet-200 dark:border-violet-800 bg-white dark:bg-gray-900 px-2 sm:px-2.5 text-[10px] sm:text-xs font-black text-violet-700 dark:text-violet-300 cursor-pointer select-none transition" title="本則朗讀完畢後，自動跳到下一則並繼續朗讀">
+<input class="sr-only" id="report-reader-continuous" type="checkbox"/>
+<span class="report-reader-toggle-dot"><i class="fa-solid fa-forward-step"></i></span>
+<span>連續播放</span>
+</label>
 </div>
 <div aria-label="報告文字大小" class="flex items-center justify-center gap-1 sm:gap-2">
 <button aria-label="縮小報告文字" class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-xs sm:text-sm font-black disabled:opacity-35" id="report-reader-font-down" type="button">A−</button>
@@ -5510,6 +5535,28 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 (()=>{const store=window.__ryanRuntimeDiagnostics=window.__ryanRuntimeDiagnostics||{errors:[],rejections:[],startedAt:Date.now()};const push=(bucket,message,source='')=>{bucket.push({message:String(message||'未知錯誤').slice(0,500),source:String(source||'').slice(0,200),time:Date.now()});if(bucket.length>30)bucket.splice(0,bucket.length-30);};window.addEventListener('error',event=>{if(event?.error||event?.message)push(store.errors,event.error?.stack||event.message,event.filename||'runtime');});window.addEventListener('unhandledrejection',event=>push(store.rejections,event.reason?.stack||event.reason||'Unhandled Promise Rejection','promise'));})();
 </script>
 <!-- v332：全站穩定化＋效能瘦身＋追蹤績效。新增 Runtime Error/重複ID/導覽/核心元件自檢與安全模組 Smoke Test；修復 v331 移除籌碼雷達後殘留的 undefined helper。策略日誌新增衍生快取、營收代號索引、快速輸入延遲 localStorage 落地並於 pagehide 強制 flush；移除舊版 changelog payload。追蹤清單新增追蹤基準價、追蹤日期、目前股價與追蹤後漲跌幅，支援排序、重設基準與雲端同步。 -->
+<!-- v333：
+【法人報告閱讀模式】
+- 開啟閱讀模式時自動使用 Screen Wake Lock，讓螢幕保持長亮、不因閒置休眠。
+- 閱讀模式關閉時自動釋放 Wake Lock；切到背景後回到畫面會自動重新取得。
+- 頂部新增「螢幕長亮」狀態提示；若瀏覽器或環境不支援，會明確顯示。
+- 語音朗讀新增「連續播放」選項，設定會保留在本機。
+- 開啟連續播放後，本則報告朗讀完成會自動跳到下一則報告並繼續朗讀。
+- 下一則若沒有可朗讀文字會自動略過，繼續找後面的報告。
+- 播放到最後一則時會顯示「連續播放完成」。
+- 原有上一則／下一則、方向鍵、左右滑動、語速、暫停／繼續、停止與字級功能均保留。
+-->
+<!-- v334：
+【策略日誌－清除三個月前舊資料】
+- 策略日誌工具列新增「清除3個月前」按鈕，並顯示目前可清除筆數。
+- 三個月以「今天往前 3 個日曆月」計算；例如 10/11 會清除 7/11 以前的資料，7/11 當日保留。
+- 清除前會顯示確認視窗與實際刪除筆數。
+- 為避免追蹤清單因舊 journal 全部被刪除而消失：若某檔目前仍在追蹤，但近三個月完全沒有策略日誌，會自動保留該股票最新一筆舊紀錄作為追蹤錨點。
+- 不會刪除法人報告、營收籌碼動能、交易規劃、追蹤價與追蹤日期。
+- 刪除採 Firebase 單次 PATCH 批次處理，不逐筆發送大量請求，降低卡頓。
+- 同步建立 deletion tombstone，避免雲端舊資料在下一次同步時被重新帶回。
+- 此功能僅管理者可使用。
+-->
 <!-- 核心 JavaScript -->
 <script>
 const originalDateSetter=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set;
@@ -7692,6 +7739,7 @@ const handleJournalTableAction=async(e)=>{
     else if(a==='delete-journal'){window.openConfirmModal('確定要刪除這筆紀錄嗎？',async()=>{state.journals=state.journals.filter(x=>x.id!==id);saveLocalData();processAndRenderJournals();if(document.getElementById('module-favorites').classList.contains('active'))renderFavorites();await recordDeletionTombstone('journals',id);await deleteDataFromCloud(`journals/${id}`);showToast('紀錄已刪除');});}
 };
 document.getElementById('journal-table-body')?.addEventListener('click',handleJournalTableAction); document.getElementById('fav-table-body')?.addEventListener('click',handleJournalTableAction);
+document.getElementById('btn-clean-old-journals')?.addEventListener('click',()=>cleanOldJournalData());
 
 document.getElementById('watchlist-group-tabs')?.addEventListener('click',event=>{
     const button=event.target.closest('[data-watchlist-group-id]');if(!button)return;
@@ -8838,6 +8886,146 @@ const deleteActiveWatchlistGroup=()=>{
 
 
 function renderJournalPrimaryView(){refreshJournalInsightCache();const data=getFilteredAndSortedData(state.journals,state.filters,state.sortConfig);renderTableRows(data,'journal-table-body','journal-empty');renderJournalActiveFilterChips();renderJournalDashboard(data);return data;}
+
+const getThreeMonthsAgoISO=()=>{
+    const today=String(getToday()||''),parts=today.split('-').map(Number);
+    if(parts.length!==3||parts.some(value=>!Number.isFinite(value)))return'';
+    const [year,month,day]=parts;
+    const targetBase=new Date(year,month-1-3,1,12,0,0);
+    const lastDay=new Date(targetBase.getFullYear(),targetBase.getMonth()+1,0,12,0,0).getDate();
+    const target=new Date(targetBase.getFullYear(),targetBase.getMonth(),Math.min(day,lastDay),12,0,0);
+    return `${target.getFullYear()}-${String(target.getMonth()+1).padStart(2,'0')}-${String(target.getDate()).padStart(2,'0')}`;
+};
+
+const getOldJournalCleanupPlan=()=>{
+    const cutoff=getThreeMonthsAgoISO();
+    if(!cutoff)return{cutoff:'',oldRows:[],deletable:[],protectedRows:[]};
+
+    const journals=Array.isArray(state.journals)?state.journals:[];
+    const oldRows=journals.filter(row=>{
+        const date=String(row?.date||'').slice(0,10);
+        return /^\d{4}-\d{2}-\d{2}$/.test(date)&&date<cutoff;
+    });
+
+    const trackedCodes=new Set();
+    journals.forEach(row=>{
+        const level=row?.isFavorite===true?1:(parseInt(row?.isFavorite)||0);
+        const groups=normalizeWatchlistGroupIds(row?.favoriteGroupIds);
+        const code=String(row?.code||'').trim();
+        if(code&&(level>0||groups.length))trackedCodes.add(code);
+    });
+
+    // 若追蹤股票在近三個月內完全沒有紀錄，保留「最新一筆舊紀錄」，
+    // 否則清掉最後一筆會讓舊版以 journal 為追蹤載體的分組一起消失。
+    const protectedIds=new Set();
+    trackedCodes.forEach(code=>{
+        const rows=journals.filter(row=>String(row?.code||'').trim()===code);
+        const hasRecent=rows.some(row=>{
+            const date=String(row?.date||'').slice(0,10);
+            return /^\d{4}-\d{2}-\d{2}$/.test(date)&&date>=cutoff;
+        });
+        if(hasRecent)return;
+
+        const oldForCode=rows.filter(row=>{
+            const date=String(row?.date||'').slice(0,10);
+            return /^\d{4}-\d{2}-\d{2}$/.test(date)&&date<cutoff;
+        }).sort((a,b)=>{
+            const dateDiff=String(b?.date||'').localeCompare(String(a?.date||''));
+            if(dateDiff)return dateDiff;
+            return Number(b?.updatedAt||b?.createdAt||0)-Number(a?.updatedAt||a?.createdAt||0);
+        });
+        if(oldForCode[0]?.id)protectedIds.add(String(oldForCode[0].id));
+    });
+
+    return{
+        cutoff,
+        oldRows,
+        protectedRows:oldRows.filter(row=>protectedIds.has(String(row.id))),
+        deletable:oldRows.filter(row=>!protectedIds.has(String(row.id)))
+    };
+};
+
+const updateOldJournalCleanupButton=()=>{
+    const button=document.getElementById('btn-clean-old-journals'),
+          count=document.getElementById('journal-old-data-count');
+    if(!button||!count)return;
+    const plan=getOldJournalCleanupPlan();
+    const deletableCount=plan.deletable.length;
+    count.textContent=String(deletableCount);
+    count.classList.toggle('hidden',deletableCount===0);
+    button.disabled=deletableCount===0;
+    button.title=deletableCount
+        ?`可永久清除 ${deletableCount} 筆 ${plan.cutoff.replace(/-/g,'/')} 以前的策略日誌${plan.protectedRows.length?`；另保留 ${plan.protectedRows.length} 筆追蹤清單錨點`:''}`
+        :`目前沒有 ${plan.cutoff?plan.cutoff.replace(/-/g,'/'):'三個月'} 以前可清除的策略日誌`;
+};
+
+const cleanOldJournalData=async()=>{
+    if(!window.isAdminMode?.())return showToast('清除舊資料僅限管理者使用','error');
+
+    const plan=getOldJournalCleanupPlan();
+    if(!plan.deletable.length){
+        updateOldJournalCleanupButton();
+        return showToast('目前沒有三個月前可清除的策略日誌');
+    }
+
+    const cutoffLabel=plan.cutoff.replace(/-/g,'/');
+    const protectedText=plan.protectedRows.length
+        ?`；為避免追蹤清單消失，會保留 ${plan.protectedRows.length} 筆追蹤股票最新舊紀錄`
+        :'';
+
+    window.openConfirmModal(
+        `確定永久清除 ${cutoffLabel} 以前的 ${plan.deletable.length} 筆策略日誌嗎？${protectedText}。此操作不會刪除法人報告、營收籌碼、交易規劃或追蹤價資料；建議重要資料先匯出備份。`,
+        async()=>{
+            const button=document.getElementById('btn-clean-old-journals');
+            if(button){
+                button.disabled=true;
+                button.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i><span>清除中…</span>';
+            }
+
+            const deleteIds=new Set(plan.deletable.map(row=>String(row.id)));
+            const deletedAt=Date.now();
+            const tombstonePatch={},journalDeletePatch={};
+
+            if(!state.deletionTombstones||typeof state.deletionTombstones!=='object')state.deletionTombstones={};
+
+            plan.deletable.forEach(row=>{
+                const id=String(row.id||'');if(!id)return;
+                const key=getTombstoneKey('journals',id);
+                const tombstone={deletedAt};
+                state.deletionTombstones[key]=tombstone;
+                tombstonePatch[key]=tombstone;
+                journalDeletePatch[id]=null;
+                selectedIds.journal.delete(id);
+                selectedIds.fav.delete(id);
+            });
+
+            state.journals=(state.journals||[]).filter(row=>!deleteIds.has(String(row.id)));
+            prunePendingCloudWrites();
+            saveLocalData();
+
+            processAndRenderJournals();
+            if(document.getElementById('module-favorites')?.classList.contains('active'))renderFavorites();
+            if(document.getElementById('module-overview')?.classList.contains('active'))renderStockOverview();
+            window.renderTrashManager?.();
+
+            showToast(`已清除 ${plan.deletable.length} 筆三個月前策略日誌${plan.protectedRows.length?`｜保留 ${plan.protectedRows.length} 筆追蹤錨點`:''}`);
+
+            // 用單次 PATCH 批次刪除，避免逐筆 Firebase 請求造成畫面卡頓。
+            Promise.all([
+                patchDataToCloud('deletionTombstones',tombstonePatch),
+                patchDataToCloud('journals',journalDeletePatch)
+            ]).then(()=>{
+                showToast(`舊資料雲端同步完成｜共 ${plan.deletable.length} 筆`);
+            }).catch(error=>{
+                console.error('三個月前策略日誌雲端清除同步失敗',error);
+                showToast('本機已清除；雲端刪除已排入待同步','error');
+            }).finally(()=>{
+                updateOldJournalCleanupButton();
+            });
+        }
+    );
+};
+
 function processAndRenderJournals(){
     const data=renderJournalPrimaryView();
     const journalActive=document.getElementById('module-journal')?.classList.contains('active');
@@ -8845,6 +9033,7 @@ function processAndRenderJournals(){
         renderWarRoom();
         if(lastJournalStreakResult)renderJournalStreaks();
     }
+    updateOldJournalCleanupButton();
     return data;
 }
 function renderFavorites(){
@@ -10255,7 +10444,53 @@ document.getElementById('plan-table-body')?.addEventListener('click',async e=>{c
 function renderPlans(){const tb=document.getElementById('plan-table-body');if(!tb)return;let cc=0,wc=0,tp=0,rh='';const sp=[...state.plans].sort((a,b)=>{let vA,vB;switch(state.planSortConfig.key){case'entryDate':vA=a.entryDate||'';vB=b.entryDate||'';break;case'stock':vA=a.stock;vB=b.stock;break;case'qty':vA=a.qty;vB=b.qty;break;case'entry':vA=a.entry;vB=b.entry;break;case'target':vA=a.target||0;vB=b.target||0;break;case'stop':vA=a.stop;vB=b.stop;break;case'status':const o={'持倉中':1,'已停利':2,'已停損':3};vA=o[a.status]||99;vB=o[b.status]||99;break;default:vA=a.createdAt||0;vB=b.createdAt||0;break;}if(vA===vB)return(a.createdAt||0)-(b.createdAt||0);return state.planSortConfig.asc?(vA>vB?1:-1):(vA>vB?-1:1);});sp.forEach(i=>{const isC=i.status!=='持倉中';if(isC){cc++;if(i.status==='已停利')wc++;tp+=i.pnl||0;}const cm=i.stock.match(/\d{4}/),isF=cm?getEpsInfo(cm[0],{}).futures:false,dn=i.name||state.codeToName[i.stock]||'',fd=i.entryDate?i.entryDate.replace(/-/g,'/'):'';rh+=`<tr class="table-row-hover border-b border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-sm ${isC?'opacity-50':''}"><td class="table-sticky-bg py-3 px-2 sm:px-3 text-center sticky left-0 z-20"><input type="checkbox" class="row-cb rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 accent-red-500 cursor-pointer w-4 h-4" value="${i.id}" data-type="plan" ${selectedIds['plan'].has(i.id)?'checked':''}></td><td class="py-3 px-3 sm:px-4 font-medium text-gray-600 dark:text-gray-400">${escapeHTML(fd)}</td><td class="py-3 px-3 sm:px-4 font-medium">${isF?'<span class="bg-sky-600 text-white text-[10px] px-1.5 py-0.5 rounded mr-1.5 shadow-sm">期</span>':''}<span class="font-bold mr-1.5 text-gray-800 dark:text-gray-200">${escapeHTML(i.stock)}</span><span class="text-gray-600 dark:text-gray-400">${escapeHTML(dn)}</span><div class="text-[10px] text-gray-400 mt-0.5">${escapeHTML(i.note||'')}</div></td><td class="py-3 px-3 sm:px-4">${i.qty}</td><td class="py-3 px-3 sm:px-4">${i.entry}</td><td class="py-3 px-3 sm:px-4 tw-red font-bold">${i.target||'-'}</td><td class="py-3 px-3 sm:px-4 tw-green font-bold">${i.stop}</td><td class="py-3 px-3 sm:px-4"><span class="px-2 py-1 rounded-md text-xs font-medium ${i.status==='持倉中'?'bg-blue-100 text-blue-700':(i.status==='已停利'?'bg-red-100 text-red-700':'bg-green-100 text-green-700')}">${i.status}</span></td><td class="py-3 px-3 sm:px-4 whitespace-nowrap">${!isC?`<button data-action="close-plan" data-id="${i.id}" class="text-xs bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 px-3 py-1.5 rounded-lg transition shadow-sm mr-2 active:scale-95">結算</button>`:`<span class="mr-3 ${i.pnl>0?'tw-red':'tw-green'} font-bold">${formatNumColor(i.pnl)}</span>`}<button data-action="edit-plan" data-id="${i.id}" class="text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110 mr-1"><i class="fa-solid fa-pen pointer-events-none"></i></button><button data-action="delete-plan" data-id="${i.id}" class="text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg inline-flex items-center transition hover:scale-110"><i class="fa-solid fa-trash pointer-events-none"></i></button></td></tr>`;});setHTMLIfChanged(tb,rh);document.getElementById('stat-total').textContent=cc;document.getElementById('stat-winrate').textContent=cc>0?Math.round((wc/cc)*100)+'%':'0%';document.getElementById('stat-pnl').textContent=tp.toString();document.getElementById('stat-pnl').className=`text-2xl font-bold ${tp>0?'tw-red':(tp<0?'tw-green':'text-gray-900 dark:text-white')} transition-colors duration-300`;updateBatchUI('plan');}
 
 let reportReaderItems=[],reportReaderIndex=0,reportReaderTouchStart=null,reportReaderBodyOverflow='',reportReaderEnteredFullscreen=false;
+let reportReaderWakeLock=null,reportReaderWakeLockRequesting=false;
+const isReportReaderOpen=()=>{const modal=document.getElementById('report-reader-modal');return !!modal&&!modal.classList.contains('hidden');};
+const updateReportReaderWakeUI=(status='active')=>{
+    const root=document.getElementById('report-reader-wake-status'),label=document.getElementById('report-reader-wake-label');
+    if(!root)return;
+    root.classList.remove('is-pending','is-unsupported','is-error');
+    const icon=root.querySelector('i');
+    if(status==='pending'){
+        root.classList.add('is-pending');if(label)label.textContent='啟用長亮';if(icon)icon.className='fa-solid fa-spinner fa-spin';root.title='正在啟用螢幕長亮';
+    }else if(status==='unsupported'){
+        root.classList.add('is-unsupported');if(label)label.textContent='不支援長亮';if(icon)icon.className='fa-solid fa-circle-exclamation';root.title='此瀏覽器或目前環境不支援 Screen Wake Lock';
+    }else if(status==='error'){
+        root.classList.add('is-error');if(label)label.textContent='長亮失敗';if(icon)icon.className='fa-solid fa-triangle-exclamation';root.title='無法啟用螢幕長亮；請確認瀏覽器權限與省電設定';
+    }else{
+        if(label)label.textContent='螢幕長亮';if(icon)icon.className='fa-solid fa-sun';root.title='閱讀模式期間螢幕將保持長亮';
+    }
+};
+const requestReportReaderWakeLock=async()=>{
+    if(!isReportReaderOpen()||document.visibilityState!=='visible')return false;
+    if(!('wakeLock' in navigator)||typeof navigator.wakeLock?.request!=='function'){updateReportReaderWakeUI('unsupported');return false;}
+    if(reportReaderWakeLock&&!reportReaderWakeLock.released){updateReportReaderWakeUI('active');return true;}
+    if(reportReaderWakeLockRequesting)return false;
+    reportReaderWakeLockRequesting=true;updateReportReaderWakeUI('pending');
+    try{
+        const sentinel=await navigator.wakeLock.request('screen');
+        reportReaderWakeLock=sentinel;
+        sentinel.addEventListener?.('release',()=>{
+            if(reportReaderWakeLock===sentinel)reportReaderWakeLock=null;
+            if(isReportReaderOpen()&&document.visibilityState==='visible'){
+                updateReportReaderWakeUI('pending');setTimeout(()=>requestReportReaderWakeLock(),500);
+            }
+        });
+        updateReportReaderWakeUI('active');return true;
+    }catch(error){
+        console.warn('閱讀模式螢幕長亮啟用失敗',error);reportReaderWakeLock=null;updateReportReaderWakeUI('error');return false;
+    }finally{reportReaderWakeLockRequesting=false;}
+};
+const releaseReportReaderWakeLock=async()=>{
+    const sentinel=reportReaderWakeLock;reportReaderWakeLock=null;reportReaderWakeLockRequesting=false;
+    if(sentinel&&!sentinel.released){try{await sentinel.release();}catch(error){}}
+};
 const REPORT_READER_SPEECH_RATE_KEY='ryan_report_reader_speech_rate_v1';
+const REPORT_READER_CONTINUOUS_KEY='ryan_report_reader_continuous_v1';
+let reportReaderContinuous=false;
+try{reportReaderContinuous=localStorage.getItem(REPORT_READER_CONTINUOUS_KEY)==='1';}catch(error){}
+const syncReportReaderContinuousUI=()=>{const input=document.getElementById('report-reader-continuous');if(input)input.checked=reportReaderContinuous;};
+const setReportReaderContinuous=value=>{reportReaderContinuous=!!value;try{localStorage.setItem(REPORT_READER_CONTINUOUS_KEY,reportReaderContinuous?'1':'0');}catch(error){}syncReportReaderContinuousUI();};
 const normalizeReportSpeechRate=value=>{const allowed=[0.75,1,1.25,1.5,2],numeric=Number(value);return allowed.includes(numeric)?numeric:1;};
 let reportReaderSpeechRate=normalizeReportSpeechRate(localStorage.getItem(REPORT_READER_SPEECH_RATE_KEY)||'1');
 let reportReaderSpeechState={status:'idle',chunks:[],index:0,runId:0};
@@ -10376,10 +10611,8 @@ const stopReportReaderSpeech=()=>{
 const speakReportReaderNextChunk=runId=>{
     if(!isReportSpeechSupported()||runId!==reportReaderSpeechState.runId||reportReaderSpeechState.status==='idle')return;
     if(reportReaderSpeechState.index>=reportReaderSpeechState.chunks.length){
-        reportReaderSpeechState.status='idle';
-        reportReaderSpeechState.chunks=[];
-        reportReaderSpeechState.index=0;
-        updateReportReaderSpeechUI();
+        reportReaderSpeechState.status='idle';reportReaderSpeechState.chunks=[];reportReaderSpeechState.index=0;updateReportReaderSpeechUI();
+        if(reportReaderContinuous&&isReportReaderOpen())setTimeout(()=>continueReportReaderPlayback(),220);
         return;
     }
     const text=reportReaderSpeechState.chunks[reportReaderSpeechState.index++];
@@ -10404,29 +10637,24 @@ const speakReportReaderNextChunk=runId=>{
         showToast('無法啟動語音朗讀','error');
     }
 };
-const toggleReportReaderSpeech=()=>{
-    if(!isReportSpeechSupported())return showToast('此瀏覽器不支援語音朗讀','error');
+const startReportReaderSpeech=({quiet=false}={})=>{
+    if(!isReportSpeechSupported()){if(!quiet)showToast('此瀏覽器不支援語音朗讀','error');return false;}
+    const report=reportReaderItems[reportReaderIndex],chunks=splitReportSpeechText(report?.content||'');
+    if(!chunks.length){if(!quiet)showToast('目前這篇法人報告沒有可朗讀內容','error');return false;}
     const synth=window.speechSynthesis;
-    if(reportReaderSpeechState.status==='speaking'){
-        synth.pause();
-        reportReaderSpeechState.status='paused';
-        updateReportReaderSpeechUI();
-        return;
-    }
-    if(reportReaderSpeechState.status==='paused'){
-        synth.resume();
-        reportReaderSpeechState.status='speaking';
-        updateReportReaderSpeechUI();
-        return;
-    }
-    const report=reportReaderItems[reportReaderIndex];
-    const chunks=splitReportSpeechText(report?.content||'');
-    if(!chunks.length)return showToast('目前這篇法人報告沒有可朗讀內容','error');
     try{synth.cancel();}catch(error){}
     const runId=reportReaderSpeechState.runId+1;
     reportReaderSpeechState={status:'speaking',chunks,index:0,runId};
     updateReportReaderSpeechUI();
     speakReportReaderNextChunk(runId);
+    return true;
+};
+const toggleReportReaderSpeech=()=>{
+    if(!isReportSpeechSupported())return showToast('此瀏覽器不支援語音朗讀','error');
+    const synth=window.speechSynthesis;
+    if(reportReaderSpeechState.status==='speaking'){synth.pause();reportReaderSpeechState.status='paused';updateReportReaderSpeechUI();return;}
+    if(reportReaderSpeechState.status==='paused'){synth.resume();reportReaderSpeechState.status='speaking';updateReportReaderSpeechUI();return;}
+    startReportReaderSpeech();
 };
 if(isReportSpeechSupported()){
     window.speechSynthesis.addEventListener?.('voiceschanged',updateReportReaderSpeechUI);
@@ -10445,9 +10673,19 @@ const renderReportReader=()=>{
     const contentWrap=document.getElementById('report-reader-content-wrap');if(contentWrap)contentWrap.scrollTop=0;
 };
 const moveReportReader=step=>{
-    const next=Math.max(0,Math.min(reportReaderItems.length-1,reportReaderIndex+step));if(next===reportReaderIndex)return;
-    stopReportReaderSpeech();
-    reportReaderIndex=next;renderReportReader();
+    const next=Math.max(0,Math.min(reportReaderItems.length-1,reportReaderIndex+step));if(next===reportReaderIndex)return false;
+    stopReportReaderSpeech();reportReaderIndex=next;renderReportReader();return true;
+};
+const continueReportReaderPlayback=()=>{
+    if(!reportReaderContinuous||!isReportReaderOpen())return false;
+    for(let next=reportReaderIndex+1;next<reportReaderItems.length;next++){
+        reportReaderIndex=next;renderReportReader();
+        if(startReportReaderSpeech({quiet:true})){
+            showToast(`連續播放｜${reportReaderIndex+1}/${reportReaderItems.length}｜${reportReaderItems[reportReaderIndex]?.code||''} ${reportReaderItems[reportReaderIndex]?.name||''}`);
+            return true;
+        }
+    }
+    stopReportReaderSpeech();showToast('連續播放完成｜已播放到最後一則報告');return false;
 };
 const requestReportBrowserFullscreen=()=>{
     if(document.fullscreenElement||document.webkitFullscreenElement)return;
@@ -10464,7 +10702,8 @@ const openReportReader=id=>{
     reportReaderItems=getReportReaderItems();reportReaderIndex=reportReaderItems.findIndex(report=>String(report.id)===String(id));
     if(reportReaderIndex<0)return showToast('找不到這筆報告','error');
     const modal=document.getElementById('report-reader-modal');if(!modal)return;
-    reportReaderBodyOverflow=document.body.style.overflow;document.body.style.overflow='hidden';modal.classList.remove('hidden');renderReportReader();requestReportBrowserFullscreen();
+    reportReaderBodyOverflow=document.body.style.overflow;document.body.style.overflow='hidden';modal.classList.remove('hidden');renderReportReader();syncReportReaderContinuousUI();requestReportBrowserFullscreen();
+    requestReportReaderWakeLock();
     setTimeout(()=>document.getElementById('report-reader-close-btn')?.focus(),50);
 };
 document.getElementById('btn-open-report-reader')?.addEventListener('click',()=>{
@@ -10472,7 +10711,7 @@ document.getElementById('btn-open-report-reader')?.addEventListener('click',()=>
 });
 const closeReportReader=()=>{
     const modal=document.getElementById('report-reader-modal');if(!modal||modal.classList.contains('hidden'))return;
-    stopReportReaderSpeech();
+    stopReportReaderSpeech();releaseReportReaderWakeLock();
     modal.classList.add('hidden');document.body.style.overflow=reportReaderBodyOverflow;reportReaderTouchStart=null;
     const fullscreenElement=document.fullscreenElement||document.webkitFullscreenElement;
     if(reportReaderEnteredFullscreen&&fullscreenElement){try{const result=document.exitFullscreen?document.exitFullscreen():document.webkitExitFullscreen?.();if(result&&typeof result.catch==='function')result.catch(()=>{});}catch(e){}}
@@ -10485,7 +10724,10 @@ document.getElementById('report-reader-copy-btn')?.addEventListener('click',()=>
 document.getElementById('report-reader-speak-btn')?.addEventListener('click',toggleReportReaderSpeech);
 document.getElementById('report-reader-speech-stop-btn')?.addEventListener('click',stopReportReaderSpeech);
 document.getElementById('report-reader-speech-rate')?.addEventListener('change',e=>setReportReaderSpeechRate(e.target.value));
-updateReportReaderSpeechUI();
+document.getElementById('report-reader-continuous')?.addEventListener('change',e=>setReportReaderContinuous(e.target.checked));
+syncReportReaderContinuousUI();updateReportReaderSpeechUI();
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&isReportReaderOpen())requestReportReaderWakeLock();});
+window.addEventListener('pagehide',()=>{releaseReportReaderWakeLock();});
 const REPORT_READER_FONT_KEY='ryan_report_reader_font_v1',reportReaderFontSizes=[15,17,19,21,23];let reportReaderFontIndex=Math.max(0,Math.min(reportReaderFontSizes.length-1,parseInt(localStorage.getItem(REPORT_READER_FONT_KEY)||'1')));
 const applyReportReaderFont=()=>{const content=document.getElementById('report-reader-content'),label=document.getElementById('report-reader-font-label'),down=document.getElementById('report-reader-font-down'),up=document.getElementById('report-reader-font-up');if(content){content.style.fontSize=`${reportReaderFontSizes[reportReaderFontIndex]}px`;content.style.lineHeight=reportReaderFontIndex>=3?'2':'1.9';}if(label)label.textContent=['較小','標準','舒適','大字','特大'][reportReaderFontIndex];if(down)down.disabled=reportReaderFontIndex===0;if(up)up.disabled=reportReaderFontIndex===reportReaderFontSizes.length-1;};
 const changeReportReaderFont=step=>{reportReaderFontIndex=Math.max(0,Math.min(reportReaderFontSizes.length-1,reportReaderFontIndex+step));localStorage.setItem(REPORT_READER_FONT_KEY,String(reportReaderFontIndex));applyReportReaderFont();};
