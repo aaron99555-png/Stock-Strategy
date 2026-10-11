@@ -5,7 +5,14 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="334" name="app-version"/>
+<meta content="336" name="app-version"/>
+<script id="startup-performance-bootstrap">
+window.__ryanStartupPerf={start:performance.now(),localReady:0,firstRender:0,cloudStart:0,cloudEnd:0,cloudOk:null};
+</script>
+<link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin/>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin/>
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <script id="admin-mode-bootstrap">
 try{
     if(window.localStorage.getItem('ryan_admin_session_v1')==='1'){
@@ -26,7 +33,8 @@ try{
 </script>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&amp;display=swap" rel="stylesheet" media="print" onload="this.media='all'"/>
+<noscript><link href="https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&amp;display=swap" rel="stylesheet"/></noscript>
 <script>
 tailwind.config={darkMode:'class',theme:{extend:{colors:{gray:{50:'#f8fafc',100:'#f1f5f9',200:'#e2e8f0',300:'#cbd5e1',400:'#94a3b8',500:'#64748b',600:'#475569',700:'#334155',800:'#1e293b',900:'#0f172a'}}}}};
 </script>
@@ -4529,7 +4537,7 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 <button class="flex-shrink-0 btn-copy-base bg-amber-50 dark:bg-amber-900/40 hover:bg-amber-600 border-amber-200 dark:border-amber-700/50 text-amber-700 dark:text-amber-200 btn-copy" data-mode="horses" title="追風馬、赤兔馬、千里馬完全相同：各自與上一期同馬種名單比對；本次有上次沒有＝🆕新進榜，上次有本次沒有＝-✂️剔除">🏇 精選馬廄</button>
 </div>
 <div class="flex items-center gap-2 flex-wrap">
-<button class="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:text-gray-500 text-white px-3 py-1.5 text-xs sm:text-sm font-bold shadow-sm transition active:scale-95 disabled:cursor-wait" id="btn-update-journal-close-prices" title="開啟網頁時會自動更新；也可手動重新更新最新一個策略日誌日期的收盤價與漲幅%，更早歷史紀錄不變" type="button"><i class="fa-solid fa-arrows-rotate"></i><span>更新收盤價</span></button>
+<button class="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:text-gray-500 text-white px-3 py-1.5 text-xs sm:text-sm font-bold shadow-sm transition active:scale-95 disabled:cursor-wait" id="btn-update-journal-close-prices" title="僅在按下此按鈕時更新最新一個策略日誌日期的收盤價與漲幅%；登入／開啟網頁時不會自動更新，更早歷史紀錄不變" type="button"><i class="fa-solid fa-arrows-rotate"></i><span>更新收盤價</span></button>
 <button class="inline-flex items-center gap-1.5 rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/25 hover:bg-red-600 dark:hover:bg-red-600 hover:text-white text-red-700 dark:text-red-300 px-3 py-1.5 text-xs sm:text-sm font-black shadow-sm transition active:scale-95 disabled:opacity-45 disabled:cursor-not-allowed" id="btn-clean-old-journals" title="永久清除日期早於三個月前的策略日誌；目前追蹤股票若只剩舊紀錄，會自動保留最新一筆避免追蹤分組消失" type="button"><i class="fa-solid fa-broom"></i><span>清除3個月前</span><span class="min-w-[20px] h-5 px-1.5 rounded-full bg-red-600 text-white text-[10px] inline-flex items-center justify-center tabular-nums" id="journal-old-data-count">0</span></button>
 <span class="hidden text-[10px] sm:text-xs text-gray-400 dark:text-gray-500 whitespace-nowrap cursor-help" id="journal-close-price-status" title="收盤價來源狀態"></span>
 </div>
@@ -5556,6 +5564,36 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 - 刪除採 Firebase 單次 PATCH 批次處理，不逐筆發送大量請求，降低卡頓。
 - 同步建立 deletion tombstone，避免雲端舊資料在下一次同步時被重新帶回。
 - 此功能僅管理者可使用。
+-->
+<!-- v335：
+【收盤價改為純手動更新】
+- 登入／開啟網頁後不再自動更新策略日誌收盤價。
+- 雲端資料同步完成後也不再自動呼叫行情來源。
+- 只有使用者實際按下「更新收盤價」按鈕時，才會抓取最新一個策略日誌日期的收盤價與漲幅%。
+- 更早歷史策略日誌的收盤價仍維持原值。
+- 更新按鈕提示文字同步改成「僅手動更新」，避免誤解。
+-->
+<!-- v336：
+【進入網頁速度全面優化】
+診斷到的主要啟動負擔：
+1. 策略訊號雷達在首畫面立即做全量分析。
+2. 管理者狀態初始化固定同時 render 策略日誌與隱藏的追蹤清單。
+3. 初次 pageshow 又重畫一次目前模組。
+4. 初次 Firebase 同步在 DOMContentLoaded 流程內 await；管理者 legacy migration 還會先下載完整 root，再正式下載一次。
+5. 隱藏的標籤管理與垃圾桶列表也在開頁時完整 render。
+6. TWSE 休市 API 與 Google Font 會在開頁初期競爭網路資源。
+
+修正：
+- 雷達改成接近視野或 browser idle 才第一次計算。
+- 管理者模式只 render 當前可見模組。
+- 初次 pageshow 不再重複 render；BFCache 回頁仍正常更新。
+- 初次 Firebase 改成首畫面後 idle 背景同步，不阻塞操作。
+- legacy migration 改用 shallow Firebase 檢查並記住已完成狀態，避免重複下載完整 root。
+- 垃圾桶／標籤管理改為開啟時再產生完整內容。
+- TWSE 休市 API 延後到 idle；Google Font 改非阻塞載入。
+- 新增 CDN preconnect。
+- 系統自檢新增「首畫面可操作時間／本機初始化／背景雲端同步」效能指標。
+- 收盤價仍維持純手動更新。
 -->
 <!-- 核心 JavaScript -->
 <script>
@@ -7419,17 +7457,25 @@ const fetchCloudPayload=async adminAccess=>{
 const hasCollectionRecords=value=>Array.isArray(value)?value.some(Boolean):!!(value&&typeof value==='object'&&Object.keys(value).length);
 const hasSyncPayload=data=>!!(data&&(hasCollectionRecords(data.journals)||hasCollectionRecords(data.plans)||hasCollectionRecords(data.revenueRecords)||hasCollectionRecords(data.reports)||hasCollectionRecords(data.checklists)||hasCollectionRecords(data.trash)||hasCollectionRecords(data.deletionTombstones)||hasCollectionRecords(data.epsData)||hasCollectionRecords(data.tagSettings?.categories)||hasCollectionRecords(data.customMarketHolidaySettings?.dates)||hasCollectionRecords(data.watchlistGroups)||hasCollectionRecords(data.watchlistMeta)));
 const hasLocalSyncData=()=>hasSyncPayload(cloudSnapshot());
+const LEGACY_MIGRATION_MARKER_KEY='ryan_legacy_cloud_migration_checked_v336';
 async function migrateLegacyCloudData(){
     if(!hasStoredAdminAccess()||!LEGACY_SYNC_KEY||LEGACY_SYNC_KEY===DIRECT_SYNC_PATH)return false;
+    const marker=`${LEGACY_SYNC_KEY}|${DIRECT_SYNC_PATH}`;
+    try{if(localStorage.getItem(LEGACY_MIGRATION_MARKER_KEY)===marker)return false;}catch(error){}
+    const markChecked=()=>{try{localStorage.setItem(LEGACY_MIGRATION_MARKER_KEY,marker);}catch(error){}};
     try{
-        const targetResponse=await fetch(`${DB_URL}/data/${DIRECT_SYNC_PATH}.json`,{cache:'no-store'});
-        if(targetResponse.ok&&hasSyncPayload(await targetResponse.json()))return false;
+        const targetResponse=await fetch(`${DB_URL}/data/${DIRECT_SYNC_PATH}.json?shallow=true`,{cache:'no-store'});
+        if(targetResponse.ok){
+            const shallow=await targetResponse.json();
+            if(shallow&&typeof shallow==='object'&&Object.keys(shallow).length){markChecked();return false;}
+        }
         const legacyPath=encodeURIComponent(LEGACY_SYNC_KEY);
         const legacyResponse=await fetch(`${DB_URL}/data/${legacyPath}.json`,{cache:'no-store'});
         if(!legacyResponse.ok)return false;
         const legacyData=await legacyResponse.json();
-        if(!hasSyncPayload(legacyData))return false;
+        if(!hasSyncPayload(legacyData)){markChecked();return false;}
         const migrateResponse=await fetch(`${DB_URL}/data/${DIRECT_SYNC_PATH}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(legacyData)});
+        if(migrateResponse.ok)markChecked();
         return migrateResponse.ok;
     }catch(error){console.warn('舊雲端資料遷移略過',error);return false;}
 }
@@ -7450,7 +7496,9 @@ async function performCloudLoad(showError,forceApply,adminAccess){
             state.customMarketHolidays=d.customMarketHolidaySettings?normalizeCustomMarketHolidays(cloudCollection(d.customMarketHolidaySettings.dates)):[];state.watchlistGroups=adminAccess?cloudCollection(d.watchlistGroups):[];state.watchlistMeta=adminAccess?normalizeWatchlistMetaMap(d.watchlistMeta||state.watchlistMeta||{}):{};
             const migratedWatchlists=adminAccess?ensureWatchlistState():false;
             const stockNameRepairs=rebuildStockLookup();
-            const migratedManagedTags=window.ensureOptimizationState?.();window.syncCustomTagSettings?.();window.renderTrashManager?.();
+            const migratedManagedTags=window.ensureOptimizationState?.();window.syncCustomTagSettings?.();window.updateTrashNavCount?.();
+            const trashModal=document.getElementById('trash-manager-modal');
+            if(trashModal&&!trashModal.classList.contains('hidden'))window.renderTrashManager?.();
             if(adminAccess){
                 if(migratedStrategyTags||migratedJournalLifecycle||stockNameRepairs.journals)await putDataToCloud('journals',Object.fromEntries(state.journals.map(x=>[x.id,x])));
                 else if(d.publicJournals===undefined&&state.journals.length)await putDataToCloud('publicJournals',Object.fromEntries(state.journals.map(x=>[x.id,sanitizeJournalForViewer(x)])));
@@ -7531,7 +7579,7 @@ async function deleteDataFromCloud(p){
     const mirrored=await cloudWrite(mirror.path,{method:'DELETE'});return primary&&mirrored;
 }
 window.reloadAdminPrivateData=async()=>{const result=await loadFromCloud(true,true);startCloudSync();return result;};
-window.clearAdminPrivateData=()=>{stripAdminState();saveLocalData();renderFavorites();renderPlans();window.renderTrashManager?.();startCloudSync();};
+window.clearAdminPrivateData=()=>{stripAdminState();saveLocalData();window.updateTrashNavCount?.();startCloudSync();};
 
 function loadLocalData(){
     const sd=localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -8276,24 +8324,7 @@ const updateJournalClosePrices=async(options={})=>{
         }
     }
 };
-document.getElementById('btn-update-journal-close-prices')?.addEventListener('click',updateJournalClosePrices);
-
-// v283：開啟網頁完成雲端同步後，自動更新一次最新策略日誌日期的收盤價。
-// 僅在已登入管理者模式時執行，避免一般瀏覽模式改動資料。
-let journalClosePriceAutoUpdateStarted=false;
-const autoUpdateJournalClosePricesOnOpen=async()=>{
-    if(journalClosePriceAutoUpdateStarted)return false;
-    journalClosePriceAutoUpdateStarted=true;
-    if(!window.isAdminMode?.())return false;
-    const status=document.getElementById('journal-close-price-status');
-    if(status){
-        status.classList.remove('hidden');
-        status.textContent='開啟網頁｜準備更新收盤價…';
-        status.title='系統會在雲端資料同步完成後自動更新一次收盤價';
-    }
-    return updateJournalClosePrices({auto:true,silent:true});
-};
-
+document.getElementById('btn-update-journal-close-prices')?.addEventListener('click',()=>updateJournalClosePrices({auto:false,silent:false}));
 
 
 const WATCHLIST_PRICE_CACHE_KEY='ryan_watchlist_price_cache_v1';
@@ -11764,9 +11795,32 @@ document.addEventListener('DOMContentLoaded',async()=>{
         });
     });
 
-    loadLocalData(); clearTransientSearchFields(); initStreakBaseDate(); updateStreakModeUI(); initStreakPanelToggle(); renderCustomMarketHolidays(); syncDuplicateCompareToggles(); renderDynamicTags(); bindDatalistAutoUpdate();
-    // v245：預設「不限策略」時直接顯示全部符合其他雷達條件的結果。
-    requestAnimationFrame(()=>{const mode=document.getElementById('streak-tag-filter-mode');if(mode&&!getSelectedStreakTags().length)mode.value='all';renderJournalStreaks();});
+    loadLocalData(); clearTransientSearchFields(); initStreakBaseDate(); updateStreakModeUI(); initStreakPanelToggle(); renderCustomMarketHolidays(); syncDuplicateCompareToggles();
+    if(typeof window.syncCustomTagSettings==='function')window.syncCustomTagSettings();else renderDynamicTags();
+    bindDatalistAutoUpdate();
+    if(window.__ryanStartupPerf)window.__ryanStartupPerf.localReady=performance.now();
+    // v336：策略訊號雷達是啟動時最重的計算之一，改成接近視野或 browser idle 後才第一次分析。
+    const scheduleInitialStreakRender=()=>{
+        let done=false,observer=null;
+        const run=()=>{
+            if(done)return;
+            if(lastJournalStreakResult){done=true;observer?.disconnect();return;}
+            done=true;observer?.disconnect();
+            const mode=document.getElementById('streak-tag-filter-mode');
+            if(mode&&!getSelectedStreakTags().length)mode.value='all';
+            renderJournalStreaks();
+        };
+        const panel=document.getElementById('journal-streak-panel');
+        if(panel&&'IntersectionObserver' in window){
+            observer=new IntersectionObserver(entries=>{
+                if(entries.some(entry=>entry.isIntersecting))run();
+            },{rootMargin:'350px 0px'});
+            observer.observe(panel);
+        }
+        if('requestIdleCallback' in window)requestIdleCallback(run,{timeout:2800});
+        else setTimeout(run,1200);
+    };
+    scheduleInitialStreakRender();
     bindAutoFill('j-code','j-name',c=>updatePreview(c,'j-preview','blue'),true); bindAutoFill('overview-code','overview-name',c=>{if(c)renderStockOverview(c);}); bindAutoFill('c-code','c-name'); bindAutoFill('r-code','r-name',null,true); bindAutoFill('rep-code','rep-name',null,true); bindAutoFill('p-stock','p-name',null,true); bindAutoFill('modal-plan-stock','modal-plan-name',null,true); 
     bindAutoFill('chk-code','chk-name',c=>{
         updatePreview(c,'chk-preview','cyan');
@@ -11797,19 +11851,22 @@ document.addEventListener('DOMContentLoaded',async()=>{
     document.getElementById('filter-futures-fav').checked=!!state.favFilters.futuresOnly;document.getElementById('filter-exclude-negative-growth-fav').checked=!!state.favFilters.excludeNegativeGrowth;document.getElementById('filter-revenue-high-fav').checked=!!state.favFilters.revenueHigh;document.getElementById('filter-large-holder-fav').checked=!!state.favFilters.largeHolder14;document.getElementById('filter-large-holder-consecutive-fav').checked=!!state.favFilters.largeHolderConsecutive;document.getElementById('filter-score-fav').value=String(state.favFilters.minScore||0);
     document.querySelectorAll('#filter-tags-container .filter-tag-cb').forEach(cb=>cb.checked=state.filters.tags.includes(cb.value));document.querySelectorAll('#filter-tags-container-fav .filter-tag-cb').forEach(cb=>cb.checked=state.favFilters.tags.includes(cb.value));renderFilterTags();
 
-    window.addEventListener('pageshow',()=>requestAnimationFrame(()=>{
-        resetSessionFiltersToDefaults(true);clearTransientSearchFields();
-        const activeModuleId=document.querySelector('.tab-content.active')?.id||'module-journal';
-        if(activeModuleId==='module-journal')processAndRenderJournals();
-        else if(activeModuleId==='module-favorites')renderFavorites();
-        else if(activeModuleId==='module-revenue')renderRevenueRecords();
-        else if(activeModuleId==='module-report')renderReports();
-        else if(activeModuleId==='module-plan')renderPlans();
-        else if(activeModuleId==='module-checklist')renderChecklists();
-        else if(activeModuleId==='module-overview')renderStockOverview();
-        // v244：pageshow 不清空策略雷達；只在策略日誌頁需要時重畫。
-        if(activeModuleId==='module-journal'&&lastJournalStreakResult)renderJournalStreaks();
-    }));
+    let initialPageShowSkipped=false;
+    window.addEventListener('pageshow',event=>{
+        if(!event.persisted&&!initialPageShowSkipped){initialPageShowSkipped=true;return;}
+        requestAnimationFrame(()=>{
+            resetSessionFiltersToDefaults(true);clearTransientSearchFields();
+            const activeModuleId=document.querySelector('.tab-content.active')?.id||'module-journal';
+            if(activeModuleId==='module-journal')processAndRenderJournals();
+            else if(activeModuleId==='module-favorites')renderFavorites();
+            else if(activeModuleId==='module-revenue')renderRevenueRecords();
+            else if(activeModuleId==='module-report')renderReports();
+            else if(activeModuleId==='module-plan')renderPlans();
+            else if(activeModuleId==='module-checklist')renderChecklists();
+            else if(activeModuleId==='module-overview')renderStockOverview();
+            if(activeModuleId==='module-journal'&&lastJournalStreakResult)renderJournalStreaks();
+        });
+    });
 
 setChkDirection('long');
 
@@ -11867,9 +11924,19 @@ setChkDirection('long');
         }
     });
 
-    await performDirectCloudSync(false);
-    // v283：頁面開啟時自動更新一次收盤價；不需再手動按按鈕。
-    await autoUpdateJournalClosePricesOnOpen();
+    const runInitialCloudSync=async()=>{
+        if(window.__ryanStartupPerf)window.__ryanStartupPerf.cloudStart=performance.now();
+        try{
+            const ok=await performDirectCloudSync(false);
+            if(window.__ryanStartupPerf){window.__ryanStartupPerf.cloudOk=!!ok;window.__ryanStartupPerf.cloudEnd=performance.now();}
+        }catch(error){
+            if(window.__ryanStartupPerf){window.__ryanStartupPerf.cloudOk=false;window.__ryanStartupPerf.cloudEnd=performance.now();}
+            console.error('初次背景雲端同步失敗',error);
+        }
+    };
+    if('requestIdleCallback' in window)requestIdleCallback(()=>runInitialCloudSync(),{timeout:1500});
+    else setTimeout(()=>runInitialCloudSync(),650);
+    // v335：收盤價維持純手動更新；背景雲端同步不會抓行情。
 });
 </script>
 <script id="responsive-module-optimization">
@@ -13563,7 +13630,7 @@ setChkDirection('long');
     };
   }
 
-  window.renderTrashManager=function(){
+  window.updateTrashNavCount=function(){
     if(!Array.isArray(state.trash))state.trash=[];
     var count=state.trash.length,badge=document.getElementById('trash-nav-count');
     if(badge){
@@ -13571,6 +13638,11 @@ setChkDirection('long');
       badge.classList.toggle('hidden',count===0);
       badge.classList.toggle('flex',count>0);
     }
+    return count;
+  };
+  window.renderTrashManager=function(){
+    if(!Array.isArray(state.trash))state.trash=[];
+    var count=window.updateTrashNavCount();
     var list=document.getElementById('trash-manager-list'),emptyButton=document.getElementById('trash-empty-all');
     if(!list)return;
     if(emptyButton)emptyButton.classList.toggle('hidden',count===0);
@@ -14138,12 +14210,12 @@ setChkDirection('long');
 
   document.addEventListener('DOMContentLoaded',function(){
     var changed=window.ensureOptimizationState();
-    window.syncCustomTagSettings();
     injectOptimizationUI();
     bindOptimizationEvents();
-    renderTagManager();window.renderTrashManager();resetTagForm();
+    window.updateTrashNavCount?.();
+    resetTagForm();
     refreshUndoImportButton();
-    if(changed)saveLocalData();
+    if(changed)scheduleLocalDataSave(180);
   });
 })();
 </script>
@@ -14216,6 +14288,19 @@ setChkDirection('long');
     if(mobileEntry)mobileEntry.setAttribute('aria-label',adminMode?'退出管理者模式':'進入管理者模式');
   }
 
+  function renderActiveAdminModule(){
+    var active=document.querySelector('.tab-content.active');
+    var id=active?active.id:'module-journal';
+    if(id==='module-journal'&&typeof window.processAndRenderJournals==='function')window.processAndRenderJournals();
+    else if(id==='module-favorites'&&typeof window.renderFavorites==='function')window.renderFavorites();
+    else if(id==='module-plan'&&typeof window.renderPlans==='function')window.renderPlans();
+    else if(id==='module-revenue'&&typeof window.renderRevenueRecords==='function')window.renderRevenueRecords();
+    else if(id==='module-report'&&typeof window.renderReports==='function')window.renderReports();
+    else if(id==='module-checklist'&&typeof window.renderChecklists==='function')window.renderChecklists();
+    else if(id==='module-overview'&&typeof window.renderStockOverview==='function')window.renderStockOverview();
+    if(window.__ryanStartupPerf&&!window.__ryanStartupPerf.firstRender)window.__ryanStartupPerf.firstRender=performance.now();
+  }
+
   function applyAdminMode(enabled){
     adminMode=Boolean(enabled);
     document.documentElement.classList.toggle('admin-mode',adminMode);
@@ -14232,8 +14317,7 @@ setChkDirection('long');
       }
       if(typeof window.clearAdminPrivateData==='function')window.clearAdminPrivateData();
     }
-    if(typeof window.processAndRenderJournals==='function')window.processAndRenderJournals();
-    if(typeof window.renderFavorites==='function')window.renderFavorites();
+    renderActiveAdminModule();
   }
 
   window.isAdminMode=function(){return adminMode;};
@@ -14470,7 +14554,9 @@ setChkDirection('long');
   // v327：手動選擇區間日期時完全保留原日期，包括週六、週日與休市日。
   document.addEventListener('DOMContentLoaded',()=>{
     loadCache();
-    fetchTwseHolidays();
+    const refresh=()=>fetchTwseHolidays();
+    if('requestIdleCallback' in window)requestIdleCallback(refresh,{timeout:2600});
+    else setTimeout(refresh,1600);
   });
 
   // 供既有篩選、清除篩選、左右日期箭頭與自訂休市日共用。
@@ -14600,6 +14686,11 @@ setChkDirection('long');
   const missing=required.filter(id=>!q(id));results.push(missing.length?item('error','核心模組／表單完整性',`缺少：${missing.join('、')}`):item('pass','核心模組／表單完整'));
   const navTargets=[...new Set([...document.querySelectorAll('[data-target^="module-"],[data-mobile-more-target^="module-"]')].map(el=>el.dataset.target||el.dataset.mobileMoreTarget).filter(Boolean))],orphan=navTargets.filter(id=>!q(id));
   results.push(orphan.length?item('error','導覽目標完整性',`找不到：${orphan.join('、')}`):item('pass',`導覽目標完整（${navTargets.length} 個模組）`));
+  const perf=window.__ryanStartupPerf||{},fmtMs=value=>Number.isFinite(value)&&value>0?`${Math.round(value)} ms`:'尚未完成';
+  const firstMs=perf.firstRender?perf.firstRender-perf.start:0,localMs=perf.localReady?perf.localReady-perf.start:0,cloudMs=(perf.cloudEnd&&perf.cloudStart)?perf.cloudEnd-perf.cloudStart:0;
+  if(firstMs)results.push(firstMs>1200?item('warn','首畫面可操作時間',fmtMs(firstMs)):item('pass','首畫面可操作時間',fmtMs(firstMs)));
+  if(localMs)results.push(localMs>900?item('warn','本機資料初始化',fmtMs(localMs)):item('pass','本機資料初始化',fmtMs(localMs)));
+  if(perf.cloudStart)results.push(perf.cloudEnd?item(perf.cloudOk===false?'warn':'pass','背景雲端同步',`${fmtMs(cloudMs)}｜不阻塞首畫面`):item('warn','背景雲端同步','同步中｜不阻塞首畫面'));
   const pending=(()=>{try{return JSON.parse(localStorage.getItem('ryan_pending_cloud_writes_v1')||'[]')}catch(e){return[]}})();results.push(pending.length?item('warn','雲端待同步資料',`${pending.length} 筆等待同步`):item('pass','沒有待同步雲端資料'));
   const bytes=(()=>{try{return new Blob(Object.values(localStorage)).size}catch(e){return 0}})();results.push(bytes>4_500_000?item('warn','localStorage 使用量偏高',`${(bytes/1024/1024).toFixed(2)} MB`):item('pass','localStorage 使用量',`${(bytes/1024/1024).toFixed(2)} MB`));
   const rowCount=document.querySelectorAll('tbody tr').length;results.push(rowCount>1200?item('warn','目前 DOM 表格列數偏多',`${rowCount} 列，建議縮小篩選區間`):item('pass','DOM 表格列數正常',`${rowCount} 列`));
