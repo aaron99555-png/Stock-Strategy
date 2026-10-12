@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="338" name="app-version"/>
+<meta content="339" name="app-version"/>
 <script id="startup-performance-bootstrap">
 window.__ryanStartupPerf={start:performance.now(),localReady:0,firstRender:0,cloudStart:0,cloudEnd:0,cloudOk:null};
 </script>
@@ -4267,6 +4267,20 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 }
 </style>
 
+
+<style id="special-attention-multiselect-v339">
+#form-tags-container .tag-input[data-special-attention="1"]:checked + .journal-form-tag-btn{
+  box-shadow:0 0 0 2px rgba(244,63,94,.22),0 6px 14px rgba(244,63,94,.14)!important;
+}
+#form-tags-container .tag-input[data-special-attention="1"] + .journal-form-tag-btn::after{
+  content:"可複選";
+  margin-left:.38rem;
+  font-size:8px;
+  font-weight:900;
+  opacity:.72;
+}
+</style>
+
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen flex flex-col antialiased">
 <nav class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-50 transition-colors duration-300">
@@ -4372,7 +4386,7 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 </div>
 <div class="journal-tag-category-card journal-tag-category-card-purple flex flex-col">
 <div aria-controls="form-tags-wrapper" aria-expanded="false" class="journal-tag-category-title flex justify-between items-center w-full cursor-pointer group" id="toggle-tags-btn" role="button" tabindex="0">
-<span class="block text-xs sm:text-sm font-black text-purple-700 dark:text-purple-200 tracking-wide group-hover:text-purple-600 dark:group-hover:text-purple-100 transition-colors select-none pointer-events-none">策略標籤 <span class="text-purple-500/80 dark:text-purple-300/80 font-medium ml-1">(單選，可不選)</span><span class="text-[10px] sm:text-xs text-purple-400 dark:text-purple-300/70 font-normal ml-2">(點擊展開/收合)</span></span>
+<span class="block text-xs sm:text-sm font-black text-purple-700 dark:text-purple-200 tracking-wide group-hover:text-purple-600 dark:group-hover:text-purple-100 transition-colors select-none pointer-events-none">策略標籤 <span class="text-purple-500/80 dark:text-purple-300/80 font-medium ml-1">(主策略單選＋特別關注可複選)</span><span class="text-[10px] sm:text-xs text-purple-400 dark:text-purple-300/70 font-normal ml-2">(點擊展開/收合)</span></span>
 <div class="flex items-center gap-1">
 <button aria-label="釘選策略標籤" aria-pressed="false" class="w-7 h-7 rounded-lg text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition active:scale-95" id="strategy-tags-pin-btn" title="釘選常駐" type="button"><i class="fa-solid fa-thumbtack pointer-events-none text-xs"></i></button>
 <div class="p-1 pointer-events-none"><i class="fa-solid fa-chevron-down text-gray-400 transition-transform duration-300 group-hover:text-blue-500" id="tags-chevron"></i></div>
@@ -5681,6 +5695,16 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 - 資料庫重複列的 EPS／股期欄位若最高目標價那列為空白，會由同股票其他有效列補齊，不覆蓋最高目標價所屬券商與報告日期。
 - 匯入預覽會明確顯示「同股取最高目標價」及被擇優淘汰的重複筆數。
 -->
+<!-- v339：
+【策略日誌－特別關注可搭配其他標籤複選】
+- 「特別追蹤」與「總編概念股」改為附加型標籤，可與其他主策略同時勾選。
+- 兩個特別關注標籤彼此也可以同時複選。
+- 其他基本面／動能／籌碼／技術／會員標籤仍維持原本「主策略單選」邏輯，避免改變既有快速輸入習慣。
+- 新增策略日誌時會一次寫入目前勾選的主策略＋特別關注標籤。
+- 同日同股已存在時，只補上尚未存在的標籤，不重複加入。
+- 右下角通知會列出本次實際新增的標籤。
+- 特別關注勾選狀態會獨立記憶，快速連續輸入下一檔時可持續使用。
+-->
 <!-- 核心 JavaScript -->
 <script>
 const originalDateSetter=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set;
@@ -5852,6 +5876,9 @@ const TAG_CATEGORIES = [
     {title: "📈 技術指標", theme: "teal", tags: ["OBV突破", "MACD突破", "KD金叉"]},
     {title: "🌱 快樂農夫與他的韭菜田投資週報", theme: "purple", tags: ["黑卡會員", "尊耀會員", "頂峰會員", "鐵粉會員"]}
 ];
+
+const SPECIAL_ATTENTION_TAGS=new Set(['特別追蹤','總編概念股']);
+const isSpecialAttentionTag=tag=>SPECIAL_ATTENTION_TAGS.has(normalizeStrategyTagName(tag));
 
 const STRATEGY_TAG_ALIASES={'一條根':'一陽指','跳空缺口':'缺口','1日籌碼集中':'1日籌碼集中度','阿婆散步':'小碎步','阿甘步伐':'小碎步','總編認同':'總編概念股','籌碼集中集中大戶增':'籌碼集中大戶增'};
 const DEPRECATED_STRATEGY_TAGS=new Set(['法人加持','非凡重點']);
@@ -6988,13 +7015,25 @@ const setupLogicBtns=(sel,fKey,cb)=>{
 };
 
 const JOURNAL_FORM_TAG_KEY='ryan_journal_form_tag_v1';
-let rememberedJournalFormTag='';
-try{rememberedJournalFormTag=localStorage.getItem(JOURNAL_FORM_TAG_KEY)||'';}catch(error){}
+const JOURNAL_FORM_SPECIAL_TAGS_KEY='ryan_journal_form_special_tags_v1';
+let rememberedJournalFormTag='',rememberedJournalSpecialTags=[];
+try{
+    rememberedJournalFormTag=localStorage.getItem(JOURNAL_FORM_TAG_KEY)||'';
+    const rawSpecial=JSON.parse(localStorage.getItem(JOURNAL_FORM_SPECIAL_TAGS_KEY)||'[]');
+    rememberedJournalSpecialTags=(Array.isArray(rawSpecial)?rawSpecial:[]).map(normalizeStrategyTagName).filter(tag=>SPECIAL_ATTENTION_TAGS.has(tag));
+}catch(error){rememberedJournalSpecialTags=[];}
 const rememberJournalFormTag=tag=>{
     rememberedJournalFormTag=String(tag||'');
     try{
         if(rememberedJournalFormTag)localStorage.setItem(JOURNAL_FORM_TAG_KEY,rememberedJournalFormTag);
         else localStorage.removeItem(JOURNAL_FORM_TAG_KEY);
+    }catch(error){}
+};
+const rememberJournalSpecialTags=tags=>{
+    rememberedJournalSpecialTags=[...new Set((Array.isArray(tags)?tags:[]).map(normalizeStrategyTagName).filter(tag=>SPECIAL_ATTENTION_TAGS.has(tag)))];
+    try{
+        if(rememberedJournalSpecialTags.length)localStorage.setItem(JOURNAL_FORM_SPECIAL_TAGS_KEY,JSON.stringify(rememberedJournalSpecialTags));
+        else localStorage.removeItem(JOURNAL_FORM_SPECIAL_TAGS_KEY);
     }catch(error){}
 };
 
@@ -7198,21 +7237,25 @@ window.updateJournalTagFilledState=updateJournalTagFilledState;
 
 function renderDynamicTags(){
     const fc=document.getElementById('form-tags-container');
-    const currentFormTag=fc?.querySelector('.tag-input:checked')?.value||rememberedJournalFormTag;
+    const checkedBefore=fc?[...fc.querySelectorAll('.tag-input:checked')].map(input=>normalizeStrategyTagName(input.value)).filter(Boolean):[];
+    const currentFormTag=checkedBefore.find(tag=>!SPECIAL_ATTENTION_TAGS.has(tag))||rememberedJournalFormTag;
+    const currentSpecialTags=checkedBefore.filter(tag=>SPECIAL_ATTENTION_TAGS.has(tag));
     if(currentFormTag)rememberJournalFormTag(currentFormTag);
+    if(currentSpecialTags.length)rememberJournalSpecialTags(currentSpecialTags);
     if(fc)fc.innerHTML=TAG_CATEGORIES.map(c=>{
         const isFarmer=String(c.title||'')==='🌱 快樂農夫與他的韭菜田投資週報';
+        const isSpecialCategory=String(c.title||'').includes('特別關注');
         const content=c.tags.map(t=>{
             const theme=window.getManagedTagTheme?.(t,c.theme)||c.theme;
             const req=window.getManagedTagRequirement?.(t)||{cadence:'none',color:'amber',hex:'#f59e0b'};
             const required=['irregular','closing','afterClose','weekly','monthly'].includes(req.cadence);
             const badge=req.cadence==='irregular'?'不定時':req.cadence==='closing'?'尾盤':req.cadence==='afterClose'?'盤後':req.cadence==='weekly'?'每週':req.cadence==='monthly'?'每月':'';
-            return`<label class="cursor-pointer relative"><input type="checkbox" value="${escapeHTML(t)}" class="hidden tag-input" data-theme="${theme}"><div class="journal-form-tag-btn px-3 py-1.5 rounded-lg text-xs font-bold border transition active:scale-95 ${THEME_MAP[theme].inactive}" ${required?`style="box-shadow:0 0 0 2px ${req.hex} inset,0 0 0 1px ${req.hex};"`:''}>${escapeHTML(t)}${required?`<span class="ml-1.5 inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-black text-white align-middle" style="background:${req.hex}">${badge}</span>`:''}<span class="journal-tag-filled-badge hidden ml-1.5 inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-black align-middle">✓ 已填</span></div></label>`;
+            return`<label class="cursor-pointer relative"><input type="checkbox" value="${escapeHTML(t)}" class="hidden tag-input" data-theme="${theme}" data-special-attention="${isSpecialAttentionTag(t)?'1':'0'}"><div class="journal-form-tag-btn px-3 py-1.5 rounded-lg text-xs font-bold border transition active:scale-95 ${THEME_MAP[theme].inactive}" ${required?`style="box-shadow:0 0 0 2px ${req.hex} inset,0 0 0 1px ${req.hex};"`:''}>${escapeHTML(t)}${required?`<span class="ml-1.5 inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-black text-white align-middle" style="background:${req.hex}">${badge}</span>`:''}<span class="journal-tag-filled-badge hidden ml-1.5 inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-black align-middle">✓ 已填</span></div></label>`;
         }).join('');
         if(isFarmer){
             return`<div class="journal-tag-category-card journal-tag-category-card-purple"><div class="journal-tag-category-title"><div class="text-xs sm:text-sm font-black text-purple-700 dark:text-purple-200">${escapeHTML(c.title)}</div></div><div class="journal-tag-category-body"><div class="flex flex-wrap gap-2">${content}</div></div></div>`;
         }
-        return`<div><div class="text-xs font-bold text-gray-500 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 pb-1 mb-2">${escapeHTML(c.title)}</div><div class="flex flex-wrap gap-2">${content}</div></div>`;
+        return`<div><div class="text-xs font-bold text-gray-500 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 pb-1 mb-2 flex items-center gap-2">${escapeHTML(c.title)}${isSpecialCategory?'<span class="inline-flex items-center rounded-full bg-rose-100 dark:bg-rose-900/40 text-rose-700 dark:text-rose-300 px-2 py-0.5 text-[9px] font-black">可搭配其他標籤複選</span>':''}</div><div class="flex flex-wrap gap-2">${content}</div></div>`;
     }).join('');
     window.renderTagRequirementReminder?.();
     
@@ -7228,18 +7271,31 @@ function renderDynamicTags(){
         else{btn.classList.remove(...activeClasses,'shadow-md');btn.classList.add(...inactiveClasses);}
     };
     const journalTagInputs=Array.from(document.querySelectorAll('.tag-input'));
-    if(rememberedJournalFormTag&&!journalTagInputs.some(cb=>cb.value===rememberedJournalFormTag))rememberJournalFormTag('');
+    const isSpecialInput=input=>input?.dataset.specialAttention==='1'||SPECIAL_ATTENTION_TAGS.has(normalizeStrategyTagName(input?.value));
+    if(rememberedJournalFormTag&&!journalTagInputs.some(cb=>cb.value===rememberedJournalFormTag&&!isSpecialInput(cb)))rememberJournalFormTag('');
+    rememberedJournalSpecialTags=rememberedJournalSpecialTags.filter(tag=>journalTagInputs.some(cb=>normalizeStrategyTagName(cb.value)===tag&&isSpecialInput(cb)));
     journalTagInputs.forEach(cb=>{
-        cb.checked=Boolean(rememberedJournalFormTag&&cb.value===rememberedJournalFormTag);
+        const normalized=normalizeStrategyTagName(cb.value);
+        cb.checked=isSpecialInput(cb)
+            ? rememberedJournalSpecialTags.includes(normalized)
+            : Boolean(rememberedJournalFormTag&&normalized===normalizeStrategyTagName(rememberedJournalFormTag));
         updateTagInputVisual(cb);
         cb.addEventListener('change',function(){
-            if(this.checked){
-                journalTagInputs.forEach(other=>{
-                    if(other!==this&&other.checked){other.checked=false;updateTagInputVisual(other);}
-                });
-                rememberJournalFormTag(this.value);
-            }else if(!journalTagInputs.some(other=>other.checked)){
-                rememberJournalFormTag('');
+            if(isSpecialInput(this)){
+                // 特別關注屬於附加標籤：可同時勾「特別追蹤＋總編概念股」，
+                // 也不會取消目前選好的主策略標籤。
+                const selectedSpecial=journalTagInputs.filter(input=>isSpecialInput(input)&&input.checked).map(input=>normalizeStrategyTagName(input.value));
+                rememberJournalSpecialTags(selectedSpecial);
+            }else{
+                // 其他分類仍維持單一主策略，避免改變既有快速輸入操作習慣。
+                if(this.checked){
+                    journalTagInputs.forEach(other=>{
+                        if(other!==this&&!isSpecialInput(other)&&other.checked){other.checked=false;updateTagInputVisual(other);}
+                    });
+                    rememberJournalFormTag(this.value);
+                }else if(!journalTagInputs.some(other=>!isSpecialInput(other)&&other.checked)){
+                    rememberJournalFormTag('');
+                }
             }
             updateTagInputVisual(this);
         });
@@ -10274,10 +10330,15 @@ document.getElementById('journal-form')?.addEventListener('submit', async e => {
     const status = normalizeJournalStatus(document.getElementById('j-status').value);
     if (!d) return showToast('請選擇日期', 'error');
 
-    const selectedTag = document.querySelector('.tag-input:checked')?.value || '';
-    const normalizedSelectedTag=normalizeStrategyTagName(selectedTag);
-    const tags = selectedTag ? [selectedTag] : [];
-    rememberJournalFormTag(selectedTag);
+    const selectedTags=[...document.querySelectorAll('.tag-input:checked')]
+        .map(input=>normalizeStrategyTagName(input.value))
+        .filter(Boolean);
+    const normalizedSelectedTags=[...new Set(selectedTags)];
+    const primarySelectedTag=normalizedSelectedTags.find(tag=>!SPECIAL_ATTENTION_TAGS.has(tag))||'';
+    const selectedSpecialTags=normalizedSelectedTags.filter(tag=>SPECIAL_ATTENTION_TAGS.has(tag));
+    const tags=[...normalizedSelectedTags];
+    rememberJournalFormTag(primarySelectedTag);
+    rememberJournalSpecialTags(selectedSpecialTags);
     
     state.codeToName[c] = n;
     state.nameToCode[n] = c;
@@ -10286,18 +10347,24 @@ document.getElementById('journal-form')?.addEventListener('submit', async e => {
     const existingIdx = state.journals.findIndex(x => x.date === d && x.code === c);
     
     if (existingIdx !== -1) {
-        // 同日同股維持一列；每次只選一個策略，但不同策略會累加顯示。
+        // 同日同股維持一列；主策略仍單選，但「特別關注」可與主策略／另一個特別關注標籤同時加入。
         const existing = state.journals[existingIdx];
         normalizeStrategyTags([existing]);
         normalizeJournalLifecycle(existing);
-        const duplicateStrategy=Boolean(selectedTag&&(existing.tags||[]).includes(normalizedSelectedTag));
-        const exactTag=!selectedTag||duplicateStrategy,exactNote=!nt||String(existing.notes||'').includes(nt),exactStatus=normalizeJournalStatus(existing.status)===status;
-        if(duplicateStrategy)playStockNoticeSound('duplicate',`journal-duplicate:${d}:${c}:${normalizedSelectedTag}`);
+        const existingTagSet=new Set((existing.tags||[]).map(normalizeStrategyTagName).filter(Boolean));
+        const duplicateStrategies=normalizedSelectedTags.filter(tag=>existingTagSet.has(tag));
+        const newStrategies=normalizedSelectedTags.filter(tag=>!existingTagSet.has(tag));
+        const exactTag=!normalizedSelectedTags.length||newStrategies.length===0,
+              exactNote=!nt||String(existing.notes||'').includes(nt),
+              exactStatus=normalizeJournalStatus(existing.status)===status;
+        if(normalizedSelectedTags.length&&duplicateStrategies.length===normalizedSelectedTags.length){
+            playStockNoticeSound('duplicate',`journal-duplicate:${d}:${c}:${normalizedSelectedTags.join('+')}`);
+        }
         if(exactTag&&exactNote&&exactStatus){
-            const tagNotice=normalizedSelectedTag||'未選策略標籤';
+            const tagNotice=normalizedSelectedTags.length?normalizedSelectedTags.join('、'):'未選策略標籤';
             return showToast(`${c} ${n}｜${tagNotice} 已存在，未重複新增`,'error');
         }
-        if(tags.length)existing.tags=[...new Set([...(existing.tags||[]),normalizeStrategyTagName(tags[0])])];
+        if(normalizedSelectedTags.length)existing.tags=[...new Set([...(existing.tags||[]).map(normalizeStrategyTagName).filter(Boolean),...normalizedSelectedTags])];
         
         if (nt && existing.notes !== nt && !(existing.notes || '').includes(nt)) {
             existing.notes = existing.notes ? existing.notes + '；' + nt : nt;
@@ -10311,17 +10378,16 @@ document.getElementById('journal-form')?.addEventListener('submit', async e => {
         scheduleJournalFastEntryRender();
         queueJournalCloudWrite(`journals/${existing.id}`,existing);
         {
-            const tagNotice=normalizedSelectedTag||'未選策略標籤';
+            const tagNotice=normalizedSelectedTags.length?normalizedSelectedTags.join('、'):'未選策略標籤';
+            const addedNotice=newStrategies.length?newStrategies.join('、'):'';
             showToast(
-                duplicateStrategy
-                    ?`${c} ${n}｜${tagNotice} 已存在，已更新備註／狀態`
-                    :`${c} ${n}｜已加入標籤：${tagNotice}`,
-                duplicateStrategy?'error':'success'
+                addedNotice
+                    ?`${c} ${n}｜已加入標籤：${addedNotice}`
+                    :`${c} ${n}｜${tagNotice} 已存在，已更新備註／狀態`,
+                addedNotice?'success':'error'
             );
         }
-        if(HORSE_NEW_ENTRY_TAGS.has(normalizedSelectedTag)){
-            showHorseNewEntryNotice(existing,normalizedSelectedTag);
-        }
+        newStrategies.filter(tag=>HORSE_NEW_ENTRY_TAGS.has(tag)).forEach(tag=>showHorseNewEntryNotice(existing,tag));
     } else {
         // 如果不存在，則建立新資料
         const id = generateId();
@@ -10346,12 +10412,10 @@ document.getElementById('journal-form')?.addEventListener('submit', async e => {
         scheduleJournalFastEntryRender();
         queueJournalCloudWrite(`journals/${id}`,p);
         {
-            const tagNotice=normalizedSelectedTag||'未選策略標籤';
+            const tagNotice=normalizedSelectedTags.length?normalizedSelectedTags.join('、'):'未選策略標籤';
             showToast(`${c} ${n}｜策略日誌已加入｜標籤：${tagNotice}`);
         }
-        if(HORSE_NEW_ENTRY_TAGS.has(normalizedSelectedTag)){
-            showHorseNewEntryNotice(p,normalizedSelectedTag);
-        }
+        normalizedSelectedTags.filter(tag=>HORSE_NEW_ENTRY_TAGS.has(tag)).forEach(tag=>showHorseNewEntryNotice(p,tag));
     }
     
     // 成功新增／更新時，resetJournalFastEntryFields 已先處理清空與 focus。
