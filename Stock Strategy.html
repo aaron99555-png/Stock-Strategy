@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="337" name="app-version"/>
+<meta content="338" name="app-version"/>
 <script id="startup-performance-bootstrap">
 window.__ryanStartupPerf={start:performance.now(),localReady:0,firstRender:0,cloudStart:0,cloudEnd:0,cloudOk:null};
 </script>
@@ -4291,7 +4291,7 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 <button aria-label="系統自檢" class="relative w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 transition shadow-sm flex items-center justify-center" data-admin-mobile-tool="" id="btn-system-health" title="系統自檢／Runtime 診斷" type="button"><i class="fa-solid fa-shield-halved"></i><span class="absolute -right-1 -top-1 hidden min-w-[16px] h-4 px-1 rounded-full text-[8px] leading-4 text-white bg-red-500" id="system-health-badge"></span></button>
 <button aria-label="全站快速查股" class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/60 transition shadow-sm flex items-center justify-center" id="btn-global-search" title="全站快速查股（Ctrl／⌘＋K）" type="button"><i class="fa-solid fa-magnifying-glass"></i></button>
 <button aria-label="進入管理者模式" class="h-8 sm:h-9 px-2 sm:px-2.5 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors shadow-sm flex items-center justify-center" id="btn-admin-mode" title="管理者模式" type="button"><i class="fa-solid fa-lock text-sm"></i><span class="hidden 2xl:inline ml-1.5 text-xs font-medium">管理者</span></button>
-<button class="hidden sm:flex text-xs sm:text-sm bg-purple-50 dark:bg-purple-900/40 hover:bg-purple-100 dark:hover:bg-purple-800/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-700/50 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm items-center font-medium active:scale-95" id="btn-db-upload" onclick="document.getElementById('excel-upload').click()" title="上傳參考資料庫或國內券商評估報告" type="button"><i class="fa-solid fa-database sm:mr-1.5"></i><span class="hidden sm:inline">快速更新</span></button>
+<button class="hidden sm:flex text-xs sm:text-sm bg-purple-50 dark:bg-purple-900/40 hover:bg-purple-100 dark:hover:bg-purple-800/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-700/50 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm items-center font-medium active:scale-95" id="btn-db-upload" onclick="document.getElementById('excel-upload').click()" title="上傳參考資料庫或國內券商評估報告；同一股票出現多次時自動採最高目標價" type="button"><i class="fa-solid fa-database sm:mr-1.5"></i><span class="hidden sm:inline">快速更新</span></button>
 <input accept=".xlsx, .xls" class="hidden" id="excel-upload" type="file"/>
 <button class="hidden sm:flex text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm items-center active:scale-95" id="btn-import-backup" onclick="document.getElementById('backup-file').click()"><i class="fa-solid fa-upload sm:mr-1.5"></i><span class="hidden sm:inline">匯入</span></button>
 <button class="hidden sm:flex text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm items-center active:scale-95" id="btn-export-backup"><i class="fa-solid fa-download sm:mr-1.5"></i><span class="hidden sm:inline">匯出</span></button>
@@ -5672,6 +5672,14 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 - 圖示／文字間距縮小，長名稱仍可自然換行。
 - 桌機主內容上方 padding 由原本 sm:py-6 的約 24px 收斂為 8px，讓導覽列與第一個內容區塊更緊湊。
 - 手機版導覽列不受此調整影響。
+-->
+<!-- v338：
+【快速更新－同一股票採最高目標價】
+- 「快速更新」匯入國內券商評估報告時，同一股票若出現多筆，不再以最新日期優先，改為直接採最高目標價。
+- 若同一股票最高目標價相同，再取報告日期較新的那一筆；仍相同則取 Excel 較後列。
+- EPS／目標價資料庫快速更新也套用相同規則：同代號重複不再列為格式錯誤，會自動整併並保留最高目標價。
+- 資料庫重複列的 EPS／股期欄位若最高目標價那列為空白，會由同股票其他有效列補齊，不覆蓋最高目標價所屬券商與報告日期。
+- 匯入預覽會明確顯示「同股取最高目標價」及被擇優淘汰的重複筆數。
 -->
 <!-- 核心 JavaScript -->
 <script>
@@ -13882,6 +13890,32 @@ setChkDirection('long');
     var year=Number(matched[1]),month=Number(matched[2]),day=Number(matched[3]),date=new Date(Date.UTC(year,month-1,day));
     return date.getUTCFullYear()===year&&date.getUTCMonth()===month-1&&date.getUTCDate()===day;
   }
+  function chooseHighestTargetImportItem(current,candidate){
+    if(!current)return candidate;
+    if(!candidate)return current;
+    var currentTarget=Number(current.targetPrice),candidateTarget=Number(candidate.targetPrice),
+        currentHasTarget=Number.isFinite(currentTarget)&&currentTarget>0,
+        candidateHasTarget=Number.isFinite(candidateTarget)&&candidateTarget>0;
+    if(currentHasTarget!==candidateHasTarget)return candidateHasTarget?candidate:current;
+    if(currentHasTarget&&candidateTarget!==currentTarget)return candidateTarget>currentTarget?candidate:current;
+    var currentDate=String(current.reportDate||''),candidateDate=String(candidate.reportDate||'');
+    if(candidateDate!==currentDate)return candidateDate>currentDate?candidate:current;
+    return Number(candidate.sourceRow||0)>=Number(current.sourceRow||0)?candidate:current;
+  }
+  function mergeDatabaseDuplicateImportItem(current,candidate){
+    if(!current)return candidate;
+    var winner=chooseHighestTargetImportItem(current,candidate),
+        loser=winner===candidate?current:candidate,
+        merged=Object.assign({},winner);
+    // 目標價、券商、報告日期以「最高目標價」那一列為準；
+    // EPS / 股期若擇優列是空白，才由另一列補齊，避免資訊被白白丟掉。
+    ['eps2025','eps2026','epsGrowth','futures'].forEach(function(key){
+      if((merged[key]===undefined||merged[key]===null||merged[key]==='')&&
+         loser[key]!==undefined&&loser[key]!==null&&loser[key]!=='')merged[key]=loser[key];
+    });
+    if(!merged.name&&loser.name)merged.name=loser.name;
+    return merged;
+  }
   function parseBrokerReportWorkbook(workbook){
     var source=getBrokerReportSource(workbook);
     if(!source)return null;
@@ -13904,12 +13938,12 @@ setChkDirection('long');
       if(issues.length){invalidRows++;rowErrors.push({rowNumber:source.headerIndex+rowOffset+2,code:code||String(rawCode||'').trim()||'—',name:name||'—',fields:issues.map(function(issue){return issue.field;}),messages:issues.map(function(issue){return issue.field+'：'+issue.reason;})});return;}
       validRows++;
       var item={code:code,name:name,broker:broker,targetPrice:targetPrice,reportDate:date,sourceRow:source.headerIndex+rowOffset+2},current=bestByCode.get(code);
-      if(!current||item.reportDate>current.reportDate||(item.reportDate===current.reportDate&&item.targetPrice>current.targetPrice))bestByCode.set(code,item);
+      bestByCode.set(code,chooseHighestTargetImportItem(current,item));
     });
     var existingCodes=new Set(Object.keys(state.epsData||{}).map(normalizeStockCodeValue)),entries=Array.from(bestByCode.values()).sort(function(a,b){return a.code.localeCompare(b.code,'zh-Hant',{numeric:true});}).map(function(item){return{item:item,key:item.code,isDuplicate:existingCodes.has(item.code)};});
-    var module={key:'brokerReport',label:'券商目標價（每檔已擇優）',entries:entries,newCount:entries.filter(function(entry){return!entry.isDuplicate;}).length,duplicateCount:entries.filter(function(entry){return entry.isDuplicate;}).length,invalidCount:invalidRows};
+    var module={key:'brokerReport',label:'券商目標價（同股取最高）',entries:entries,newCount:entries.filter(function(entry){return!entry.isDuplicate;}).length,duplicateCount:entries.filter(function(entry){return entry.isDuplicate;}).length,invalidCount:invalidRows};
     var preview=buildImportPreview('brokerReport','券商評估報告快速更新', [module]);
-    preview.description=invalidRows?'已完成擇優，但發現 '+invalidRows+' 列欄位異常；異常資料不會匯入。':'已依股票代號分組，先取最新日期；同日多筆再取最高目標價。';
+    preview.description=(invalidRows?'發現 '+invalidRows+' 列欄位異常，異常資料不會匯入；':'')+'同一股票出現多次時，固定採「最高目標價」；若最高目標價相同，再取較新的報告日期。';
     preview.sourceCount=validRows+invalidRows;preview.selectedCount=entries.length;preview.discardedCount=Math.max(0,validRows-entries.length);
     preview.details=entries.map(function(entry){return entry.item;});preview.errors=rowErrors;preview.hasBlockingErrors=false;
     return preview;
@@ -13981,10 +14015,10 @@ setChkDirection('long');
       var missingModule={key:'database',label:'EPS／目標價參考資料庫',entries:[],newCount:0,duplicateCount:0,invalidCount:source.missingHeaders.length},missingPreview=buildImportPreview('database','EPS／目標價資料庫格式錯誤',[missingModule]);
       missingPreview.description='必要欄位標題不完整，請修正後重新上傳。';missingPreview.hasBlockingErrors=true;missingPreview.errors=[{rowNumber:'標題列',code:'—',name:'—',fields:source.missingHeaders,messages:source.missingHeaders.map(function(field){return'缺少必要欄位「'+field+'」';})}];return missingPreview;
     }
-    var existingCodes=new Set(Object.keys(state.epsData||{}).map(normalizeStockCodeValue)),acceptedCodeRows=new Map(),entries=[],rowErrors=[],validRows=0,invalidRows=0;
+    var existingCodes=new Set(Object.keys(state.epsData||{}).map(normalizeStockCodeValue)),bestByCode=new Map(),rowErrors=[],validRows=0,invalidRows=0,duplicateRows=0;
     source.rows.forEach(function(cells,rowOffset){
       cells=Array.isArray(cells)?cells:[];if(cells.every(function(value){return value==null||String(value).trim()==='';}))return;
-      var map=source.headerMap,rowNumber=source.headerIndex+rowOffset+2,rawCode=cells[map.code],rawName=cells[map.name],code=normalizeStockCodeValue(rawCode),name=String(rawName||'').trim(),issues=[],item={code:code,name:name};
+      var map=source.headerMap,rowNumber=source.headerIndex+rowOffset+2,rawCode=cells[map.code],rawName=cells[map.name],code=normalizeStockCodeValue(rawCode),name=String(rawName||'').trim(),issues=[],item={code:code,name:name,sourceRow:rowNumber};
       if(rawCode==null||String(rawCode).trim()==='')issues.push({field:'股票代號',reason:'不得空白'});else if(!isValidStockCode(code))issues.push({field:'股票代號',reason:'格式無效，需為 4～6 碼股票代號'});
       if(!name)issues.push({field:'股名／公司名稱',reason:'不得空白'});else if(!isSafeImportedLabel(name,40))issues.push({field:'股名／公司名稱',reason:'含不支援符號或超過 40 字'});
       [['eps2025','114年／2025 EPS',false],['eps2026','115年／2026 EPS',false],['epsGrowth','EPS成長率',true]].forEach(function(config){
@@ -13995,15 +14029,22 @@ setChkDirection('long');
       if(map.broker>=0&&!isImportedBlankMarker(cells[map.broker])){var broker=String(cells[map.broker]).trim();if(!isSafeImportedLabel(broker,40))issues.push({field:'券商',reason:'含不支援符號或超過 40 字'});else item.broker=broker;}
       if(map.reportDate>=0&&!isImportedBlankMarker(cells[map.reportDate])){var reportDate=normalizeImportDate(cells[map.reportDate]);if(!isValidImportedDate(reportDate))issues.push({field:'報告日期',reason:'格式無效，請使用 YYYY/MM/DD 或有效的 Excel 日期'});else item.reportDate=reportDate;}
       if(map.futures>=0&&!isImportedBlankMarker(cells[map.futures])){var futuresText=String(cells[map.futures]).trim().toUpperCase(),yesValues=['●','是','Y','YES','1','有'],noValues=['否','N','NO','0','無','-','—'];if(yesValues.includes(futuresText))item.futures='●';else if(noValues.includes(futuresText))item.futures=null;else issues.push({field:'股期',reason:'僅接受「●、是、Y」或「否、N」'});}
-      if(!issues.length&&acceptedCodeRows.has(code))issues.push({field:'股票代號',reason:'檔案內重複，前一筆位於 Excel 第 '+acceptedCodeRows.get(code)+' 列'});
       if(issues.length){invalidRows++;rowErrors.push({rowNumber:rowNumber,code:code||String(rawCode||'').trim()||'—',name:name||'—',fields:issues.map(function(issue){return issue.field;}),messages:issues.map(function(issue){return issue.field+'：'+issue.reason;})});return;}
-      acceptedCodeRows.set(code,rowNumber);validRows++;entries.push({item:item,key:code,isDuplicate:existingCodes.has(code)});
+      validRows++;
+      var current=bestByCode.get(code);
+      if(current)duplicateRows++;
+      bestByCode.set(code,mergeDatabaseDuplicateImportItem(current,item));
     });
     if(!validRows&&!invalidRows){invalidRows=1;rowErrors.push({rowNumber:'資料區',code:'—',name:'—',fields:['資料'],messages:['找不到可匯入的資料列']});}
-    var module={key:'database',label:'EPS／目標價參考資料庫',entries:entries,newCount:entries.filter(function(entry){return!entry.isDuplicate;}).length,duplicateCount:entries.filter(function(entry){return entry.isDuplicate;}).length,invalidCount:invalidRows},preview=buildImportPreview('database','EPS／目標價資料庫匯入預覽',[module]);
+    var entries=Array.from(bestByCode.values()).sort(function(a,b){return a.code.localeCompare(b.code,'zh-Hant',{numeric:true});}).map(function(item){
+      return{item:item,key:item.code,isDuplicate:existingCodes.has(item.code)};
+    });
+    var module={key:'database',label:'EPS／目標價參考資料庫（同股取最高目標價）',entries:entries,newCount:entries.filter(function(entry){return!entry.isDuplicate;}).length,duplicateCount:entries.filter(function(entry){return entry.isDuplicate;}).length,invalidCount:invalidRows},preview=buildImportPreview('database','EPS／目標價資料庫匯入預覽',[module]);
     var detected2026=source.headerMap.eps2026>=0,sourceSheetText=source.sheetName?'工作表「'+source.sheetName+'」；':'';
-    preview.description=sourceSheetText+(detected2026?'已辨識「'+String(source.headers[source.headerMap.eps2026]||'預估2026EPS')+'」→ 26EPS。':'未找到 2026 EPS 欄位。')+(invalidRows?'另有 '+invalidRows+' 列欄位異常，異常資料不會匯入。':' EPS、目標價及相關欄位檢查完成。');
-    preview.errors=rowErrors;preview.hasBlockingErrors=!validRows&&invalidRows===1&&rowErrors[0].rowNumber==='資料區';preview.sourceCount=validRows+invalidRows;preview.selectedCount=entries.length;preview.details=entries.map(function(entry){return entry.item;});preview.detected2026=detected2026;preview.sourceSheetName=source.sheetName;return preview;
+    preview.description=sourceSheetText+(detected2026?'已辨識「'+String(source.headers[source.headerMap.eps2026]||'預估2026EPS')+'」→ 26EPS。':'未找到 2026 EPS 欄位。')+
+      (duplicateRows?'檔案內有 '+duplicateRows+' 筆同代號重複資料，已自動保留最高目標價；同價再取較新報告日期。':'同一股票若重複出現，會自動採最高目標價。')+
+      (invalidRows?'另有 '+invalidRows+' 列欄位異常，異常資料不會匯入。':'');
+    preview.errors=rowErrors;preview.hasBlockingErrors=!validRows&&invalidRows===1&&rowErrors[0].rowNumber==='資料區';preview.sourceCount=validRows+invalidRows;preview.selectedCount=entries.length;preview.discardedCount=Math.max(0,validRows-entries.length);preview.details=entries.map(function(entry){return entry.item;});preview.detected2026=detected2026;preview.sourceSheetName=source.sheetName;return preview;
   }
 
   function workbookLooksLikeEpsDatabase(workbook){
