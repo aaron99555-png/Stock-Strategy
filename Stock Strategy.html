@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="341" name="app-version"/>
+<meta content="342" name="app-version"/>
 <script id="startup-performance-bootstrap">
 window.__ryanStartupPerf={start:performance.now(),localReady:0,firstRender:0,cloudStart:0,cloudEnd:0,cloudOk:null};
 </script>
@@ -3724,6 +3724,89 @@ html.dark #module-journal table :is(th,td):nth-child(7){
 </style>
 
 
+<style id="copy-custom-title-v323">
+.copy-title-row{
+  flex:0 0 100%;
+  width:100%;
+  display:flex;
+  align-items:center;
+  gap:7px;
+  min-width:0;
+}
+.copy-title-label{
+  flex:0 0 auto;
+  display:inline-flex;
+  align-items:center;
+  font-size:11px;
+  font-weight:900;
+  color:#2563eb;
+  white-space:nowrap;
+}
+.dark .copy-title-label{color:#93c5fd;}
+.copy-title-input{
+  flex:0 1 420px;
+  width:min(420px,100%);
+  min-width:180px;
+  height:34px;
+  padding:0 10px;
+  border:1px solid #bfdbfe;
+  border-radius:9px;
+  background:#fff;
+  color:#111827;
+  font-size:12px;
+  font-weight:700;
+  outline:none;
+  transition:border-color .15s,box-shadow .15s,background .15s;
+}
+.copy-title-input:focus{
+  border-color:#3b82f6;
+  box-shadow:0 0 0 2px rgba(59,130,246,.14);
+}
+.dark .copy-title-input{
+  background:#111827;
+  color:#f9fafb;
+  border-color:#1e40af;
+}
+.dark .copy-title-input::placeholder{color:#6b7280;}
+.copy-title-clear{
+  flex:0 0 32px;
+  width:32px;
+  height:32px;
+  border-radius:9px;
+  border:1px solid #dbeafe;
+  background:#eff6ff;
+  color:#3b82f6;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  transition:.15s;
+}
+.copy-title-clear:hover{background:#dbeafe;color:#1d4ed8;}
+.dark .copy-title-clear{
+  background:rgba(30,64,175,.22);
+  border-color:#1e40af;
+  color:#93c5fd;
+}
+@media(max-width:640px){
+  .copy-title-row{
+    display:grid;
+    grid-template-columns:auto minmax(0,1fr) 32px;
+    gap:6px;
+  }
+  .copy-title-label{
+    font-size:10.5px;
+  }
+  .copy-title-input{
+    width:100%;
+    min-width:0;
+    max-width:none;
+    height:34px;
+    font-size:11.5px;
+  }
+}
+</style>
+
+
 <style id="watchlist-workspace-v324">
 #module-favorites .card-panel{
   border-top:0!important;
@@ -4199,6 +4282,213 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 </style>
 
 
+<style id="copy-title-layout-v340">
+.copy-title-card{
+  flex:0 0 100%;
+  width:100%;
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  padding:10px 12px;
+  border:1px solid #dbeafe;
+  border-radius:12px;
+  background:linear-gradient(135deg,#eff6ff 0%,#ffffff 58%,#f8fafc 100%);
+  box-shadow:0 3px 10px rgba(37,99,235,.06);
+}
+.dark .copy-title-card{
+  border-color:#1e3a8a;
+  background:linear-gradient(135deg,rgba(30,64,175,.22),rgba(17,24,39,.94) 62%,rgba(15,23,42,.96));
+}
+.copy-title-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+}
+.copy-title-heading{
+  min-width:0;
+  display:flex;
+  align-items:center;
+  gap:9px;
+}
+.copy-title-icon{
+  flex:0 0 30px;
+  width:30px;
+  height:30px;
+  border-radius:9px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  background:#2563eb;
+  color:#fff;
+  box-shadow:0 4px 10px rgba(37,99,235,.16);
+}
+.copy-title-card .copy-title-label{
+  display:block;
+  color:#1d4ed8;
+  font-size:12px;
+  line-height:1.2;
+  font-weight:950;
+}
+.dark .copy-title-card .copy-title-label{color:#93c5fd}
+.copy-title-help{
+  margin-top:2px;
+  color:#64748b;
+  font-size:10px;
+  line-height:1.35;
+  font-weight:650;
+}
+.dark .copy-title-help{color:#94a3b8}
+.copy-title-sync-badge{
+  flex:0 0 auto;
+  display:inline-flex;
+  align-items:center;
+  min-height:24px;
+  padding:0 8px;
+  border-radius:999px;
+  border:1px solid #bfdbfe;
+  background:#fff;
+  color:#2563eb;
+  font-size:9px;
+  font-weight:900;
+  white-space:nowrap;
+}
+.dark .copy-title-sync-badge{
+  border-color:#1e40af;
+  background:#111827;
+  color:#93c5fd;
+}
+.copy-title-card .copy-title-row{
+  width:100%;
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  align-items:center!important;
+  gap:8px!important;
+}
+.copy-title-input-wrap{
+  position:relative;
+  min-width:0;
+}
+.copy-title-card .copy-title-input{
+  width:100%!important;
+  max-width:none!important;
+  min-width:0!important;
+  height:38px!important;
+  padding:0 58px 0 11px!important;
+  border:1px solid #bfdbfe!important;
+  border-radius:9px!important;
+  background:#fff!important;
+  color:#111827!important;
+  font-size:12px!important;
+  font-weight:800!important;
+}
+.copy-title-card .copy-title-input:focus{
+  border-color:#2563eb!important;
+  box-shadow:0 0 0 3px rgba(37,99,235,.12)!important;
+}
+.dark .copy-title-card .copy-title-input{
+  background:#111827!important;
+  color:#f9fafb!important;
+  border-color:#1e40af!important;
+}
+.copy-title-count{
+  position:absolute;
+  right:9px;
+  top:50%;
+  transform:translateY(-50%);
+  color:#94a3b8;
+  font-size:9px;
+  font-weight:800;
+  pointer-events:none;
+}
+.copy-title-card .copy-title-clear{
+  width:auto!important;
+  min-width:96px!important;
+  height:38px!important;
+  padding:0 10px!important;
+  border-radius:9px!important;
+  border:1px solid #cbd5e1!important;
+  background:#fff!important;
+  color:#475569!important;
+  font-size:10px!important;
+  font-weight:900!important;
+  white-space:nowrap;
+}
+.copy-title-card .copy-title-clear:hover{
+  border-color:#93c5fd!important;
+  background:#eff6ff!important;
+  color:#1d4ed8!important;
+}
+.dark .copy-title-card .copy-title-clear{
+  border-color:#374151!important;
+  background:#111827!important;
+  color:#cbd5e1!important;
+}
+.copy-title-preview-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-width:0;
+  padding-top:7px;
+  border-top:1px dashed #dbeafe;
+}
+.dark .copy-title-preview-row{border-color:#1e3a8a}
+.copy-title-preview-label{
+  flex:0 0 auto;
+  color:#64748b;
+  font-size:9px;
+  font-weight:900;
+  white-space:nowrap;
+}
+.copy-title-preview{
+  min-width:0;
+  max-width:100%;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  color:#1e40af;
+  background:#dbeafe;
+  border-radius:6px;
+  padding:3px 7px;
+  font-size:10px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+}
+.dark .copy-title-preview{
+  color:#bfdbfe;
+  background:rgba(30,64,175,.28);
+}
+@media(max-width:640px){
+  .copy-title-card{
+    padding:9px;
+    gap:7px;
+  }
+  .copy-title-help{
+    font-size:9px;
+  }
+  .copy-title-sync-badge{
+    min-height:22px;
+    padding:0 7px;
+  }
+  .copy-title-card .copy-title-row{
+    grid-template-columns:minmax(0,1fr)!important;
+  }
+  .copy-title-card .copy-title-clear{
+    width:100%!important;
+    min-width:0!important;
+    height:34px!important;
+  }
+  .copy-title-preview-row{
+    align-items:flex-start;
+    flex-direction:column;
+    gap:4px;
+  }
+  .copy-title-preview{
+    width:100%;
+  }
+}
+</style>
+
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen flex flex-col antialiased">
 <nav class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-50 transition-colors duration-300">
@@ -4518,6 +4808,30 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 <input class="copy-mark-notes rounded border-slate-300 dark:border-slate-600 accent-slate-600 w-3.5 h-3.5" type="checkbox"/>
 <span>📝備註</span>
 </label>
+</div>
+<div class="copy-toolbar-break" aria-hidden="true"></div>
+<div class="copy-title-card">
+<div class="copy-title-head">
+<div class="copy-title-heading">
+<span class="copy-title-icon"><i class="fa-solid fa-heading"></i></span>
+<div>
+<div class="copy-title-label">複製標題</div>
+<div class="copy-title-help">自訂後會套用到所有複製模式；留白則使用各按鈕原本標題</div>
+</div>
+</div>
+<span class="copy-title-sync-badge"><i class="fa-solid fa-link mr-1"></i>同步</span>
+</div>
+<div class="copy-title-row">
+<div class="copy-title-input-wrap">
+<input class="copy-title-input" type="text" maxlength="50" placeholder="例如：萊恩今日多重濾網" autocomplete="off"/>
+<span class="copy-title-count">0/50</span>
+</div>
+<button class="copy-title-clear" type="button" title="清除自訂標題，恢復各複製按鈕的預設標題" aria-label="恢復預設複製標題"><i class="fa-solid fa-rotate-left mr-1.5"></i><span>恢復預設</span></button>
+</div>
+<div class="copy-title-preview-row">
+<span class="copy-title-preview-label"><i class="fa-solid fa-eye mr-1"></i>格式預覽</span>
+<code class="copy-title-preview">留白時依複製按鈕自動套用標題</code>
+</div>
 </div>
 <div class="copy-toolbar-break" aria-hidden="true"></div>
 <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="selected">獨選</button>
@@ -5187,6 +5501,30 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 </label>
 </div>
 <div class="copy-toolbar-break" aria-hidden="true"></div>
+<div class="copy-title-card">
+<div class="copy-title-head">
+<div class="copy-title-heading">
+<span class="copy-title-icon"><i class="fa-solid fa-heading"></i></span>
+<div>
+<div class="copy-title-label">複製標題</div>
+<div class="copy-title-help">自訂後會套用到所有複製模式；留白則使用各按鈕原本標題</div>
+</div>
+</div>
+<span class="copy-title-sync-badge"><i class="fa-solid fa-link mr-1"></i>同步</span>
+</div>
+<div class="copy-title-row">
+<div class="copy-title-input-wrap">
+<input class="copy-title-input" type="text" maxlength="50" placeholder="例如：萊恩今日多重濾網" autocomplete="off"/>
+<span class="copy-title-count">0/50</span>
+</div>
+<button class="copy-title-clear" type="button" title="清除自訂標題，恢復各複製按鈕的預設標題" aria-label="恢復預設複製標題"><i class="fa-solid fa-rotate-left mr-1.5"></i><span>恢復預設</span></button>
+</div>
+<div class="copy-title-preview-row">
+<span class="copy-title-preview-label"><i class="fa-solid fa-eye mr-1"></i>格式預覽</span>
+<code class="copy-title-preview">留白時依複製按鈕自動套用標題</code>
+</div>
+</div>
+<div class="copy-toolbar-break" aria-hidden="true"></div>
 <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="selected">獨選</button>
 <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="strategy">策略</button>
 <button class="flex-shrink-0 btn-copy-base bg-fuchsia-50 dark:bg-fuchsia-900/40 hover:bg-fuchsia-600 border-fuchsia-200 dark:border-fuchsia-700/50 text-fuchsia-700 dark:text-fuchsia-200 btn-copy" data-mode="copy_a" title="破繭而出、月來越好、季不可失、OBV突破、MACD突破">複製A</button>
@@ -5611,13 +5949,30 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 - 右下角通知會列出本次實際新增的標籤。
 - 特別關注勾選狀態會獨立記憶，快速連續輸入下一檔時可持續使用。
 -->
-<!-- v341：
-【移除自訂複製標題功能】
-- 移除策略日誌與追蹤清單中的自訂標題設定區。
-- 移除輸入框、字數、格式預覽、同步、恢復預設等相關 UI。
-- 移除自訂標題 localStorage 與相關 JavaScript / CSS。
-- 所有複製按鈕恢復使用各自原本預設名稱，例如「多重濾網」、「精選馬廄」等。
-- 其他複製功能與小標籤設定維持不變。
+<!-- v340：
+【複製標題區重新整理】
+- 策略日誌與追蹤清單的「複製標題」改成獨立設定卡片，不再和小標籤、複製按鈕擠在同一排。
+- 標題名稱、說明、同步狀態、輸入框、恢復預設按鈕重新分層。
+- 輸入框新增 0/50 即時字數。
+- 新增「格式預覽」，輸入自訂標題後直接顯示實際標題樣式：| 日期 自訂標題 |。
+- 留白時預覽明確顯示「依複製按鈕自動套用標題」。
+- 原本策略日誌與追蹤清單自訂標題同步機制保留。
+- 「清除」改名為「恢復預設」，功能更直覺。
+- 手機版改成上下排列，避免標題輸入框與按鈕被壓縮。
+- 實際複製內容格式與既有各複製模式邏輯不變。
+-->
+<!-- v342：
+【恢復 v340 ＋ 修正追風馬新進榜誤判】
+- 本版直接以 v340 為基底，已恢復上一版的「複製標題」設定卡片與相關功能。
+- 找到追風馬誤報原因：原本「新進後維持 7 天」的顯示邏輯，被同時拿去判斷「這一次是否新進」。
+- 因此一檔股票上一次才新進、這一次仍在追風馬名單時，只要還在 7 天內，就可能再次被說成「新進榜」。
+- 新增 isHorseSnapshotNewEntry：只比較「本期同馬種名單」與「緊鄰上一期同馬種名單」。
+- 上一期已經有這檔，本期再次輸入追風馬 => 不再通知新進榜。
+- 上一期沒有、本期新增 => 才會通知新進榜。
+- 若完全沒有上一期馬種名單，第一期不會整批誤判為新進榜。
+- 策略訊號雷達的每日 🆕 判斷同步改用嚴格快照比較。
+- 「精選馬廄」複製修正：不再被 7 日顯示狀態污染，🆕只由本次 vs 上一期的 newCodes 決定。
+- 原本一般彙整畫面需要的「新進狀態維持 7 日」仍保留，不影響歷史顯示用途。
 -->
 <!-- 核心 JavaScript -->
 <script>
@@ -9236,9 +9591,9 @@ const addIsoDays=(iso,days)=>{
     dt.setUTCDate(dt.getUTCDate()+Number(days||0));
     return `${dt.getUTCFullYear()}-${String(dt.getUTCMonth()+1).padStart(2,'0')}-${String(dt.getUTCDate()).padStart(2,'0')}`;
 };
-// v315：追風馬／赤兔馬／千里馬的新進榜統一採「本次名單 vs 上一次同馬種名單」比對。
-// 本次有、上一次沒有 => 視為新進榜；若完全沒有上一期名單，不會整批誤判新進榜。
-// 新進後仍沿用原本規則：🆕 標示維持 7 個日曆日。
+// v315 / v342：歷史「新進狀態」仍可保留 7 個日曆日供一般彙整畫面使用；
+// 但「本次輸入通知、策略雷達某日標示、精選馬廄複製」一律改用 isHorseSnapshotNewEntry，
+// 嚴格比較本期與緊鄰上一期，不會因上一次的新進狀態仍在 7 日內而再次誤報。
 const getHorseSnapshotDates=tag=>[...new Set((state.journals||[])
     .filter(j=>journalHasStrategyTag(j,tag))
     .map(j=>normalizeHorseJournalDate(j?.date))
@@ -9249,6 +9604,29 @@ const getHorseSnapshotCodes=(tag,date)=>new Set((state.journals||[])
     .filter(j=>normalizeHorseJournalDate(j?.date)===date&&journalHasStrategyTag(j,tag))
     .map(j=>String(j?.code||'').trim())
     .filter(Boolean));
+
+// v342：將「這一次是否新進」與「新進標示維持一週」拆開。
+// 真正的新進榜只看：本次同馬種名單有、緊鄰上一期同馬種名單沒有。
+const getPreviousHorseSnapshotDate=(tag,currentDate)=>{
+    const wanted=normalizeStrategyTagName(tag),date=normalizeHorseJournalDate(currentDate);
+    if(!HORSE_NEW_ENTRY_TAGS.has(wanted)||!date)return'';
+    const dates=getHorseSnapshotDates(wanted).filter(snapshotDate=>snapshotDate<date);
+    return dates[dates.length-1]||'';
+};
+
+const isHorseSnapshotNewEntry=(journal,tag)=>{
+    const wanted=normalizeStrategyTagName(tag);
+    if(!journal||!HORSE_NEW_ENTRY_TAGS.has(wanted)||!journalHasStrategyTag(journal,wanted))return false;
+    const code=String(journal.code||'').trim(),date=normalizeHorseJournalDate(journal.date);
+    if(!code||!date)return false;
+    const previousDate=getPreviousHorseSnapshotDate(wanted,date);
+    // 完全沒有上一期名單時，不把第一期整批誤判為新進榜。
+    if(!previousDate)return false;
+    const currentCodes=getHorseSnapshotCodes(wanted,date);
+    if(!currentCodes.has(code))return false;
+    const previousCodes=getHorseSnapshotCodes(wanted,previousDate);
+    return !previousCodes.has(code);
+};
 
 const getHorseSnapshotNewEntryStart=(journal,tag)=>{
     const wanted=normalizeStrategyTagName(tag);
@@ -9284,7 +9662,7 @@ const getHorseNewEntryTagsForCodeDate=(code,date)=>{
     const c=String(code||'').trim(),d=normalizeHorseJournalDate(date);if(!c||!d)return[];
     return Array.from(HORSE_NEW_ENTRY_TAGS).filter(tag=>{
         const sameDay=(state.journals||[]).filter(j=>String(j.code||'').trim()===c&&normalizeHorseJournalDate(j.date)===d&&journalHasStrategyTag(j,tag));
-        return sameDay.length>0&&sameDay.some(j=>isHorseTagNewEntry(j,tag));
+        return sameDay.length>0&&sameDay.some(j=>isHorseSnapshotNewEntry(j,tag));
     });
 };
 const isHorseNewEntryJournal=journal=>Boolean(journal?._horseNewEntry)||getHorseNewEntryTags(journal).length>0;
@@ -9293,7 +9671,7 @@ const getCopyJournalName=journal=>`${journal?.name||''}${isHorseNewEntryJournal(
 // v258：輸入追風馬／赤兔馬／千里馬時，若本次屬於新進榜，跳出醒目通知。
 const showHorseNewEntryNotice=(journal,tag)=>{
     const normalizedTag=normalizeStrategyTagName(tag);
-    if(!journal||!HORSE_NEW_ENTRY_TAGS.has(normalizedTag)||!isHorseTagNewEntry(journal,normalizedTag))return false;
+    if(!journal||!HORSE_NEW_ENTRY_TAGS.has(normalizedTag)||!isHorseSnapshotNewEntry(journal,normalizedTag))return false;
 
     document.getElementById('horse-new-entry-notice')?.remove();
     const iconMap={'追風馬':'🌪️','赤兔馬':'🐎','千里馬':'🏇'};
@@ -9341,7 +9719,7 @@ const showHorseNewEntryNotice=(journal,tag)=>{
 
     const hint=document.createElement('div');
     hint.style.cssText='margin-top:5px;font-size:11px;color:#a16207;';
-    hint.textContent='與上一期同馬種名單比對為新增，🆕標示會維持一週。';
+    hint.textContent='與緊鄰上一期同馬種名單比對：上一期沒有、本期才新增。';
 
     notice.append(header,stock,detail,hint);
     document.body.appendChild(notice);
@@ -11159,10 +11537,12 @@ const getRecentBrokerTargetPrice=(code,referenceDate=getToday())=>{
     return{targetPrice:target,broker:String(info.broker||'').trim(),targetUpdateDate,achieved:isTargetPriceAchieved(code,info)};
 };
 const formatCopyTargetPrice=value=>Number(value).toLocaleString('zh-TW',{maximumFractionDigits:2});
-const getStrategyCopyStockName=(journal,duplicateCodes,horseTag='')=>{
+const getStrategyCopyStockName=(journal,duplicateCodes,horseTag='',options={})=>{
     const name=String(journal?.name||'').trim();
     const referenceDate=journal?.date||getToday();
-    const isNew=horseTag?isHorseTagNewEntry(journal,horseTag):isHorseNewEntryJournal(journal);
+    const isNew=options?.suppressNewEntry===true
+        ? false
+        : (horseTag?isHorseTagNewEntry(journal,horseTag):isHorseNewEntryJournal(journal));
     const recentTarget=state.copyMarkTargetPrice!==false?getRecentBrokerTargetPrice(journal?.code,referenceDate):null;
     const targetText=recentTarget?`【目標價：${formatCopyTargetPrice(recentTarget.targetPrice)}${recentTarget.achieved?'｜已達標':''}】`:'';
     const note=String(journal?.notes||'').trim().replace(/\s*\n+\s*/g,'；');
@@ -11274,9 +11654,85 @@ document.querySelectorAll('.copy-mark-notes').forEach(cb=>{
     });
 });
 syncCopyLabelToggles();
-const buildCopyHeader=(dateText,defaultTitle,filterSuffix='')=>{
-    return `| ${dateText} ${defaultTitle}${filterSuffix||''} |`;
+const COPY_CUSTOM_TITLE_KEY='ryan_copy_custom_title_v1';
+const sanitizeCopyCustomTitle=value=>String(value||'')
+    .replace(/[\r\n\t]+/g,' ')
+    .replace(/\|/g,'｜')
+    .replace(/\s+/g,' ')
+    .trim()
+    .slice(0,50);
+
+const getCopyCustomTitle=()=>{
+    const active=document.querySelector('.tab-content.active .copy-title-input');
+    const any=active||document.querySelector('.copy-title-input');
+    return sanitizeCopyCustomTitle(any?.value||'');
 };
+
+const buildCopyHeader=(dateText,defaultTitle,filterSuffix='')=>{
+    const custom=getCopyCustomTitle();
+    const title=custom||defaultTitle;
+    return `| ${dateText} ${title}${filterSuffix||''} |`;
+};
+
+const getCopyTitlePreviewDate=card=>{
+    const module=card?.closest('.tab-content');
+    if(module?.id==='module-favorites')return getToday().replace(/-/g,'/');
+    const start=String(document.getElementById('filter-start')?.value||''),
+          end=String(document.getElementById('filter-end')?.value||'');
+    if(start&&end)return start===end?start.replace(/-/g,'/'):`${start.replace(/-/g,'/')}~${end.replace(/-/g,'/')}`;
+    return getToday().replace(/-/g,'/');
+};
+const updateCopyTitlePresentation=normalized=>{
+    document.querySelectorAll('.copy-title-card').forEach(card=>{
+        const count=card.querySelector('.copy-title-count'),
+              preview=card.querySelector('.copy-title-preview'),
+              clear=card.querySelector('.copy-title-clear'),
+              date=getCopyTitlePreviewDate(card);
+        if(count)count.textContent=`${normalized.length}/50`;
+        if(preview)preview.textContent=normalized
+            ?`| ${date} ${normalized} |`
+            :'留白時依複製按鈕自動套用標題';
+        if(clear){
+            clear.disabled=!normalized;
+            clear.style.opacity=normalized?'1':'.5';
+        }
+    });
+};
+const syncCopyCustomTitleInputs=(value,persist=true)=>{
+    const normalized=sanitizeCopyCustomTitle(value);
+    document.querySelectorAll('.copy-title-input').forEach(input=>{
+        if(input.value!==normalized)input.value=normalized;
+    });
+    updateCopyTitlePresentation(normalized);
+    if(persist){
+        try{
+            if(normalized)localStorage.setItem(COPY_CUSTOM_TITLE_KEY,normalized);
+            else localStorage.removeItem(COPY_CUSTOM_TITLE_KEY);
+        }catch(error){}
+    }
+    return normalized;
+};
+
+(()=>{
+    let stored='';
+    try{stored=localStorage.getItem(COPY_CUSTOM_TITLE_KEY)||'';}catch(error){}
+    syncCopyCustomTitleInputs(stored,false);
+
+    document.querySelectorAll('.copy-title-input').forEach(input=>{
+        input.addEventListener('input',event=>syncCopyCustomTitleInputs(event.target.value,true));
+        input.addEventListener('change',event=>syncCopyCustomTitleInputs(event.target.value,true));
+    });
+
+    document.querySelectorAll('.copy-title-clear').forEach(button=>{
+        button.addEventListener('click',()=>{
+            syncCopyCustomTitleInputs('',true);
+            const active=document.querySelector('.tab-content.active .copy-title-input')||document.querySelector('.copy-title-input');
+            active?.focus();
+            showToast('已恢復預設複製標題');
+        });
+    });
+    ['filter-start','filter-end'].forEach(id=>document.getElementById(id)?.addEventListener('change',()=>updateCopyTitlePresentation(getCopyCustomTitle())));
+})();
 
 const executeCopy=async t=>{if(navigator.clipboard&&window.isSecureContext){try{const ok=await window.copyTextOptimized(t);if(ok)return showToast('複製成功');}catch(e){console.warn('剪貼簿 API 無法使用，改用相容模式',e);}}fallbackCopy(t);};
 const fallbackCopy=t=>{const x=document.createElement("textarea");x.value=t;x.style.position="fixed";document.body.appendChild(x);x.focus();x.select();try{document.execCommand('copy');showToast('複製成功');}catch(e){showToast('複製失敗','error');}document.body.removeChild(x);};
@@ -11365,7 +11821,8 @@ const getHorseTagPreviousSnapshotComparison=(tag,currentItems,filterState,isFavo
 };
 
 const getHorseSnapshotCopyName=(journal,duplicateCodes,tag,newCodes)=>{
-    const base=getStrategyCopyStockName(journal,duplicateCodes,tag);
+    // 專用「精選馬廄」只能用本次與上一期的差異判斷，不可沿用 7 日顯示狀態。
+    const base=getStrategyCopyStockName(journal,duplicateCodes,tag,{suppressNewEntry:true});
     const code=String(journal?.code||'').trim();
     if(
         !HORSE_NEW_ENTRY_TAGS.has(normalizeStrategyTagName(tag))||
