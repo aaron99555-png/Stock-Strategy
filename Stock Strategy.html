@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="344" name="app-version"/>
+<meta content="347" name="app-version"/>
 <script id="startup-performance-bootstrap">
 window.__ryanStartupPerf={start:performance.now(),localReady:0,firstRender:0,cloudStart:0,cloudEnd:0,cloudOk:null};
 </script>
@@ -5216,6 +5216,385 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 </style>
 
 
+
+<style id="journal-filter-compact-width-v346">
+/* v346：篩選控制項改成內容導向寬度，不再整排平均撐滿 */
+@media (min-width:1200px){
+  #module-journal .journal-fixed-filter-toolbar{
+    display:flex!important;
+    flex-wrap:wrap!important;
+    align-items:flex-end!important;
+    align-content:flex-start!important;
+    gap:10px 12px!important;
+  }
+
+  #module-journal .journal-fixed-filter-toolbar::before{
+    flex:0 0 100%!important;
+    width:100%!important;
+  }
+
+  /* 第一排 */
+  #module-journal .journal-filter-row-date{
+    flex:0 0 430px!important;
+    width:430px!important;
+  }
+  #module-journal .journal-filter-row-search-clear{
+    flex:0 0 260px!important;
+    width:260px!important;
+  }
+  #module-journal .journal-filter-row-conditions-1{
+    flex:0 0 auto!important;
+    width:auto!important;
+    display:flex!important;
+    gap:7px!important;
+  }
+  #module-journal .journal-filter-row-conditions-1 > label{
+    width:auto!important;
+    min-width:138px!important;
+    max-width:165px!important;
+    padding:6px 11px!important;
+  }
+
+  /* 第二排：不再 12 欄等分，直接依內容排小格 */
+  #module-journal .journal-filter-row-grid-6{
+    flex:0 0 100%!important;
+    width:100%!important;
+    display:flex!important;
+    flex-wrap:wrap!important;
+    align-items:center!important;
+    gap:8px!important;
+  }
+  #module-journal .journal-filter-row-grid-6 > label{
+    flex:0 0 auto!important;
+    width:auto!important;
+    min-width:160px!important;
+    max-width:205px!important;
+    padding:6px 11px!important;
+  }
+  #module-journal .journal-filter-row-grid-6 > select{
+    flex:0 0 auto!important;
+    width:145px!important;
+    min-width:145px!important;
+    max-width:165px!important;
+  }
+  #module-journal #filter-journal-quick{
+    width:165px!important;
+    min-width:165px!important;
+    max-width:185px!important;
+  }
+
+  /* 標籤 / 組合 / 清除維持一組，但不要拉太寬 */
+  #module-journal .journal-filter-tag-cell{
+    flex:0 0 355px!important;
+    width:355px!important;
+    min-width:355px!important;
+    max-width:355px!important;
+    grid-template-columns:minmax(145px,1fr) 90px 104px!important;
+  }
+
+  #module-journal .journal-filter-tags-display-row{
+    flex:0 0 100%!important;
+    width:100%!important;
+  }
+
+  /* 讓整體看起來更像工具列，而不是大表單 */
+  #module-journal .journal-filter-row-date .date-range-fast,
+  #module-journal .journal-filter-row-search-clear > div:first-child,
+  #module-journal .journal-filter-row-conditions-1 > label,
+  #module-journal .journal-filter-row-grid-6 > label,
+  #module-journal .journal-filter-row-grid-6 > select,
+  #module-journal .journal-filter-tag-cell > button{
+    border-radius:9px!important;
+  }
+}
+
+/* 900~1199：也避免每格平均撐滿 */
+@media (min-width:900px) and (max-width:1199px){
+  #module-journal .journal-fixed-filter-toolbar{
+    display:flex!important;
+    flex-wrap:wrap!important;
+    align-items:flex-end!important;
+    gap:10px!important;
+  }
+  #module-journal .journal-fixed-filter-toolbar::before{
+    flex:0 0 100%!important;
+    width:100%!important;
+  }
+  #module-journal .journal-filter-row-date{
+    flex:0 0 410px!important;
+    width:410px!important;
+  }
+  #module-journal .journal-filter-row-search-clear{
+    flex:0 0 250px!important;
+    width:250px!important;
+  }
+  #module-journal .journal-filter-row-conditions-1{
+    flex:0 0 100%!important;
+    width:100%!important;
+    display:flex!important;
+    flex-wrap:wrap!important;
+    gap:7px!important;
+  }
+  #module-journal .journal-filter-row-conditions-1 > label{
+    width:auto!important;
+    min-width:135px!important;
+    max-width:160px!important;
+  }
+  #module-journal .journal-filter-row-grid-6{
+    flex:0 0 100%!important;
+    width:100%!important;
+    display:flex!important;
+    flex-wrap:wrap!important;
+    gap:8px!important;
+  }
+  #module-journal .journal-filter-row-grid-6 > label{
+    width:auto!important;
+    min-width:155px!important;
+    max-width:200px!important;
+  }
+  #module-journal .journal-filter-row-grid-6 > select{
+    width:140px!important;
+    min-width:140px!important;
+    max-width:160px!important;
+  }
+  #module-journal #filter-journal-quick{
+    width:160px!important;
+    min-width:160px!important;
+  }
+  #module-journal .journal-filter-tag-cell{
+    flex:0 0 350px!important;
+    width:350px!important;
+    min-width:350px!important;
+    max-width:350px!important;
+  }
+}
+</style>
+
+
+<style id="journal-filter-horizontal-v347">
+/* v347：桌機策略日誌篩選區改為真正橫向工具列，不再上下直排 */
+@media (min-width:900px){
+  #module-journal .journal-fixed-filter-toolbar{
+    display:flex!important;
+    flex-direction:column!important;
+    gap:8px!important;
+    width:100%!important;
+    align-items:stretch!important;
+  }
+
+  #module-journal .journal-fixed-filter-toolbar::before{
+    flex:0 0 auto!important;
+    width:100%!important;
+    margin:0!important;
+    padding:0 0 7px 1px!important;
+  }
+
+  /* 移除各區塊上方小標題，避免每組看起來又往下疊一層 */
+  #module-journal .journal-filter-row-date::before,
+  #module-journal .journal-filter-row-search-clear::before,
+  #module-journal .journal-filter-row-conditions-1::before,
+  #module-journal .journal-filter-row-grid-6::before{
+    content:none!important;
+    display:none!important;
+  }
+
+  #module-journal .journal-fixed-filter-toolbar > .journal-mobile-row{
+    padding-top:0!important;
+    position:relative!important;
+    min-width:0!important;
+  }
+
+  /* 第一排：日期 + 搜尋 + 三個快速條件，全放同一排 */
+  #module-journal .journal-filter-row-date,
+  #module-journal .journal-filter-row-search-clear,
+  #module-journal .journal-filter-row-conditions-1{
+    display:flex!important;
+    align-items:center!important;
+    width:auto!important;
+    min-width:0!important;
+    flex:0 0 auto!important;
+  }
+
+  #module-journal .journal-fixed-filter-toolbar{
+    position:relative!important;
+  }
+
+  /* 用 display:contents 讓前三組控制項直接成為同一條水平工具列 */
+  #module-journal .journal-filter-row-date,
+  #module-journal .journal-filter-row-search-clear,
+  #module-journal .journal-filter-row-conditions-1{
+    display:contents!important;
+  }
+
+  /* 第一排所有項目透過 order 排在前面 */
+  #module-journal .journal-filter-row-date .date-range-fast{
+    order:1!important;
+    flex:0 0 390px!important;
+    width:390px!important;
+    min-width:390px!important;
+    height:40px!important;
+  }
+  #module-journal .journal-filter-row-search-clear > div:first-child{
+    order:2!important;
+    flex:0 0 235px!important;
+    width:235px!important;
+    min-width:235px!important;
+    height:40px!important;
+  }
+  #module-journal .journal-filter-row-conditions-1 > label{
+    order:3!important;
+    flex:0 0 auto!important;
+    width:auto!important;
+    min-width:126px!important;
+    max-width:145px!important;
+    height:40px!important;
+    min-height:40px!important;
+    padding:5px 9px!important;
+    justify-content:center!important;
+  }
+
+  /* 關鍵：toolbar 本身允許第一排橫向排列 */
+  #module-journal .journal-fixed-filter-toolbar{
+    flex-flow:row wrap!important;
+    align-items:center!important;
+    column-gap:8px!important;
+    row-gap:8px!important;
+  }
+  #module-journal .journal-fixed-filter-toolbar::before{
+    flex-basis:100%!important;
+  }
+
+  /* 第二排：進階篩選全部橫向，不再一格一列 */
+  #module-journal .journal-filter-row-grid-6{
+    order:20!important;
+    flex:0 0 100%!important;
+    width:100%!important;
+    display:flex!important;
+    flex-direction:row!important;
+    flex-wrap:nowrap!important;
+    align-items:center!important;
+    gap:7px!important;
+    overflow-x:auto!important;
+    overflow-y:visible!important;
+    padding-bottom:2px!important;
+    scrollbar-width:thin;
+  }
+
+  #module-journal .journal-filter-row-grid-6 > label{
+    flex:0 0 auto!important;
+    width:auto!important;
+    min-width:145px!important;
+    max-width:175px!important;
+    height:40px!important;
+    min-height:40px!important;
+    padding:5px 9px!important;
+    justify-content:center!important;
+  }
+
+  #module-journal .journal-filter-row-grid-6 > select{
+    flex:0 0 125px!important;
+    width:125px!important;
+    min-width:125px!important;
+    max-width:140px!important;
+    height:40px!important;
+    min-height:40px!important;
+    padding:5px 8px!important;
+    font-size:11px!important;
+  }
+
+  #module-journal #filter-journal-quick{
+    flex-basis:145px!important;
+    width:145px!important;
+    min-width:145px!important;
+  }
+
+  #module-journal .journal-filter-tag-cell{
+    flex:0 0 320px!important;
+    width:320px!important;
+    min-width:320px!important;
+    max-width:320px!important;
+    height:40px!important;
+    display:grid!important;
+    grid-template-columns:minmax(130px,1fr) 82px 96px!important;
+    gap:6px!important;
+    overflow:visible!important;
+  }
+  #module-journal .journal-filter-tag-cell > button{
+    height:40px!important;
+    min-height:40px!important;
+    width:100%!important;
+    min-width:0!important;
+    padding:5px 7px!important;
+    font-size:11px!important;
+  }
+
+  /* 已選標籤 / 快速組合也橫向 */
+  #module-journal .journal-filter-tags-display-row{
+    order:30!important;
+    flex:0 0 100%!important;
+    width:100%!important;
+    display:flex!important;
+    flex-direction:row!important;
+    flex-wrap:wrap!important;
+    align-items:center!important;
+    gap:8px!important;
+    margin-top:0!important;
+    padding-top:7px!important;
+  }
+  #module-journal #tag-preset-quick-journal{
+    width:auto!important;
+    flex:0 1 auto!important;
+  }
+  #module-journal #filter-tags-display{
+    width:auto!important;
+    flex:1 1 300px!important;
+    margin-top:0!important;
+  }
+
+  #module-journal #journal-active-filter-chips{
+    margin-top:7px!important;
+  }
+}
+
+/* 大螢幕再縮一點，盡量完整塞進同一排 */
+@media (min-width:1440px){
+  #module-journal .journal-filter-row-date .date-range-fast{
+    flex-basis:365px!important;
+    width:365px!important;
+    min-width:365px!important;
+  }
+  #module-journal .journal-filter-row-search-clear > div:first-child{
+    flex-basis:220px!important;
+    width:220px!important;
+    min-width:220px!important;
+  }
+  #module-journal .journal-filter-row-conditions-1 > label{
+    min-width:118px!important;
+    max-width:135px!important;
+  }
+  #module-journal .journal-filter-row-grid-6 > label{
+    min-width:135px!important;
+    max-width:165px!important;
+  }
+  #module-journal .journal-filter-row-grid-6 > select{
+    flex-basis:118px!important;
+    width:118px!important;
+    min-width:118px!important;
+  }
+  #module-journal #filter-journal-quick{
+    flex-basis:138px!important;
+    width:138px!important;
+    min-width:138px!important;
+  }
+  #module-journal .journal-filter-tag-cell{
+    flex-basis:305px!important;
+    width:305px!important;
+    min-width:305px!important;
+    max-width:305px!important;
+  }
+}
+</style>
+
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen flex flex-col antialiased">
 <nav class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-50 transition-colors duration-300">
@@ -6729,6 +7108,28 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 - 已選標籤與快速組合獨立成下方一列，更容易辨認目前套用條件。
 - 複製區重新分成「輸出標示／複製標題／複製方式／資料維護」；資料維護固定獨立卡片，避免和複製按鈕混在一起。
 - 複製標題功能保留，但桌機改成更緊湊的橫向排列，降低整區高度。
+-->
+<!-- v346：
+【策略日誌篩選欄位縮窄】
+- 修正 v345 每個篩選控制項被 Grid 平均拉滿，導致每格過寬、視覺笨重。
+- 桌機版改成 Flex Wrap + 內容導向固定寬度。
+- 日期約 430px、搜尋約 260px。
+- 快速條件每格約 138~165px。
+- 大戶條件約 160~205px。
+- 分數／等級／狀態約 145px，訊號約 165px。
+- 標籤挑選＋組合＋清除固定約 355px。
+- 控制項靠左緊密排列，右側自然留白，不再硬撐滿整排。
+- 手機版原本配置不受影響。
+-->
+<!-- v347：
+【策略日誌篩選工具列改為橫向排列】
+- 桌機版不再將日期／搜尋／快速條件／進階條件垂直堆疊。
+- 第一排改成：日期區間 → 關鍵字搜尋 → 排除負成長 → 營收創高 → 僅含股期，全部橫向排列。
+- 第二排進階篩選全部橫向排列，不再一格一列。
+- 大戶、分數、等級、狀態、訊號、標籤挑選、組合、清除全部維持工具列形式。
+- 欄位寬度進一步縮小，盡量在桌機畫面一次顯示；空間不足時第二排只做橫向捲動，不改回直排。
+- 已選標籤與快速組合也改成橫向顯示。
+- 手機版維持原本適合觸控的排列。
 -->
 <!-- 核心 JavaScript -->
 <script>
