@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="342" name="app-version"/>
+<meta content="344" name="app-version"/>
 <script id="startup-performance-bootstrap">
 window.__ryanStartupPerf={start:performance.now(),localReady:0,firstRender:0,cloudStart:0,cloudEnd:0,cloudOk:null};
 </script>
@@ -4489,6 +4489,439 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 }
 </style>
 
+
+<style id="journal-streak-height-view-v343">
+/* 1. 策略日誌主表格：增加可視高度，桌機可一次看到更多檔 */
+#journal-table-scroll{
+  max-height:min(78vh, 920px)!important;
+  overscroll-behavior:contain;
+}
+#streak-results{
+  max-height:min(82vh, 960px)!important;
+  overscroll-behavior:contain;
+  scrollbar-gutter:stable;
+}
+@media(min-width:1536px){
+  #journal-table-scroll{max-height:min(82vh, 980px)!important;}
+  #streak-results{max-height:min(84vh, 1020px)!important;}
+}
+@media(max-width:640px){
+  #journal-table-scroll{max-height:72vh!important;}
+  #streak-results{max-height:76vh!important;}
+}
+
+/* 2. 篩選結果顯示模式切換 */
+.streak-results-header-actions{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:7px;
+  min-width:0;
+}
+.streak-view-switch{
+  display:inline-flex;
+  align-items:center;
+  padding:2px;
+  border:1px solid #ddd6fe;
+  border-radius:9px;
+  background:#f5f3ff;
+}
+.dark .streak-view-switch{
+  border-color:#4c1d95;
+  background:rgba(76,29,149,.22);
+}
+.streak-view-btn{
+  height:28px;
+  min-width:62px;
+  padding:0 9px;
+  border:0;
+  border-radius:7px;
+  background:transparent;
+  color:#7c3aed;
+  font-size:10px;
+  font-weight:900;
+  transition:.14s ease;
+}
+.dark .streak-view-btn{color:#c4b5fd;}
+.streak-view-btn:hover{background:rgba(255,255,255,.75);}
+.dark .streak-view-btn:hover{background:rgba(17,24,39,.7);}
+.streak-view-btn.is-active{
+  background:#7c3aed;
+  color:#fff;
+  box-shadow:0 2px 7px rgba(124,58,237,.22);
+}
+
+/* 卡片模式：沿用原本多欄卡片 */
+#streak-results.streak-view-card-mode{
+  display:grid!important;
+}
+
+/* 清單模式：一檔一列，隱藏每日明細與策略頻率，提升可視檔數 */
+#streak-results.streak-view-list-mode{
+  display:block!important;
+  padding-top:3px!important;
+}
+#streak-results.streak-view-list-mode .streak-result-card{
+  display:grid!important;
+  grid-template-columns:minmax(190px,1.1fr) minmax(155px,.82fr) minmax(140px,.72fr) minmax(230px,1.35fr) auto;
+  align-items:center!important;
+  gap:8px 10px!important;
+  margin-bottom:6px!important;
+  padding:8px 10px!important;
+  border-radius:10px!important;
+  box-shadow:0 1px 4px rgba(15,23,42,.05)!important;
+}
+#streak-results.streak-view-list-mode .streak-result-main{
+  grid-column:1;
+  min-width:0;
+}
+#streak-results.streak-view-list-mode .streak-result-meta{
+  grid-column:2;
+  margin-top:0!important;
+}
+#streak-results.streak-view-list-mode .streak-result-strength{
+  grid-column:3;
+  min-width:0;
+}
+#streak-results.streak-view-list-mode .streak-result-strength > div{
+  margin-top:0!important;
+  padding:6px 8px!important;
+}
+#streak-results.streak-view-list-mode .streak-result-strength > div > div:last-child{
+  margin-top:4px!important;
+}
+#streak-results.streak-view-list-mode .streak-result-common{
+  grid-column:4;
+  margin:0!important;
+  min-width:0;
+}
+#streak-results.streak-view-list-mode .streak-result-action{
+  grid-column:5;
+  margin:0!important;
+  padding:0!important;
+  border-top:0!important;
+  justify-self:end;
+}
+#streak-results.streak-view-list-mode .streak-result-action button{
+  height:30px!important;
+  white-space:nowrap;
+}
+#streak-results.streak-view-list-mode .streak-result-frequency,
+#streak-results.streak-view-list-mode .streak-result-daily{
+  display:none!important;
+}
+
+/* 中型寬度：清單改成兩列，但仍比卡片模式緊湊 */
+@media(max-width:1100px){
+  #streak-results.streak-view-list-mode .streak-result-card{
+    grid-template-columns:minmax(180px,1fr) minmax(145px,.8fr) minmax(120px,.65fr) auto;
+  }
+  #streak-results.streak-view-list-mode .streak-result-main{grid-column:1;}
+  #streak-results.streak-view-list-mode .streak-result-meta{grid-column:2;}
+  #streak-results.streak-view-list-mode .streak-result-strength{grid-column:3;}
+  #streak-results.streak-view-list-mode .streak-result-action{grid-column:4;}
+  #streak-results.streak-view-list-mode .streak-result-common{
+    grid-column:1 / 5;
+    padding-top:4px;
+    border-top:1px dashed #ede9fe;
+  }
+  .dark #streak-results.streak-view-list-mode .streak-result-common{border-color:#4c1d95;}
+}
+@media(max-width:640px){
+  #streak-results-header{
+    align-items:flex-start!important;
+    flex-direction:column!important;
+  }
+  .streak-results-header-actions{
+    width:100%;
+    justify-content:space-between;
+  }
+  .streak-view-switch{flex:1 1 auto;}
+  .streak-view-btn{flex:1 1 50%;min-width:0;}
+  #streak-results.streak-view-list-mode .streak-result-card{
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:6px 8px!important;
+    padding:8px!important;
+  }
+  #streak-results.streak-view-list-mode .streak-result-main{grid-column:1;}
+  #streak-results.streak-view-list-mode .streak-result-action{grid-column:2;grid-row:1;}
+  #streak-results.streak-view-list-mode .streak-result-meta{
+    grid-column:1 / 3;
+    margin-top:0!important;
+  }
+  #streak-results.streak-view-list-mode .streak-result-strength{
+    grid-column:1 / 3;
+  }
+  #streak-results.streak-view-list-mode .streak-result-common{
+    grid-column:1 / 3;
+  }
+}
+</style>
+
+
+<style id="journal-control-layout-v344">
+/* v344：策略日誌上方控制區重新分組，減少大片空白並提升掃讀速度 */
+@media (min-width:900px){
+  #module-journal .journal-fixed-filter-toolbar{
+    display:grid!important;
+    grid-template-columns:minmax(420px,1.55fr) minmax(220px,.75fr) minmax(480px,1.7fr)!important;
+    gap:10px 12px!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    align-items:stretch!important;
+  }
+  #module-journal .journal-fixed-filter-toolbar::before{
+    content:"🔎 篩選股票";
+    grid-column:1 / -1;
+    display:block;
+    padding:0 0 7px 1px;
+    margin-bottom:-2px;
+    border-bottom:1px solid #e2e8f0;
+    color:#334155;
+    font-size:12px;
+    font-weight:950;
+    letter-spacing:.02em;
+  }
+  .dark #module-journal .journal-fixed-filter-toolbar::before{border-color:#374151;color:#e2e8f0;}
+
+  /* 舊版桌機 display:contents 會讓欄位失去分組，這裡改回實體容器 */
+  #module-journal .journal-fixed-filter-toolbar > .journal-mobile-row{
+    display:block!important;
+    min-width:0!important;
+    position:relative!important;
+    padding-top:18px!important;
+  }
+  #module-journal .journal-filter-row-date{grid-column:1;}
+  #module-journal .journal-filter-row-search-clear{grid-column:2;}
+  #module-journal .journal-filter-row-conditions-1{grid-column:3;}
+  #module-journal .journal-filter-row-grid-6{grid-column:1 / -1;}
+
+  #module-journal .journal-filter-row-date::before,
+  #module-journal .journal-filter-row-search-clear::before,
+  #module-journal .journal-filter-row-conditions-1::before,
+  #module-journal .journal-filter-row-grid-6::before{
+    position:absolute;
+    top:0;
+    left:1px;
+    color:#64748b;
+    font-size:9.5px;
+    line-height:1;
+    font-weight:900;
+    letter-spacing:.04em;
+  }
+  #module-journal .journal-filter-row-date::before{content:"日期區間";}
+  #module-journal .journal-filter-row-search-clear::before{content:"關鍵字搜尋";}
+  #module-journal .journal-filter-row-conditions-1::before{content:"快速條件";}
+  #module-journal .journal-filter-row-grid-6::before{content:"進階篩選";}
+
+  #module-journal .journal-filter-row-date .date-range-fast,
+  #module-journal .journal-filter-row-search-clear > div:first-child{
+    width:100%!important;
+    height:40px!important;
+    min-height:40px!important;
+    box-sizing:border-box!important;
+  }
+  #module-journal .journal-filter-row-search-clear #filter-code{width:100%!important;max-width:none!important;}
+
+  #module-journal .journal-filter-row-conditions-1{
+    display:grid!important;
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:7px!important;
+  }
+  #module-journal .journal-filter-row-conditions-1 > label{
+    min-width:0!important;
+    min-height:40px!important;
+    height:40px!important;
+    justify-content:center!important;
+    padding:6px 8px!important;
+  }
+
+  #module-journal .journal-filter-row-grid-6{
+    display:grid!important;
+    grid-template-columns:repeat(8,minmax(0,1fr))!important;
+    gap:7px!important;
+  }
+  #module-journal .journal-filter-row-grid-6 > label,
+  #module-journal .journal-filter-row-grid-6 > select{
+    width:100%!important;
+    min-width:0!important;
+    max-width:none!important;
+    min-height:40px!important;
+    height:40px!important;
+    margin:0!important;
+  }
+  #module-journal .journal-filter-row-grid-6 > label{justify-content:center!important;padding:5px 7px!important;}
+  #module-journal .journal-filter-row-grid-6 > select{padding:5px 8px!important;font-size:11px!important;}
+  #module-journal .journal-filter-tag-cell{
+    grid-column:span 2!important;
+    display:grid!important;
+    grid-template-columns:minmax(0,1.2fr) minmax(88px,.8fr) minmax(92px,.85fr)!important;
+    gap:6px!important;
+    min-width:0!important;
+    height:40px!important;
+    position:relative!important;
+  }
+  #module-journal .journal-filter-tag-cell > button{
+    min-width:0!important;
+    width:100%!important;
+    height:40px!important;
+    justify-content:center!important;
+    padding:5px 7px!important;
+    font-size:11px!important;
+  }
+  #module-journal #filter-tag-panel{height:auto!important;}
+
+  #module-journal .journal-filter-tags-display-row{
+    grid-column:1 / -1;
+    display:flex!important;
+    align-items:center!important;
+    gap:7px!important;
+    min-width:0!important;
+    margin-top:-1px!important;
+    padding-top:7px!important;
+    border-top:1px dashed #e2e8f0;
+  }
+  .dark #module-journal .journal-filter-tags-display-row{border-color:#374151;}
+  #module-journal #journal-active-filter-chips{margin-top:7px!important;}
+
+  /* 複製區：左邊為輸出設定，右邊為資料維護 */
+  #module-journal .copy-section{padding:10px 12px!important;}
+  #module-journal .copy-section-row{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) 166px!important;
+    gap:10px!important;
+    align-items:stretch!important;
+  }
+  #module-journal .copy-toolbar{
+    display:flex!important;
+    flex-wrap:wrap!important;
+    align-content:flex-start!important;
+    align-items:center!important;
+    gap:7px!important;
+    width:100%!important;
+    min-width:0!important;
+    overflow:visible!important;
+    padding:9px 10px!important;
+  }
+  #module-journal .copy-toolbar > span:first-child{
+    flex:0 0 100%;
+    width:100%;
+    margin:0!important;
+    padding:0 0 6px!important;
+    border-bottom:1px solid #dbeafe;
+    color:#1d4ed8!important;
+    font-size:12px!important;
+    font-weight:950!important;
+  }
+  .dark #module-journal .copy-toolbar > span:first-child{border-color:#1e3a8a;color:#93c5fd!important;}
+
+  #module-journal .copy-small-label-controls{
+    flex:0 0 100%!important;
+    width:100%!important;
+    min-width:0!important;
+    flex-wrap:wrap!important;
+    gap:5px 10px!important;
+    padding:7px 9px!important;
+    border-radius:9px!important;
+  }
+  #module-journal .copy-toolbar-break{flex:0 0 100%!important;width:100%!important;height:0!important;}
+
+  /* 自訂標題改成橫向緊湊卡，不再佔大塊高度 */
+  #module-journal .copy-title-card{
+    flex:0 0 100%!important;
+    width:100%!important;
+    display:grid!important;
+    grid-template-columns:minmax(245px,.75fr) minmax(360px,1.25fr)!important;
+    gap:7px 10px!important;
+    align-items:center!important;
+    padding:7px 9px!important;
+    border-radius:9px!important;
+  }
+  #module-journal .copy-title-head{align-items:center!important;}
+  #module-journal .copy-title-icon{width:27px!important;height:27px!important;flex-basis:27px!important;}
+  #module-journal .copy-title-help{font-size:9px!important;}
+  #module-journal .copy-title-row{grid-template-columns:minmax(0,1fr) auto!important;gap:6px!important;}
+  #module-journal .copy-title-input{height:34px!important;}
+  #module-journal .copy-title-clear{height:34px!important;min-width:88px!important;}
+  #module-journal .copy-title-preview-row{
+    grid-column:1 / -1!important;
+    padding-top:4px!important;
+    gap:6px!important;
+  }
+
+  #module-journal .copy-mode-label{
+    flex:0 0 auto;
+    height:31px;
+    display:inline-flex;
+    align-items:center;
+    padding:0 9px;
+    border-radius:8px;
+    background:#e0e7ff;
+    color:#4338ca;
+    font-size:10px;
+    font-weight:950;
+    white-space:nowrap;
+  }
+  .dark #module-journal .copy-mode-label{background:rgba(67,56,202,.25);color:#c7d2fe;}
+  #module-journal .btn-copy{min-height:31px!important;padding-top:5px!important;padding-bottom:5px!important;}
+
+  #module-journal .journal-maintenance-tools{
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:stretch!important;
+    justify-content:flex-start!important;
+    gap:7px!important;
+    min-width:0!important;
+    padding:9px!important;
+    border:1px solid #d1fae5;
+    border-radius:11px;
+    background:#f0fdf4;
+  }
+  .dark #module-journal .journal-maintenance-tools{border-color:#14532d;background:rgba(20,83,45,.18);}
+  #module-journal .journal-maintenance-title{
+    display:block;
+    padding-bottom:6px;
+    border-bottom:1px solid #bbf7d0;
+    color:#047857;
+    font-size:10px;
+    font-weight:950;
+    text-align:center;
+  }
+  .dark #module-journal .journal-maintenance-title{border-color:#166534;color:#86efac;}
+  #module-journal .journal-maintenance-tools > button{width:100%!important;justify-content:center!important;min-height:34px!important;}
+}
+
+/* 900~1180px：避免控制項被壓得太窄 */
+@media (min-width:900px) and (max-width:1180px){
+  #module-journal .journal-fixed-filter-toolbar{grid-template-columns:1fr 1fr!important;}
+  #module-journal .journal-filter-row-date{grid-column:1;}
+  #module-journal .journal-filter-row-search-clear{grid-column:2;}
+  #module-journal .journal-filter-row-conditions-1{grid-column:1 / -1;}
+  #module-journal .journal-filter-row-grid-6{grid-template-columns:repeat(4,minmax(0,1fr))!important;}
+  #module-journal .journal-filter-tag-cell{grid-column:span 2!important;}
+  #module-journal .copy-section-row{grid-template-columns:1fr!important;}
+  #module-journal .journal-maintenance-tools{flex-direction:row!important;align-items:center!important;}
+  #module-journal .journal-maintenance-title{border-bottom:0!important;border-right:1px solid #bbf7d0;padding:0 9px 0 0!important;}
+  #module-journal .journal-maintenance-tools > button{width:auto!important;}
+}
+
+/* 手機：維持原本單欄操作，只把複製分組標題做得更清楚 */
+@media (max-width:899px){
+  #module-journal .copy-mode-label{
+    flex:0 0 100%;
+    width:100%;
+    margin-top:2px;
+    font-size:10px;
+    font-weight:950;
+    color:#4f46e5;
+  }
+  #module-journal .journal-maintenance-tools{width:100%;}
+  #module-journal .journal-maintenance-title{display:none;}
+}
+</style>
+
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen flex flex-col antialiased">
 <nav class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-50 transition-colors duration-300">
@@ -4704,7 +5137,13 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 <div class="hidden grid grid-cols-3 sm:grid-cols-6 gap-1.5 px-4 sm:px-5 pt-1 pb-2" id="streak-stats"></div>
 <div class="hidden px-4 sm:px-5 pt-1 pb-1.5 flex items-center justify-between gap-2" id="streak-results-header">
   <div class="text-sm font-black text-violet-700 dark:text-violet-300"><i class="fa-solid fa-list-check mr-1.5"></i>篩選結果 <span id="streak-results-count" class="ml-1 text-xs font-bold text-gray-500 dark:text-gray-400"></span></div>
-  <button type="button" id="streak-back-filters-btn" class="h-8 px-3 rounded-lg border border-violet-200 dark:border-violet-700 bg-white dark:bg-gray-800 text-[11px] font-bold text-violet-700 dark:text-violet-300"><i class="fa-solid fa-arrow-up mr-1"></i>回篩選</button>
+  <div class="streak-results-header-actions">
+    <div class="streak-view-switch" role="group" aria-label="篩選結果顯示方式">
+      <button type="button" class="streak-view-btn" data-streak-view="card" aria-pressed="true" title="卡片模式：顯示完整策略與每日明細"><i class="fa-solid fa-grip mr-1"></i><span>卡片</span></button>
+      <button type="button" class="streak-view-btn" data-streak-view="list" aria-pressed="false" title="清單模式：精簡顯示，可一次看到更多股票"><i class="fa-solid fa-list mr-1"></i><span>清單</span></button>
+    </div>
+    <button type="button" id="streak-back-filters-btn" class="h-8 px-3 rounded-lg border border-violet-200 dark:border-violet-700 bg-white dark:bg-gray-800 text-[11px] font-bold text-violet-700 dark:text-violet-300"><i class="fa-solid fa-arrow-up mr-1"></i>回篩選</button>
+  </div>
 </div>
 <div class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-5 gap-2 px-4 sm:px-5 pb-3 max-h-[640px] lg:max-h-[75vh] overflow-y-auto items-start" id="streak-results"></div>
 </div>
@@ -4834,6 +5273,7 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 </div>
 </div>
 <div class="copy-toolbar-break" aria-hidden="true"></div>
+<span class="copy-mode-label"><i class="fa-solid fa-wand-magic-sparkles mr-1.5"></i>複製方式</span>
 <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="selected">獨選</button>
 <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="strategy">策略</button>
 <button class="flex-shrink-0 btn-copy-base bg-fuchsia-50 dark:bg-fuchsia-900/40 hover:bg-fuchsia-600 border-fuchsia-200 dark:border-fuchsia-700/50 text-fuchsia-700 dark:text-fuchsia-200 btn-copy" data-mode="copy_a" title="破繭而出、月來越好、季不可失、OBV突破、MACD突破">複製A</button>
@@ -4845,7 +5285,8 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 <button class="flex-shrink-0 btn-copy-base bg-green-50 dark:bg-green-900/40 hover:bg-green-600 border-green-200 dark:border-green-700/50 text-green-700 dark:text-green-200 btn-copy" data-mode="eps">EPS</button>
 <button class="flex-shrink-0 btn-copy-base bg-amber-50 dark:bg-amber-900/40 hover:bg-amber-600 border-amber-200 dark:border-amber-700/50 text-amber-700 dark:text-amber-200 btn-copy" data-mode="horses" title="追風馬、赤兔馬、千里馬完全相同：各自與上一期同馬種名單比對；本次有上次沒有＝🆕新進榜，上次有本次沒有＝-✂️剔除">🏇 精選馬廄</button>
 </div>
-<div class="flex items-center gap-2 flex-wrap">
+<div class="journal-maintenance-tools flex items-center gap-2 flex-wrap">
+<span class="journal-maintenance-title"><i class="fa-solid fa-screwdriver-wrench mr-1.5"></i>資料維護</span>
 <button class="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:text-gray-500 text-white px-3 py-1.5 text-xs sm:text-sm font-bold shadow-sm transition active:scale-95 disabled:cursor-wait" id="btn-update-journal-close-prices" title="僅在按下此按鈕時更新最新一個策略日誌日期的收盤價與漲幅%；登入／開啟網頁時不會自動更新，更早歷史紀錄不變" type="button"><i class="fa-solid fa-arrows-rotate"></i><span>更新收盤價</span></button>
 <button class="inline-flex items-center gap-1.5 rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/25 hover:bg-red-600 dark:hover:bg-red-600 hover:text-white text-red-700 dark:text-red-300 px-3 py-1.5 text-xs sm:text-sm font-black shadow-sm transition active:scale-95 disabled:opacity-45 disabled:cursor-not-allowed" id="btn-clean-old-journals" title="永久清除日期早於三個月前的策略日誌；目前追蹤股票若只剩舊紀錄，會自動保留最新一筆避免追蹤分組消失" type="button"><i class="fa-solid fa-broom"></i><span>清除3個月前</span><span class="min-w-[20px] h-5 px-1.5 rounded-full bg-red-600 text-white text-[10px] inline-flex items-center justify-center tabular-nums" id="journal-old-data-count">0</span></button>
 <span class="hidden text-[10px] sm:text-xs text-gray-400 dark:text-gray-500 whitespace-nowrap cursor-help" id="journal-close-price-status" title="收盤價來源狀態"></span>
@@ -4862,7 +5303,7 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 <button class="h-8 bg-red-600 hover:bg-red-500 text-white text-xs font-medium px-3 rounded-lg transition shadow-sm active:scale-95" data-batch-delete-type="journal" type="button">批次刪除</button>
 </div>
 </div>
-<div class="mobile-card-scroll overflow-x-auto overflow-y-auto max-h-[65vh] 2xl:max-h-[70vh] flex-grow relative rounded-b-xl w-full">
+<div class="mobile-card-scroll overflow-x-auto overflow-y-auto max-h-[65vh] 2xl:max-h-[70vh] flex-grow relative rounded-b-xl w-full" id="journal-table-scroll">
 <table class="mobile-card-table min-w-full text-left text-sm whitespace-nowrap table-auto w-full">
 <thead class="bg-gray-50/95 dark:bg-gray-900/95 backdrop-blur-md text-gray-500 dark:text-gray-400 sticky top-0 z-30 shadow-sm font-medium border-b border-gray-200 dark:border-gray-700">
 <tr>
@@ -5525,6 +5966,7 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 </div>
 </div>
 <div class="copy-toolbar-break" aria-hidden="true"></div>
+<span class="copy-mode-label"><i class="fa-solid fa-wand-magic-sparkles mr-1.5"></i>複製方式</span>
 <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="selected">獨選</button>
 <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="strategy">策略</button>
 <button class="flex-shrink-0 btn-copy-base bg-fuchsia-50 dark:bg-fuchsia-900/40 hover:bg-fuchsia-600 border-fuchsia-200 dark:border-fuchsia-700/50 text-fuchsia-700 dark:text-fuchsia-200 btn-copy" data-mode="copy_a" title="破繭而出、月來越好、季不可失、OBV突破、MACD突破">複製A</button>
@@ -5974,6 +6416,26 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 - 「精選馬廄」複製修正：不再被 7 日顯示狀態污染，🆕只由本次 vs 上一期的 newCodes 決定。
 - 原本一般彙整畫面需要的「新進狀態維持 7 日」仍保留，不影響歷史顯示用途。
 -->
+<!-- v343：
+【策略日誌表格加高＋篩選結果雙模式】
+- 策略日誌主表格可視高度由原本約 65~70vh 提高到桌機約 78~82vh，減少捲動、一次看到更多股票。
+- 策略訊號雷達「篩選結果」可視高度提高到約 82~84vh。
+- 篩選結果新增「卡片／清單」兩種顯示模式，可直接在結果標題列切換。
+- 卡片模式保留完整：強度、共同策略、策略頻率、每日策略明細。
+- 清單模式改為一檔一列，保留股票、出現/連續資訊、熱度、強度、共同策略與個股總覽，隱藏策略頻率與每日明細，因此可一次看到更多檔。
+- 顯示模式會記憶在本機，下次開啟仍維持上次選擇。
+- 手機清單模式採兩欄精簡排列，避免橫向擠壓。
+-->
+<!-- v344：
+【移除兩個策略標籤＋篩選/複製區重新整理】
+- 策略標籤移除「營收創高」「千張大戶」；兩者仍保留為資料條件/複製小標籤，不影響營收與大戶資料判斷。
+- 舊日誌、舊 tagSettings、快速組合中的這兩個手動策略標籤會在載入時自動清理，不會再被 migration 補回。
+- 桌機篩選區改成「日期區間／關鍵字搜尋／快速條件／進階篩選」四個清楚分組，減少大片留白。
+- 進階篩選固定網格排列：大戶條件、分數、等級、狀態、訊號、標籤/組合/清除集中在同一排。
+- 已選標籤與快速組合獨立成下方一列，更容易辨認目前套用條件。
+- 複製區重新分成「輸出標示／複製標題／複製方式／資料維護」；資料維護固定獨立卡片，避免和複製按鈕混在一起。
+- 複製標題功能保留，但桌機改成更緊湊的橫向排列，降低整區高度。
+-->
 <!-- 核心 JavaScript -->
 <script>
 const originalDateSetter=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set;
@@ -6139,9 +6601,9 @@ const THEME_MAP = {
 
 const TAG_CATEGORIES = [
     {title: "🌟 特別關注", theme: "rose", tags: ["特別追蹤", "總編概念股"]},
-    {title: "📊 基本面佳", theme: "blue", tags: ["多頭營收創高", "營收創高", "追風馬", "赤兔馬", "千里馬"]},
+    {title: "📊 基本面佳", theme: "blue", tags: ["多頭營收創高", "追風馬", "赤兔馬", "千里馬"]},
     {title: "🔥 動能與型態", theme: "amber", tags: ["一陽指", "金包銀", "披荊斬棘", "破繭而出", "月來越好", "季不可失", "守株待兔", "缺口", "小碎步", "多排上漲"]},
-    {title: "💰 量價與籌碼", theme: "purple", tags: ["量價齊揚", "高成交值", "高成交值高營收", "千張大戶", "外資連買", "投信連買", "外資+投信", "外資+自營", "投信+自營", "三法聯手", "多頭法人買籌碼集中", "1日籌碼集中度", "5日籌碼集中", "20日籌碼集中", "籌碼集中大戶增"]},
+    {title: "💰 量價與籌碼", theme: "purple", tags: ["量價齊揚", "高成交值", "高成交值高營收", "外資連買", "投信連買", "外資+投信", "外資+自營", "投信+自營", "三法聯手", "多頭法人買籌碼集中", "1日籌碼集中度", "5日籌碼集中", "20日籌碼集中", "籌碼集中大戶增"]},
     {title: "📈 技術指標", theme: "teal", tags: ["OBV突破", "MACD突破", "KD金叉"]},
     {title: "🌱 快樂農夫與他的韭菜田投資週報", theme: "purple", tags: ["黑卡會員", "尊耀會員", "頂峰會員", "鐵粉會員"]}
 ];
@@ -6150,7 +6612,7 @@ const SPECIAL_ATTENTION_TAGS=new Set(['特別追蹤','總編概念股']);
 const isSpecialAttentionTag=tag=>SPECIAL_ATTENTION_TAGS.has(normalizeStrategyTagName(tag));
 
 const STRATEGY_TAG_ALIASES={'一條根':'一陽指','跳空缺口':'缺口','1日籌碼集中':'1日籌碼集中度','阿婆散步':'小碎步','阿甘步伐':'小碎步','總編認同':'總編概念股','籌碼集中集中大戶增':'籌碼集中大戶增'};
-const DEPRECATED_STRATEGY_TAGS=new Set(['法人加持','非凡重點']);
+const DEPRECATED_STRATEGY_TAGS=new Set(['法人加持','非凡重點','營收創高','千張大戶']);
 const normalizeStrategyTagName=tag=>{
     const raw=String(tag??'').trim();
     const normalized=STRATEGY_TAG_ALIASES[raw]||raw;
@@ -9936,6 +10398,32 @@ const getStreakDataFilterLabels=filters=>{
     return labels;
 };
 
+const STREAK_RESULT_VIEW_KEY='ryan_streak_result_view_v1';
+let streakResultViewMode='card';
+try{
+    const savedView=localStorage.getItem(STREAK_RESULT_VIEW_KEY);
+    if(savedView==='list'||savedView==='card')streakResultViewMode=savedView;
+}catch(error){}
+
+const applyStreakResultViewMode=(mode=streakResultViewMode,persist=true)=>{
+    streakResultViewMode=mode==='list'?'list':'card';
+    const root=document.getElementById('streak-results');
+    if(root){
+        root.classList.toggle('streak-view-card-mode',streakResultViewMode==='card');
+        root.classList.toggle('streak-view-list-mode',streakResultViewMode==='list');
+        root.dataset.viewMode=streakResultViewMode;
+    }
+    document.querySelectorAll('[data-streak-view]').forEach(button=>{
+        const active=button.dataset.streakView===streakResultViewMode;
+        button.classList.toggle('is-active',active);
+        button.setAttribute('aria-pressed',String(active));
+    });
+    if(persist){
+        try{localStorage.setItem(STREAK_RESULT_VIEW_KEY,streakResultViewMode);}catch(error){}
+    }
+    return streakResultViewMode;
+};
+
 function renderJournalStreaks(){
     const baseInput=document.getElementById('streak-base-date'),stockSearchInput=document.getElementById('streak-stock-search'),modeInput=document.getElementById('streak-mode'),daysInput=document.getElementById('streak-min-days'),occurrencesInput=document.getElementById('streak-min-occurrences'),horseModeInput=document.getElementById('streak-horse-mode'),tagModeInput=document.getElementById('streak-tag-filter-mode'),sortInput=document.getElementById('streak-result-sort'),heatInput=document.getElementById('streak-heat-filter'),strengthInput=document.getElementById('streak-min-strength'),summary=document.getElementById('streak-summary'),root=document.getElementById('streak-results'),copyBtn=document.getElementById('streak-copy-btn');
     if(!baseInput||!modeInput||!daysInput||!occurrencesInput||!horseModeInput||!tagModeInput||!sortInput||!heatInput||!strengthInput||!summary||!root||!copyBtn)return;
@@ -10046,20 +10534,20 @@ function renderJournalStreaks(){
                 }).join('');
             }
 
-            return `<article class="streak-result-card rounded-xl border border-violet-200 dark:border-violet-800/60 bg-white dark:bg-gray-900/35 p-2.5 sm:p-3 shadow-sm">
-                <div class="flex items-start justify-between gap-2">
+            return `<article class="streak-result-card streak-result-item rounded-xl border border-violet-200 dark:border-violet-800/60 bg-white dark:bg-gray-900/35 p-2.5 sm:p-3 shadow-sm">
+                <div class="streak-result-main flex items-start justify-between gap-2">
                     <div class="min-w-0 flex flex-wrap items-center gap-1">
                         <span class="font-black text-violet-700 dark:text-violet-300 cursor-pointer hover:underline hover:text-blue-600 dark:hover:text-blue-300 transition" data-yahoo-stock-code="${safeCode}" role="link" tabindex="0" title="開啟 Yahoo 股市 ${safeCode}">${safeCode}</span>
                         <span class="font-bold text-gray-800 dark:text-gray-100 cursor-pointer hover:underline hover:text-blue-600 dark:hover:text-blue-300 transition" data-yahoo-stock-code="${safeCode}" role="link" tabindex="0" title="開啟 Yahoo 股市 ${safeCode}">${safeName}</span>${newBadge}${infoIcons}
                     </div>
                     <span class="shrink-0 rounded-full bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 px-2.5 py-1 text-[10px] font-black">${escapeHTML(resultBadge)}</span>
                 </div>
-                <div class="flex flex-wrap items-center gap-1.5 mt-2">${heatBadge}<span class="text-[10px] text-gray-400">前期 ${Number(item?.previousWindowOccurrences||0)} 次 → 本期 ${Number(item?.currentWindowOccurrences||0)} 次</span></div>
-                ${strengthHtml}
-                <div class="flex flex-wrap items-center gap-1 mt-3 mb-2"><span class="text-[10px] text-gray-500 dark:text-gray-400 mr-1">共同策略</span>${commonHtml}</div>
-                <div class="flex flex-wrap items-center gap-1 mb-2"><span class="text-[10px] text-gray-500 dark:text-gray-400 mr-1">策略頻率</span>${frequencyHtml}</div>
-                <div>${dailyHtml}</div>
-                <div class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700/70">
+                <div class="streak-result-meta flex flex-wrap items-center gap-1.5 mt-2">${heatBadge}<span class="text-[10px] text-gray-400">前期 ${Number(item?.previousWindowOccurrences||0)} 次 → 本期 ${Number(item?.currentWindowOccurrences||0)} 次</span></div>
+                <div class="streak-result-strength">${strengthHtml}</div>
+                <div class="streak-result-common flex flex-wrap items-center gap-1 mt-3 mb-2"><span class="text-[10px] text-gray-500 dark:text-gray-400 mr-1">共同策略</span>${commonHtml}</div>
+                <div class="streak-result-frequency flex flex-wrap items-center gap-1 mb-2"><span class="text-[10px] text-gray-500 dark:text-gray-400 mr-1">策略頻率</span>${frequencyHtml}</div>
+                <div class="streak-result-daily">${dailyHtml}</div>
+                <div class="streak-result-action mt-3 pt-3 border-t border-gray-100 dark:border-gray-700/70">
                     <button type="button" data-streak-action="overview" data-code="${safeCode}" data-name="${safeName}" class="h-8 px-2.5 rounded-lg border border-violet-200 dark:border-violet-700 bg-violet-50 dark:bg-violet-900/30 text-violet-700 dark:text-violet-200 text-[11px] font-bold"><i class="fa-solid fa-chart-pie mr-1"></i>個股總覽</button>
                 </div>
             </article>`;
@@ -10074,6 +10562,7 @@ function renderJournalStreaks(){
     if(!root.innerHTML.trim()){
         root.innerHTML='<div class="col-span-full rounded-xl border border-amber-300 bg-amber-50 dark:bg-amber-900/20 p-4 text-sm font-bold text-amber-700 dark:text-amber-300">已篩選到股票，但結果卡片產生失敗。請重新整理頁面。</div>';
     }
+    applyStreakResultViewMode(streakResultViewMode,false);
     optimizeStreakResultMobileCodeName();
 optimizeStreakDataConditionOrder();
 setTimeout(optimizeStreakDataConditionOrder,0);
@@ -10129,7 +10618,15 @@ const scheduleStreakAutoRender=(delay=30)=>{
     clearTimeout(streakAutoRenderTimer);
     streakAutoRenderTimer=setTimeout(()=>renderJournalStreaks(),delay);
 };
+requestAnimationFrame(()=>applyStreakResultViewMode(streakResultViewMode,false));
+
 document.getElementById('streak-search-form')?.addEventListener('submit',e=>{e.preventDefault();});
+document.getElementById('streak-results-header')?.addEventListener('click',event=>{
+    const button=event.target.closest('[data-streak-view]');
+    if(!button)return;
+    const mode=applyStreakResultViewMode(button.dataset.streakView,true);
+    showToast(mode==='list'?'篩選結果已切換為清單模式':'篩選結果已切換為卡片模式');
+});
 document.getElementById('streak-reset-btn')?.addEventListener('click',()=>resetStreakFiltersToDefaults({renderResults:true,notify:true}));
 document.getElementById('streak-base-date')?.addEventListener('change',()=>scheduleStreakAutoRender());
 const streakStockSearchInput=document.getElementById('streak-stock-search');
@@ -13557,7 +14054,7 @@ setChkDirection('long');
   }
   function normalizeTagMeta(name,categoryTheme,meta){
     var source=meta&&typeof meta==='object'?meta:{};
-    var defaultCadence=name==='千張大戶'?'weekly':name==='營收創高'?'monthly':'none';
+    var defaultCadence='none';
     var rawCadence=String(source.requiredCadence||defaultCadence);
     var cadence=rawCadence==='daily'?'afterClose':(['none','irregular','closing','afterClose','weekly','monthly'].includes(rawCadence)?rawCadence:defaultCadence);
     var reminderColor=REMINDER_COLOR_KEYS.includes(source.reminderColor)?source.reminderColor:'amber';
@@ -13578,7 +14075,7 @@ setChkDirection('long');
       DEFAULT_TAG_CATEGORIES.forEach(function(category){
         category.tags.forEach(function(tag){meta[tag]=normalizeTagMeta(tag,category.theme,null);});
       });
-      state.tagSettings={version:3,categories:clone(DEFAULT_TAG_CATEGORIES),meta:meta,updatedAt:Date.now()};
+      state.tagSettings={version:4,categories:clone(DEFAULT_TAG_CATEGORIES),meta:meta,updatedAt:Date.now()};
       changed=true;
     }else{
       var previousSettings=JSON.stringify({categories:state.tagSettings.categories,meta:state.tagSettings.meta||{},version:state.tagSettings.version});
@@ -13673,14 +14170,8 @@ setChkDirection('long');
         seen.add(tag);
       });
 
-      // v319：新增「營收創高」策略標籤，放在基本面佳。
-      if(!fundamentalCategory.tags.includes('營收創高')){
-        var revenueTagIndex=fundamentalCategory.tags.indexOf('多頭營收創高');
-        fundamentalCategory.tags.splice(revenueTagIndex>=0?revenueTagIndex+1:0,0,'營收創高');
-        seen.add('營收創高');
-        changed=true;
-      }
-      if(!sourceMeta['營收創高'])sourceMeta['營收創高']=normalizeTagMeta('營收創高','blue',null);
+      // v344：「營收創高」「千張大戶」已自策略標籤移除；
+      // 舊 localStorage / 雲端 tagSettings 由 normalizeStrategyTagName 自動清掉。
 
       // v161：既有使用者也自動補上「🌱 快樂農夫與他的韭菜田投資週報」與三個會員標籤。
       var analystCategoryTitle='🌱 快樂農夫與他的韭菜田投資週報';
@@ -13714,7 +14205,7 @@ setChkDirection('long');
 
       // v304：既有使用者自動補上「量價與籌碼」必要標籤，包含「多頭法人買籌碼集中」。
       var chipCategoryTitle='💰 量價與籌碼';
-      var chipAllianceTags=['高成交值高營收','千張大戶','外資連買','投信連買','外資+投信','外資+自營','投信+自營','三法聯手','多頭法人買籌碼集中','籌碼集中大戶增'];
+      var chipAllianceTags=['高成交值高營收','外資連買','投信連買','外資+投信','外資+自營','投信+自營','三法聯手','多頭法人買籌碼集中','籌碼集中大戶增'];
       var chipCategory=normalizedCategories.find(function(category){return String(category.title||'')===chipCategoryTitle;});
       if(!chipCategory){
         chipCategory={title:chipCategoryTitle,theme:'purple',tags:[]};
@@ -13737,15 +14228,10 @@ setChkDirection('long');
         });
       });
 
-      // v319：只在版本升級時預設一次；日後使用者仍可自行改頻率。
-      if(previousTagSettingsVersion<2){
-        if(nextMeta['千張大戶'])nextMeta['千張大戶'].requiredCadence='weekly';
-        if(nextMeta['營收創高'])nextMeta['營收創高'].requiredCadence='monthly';
-        changed=true;
-      }
+      // v344：移除「營收創高」「千張大戶」策略標籤後，不再建立其提醒週期。
       state.tagSettings.categories=normalizedCategories;
       state.tagSettings.meta=nextMeta;
-      state.tagSettings.version=3;
+      state.tagSettings.version=4;
       if(JSON.stringify({categories:state.tagSettings.categories,meta:state.tagSettings.meta,version:state.tagSettings.version})!==previousSettings){state.tagSettings.updatedAt=Date.now();changed=true;}
     }
     return changed;
