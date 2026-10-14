@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="347" name="app-version"/>
+<meta content="349" name="app-version"/>
 <script id="startup-performance-bootstrap">
 window.__ryanStartupPerf={start:performance.now(),localReady:0,firstRender:0,cloudStart:0,cloudEnd:0,cloudOk:null};
 </script>
@@ -5595,6 +5595,501 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 }
 </style>
 
+
+<style id="journal-filter-chain-v348">
+/* v348：桌機篩選區改為「接龍式單列橫排」，不再上下堆疊 */
+@media (min-width:1200px){
+  #module-journal .journal-fixed-filter-toolbar{
+    display:flex!important;
+    flex-flow:row nowrap!important;
+    align-items:center!important;
+    gap:6px!important;
+    width:100%!important;
+    min-width:0!important;
+    overflow:visible!important;
+    padding-top:0!important;
+  }
+
+  /* 篩選股票標題獨立在上方，但不佔工具列橫排 */
+  #module-journal .journal-fixed-filter-toolbar::before{
+    content:none!important;
+    display:none!important;
+  }
+
+  /* 所有舊分組容器完全攤平，讓控制項真的接成一條 */
+  #module-journal .journal-fixed-filter-toolbar > .journal-filter-row-date,
+  #module-journal .journal-fixed-filter-toolbar > .journal-filter-row-search-clear,
+  #module-journal .journal-fixed-filter-toolbar > .journal-filter-row-conditions-1,
+  #module-journal .journal-fixed-filter-toolbar > .journal-filter-row-grid-6{
+    display:contents!important;
+  }
+
+  #module-journal .journal-filter-row-date::before,
+  #module-journal .journal-filter-row-search-clear::before,
+  #module-journal .journal-filter-row-conditions-1::before,
+  #module-journal .journal-filter-row-grid-6::before{
+    content:none!important;
+    display:none!important;
+  }
+
+  /* 全部固定為橫向小尺寸 */
+  #module-journal .journal-filter-row-date .date-range-fast{
+    flex:0 0 332px!important;
+    width:332px!important;
+    min-width:332px!important;
+    height:38px!important;
+    min-height:38px!important;
+    margin:0!important;
+  }
+  #module-journal .journal-filter-row-date .date-range-fast > span:first-child{
+    display:none!important;
+  }
+
+  #module-journal .journal-filter-row-search-clear > div:first-child{
+    flex:0 0 190px!important;
+    width:190px!important;
+    min-width:190px!important;
+    height:38px!important;
+    min-height:38px!important;
+    margin:0!important;
+  }
+  #module-journal .journal-filter-row-search-clear #filter-code{
+    width:100%!important;
+    max-width:none!important;
+  }
+
+  #module-journal .journal-filter-row-conditions-1 > label{
+    flex:0 0 auto!important;
+    width:auto!important;
+    min-width:92px!important;
+    max-width:108px!important;
+    height:38px!important;
+    min-height:38px!important;
+    margin:0!important;
+    padding:4px 8px!important;
+    justify-content:center!important;
+  }
+  #module-journal .journal-filter-row-conditions-1 > label span{
+    font-size:11px!important;
+  }
+
+  #module-journal .journal-filter-row-grid-6 > label{
+    flex:0 0 auto!important;
+    width:auto!important;
+    min-width:118px!important;
+    max-width:138px!important;
+    height:38px!important;
+    min-height:38px!important;
+    margin:0!important;
+    padding:4px 8px!important;
+    justify-content:center!important;
+  }
+  #module-journal .journal-filter-row-grid-6 > label span{
+    font-size:10.5px!important;
+  }
+
+  #module-journal .journal-filter-row-grid-6 > select{
+    flex:0 0 98px!important;
+    width:98px!important;
+    min-width:98px!important;
+    max-width:105px!important;
+    height:38px!important;
+    min-height:38px!important;
+    margin:0!important;
+    padding:4px 6px!important;
+    font-size:10.5px!important;
+  }
+  #module-journal #filter-journal-quick{
+    flex-basis:108px!important;
+    width:108px!important;
+    min-width:108px!important;
+    max-width:116px!important;
+  }
+
+  #module-journal .journal-filter-tag-cell{
+    flex:0 0 258px!important;
+    width:258px!important;
+    min-width:258px!important;
+    max-width:258px!important;
+    height:38px!important;
+    margin:0!important;
+    display:grid!important;
+    grid-template-columns:minmax(105px,1fr) 67px 80px!important;
+    gap:3px!important;
+    position:relative!important;
+    overflow:visible!important;
+  }
+  #module-journal .journal-filter-tag-cell > button{
+    width:100%!important;
+    min-width:0!important;
+    height:38px!important;
+    min-height:38px!important;
+    padding:4px 5px!important;
+    font-size:10px!important;
+    justify-content:center!important;
+  }
+  #module-journal .journal-filter-tag-cell #filter-tag-btn span{
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+
+  /* 標籤結果獨立下一排；主篩選本身維持一整條 */
+  #module-journal .journal-filter-tags-display-row{
+    display:none!important;
+  }
+
+  /* 若視窗略小，整條改成橫向捲動，也絕不改成垂直 */
+  #module-journal .card-panel > .p-4:first-of-type{
+    overflow-x:auto!important;
+    overflow-y:visible!important;
+    scrollbar-width:thin;
+  }
+  #module-journal .journal-fixed-filter-toolbar{
+    min-width:max-content!important;
+  }
+
+  #module-journal #journal-active-filter-chips{
+    min-width:100%!important;
+    width:max-content!important;
+    margin-top:7px!important;
+    padding-top:6px!important;
+  }
+
+  /* 複製區：標示小標籤改成一條緊密橫排，不再留大片空白 */
+  #module-journal .copy-small-label-controls{
+    flex:0 0 auto!important;
+    width:auto!important;
+    min-width:0!important;
+    display:inline-flex!important;
+    flex-direction:row!important;
+    flex-wrap:nowrap!important;
+    align-items:center!important;
+    gap:4px!important;
+    padding:4px 6px!important;
+    border-radius:8px!important;
+  }
+  #module-journal .copy-small-label-controls > span{
+    flex:0 0 auto!important;
+    width:auto!important;
+    margin:0 2px 0 0!important;
+    padding:0!important;
+    grid-column:auto!important;
+    font-size:9.5px!important;
+  }
+  #module-journal .copy-small-label-controls > label{
+    flex:0 0 auto!important;
+    min-width:0!important;
+    width:auto!important;
+    gap:3px!important;
+    margin:0!important;
+    padding:0 2px!important;
+    font-size:9.5px!important;
+  }
+  #module-journal .copy-small-label-controls input{
+    width:13px!important;
+    height:13px!important;
+    min-width:13px!important;
+  }
+
+  /* 複製按鈕也接續排，減少不必要換行 */
+  #module-journal .copy-toolbar{
+    gap:5px!important;
+  }
+  #module-journal .copy-toolbar-break{
+    flex-basis:100%!important;
+    height:0!important;
+  }
+}
+
+/* 1200 以下桌機仍保持橫排，只允許橫向捲動 */
+@media (min-width:900px) and (max-width:1199px){
+  #module-journal .journal-fixed-filter-toolbar{
+    display:flex!important;
+    flex-flow:row nowrap!important;
+    align-items:center!important;
+    gap:6px!important;
+    min-width:max-content!important;
+    width:max-content!important;
+  }
+  #module-journal .journal-fixed-filter-toolbar::before{display:none!important;content:none!important;}
+  #module-journal .journal-fixed-filter-toolbar > .journal-filter-row-date,
+  #module-journal .journal-fixed-filter-toolbar > .journal-filter-row-search-clear,
+  #module-journal .journal-fixed-filter-toolbar > .journal-filter-row-conditions-1,
+  #module-journal .journal-fixed-filter-toolbar > .journal-filter-row-grid-6{
+    display:contents!important;
+  }
+  #module-journal .journal-filter-row-date::before,
+  #module-journal .journal-filter-row-search-clear::before,
+  #module-journal .journal-filter-row-conditions-1::before,
+  #module-journal .journal-filter-row-grid-6::before{
+    display:none!important;content:none!important;
+  }
+  #module-journal .card-panel > .p-4:first-of-type{
+    overflow-x:auto!important;
+    overflow-y:visible!important;
+  }
+  #module-journal .journal-filter-tags-display-row{display:none!important;}
+
+  #module-journal .copy-small-label-controls{
+    display:flex!important;
+    flex-flow:row wrap!important;
+    gap:4px 6px!important;
+    padding:5px 7px!important;
+  }
+  #module-journal .copy-small-label-controls > span{
+    width:auto!important;
+    flex:0 0 auto!important;
+    grid-column:auto!important;
+  }
+}
+</style>
+
+
+<style id="journal-filter-left-right-v349">
+/* v349：依需求將篩選列拆成「左區＋右區」第一排，第二排放下拉與標籤 */
+@media (min-width:1200px){
+  #module-journal .card-panel > .p-4:first-of-type{
+    overflow-x:visible!important;
+    overflow-y:visible!important;
+  }
+
+  #module-journal .journal-fixed-filter-toolbar{
+    display:grid!important;
+    grid-template-columns:358px 210px 96px 96px 96px 1fr 138px 138px;
+    grid-template-rows:38px 38px auto;
+    gap:7px 8px!important;
+    align-items:center!important;
+    width:100%!important;
+    min-width:0!important;
+  }
+  #module-journal .journal-fixed-filter-toolbar::before{
+    content:none!important;
+    display:none!important;
+  }
+
+  /* 攤平舊容器 */
+  #module-journal .journal-fixed-filter-toolbar > .journal-filter-row-date,
+  #module-journal .journal-fixed-filter-toolbar > .journal-filter-row-search-clear,
+  #module-journal .journal-fixed-filter-toolbar > .journal-filter-row-conditions-1,
+  #module-journal .journal-fixed-filter-toolbar > .journal-filter-row-grid-6{
+    display:contents!important;
+  }
+  #module-journal .journal-filter-row-date::before,
+  #module-journal .journal-filter-row-search-clear::before,
+  #module-journal .journal-filter-row-conditions-1::before,
+  #module-journal .journal-filter-row-grid-6::before{
+    content:none!important;
+    display:none!important;
+  }
+
+  /* 圖一：左邊 */
+  #module-journal .journal-filter-row-date .date-range-fast{
+    grid-column:1;
+    grid-row:1;
+    width:100%!important;
+    min-width:0!important;
+    height:38px!important;
+    min-height:38px!important;
+    margin:0!important;
+  }
+  #module-journal .journal-filter-row-date .date-range-fast > span:first-child{display:none!important;}
+
+  #module-journal .journal-filter-row-search-clear > div:first-child{
+    grid-column:2;
+    grid-row:1;
+    width:100%!important;
+    min-width:0!important;
+    height:38px!important;
+    min-height:38px!important;
+    margin:0!important;
+  }
+  #module-journal .journal-filter-row-search-clear #filter-code{
+    width:100%!important;
+    max-width:none!important;
+  }
+
+  #module-journal .journal-filter-row-conditions-1 > label:nth-of-type(1){
+    grid-column:3; grid-row:1;
+  }
+  #module-journal .journal-filter-row-conditions-1 > label:nth-of-type(2){
+    grid-column:4; grid-row:1;
+  }
+  #module-journal .journal-filter-row-conditions-1 > label:nth-of-type(3){
+    grid-column:5; grid-row:1;
+  }
+
+  /* 圖二：右邊 */
+  #module-journal .journal-filter-row-grid-6 > label:nth-of-type(1){
+    grid-column:7; grid-row:1;
+  }
+  #module-journal .journal-filter-row-grid-6 > label:nth-of-type(2){
+    grid-column:8; grid-row:1;
+  }
+
+  /* 圖三：第二排 */
+  #module-journal .journal-filter-row-grid-6 > select:nth-of-type(1){
+    grid-column:1; grid-row:2;
+  }
+  #module-journal .journal-filter-row-grid-6 > select:nth-of-type(2){
+    grid-column:2; grid-row:2;
+  }
+  #module-journal .journal-filter-row-grid-6 > select:nth-of-type(3){
+    grid-column:3; grid-row:2;
+  }
+  #module-journal .journal-filter-row-grid-6 > select:nth-of-type(4){
+    grid-column:4; grid-row:2;
+  }
+  #module-journal .journal-filter-tag-cell{
+    grid-column:5 / 9;
+    grid-row:2;
+    display:grid!important;
+    grid-template-columns:128px 90px 94px!important;
+    gap:6px!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:none!important;
+    height:38px!important;
+    margin:0!important;
+  }
+
+  /* 第三排：保留已選條件/快速組合顯示 */
+  #module-journal .journal-filter-tags-display-row{
+    grid-column:1 / -1;
+    grid-row:3;
+    display:flex!important;
+    flex-wrap:wrap!important;
+    align-items:center!important;
+    gap:8px!important;
+    margin-top:0!important;
+    padding-top:7px!important;
+  }
+  #module-journal #tag-preset-quick-journal{
+    flex:0 0 auto!important;
+    width:auto!important;
+  }
+  #module-journal #filter-tags-display{
+    flex:1 1 260px!important;
+    width:auto!important;
+    min-width:220px!important;
+    margin-top:0!important;
+  }
+
+  /* 共同尺寸與視覺緊湊化 */
+  #module-journal .journal-filter-row-conditions-1 > label,
+  #module-journal .journal-filter-row-grid-6 > label,
+  #module-journal .journal-filter-row-grid-6 > select,
+  #module-journal .journal-filter-tag-cell > button{
+    min-width:0!important;
+    width:100%!important;
+    height:38px!important;
+    min-height:38px!important;
+    margin:0!important;
+    border-radius:9px!important;
+  }
+  #module-journal .journal-filter-row-conditions-1 > label{
+    max-width:none!important;
+    padding:4px 8px!important;
+    justify-content:center!important;
+  }
+  #module-journal .journal-filter-row-grid-6 > label{
+    max-width:none!important;
+    padding:4px 8px!important;
+    justify-content:center!important;
+  }
+  #module-journal .journal-filter-row-grid-6 > select{
+    max-width:none!important;
+    padding:4px 8px!important;
+    font-size:11px!important;
+  }
+  #module-journal .journal-filter-row-conditions-1 > label span,
+  #module-journal .journal-filter-row-grid-6 > label span{
+    font-size:10.5px!important;
+    white-space:nowrap!important;
+  }
+  #module-journal .journal-filter-tag-cell > button{
+    padding:4px 6px!important;
+    font-size:10.5px!important;
+    justify-content:center!important;
+  }
+  #module-journal .journal-filter-tag-cell #filter-tag-btn span{
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+
+  /* 複製區標示小標籤再緊一點 */
+  #module-journal .copy-small-label-controls{
+    display:inline-flex!important;
+    flex-wrap:nowrap!important;
+    align-items:center!important;
+    gap:3px!important;
+    padding:4px 5px!important;
+    width:auto!important;
+    min-width:0!important;
+  }
+  #module-journal .copy-small-label-controls > span{
+    margin:0 3px 0 0!important;
+    font-size:9.5px!important;
+    padding:0!important;
+    width:auto!important;
+    flex:0 0 auto!important;
+  }
+  #module-journal .copy-small-label-controls > label{
+    margin:0!important;
+    padding:0 1px!important;
+    gap:2px!important;
+    width:auto!important;
+    min-width:0!important;
+    flex:0 0 auto!important;
+    font-size:9.5px!important;
+  }
+  #module-journal .copy-small-label-controls input{
+    width:13px!important; height:13px!important; min-width:13px!important;
+  }
+}
+
+/* 中型桌機也照同邏輯，但尺寸略小；不直排 */
+@media (min-width:900px) and (max-width:1199px){
+  #module-journal .card-panel > .p-4:first-of-type{
+    overflow-x:auto!important;
+    overflow-y:visible!important;
+  }
+  #module-journal .journal-fixed-filter-toolbar{
+    display:grid!important;
+    grid-template-columns:330px 190px 92px 92px 92px 120px 128px 128px;
+    grid-template-rows:38px 38px auto;
+    gap:7px 7px!important;
+    align-items:center!important;
+    width:max-content!important;
+    min-width:max-content!important;
+  }
+  #module-journal .journal-fixed-filter-toolbar::before{display:none!important;content:none!important;}
+  #module-journal .journal-fixed-filter-toolbar > .journal-filter-row-date,
+  #module-journal .journal-fixed-filter-toolbar > .journal-filter-row-search-clear,
+  #module-journal .journal-fixed-filter-toolbar > .journal-filter-row-conditions-1,
+  #module-journal .journal-fixed-filter-toolbar > .journal-filter-row-grid-6{display:contents!important;}
+  #module-journal .journal-filter-row-date::before,
+  #module-journal .journal-filter-row-search-clear::before,
+  #module-journal .journal-filter-row-conditions-1::before,
+  #module-journal .journal-filter-row-grid-6::before{display:none!important;content:none!important;}
+  #module-journal .journal-filter-row-date .date-range-fast{grid-column:1;grid-row:1;}
+  #module-journal .journal-filter-row-search-clear > div:first-child{grid-column:2;grid-row:1;}
+  #module-journal .journal-filter-row-conditions-1 > label:nth-of-type(1){grid-column:3;grid-row:1;}
+  #module-journal .journal-filter-row-conditions-1 > label:nth-of-type(2){grid-column:4;grid-row:1;}
+  #module-journal .journal-filter-row-conditions-1 > label:nth-of-type(3){grid-column:5;grid-row:1;}
+  #module-journal .journal-filter-row-grid-6 > label:nth-of-type(1){grid-column:7;grid-row:1;}
+  #module-journal .journal-filter-row-grid-6 > label:nth-of-type(2){grid-column:8;grid-row:1;}
+  #module-journal .journal-filter-row-grid-6 > select:nth-of-type(1){grid-column:1;grid-row:2;}
+  #module-journal .journal-filter-row-grid-6 > select:nth-of-type(2){grid-column:2;grid-row:2;}
+  #module-journal .journal-filter-row-grid-6 > select:nth-of-type(3){grid-column:3;grid-row:2;}
+  #module-journal .journal-filter-row-grid-6 > select:nth-of-type(4){grid-column:4;grid-row:2;}
+  #module-journal .journal-filter-tag-cell{
+    grid-column:5 / 9; grid-row:2;
+    display:grid!important; grid-template-columns:120px 84px 88px!important; gap:6px!important;
+  }
+  #module-journal .journal-filter-tags-display-row{grid-column:1 / -1;grid-row:3;display:flex!important;gap:8px!important;align-items:center!important;flex-wrap:wrap!important;}
+}
+</style>
+
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen flex flex-col antialiased">
 <nav class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-50 transition-colors duration-300">
@@ -7130,6 +7625,23 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 - 欄位寬度進一步縮小，盡量在桌機畫面一次顯示；空間不足時第二排只做橫向捲動，不改回直排。
 - 已選標籤與快速組合也改成橫向顯示。
 - 手機版維持原本適合觸控的排列。
+-->
+<!-- v348：
+【篩選區接龍橫排＋標示小標籤緊湊】
+- 桌機版將日期、搜尋、快速條件、進階條件、下拉選單、標籤挑選、組合、清除全部攤平成單一橫向工具列。
+- 不再使用垂直分組；右側空白改由後續控制項直接接續填滿。
+- 各欄位再次縮窄，日期約 332px、搜尋 190px、快速條件約 92~108px、下拉約 98px。
+- 若畫面寬度不足，整條只做橫向捲動，不會改成垂直排列。
+- 已選標籤區不再佔用篩選工具列空間，活動篩選條件仍保留顯示。
+- 「標示小標籤」改成內容寬度的一條緊密橫排，縮小間距、內距、字級與 checkbox，不再撐滿整個寬度。
+-->
+<!-- v349：
+【篩選區左右分區＋第二排配置】
+- 第一排左側放：日期區間、搜尋、排除負成長、營收創高、僅含股期（對應圖一）。
+- 第一排右側放：近一週千張大戶增、千張大戶連續增加（對應圖二）。
+- 第二排放：分數、等級、狀態、訊號、標籤挑選、組合、清除篩選（對應圖三）。
+- 已選標籤/快速組合保留在第三排。
+- 複製區「標示小標籤」再縮緊，減少空白。
 -->
 <!-- 核心 JavaScript -->
 <script>
