@@ -4922,6 +4922,300 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 }
 </style>
 
+<style id="journal-control-layout-v345">
+/* v345：重做策略日誌篩選區桌機版排版，避免空白過多並提升辨識度 */
+@media (min-width:1200px){
+  #module-journal .journal-fixed-filter-toolbar{
+    display:grid!important;
+    grid-template-columns:repeat(12,minmax(0,1fr))!important;
+    gap:10px 12px!important;
+    align-items:start!important;
+    width:100%!important;
+    min-height:0!important;
+    max-height:none!important;
+  }
+  #module-journal .journal-fixed-filter-toolbar::before{
+    content:"🔎 篩選股票";
+    grid-column:1 / -1;
+    display:block;
+    padding:0 0 8px 1px;
+    margin-bottom:2px;
+    border-bottom:1px solid #e2e8f0;
+    color:#334155;
+    font-size:12px;
+    font-weight:950;
+    letter-spacing:.02em;
+  }
+  .dark #module-journal .journal-fixed-filter-toolbar::before{border-color:#374151;color:#e2e8f0;}
+
+  #module-journal .journal-fixed-filter-toolbar > .journal-mobile-row{
+    display:block!important;
+    min-width:0!important;
+    position:relative!important;
+    padding-top:16px!important;
+  }
+  #module-journal .journal-filter-row-date{grid-column:span 5;}
+  #module-journal .journal-filter-row-search-clear{grid-column:span 3;}
+  #module-journal .journal-filter-row-conditions-1{grid-column:span 4;}
+  #module-journal .journal-filter-row-grid-6{grid-column:1 / -1;}
+
+  #module-journal .journal-filter-row-date::before,
+  #module-journal .journal-filter-row-search-clear::before,
+  #module-journal .journal-filter-row-conditions-1::before,
+  #module-journal .journal-filter-row-grid-6::before{
+    position:absolute;
+    top:0;
+    left:1px;
+    color:#64748b;
+    font-size:10px;
+    line-height:1;
+    font-weight:900;
+    letter-spacing:.04em;
+  }
+  #module-journal .journal-filter-row-date::before{content:"日期區間";}
+  #module-journal .journal-filter-row-search-clear::before{content:"關鍵字搜尋";}
+  #module-journal .journal-filter-row-conditions-1::before{content:"快速條件";}
+  #module-journal .journal-filter-row-grid-6::before{content:"進階篩選";}
+
+  #module-journal .journal-filter-row-date .date-range-fast,
+  #module-journal .journal-filter-row-search-clear > div:first-child{
+    width:100%!important;
+    min-height:42px!important;
+    height:42px!important;
+    box-sizing:border-box!important;
+  }
+  #module-journal .journal-filter-row-search-clear #filter-code{width:100%!important;max-width:none!important;}
+
+  #module-journal .journal-filter-row-conditions-1{
+    display:grid!important;
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:8px!important;
+    align-items:stretch!important;
+  }
+  #module-journal .journal-filter-row-conditions-1 > label{
+    min-width:0!important;
+    min-height:42px!important;
+    height:42px!important;
+    justify-content:center!important;
+    padding:6px 10px!important;
+  }
+
+  #module-journal .journal-filter-row-grid-6{
+    display:grid!important;
+    grid-template-columns:repeat(12,minmax(0,1fr))!important;
+    gap:8px!important;
+    align-items:stretch!important;
+  }
+  #module-journal .journal-filter-row-grid-6 > label,
+  #module-journal .journal-filter-row-grid-6 > select{
+    width:100%!important;
+    min-width:0!important;
+    max-width:none!important;
+    min-height:42px!important;
+    height:42px!important;
+    margin:0!important;
+  }
+  #module-journal .journal-filter-row-grid-6 > label{
+    grid-column:span 3!important;
+    justify-content:center!important;
+    padding:6px 10px!important;
+  }
+  #module-journal .journal-filter-row-grid-6 > select{
+    grid-column:span 2!important;
+    padding:5px 10px!important;
+    font-size:12px!important;
+  }
+  #module-journal .journal-filter-row-grid-6 > #filter-journal-quick{grid-column:span 3!important;}
+
+  #module-journal .journal-filter-tag-cell{
+    grid-column:span 3!important;
+    display:grid!important;
+    grid-template-columns:minmax(0,1.15fr) 96px 108px!important;
+    gap:8px!important;
+    min-width:0!important;
+    height:42px!important;
+    position:relative!important;
+  }
+  #module-journal .journal-filter-tag-cell > button{
+    min-width:0!important;
+    width:100%!important;
+    height:42px!important;
+    justify-content:center!important;
+    padding:6px 10px!important;
+    font-size:12px!important;
+  }
+  #module-journal #filter-tag-panel{height:auto!important;}
+
+  #module-journal .journal-filter-tags-display-row{
+    grid-column:1 / -1;
+    display:grid!important;
+    grid-template-columns:minmax(220px,.9fr) minmax(0,1.1fr)!important;
+    gap:10px!important;
+    align-items:start!important;
+    min-width:0!important;
+    margin-top:0!important;
+    padding-top:8px!important;
+    border-top:1px dashed #e2e8f0;
+  }
+  .dark #module-journal .journal-filter-tags-display-row{border-color:#374151;}
+  #module-journal #tag-preset-quick-journal{width:100%!important;min-width:0!important;}
+  #module-journal #filter-tags-display{width:100%!important;min-width:0!important;margin-top:0!important;}
+  #module-journal #journal-active-filter-chips{
+    margin-top:8px!important;
+    padding-top:8px!important;
+    border-top:1px solid #e2e8f0;
+  }
+  .dark #module-journal #journal-active-filter-chips{border-color:#374151;}
+
+  /* 複製區同步做緊湊整理 */
+  #module-journal .copy-section{padding:12px!important;}
+  #module-journal .copy-section-row{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) 182px!important;
+    gap:12px!important;
+    align-items:stretch!important;
+  }
+  #module-journal .copy-toolbar{
+    display:flex!important;
+    flex-wrap:wrap!important;
+    align-content:flex-start!important;
+    align-items:center!important;
+    gap:8px!important;
+    width:100%!important;
+    min-width:0!important;
+    overflow:visible!important;
+    padding:10px!important;
+  }
+  #module-journal .copy-toolbar > span:first-child{
+    flex:0 0 100%;
+    width:100%;
+    margin:0!important;
+    padding:0 0 6px!important;
+    border-bottom:1px solid #dbeafe;
+    color:#1d4ed8!important;
+    font-size:12px!important;
+    font-weight:950!important;
+  }
+  .dark #module-journal .copy-toolbar > span:first-child{border-color:#1e3a8a;color:#93c5fd!important;}
+  #module-journal .copy-small-label-controls{
+    flex:0 0 100%!important;
+    width:100%!important;
+    min-width:0!important;
+    display:grid!important;
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+    gap:6px 10px!important;
+    align-items:center!important;
+    padding:8px 10px!important;
+    border-radius:10px!important;
+  }
+  #module-journal .copy-small-label-controls > span{
+    grid-column:1 / -1;
+    margin-bottom:-1px!important;
+  }
+  #module-journal .copy-small-label-controls > label{min-width:0!important;}
+  #module-journal .copy-toolbar-break{flex:0 0 100%!important;width:100%!important;height:0!important;}
+  #module-journal .copy-title-card{
+    flex:0 0 100%!important;
+    width:100%!important;
+    display:grid!important;
+    grid-template-columns:minmax(235px,.7fr) minmax(380px,1.3fr)!important;
+    gap:8px 12px!important;
+    align-items:center!important;
+    padding:9px 10px!important;
+    border-radius:10px!important;
+  }
+  #module-journal .copy-title-row{grid-template-columns:minmax(0,1fr) auto!important;gap:7px!important;}
+  #module-journal .copy-title-input{height:36px!important;}
+  #module-journal .copy-title-clear{height:36px!important;min-width:94px!important;}
+  #module-journal .journal-maintenance-tools{
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:stretch!important;
+    justify-content:flex-start!important;
+    gap:8px!important;
+    min-width:0!important;
+    padding:10px!important;
+    border:1px solid #d1fae5;
+    border-radius:12px;
+    background:#f0fdf4;
+  }
+  .dark #module-journal .journal-maintenance-tools{border-color:#14532d;background:rgba(20,83,45,.18);}
+  #module-journal .journal-maintenance-title{
+    display:block;
+    padding-bottom:6px;
+    border-bottom:1px solid #bbf7d0;
+    color:#047857;
+    font-size:10px;
+    font-weight:950;
+    text-align:center;
+  }
+  .dark #module-journal .journal-maintenance-title{border-color:#166534;color:#86efac;}
+  #module-journal .journal-maintenance-tools > button{width:100%!important;justify-content:center!important;min-height:35px!important;}
+}
+
+@media (min-width:900px) and (max-width:1199px){
+  #module-journal .journal-fixed-filter-toolbar{
+    display:grid!important;
+    grid-template-columns:repeat(8,minmax(0,1fr))!important;
+    gap:10px!important;
+    align-items:start!important;
+  }
+  #module-journal .journal-fixed-filter-toolbar::before{
+    content:"🔎 篩選股票";
+    grid-column:1 / -1;
+    display:block;
+    padding:0 0 8px 1px;
+    margin-bottom:2px;
+    border-bottom:1px solid #e2e8f0;
+    color:#334155;
+    font-size:12px;
+    font-weight:950;
+    letter-spacing:.02em;
+  }
+  .dark #module-journal .journal-fixed-filter-toolbar::before{border-color:#374151;color:#e2e8f0;}
+  #module-journal .journal-fixed-filter-toolbar > .journal-mobile-row{display:block!important;position:relative!important;padding-top:16px!important;min-width:0!important;}
+  #module-journal .journal-filter-row-date{grid-column:span 4;}
+  #module-journal .journal-filter-row-search-clear{grid-column:span 4;}
+  #module-journal .journal-filter-row-conditions-1,
+  #module-journal .journal-filter-row-grid-6{grid-column:1 / -1;}
+  #module-journal .journal-filter-row-date::before,
+  #module-journal .journal-filter-row-search-clear::before,
+  #module-journal .journal-filter-row-conditions-1::before,
+  #module-journal .journal-filter-row-grid-6::before{
+    position:absolute;top:0;left:1px;color:#64748b;font-size:10px;line-height:1;font-weight:900;letter-spacing:.04em;
+  }
+  #module-journal .journal-filter-row-date::before{content:"日期區間";}
+  #module-journal .journal-filter-row-search-clear::before{content:"關鍵字搜尋";}
+  #module-journal .journal-filter-row-conditions-1::before{content:"快速條件";}
+  #module-journal .journal-filter-row-grid-6::before{content:"進階篩選";}
+  #module-journal .journal-filter-row-date .date-range-fast,
+  #module-journal .journal-filter-row-search-clear > div:first-child{width:100%!important;height:42px!important;min-height:42px!important;box-sizing:border-box!important;}
+  #module-journal .journal-filter-row-search-clear #filter-code{width:100%!important;max-width:none!important;}
+  #module-journal .journal-filter-row-conditions-1{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:8px!important;}
+  #module-journal .journal-filter-row-conditions-1 > label{min-height:42px!important;height:42px!important;justify-content:center!important;padding:6px 8px!important;}
+  #module-journal .journal-filter-row-grid-6{display:grid!important;grid-template-columns:repeat(8,minmax(0,1fr))!important;gap:8px!important;}
+  #module-journal .journal-filter-row-grid-6 > label,
+  #module-journal .journal-filter-row-grid-6 > select{width:100%!important;min-width:0!important;max-width:none!important;min-height:42px!important;height:42px!important;margin:0!important;}
+  #module-journal .journal-filter-row-grid-6 > label{grid-column:span 2!important;justify-content:center!important;padding:6px 8px!important;}
+  #module-journal .journal-filter-row-grid-6 > select{grid-column:span 2!important;padding:5px 8px!important;font-size:12px!important;}
+  #module-journal .journal-filter-row-grid-6 > #filter-journal-quick{grid-column:span 2!important;}
+  #module-journal .journal-filter-tag-cell{grid-column:span 4!important;display:grid!important;grid-template-columns:minmax(0,1.1fr) 92px 98px!important;gap:8px!important;min-width:0!important;height:42px!important;position:relative!important;}
+  #module-journal .journal-filter-tag-cell > button{min-width:0!important;width:100%!important;height:42px!important;justify-content:center!important;padding:6px 8px!important;font-size:12px!important;}
+  #module-journal .journal-filter-tags-display-row{grid-column:1 / -1;display:grid!important;grid-template-columns:1fr!important;gap:8px!important;align-items:start!important;min-width:0!important;margin-top:0!important;padding-top:8px!important;border-top:1px dashed #e2e8f0;}
+  .dark #module-journal .journal-filter-tags-display-row{border-color:#374151;}
+  #module-journal #tag-preset-quick-journal,#module-journal #filter-tags-display{width:100%!important;min-width:0!important;margin-top:0!important;}
+  #module-journal #journal-active-filter-chips{margin-top:8px!important;padding-top:8px!important;border-top:1px solid #e2e8f0;}
+  .dark #module-journal #journal-active-filter-chips{border-color:#374151;}
+  #module-journal .copy-section-row{grid-template-columns:1fr!important;}
+  #module-journal .copy-small-label-controls{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:6px 10px!important;align-items:center!important;}
+  #module-journal .copy-small-label-controls > span{grid-column:1 / -1;}
+  #module-journal .journal-maintenance-tools{flex-direction:row!important;align-items:center!important;flex-wrap:wrap!important;}
+  #module-journal .journal-maintenance-title{border-bottom:0!important;border-right:1px solid #bbf7d0;padding:0 10px 0 0!important;}
+  #module-journal .journal-maintenance-tools > button{width:auto!important;flex:1 1 160px!important;}
+}
+</style>
+
+
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen flex flex-col antialiased">
 <nav class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-50 transition-colors duration-300">
