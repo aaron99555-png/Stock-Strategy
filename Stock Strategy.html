@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="350" name="app-version"/>
+<meta content="351" name="app-version"/>
 <script id="startup-performance-bootstrap">
 window.__ryanStartupPerf={start:performance.now(),localReady:0,firstRender:0,cloudStart:0,cloudEnd:0,cloudOk:null};
 </script>
@@ -6318,6 +6318,74 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 }
 </style>
 
+
+<style id="journal-filter-size-tuning-v351">
+/* v351：大戶兩格再縮小，分數欄加大 */
+@media (min-width:1200px){
+  #module-journal .journal-fixed-filter-toolbar{
+    grid-template-columns:
+      330px 185px
+      88px 88px 88px
+      108px 116px
+      118px 92px 104px 104px
+      minmax(1px,1fr)!important;
+  }
+
+  /* 近一週千張大戶增 */
+  #module-journal .journal-filter-row-grid-6 > label:nth-of-type(1){
+    padding:4px 5px!important;
+  }
+  /* 千張大戶連續增加 */
+  #module-journal .journal-filter-row-grid-6 > label:nth-of-type(2){
+    padding:4px 5px!important;
+  }
+  #module-journal .journal-filter-row-grid-6 > label:nth-of-type(1) span,
+  #module-journal .journal-filter-row-grid-6 > label:nth-of-type(2) span{
+    font-size:9px!important;
+    letter-spacing:-.035em!important;
+  }
+
+  /* 分數欄放大 */
+  #module-journal #filter-score{
+    width:100%!important;
+    min-width:0!important;
+    max-width:none!important;
+    font-size:11.5px!important;
+    font-weight:700!important;
+    padding-left:9px!important;
+    padding-right:9px!important;
+  }
+}
+
+/* 中型桌機同樣調整，仍保持第一排同一行 */
+@media (min-width:900px) and (max-width:1199px){
+  #module-journal .journal-fixed-filter-toolbar{
+    grid-template-columns:
+      320px 180px
+      86px 86px 86px
+      106px 114px
+      116px 90px 102px 102px!important;
+  }
+
+  #module-journal .journal-filter-row-grid-6 > label:nth-of-type(1),
+  #module-journal .journal-filter-row-grid-6 > label:nth-of-type(2){
+    padding:4px 5px!important;
+  }
+  #module-journal .journal-filter-row-grid-6 > label:nth-of-type(1) span,
+  #module-journal .journal-filter-row-grid-6 > label:nth-of-type(2) span{
+    font-size:9px!important;
+    letter-spacing:-.035em!important;
+  }
+
+  #module-journal #filter-score{
+    font-size:11.5px!important;
+    font-weight:700!important;
+    padding-left:8px!important;
+    padding-right:8px!important;
+  }
+}
+</style>
+
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen flex flex-col antialiased">
 <nav class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-50 transition-colors duration-300">
@@ -7878,6 +7946,14 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 - 第二排只放：標籤挑選 → 清除篩選 → 組合。
 - 控制項高度統一 38px，字級與內距縮小，減少佔用空間。
 - 900~1199px 若空間不足只做橫向捲動，不會改成垂直。
+-->
+<!-- v351：
+【大戶格縮小＋分數格加大】
+- 「近一週千張大戶增」欄位寬度縮小。
+- 「千張大戶連續增加」欄位寬度縮小。
+- 兩個大戶條件文字略縮，維持同一行不換行。
+- 「分數不限」欄位加寬，字級與字重同步放大，辨識更明顯。
+- 第一排其他欄位位置與第二排三按鈕配置維持不變。
 -->
 <!-- 核心 JavaScript -->
 <script>
