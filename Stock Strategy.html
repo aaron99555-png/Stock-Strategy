@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="356" name="app-version"/>
+<meta content="357" name="app-version"/>
 <script id="startup-performance-bootstrap">
 window.__ryanStartupPerf={start:performance.now(),localReady:0,firstRender:0,cloudStart:0,cloudEnd:0,cloudOk:null};
 </script>
@@ -6558,6 +6558,181 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 }
 </style>
 
+
+<style id="tag-manager-batch-v357">
+.tag-manager-batch-toolbar{
+  padding:10px;
+  border:1px solid #ddd6fe;
+  border-radius:12px;
+  background:rgba(245,243,255,.96);
+  box-shadow:0 6px 18px rgba(76,29,149,.08);
+  backdrop-filter:blur(8px);
+}
+.dark .tag-manager-batch-toolbar{
+  border-color:#4c1d95;
+  background:rgba(30,27,75,.94);
+}
+.tag-manager-batch-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:8px;
+}
+.tag-manager-batch-count{
+  flex:0 0 auto;
+  min-width:58px;
+  height:24px;
+  padding:0 8px;
+  border-radius:999px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  background:#7c3aed;
+  color:#fff;
+  font-size:9px;
+  font-weight:950;
+}
+.tag-manager-batch-actions{
+  display:grid;
+  grid-template-columns:auto auto minmax(125px,1fr) minmax(120px,1fr) minmax(150px,1.1fr);
+  gap:7px;
+  align-items:end;
+}
+.tag-manager-batch-lite,
+.tag-manager-batch-apply{
+  height:36px;
+  border-radius:9px;
+  padding:0 10px;
+  font-size:10px;
+  font-weight:900;
+  white-space:nowrap;
+}
+.tag-manager-batch-lite{
+  border:1px solid #c4b5fd;
+  background:#fff;
+  color:#6d28d9;
+}
+.dark .tag-manager-batch-lite{
+  border-color:#5b21b6;
+  background:#111827;
+  color:#c4b5fd;
+}
+.tag-manager-batch-apply{
+  border:1px solid #7c3aed;
+  background:#7c3aed;
+  color:#fff;
+}
+.tag-manager-batch-apply:hover:not(:disabled){background:#6d28d9;}
+.tag-manager-batch-apply:disabled{
+  opacity:.42;
+  cursor:not-allowed;
+}
+.tag-manager-batch-field{
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+  min-width:0;
+}
+.tag-manager-batch-field > span{
+  color:#6b7280;
+  font-size:9px;
+  font-weight:900;
+}
+.dark .tag-manager-batch-field > span{color:#9ca3af;}
+.tag-manager-batch-field select{
+  width:100%;
+  height:36px;
+  min-width:0;
+  border:1px solid #c4b5fd;
+  border-radius:9px;
+  padding:0 8px;
+  background:#fff;
+  color:#374151;
+  font-size:10px;
+  font-weight:800;
+}
+.dark .tag-manager-batch-field select{
+  border-color:#5b21b6;
+  background:#111827;
+  color:#e5e7eb;
+}
+.tag-manager-batch-box{
+  flex:0 0 26px;
+  width:26px;
+  height:26px;
+  position:relative;
+  cursor:pointer;
+}
+.tag-manager-batch-box input{
+  position:absolute;
+  opacity:0;
+  pointer-events:none;
+}
+.tag-manager-batch-box span{
+  width:26px;
+  height:26px;
+  border:1px solid #d1d5db;
+  border-radius:8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#fff;
+  color:transparent;
+  font-size:10px;
+  transition:.13s ease;
+}
+.dark .tag-manager-batch-box span{
+  border-color:#4b5563;
+  background:#111827;
+}
+.tag-manager-batch-box input:checked + span{
+  border-color:#7c3aed;
+  background:#7c3aed;
+  color:#fff;
+  box-shadow:0 3px 10px rgba(124,58,237,.2);
+}
+.tag-manager-row{
+  transition:.13s ease;
+}
+.tag-manager-row-selected{
+  border-color:#a78bfa!important;
+  background:#f5f3ff!important;
+  box-shadow:0 0 0 2px rgba(139,92,246,.08);
+}
+.dark .tag-manager-row-selected{
+  border-color:#7c3aed!important;
+  background:rgba(76,29,149,.2)!important;
+}
+@media(max-width:1100px){
+  .tag-manager-batch-actions{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  .tag-manager-batch-field{
+    grid-column:span 1;
+  }
+  .tag-manager-batch-apply{
+    grid-column:1 / -1;
+  }
+}
+@media(max-width:640px){
+  .tag-manager-batch-toolbar{
+    position:static!important;
+    padding:8px;
+  }
+  .tag-manager-batch-actions{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:6px;
+  }
+  .tag-manager-batch-field{
+    grid-column:1 / -1;
+  }
+  .tag-manager-batch-apply{
+    grid-column:1 / -1;
+  }
+}
+</style>
+
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen flex flex-col antialiased">
 <nav class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-50 transition-colors duration-300">
@@ -8195,6 +8370,16 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 - 既有使用者的 tagSettings 會自動補入，不需重新建立標籤設定。
 - 策略複製時「三法偷吃貨」使用 🥷 圖示。
 - 可正常使用既有的標籤篩選、連續進榜判斷、策略複製與提醒設定。
+-->
+<!-- v357：
+【自訂標籤管理－批次多選修改】
+- 自訂標籤管理右側每一個標籤新增批次勾選框。
+- 可一次選擇多個標籤，同時變更「必填頻率」與「標籤顏色」。
+- 批次工具列提供：全選、清除、頻率選擇、顏色選擇、套用。
+- 頻率與顏色都有「不變」選項，因此可只改其中一項，也可兩項一起改。
+- 批次套用只修改 requiredCadence / theme，不會動到標籤名稱、分類、複製圖示、是否參與策略、提醒標註顏色。
+- 套用一次只進行一次本機／雲端設定同步，避免逐筆更新造成卡頓。
+- 個別標籤原本的編輯、排序、刪除功能全部保留。
 -->
 <!-- 核心 JavaScript -->
 <script>
@@ -15847,6 +16032,7 @@ setChkDirection('long');
   var VALID_THEMES=['rose','blue','amber','purple','teal'];
   var REMINDER_COLOR_KEYS=['rose','orange','amber','yellow','lime','green','teal','cyan','sky','blue','indigo','violet','purple','pink','slate'];
   var pendingImport=null;
+  var managedTagBatchSelection=new Set();
   var IMPORT_RECOVERY_DB='ryan_stock_import_recovery_v1',IMPORT_RECOVERY_STORE='snapshots',IMPORT_RECOVERY_KEY='latestImport',importRecoveryMemory=null;
   var TYPE_CONFIG={
     journal:{stateKey:'journals',cloud:'journals',label:'策略日誌'},
@@ -16241,7 +16427,7 @@ setChkDirection('long');
     document.body.insertAdjacentHTML('beforeend',[
       '<div id="tag-manager-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-[190] hidden items-center justify-center p-3">',
       '<div class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-2xl border border-gray-200 dark:border-gray-700 shadow-2xl w-full max-w-4xl max-h-[92vh] flex flex-col modal-enter">',
-      '<div class="p-4 sm:p-5 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between gap-3"><div><h3 class="text-lg sm:text-xl font-black text-rose-600 dark:text-rose-300"><i class="fa-solid fa-tags mr-2"></i>自訂標籤管理</h3><p class="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 mt-1">可新增、改名、分類、排序、設定標籤顏色；也能指定不定時／尾盤／盤後／每週／每月填寫提醒與提醒標註顏色。</p></div><button id="tag-manager-close" type="button" class="w-9 h-9 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-500 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button></div>',
+      '<div class="p-4 sm:p-5 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between gap-3"><div><h3 class="text-lg sm:text-xl font-black text-rose-600 dark:text-rose-300"><i class="fa-solid fa-tags mr-2"></i>自訂標籤管理</h3><p class="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 mt-1">可新增、改名、分類、排序；右側可一次勾選多個標籤，批次修改必填頻率與標籤顏色。</p></div><button id="tag-manager-close" type="button" class="w-9 h-9 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-500 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button></div>',
       '<div class="grid grid-cols-1 lg:grid-cols-12 min-h-0 flex-1">',
       '<div class="lg:col-span-5 p-4 sm:p-5 border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-gray-700 bg-gray-50/70 dark:bg-gray-900/30">',
       '<input type="hidden" id="tag-manager-original">',
@@ -16254,7 +16440,18 @@ setChkDirection('long');
       '<label class="col-span-2 flex items-center gap-2 p-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 cursor-pointer"><input type="checkbox" id="tag-manager-strategy" class="w-4 h-4 accent-rose-600" checked><span class="text-xs sm:text-sm font-bold">納入策略計分及一般策略複製</span></label></div>',
       '<div class="flex gap-2 mt-4"><button id="tag-manager-save" type="button" class="flex-1 h-10 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-bold text-sm"><i class="fa-solid fa-floppy-disk mr-1.5"></i>儲存標籤</button><button id="tag-manager-cancel-edit" type="button" class="hidden px-4 h-10 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-200 text-sm font-bold">取消編輯</button></div>',
       '</div>',
-      '<div class="lg:col-span-7 min-h-0 p-4 sm:p-5 overflow-y-auto"><div id="tag-manager-list" class="space-y-4"></div></div>',
+      '<div class="lg:col-span-7 min-h-0 p-4 sm:p-5 overflow-y-auto">',
+      '<div id="tag-manager-batch-toolbar" class="tag-manager-batch-toolbar sticky top-0 z-20 mb-4">',
+      '<div class="tag-manager-batch-head"><div><div class="text-xs font-black text-purple-700 dark:text-purple-300"><i class="fa-solid fa-check-double mr-1.5"></i>批次編輯</div><div class="text-[9px] text-gray-500 dark:text-gray-400 mt-0.5">先勾選多個標籤，再一次套用頻率／顏色</div></div><span id="tag-manager-batch-count" class="tag-manager-batch-count">已選 0</span></div>',
+      '<div class="tag-manager-batch-actions">',
+      '<button id="tag-manager-batch-select-all" type="button" class="tag-manager-batch-lite"><i class="fa-solid fa-square-check mr-1"></i>全選</button>',
+      '<button id="tag-manager-batch-clear" type="button" class="tag-manager-batch-lite"><i class="fa-solid fa-xmark mr-1"></i>清除</button>',
+      '<label class="tag-manager-batch-field"><span>必填頻率</span><select id="tag-manager-batch-cadence"><option value="keep">不變</option><option value="none">不提醒</option><option value="irregular">不定時</option><option value="closing">尾盤填寫</option><option value="afterClose">盤後填寫</option><option value="weekly">每週填寫</option><option value="monthly">每月填寫</option></select></label>',
+      '<label class="tag-manager-batch-field"><span>標籤顏色</span><select id="tag-manager-batch-theme"><option value="keep">不變</option><option value="rose">紅色</option><option value="blue">藍色</option><option value="amber">橘色</option><option value="purple">紫色</option><option value="teal">綠色</option></select></label>',
+      '<button id="tag-manager-batch-apply" type="button" class="tag-manager-batch-apply" disabled><i class="fa-solid fa-wand-magic-sparkles mr-1.5"></i>套用到已選標籤</button>',
+      '</div></div>',
+      '<div id="tag-manager-list" class="space-y-4"></div>',
+      '</div>',
       '</div></div></div>',
 
       '<div id="trash-manager-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-[190] hidden items-center justify-center p-3">',
@@ -16296,6 +16493,81 @@ setChkDirection('long');
     updateReminderColorPreview();
   }
 
+  function getAllManagedTagNames(){
+    return state.tagSettings.categories.reduce(function(result,category){
+      return result.concat(category.tags||[]);
+    },[]);
+  }
+
+  function syncManagedTagBatchToolbar(){
+    var allTags=getAllManagedTagNames(),validSet=new Set(allTags);
+    managedTagBatchSelection.forEach(function(tag){
+      if(!validSet.has(tag))managedTagBatchSelection.delete(tag);
+    });
+    var count=managedTagBatchSelection.size,
+        counter=document.getElementById('tag-manager-batch-count'),
+        apply=document.getElementById('tag-manager-batch-apply');
+    if(counter)counter.textContent='已選 '+count;
+    if(apply)apply.disabled=count===0;
+    document.querySelectorAll('.tag-manager-batch-check').forEach(function(input){
+      var tag=decodeURIComponent(input.dataset.tagName||'');
+      input.checked=managedTagBatchSelection.has(tag);
+      var row=input.closest('.tag-manager-row');
+      if(row)row.classList.toggle('tag-manager-row-selected',input.checked);
+    });
+  }
+
+  function selectAllManagedTags(){
+    managedTagBatchSelection=new Set(getAllManagedTagNames());
+    syncManagedTagBatchToolbar();
+  }
+
+  function clearManagedTagBatchSelection(){
+    managedTagBatchSelection.clear();
+    syncManagedTagBatchToolbar();
+  }
+
+  async function applyManagedTagBatchChanges(){
+    if(!window.isAdminMode||!window.isAdminMode())return showToast('批次修改標籤僅限管理者使用','error');
+    if(!managedTagBatchSelection.size)return showToast('請先勾選要批次修改的標籤','error');
+
+    var cadence=document.getElementById('tag-manager-batch-cadence')?.value||'keep',
+        theme=document.getElementById('tag-manager-batch-theme')?.value||'keep';
+
+    if(cadence==='keep'&&theme==='keep')return showToast('請至少選擇一項要變更的頻率或顏色','error');
+
+    var validCadences=['none','irregular','closing','afterClose','weekly','monthly'],
+        changedTags=[];
+
+    managedTagBatchSelection.forEach(function(tag){
+      var category=state.tagSettings.categories.find(function(item){return(item.tags||[]).includes(tag);}),
+          baseTheme=category?.theme||'blue',
+          meta=normalizeTagMeta(tag,baseTheme,state.tagSettings.meta[tag]);
+
+      if(cadence!=='keep'&&validCadences.includes(cadence))meta.requiredCadence=cadence;
+      if(theme!=='keep'&&VALID_THEMES.includes(theme))meta.theme=theme;
+
+      state.tagSettings.meta[tag]=meta;
+      changedTags.push(tag);
+    });
+
+    if(!changedTags.length)return showToast('沒有可修改的標籤','error');
+
+    await persistTagSettings(false);
+    syncManagedTagBatchToolbar();
+
+    var changes=[];
+    if(cadence!=='keep'){
+      var cadenceLabel={none:'不提醒',irregular:'不定時',closing:'尾盤填寫',afterClose:'盤後填寫',weekly:'每週填寫',monthly:'每月填寫'}[cadence]||cadence;
+      changes.push('頻率：'+cadenceLabel);
+    }
+    if(theme!=='keep'){
+      var themeLabel={rose:'紅色',blue:'藍色',amber:'橘色',purple:'紫色',teal:'綠色'}[theme]||theme;
+      changes.push('顏色：'+themeLabel);
+    }
+    showToast('已批次更新 '+changedTags.length+' 個標籤｜'+changes.join('｜'));
+  }
+
   function renderTagManager(){
     window.ensureOptimizationState();
     var select=document.getElementById('tag-manager-category');
@@ -16313,7 +16585,9 @@ setChkDirection('long');
         var meta=state.tagSettings.meta[tag]||normalizeTagMeta(tag,category.theme,null);
         var encoded=encodeURIComponent(tag);
         var req=window.getManagedTagRequirement(tag),reqLabel=req.cadence==='irregular'?'不定時':req.cadence==='closing'?'尾盤填寫':req.cadence==='afterClose'?'盤後填寫':req.cadence==='weekly'?'每週填寫':req.cadence==='monthly'?'每月填寫':'';
-        return '<div class="flex items-center gap-2 p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900/40">'+
+        var isBatchSelected=managedTagBatchSelection.has(tag);
+        return '<div class="tag-manager-row '+(isBatchSelected?'tag-manager-row-selected ':'')+'flex items-center gap-2 p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900/40">'+
+          '<label class="tag-manager-batch-box" title="加入批次編輯"><input type="checkbox" class="tag-manager-batch-check" data-tag-name="'+encoded+'" '+(isBatchSelected?'checked':'')+'><span><i class="fa-solid fa-check"></i></span></label>'+
           '<span class="w-8 h-8 shrink-0 rounded-lg flex items-center justify-center border text-base '+getTagStyle(tag,true)+'">'+escapeHTML(meta.icon||'🏷️')+'</span>'+
           '<div class="min-w-0 flex-1"><div class="font-bold text-sm truncate">'+escapeHTML(tag)+'</div><div class="flex flex-wrap gap-1 mt-1"><span class="text-[9px] px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-gray-500">'+escapeHTML(meta.theme)+'</span><span class="text-[9px] px-1.5 py-0.5 rounded '+(meta.isStrategy?'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300':'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300')+'">'+(meta.isStrategy?'參與策略':'僅關注')+'</span>'+(reqLabel?'<span class="text-[9px] px-1.5 py-0.5 rounded text-white font-black" style="background:'+req.hex+'">'+escapeHTML(reqLabel)+'</span>':'')+'</div></div>'+
           '<div class="flex items-center gap-1"><button type="button" data-tag-action="up" data-tag-name="'+encoded+'" title="往前" class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-500 disabled:opacity-30" '+(index===0?'disabled':'')+'><i class="fa-solid fa-arrow-up"></i></button><button type="button" data-tag-action="down" data-tag-name="'+encoded+'" title="往後" class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-500 disabled:opacity-30" '+(index===category.tags.length-1?'disabled':'')+'><i class="fa-solid fa-arrow-down"></i></button><button type="button" data-tag-action="edit" data-tag-name="'+encoded+'" title="編輯" class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300"><i class="fa-solid fa-pen"></i></button><button type="button" data-tag-action="delete" data-tag-name="'+encoded+'" title="刪除" class="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-900/30 text-red-500"><i class="fa-solid fa-trash"></i></button></div>'+
@@ -16321,6 +16595,7 @@ setChkDirection('long');
       }).join('');
       return '<section><div class="flex items-center justify-between pb-2 mb-2 border-b border-gray-200 dark:border-gray-700"><h4 class="font-black text-sm">'+escapeHTML(category.title)+'</h4><span class="text-[10px] text-gray-400">'+category.tags.length+' 個</span></div><div class="space-y-2">'+(rows||'<div class="text-xs text-gray-400 text-center py-4">此分類尚無標籤</div>')+'</div></section>';
     }).join('');
+    syncManagedTagBatchToolbar();
   }
 
   function updateReferencesForRenamedTag(oldName,newName){
@@ -16372,6 +16647,10 @@ setChkDirection('long');
     if(original&&original!==name){
       updateReferencesForRenamedTag(original,name);
       delete state.tagSettings.meta[original];
+      if(managedTagBatchSelection.has(original)){
+        managedTagBatchSelection.delete(original);
+        managedTagBatchSelection.add(name);
+      }
     }
     state.tagSettings.meta[name]={isStrategy:isStrategy,icon:icon.slice(0,12),theme:VALID_THEMES.includes(theme)?theme:target.theme,requiredCadence:['irregular','closing','afterClose','weekly','monthly'].includes(requiredCadence)?requiredCadence:'none',reminderColor:REMINDER_COLOR_KEYS.includes(reminderColor)?reminderColor:'amber'};
     resetTagForm();
@@ -16410,6 +16689,7 @@ setChkDirection('long');
     openConfirmModal('確定刪除標籤「'+tag+'」？所有既有紀錄中的此標籤也會一併移除。',async function(){
       state.tagSettings.categories.forEach(function(category){category.tags=category.tags.filter(function(item){return item!==tag;});});
       delete state.tagSettings.meta[tag];
+      managedTagBatchSelection.delete(tag);
       state.journals.forEach(function(item){item.tags=(item.tags||[]).filter(function(current){return current!==tag;});item.updatedAt=Date.now();});
       state.filters.tags=(state.filters.tags||[]).filter(function(item){return item!==tag;});
       state.favFilters.tags=(state.favFilters.tags||[]).filter(function(item){return item!==tag;});
@@ -17043,17 +17323,32 @@ setChkDirection('long');
   },true);
 
   function bindOptimizationEvents(){
-    document.getElementById('btn-tag-manager').addEventListener('click',function(){renderTagManager();document.getElementById('tag-manager-modal').classList.remove('hidden');document.getElementById('tag-manager-modal').classList.add('flex');});
+    document.getElementById('btn-tag-manager').addEventListener('click',function(){
+      managedTagBatchSelection.clear();
+      renderTagManager();
+      document.getElementById('tag-manager-modal').classList.remove('hidden');
+      document.getElementById('tag-manager-modal').classList.add('flex');
+    });
     document.getElementById('tag-manager-close').addEventListener('click',function(){document.getElementById('tag-manager-modal').classList.add('hidden');document.getElementById('tag-manager-modal').classList.remove('flex');});
     document.getElementById('tag-manager-save').addEventListener('click',saveManagedTag);
     document.getElementById('tag-manager-cancel-edit').addEventListener('click',resetTagForm);
     document.getElementById('tag-manager-reminder-color').addEventListener('change',updateReminderColorPreview);
     document.getElementById('tag-manager-category').addEventListener('change',function(){if(document.getElementById('tag-manager-original').value)return;var category=state.tagSettings.categories[parseInt(this.value,10)||0];if(category){document.getElementById('tag-manager-theme').value=category.theme;document.getElementById('tag-manager-strategy').checked=(parseInt(this.value,10)||0)!==0;}});
+    document.getElementById('tag-manager-list').addEventListener('change',function(event){
+      var input=event.target.closest('.tag-manager-batch-check');if(!input)return;
+      var tag=decodeURIComponent(input.dataset.tagName||'');
+      if(!tag)return;
+      if(input.checked)managedTagBatchSelection.add(tag);else managedTagBatchSelection.delete(tag);
+      syncManagedTagBatchToolbar();
+    });
     document.getElementById('tag-manager-list').addEventListener('click',function(event){
       var button=event.target.closest('[data-tag-action]');if(!button)return;
       var tag=decodeURIComponent(button.dataset.tagName),action=button.dataset.tagAction;
       if(action==='edit')editManagedTag(tag);else if(action==='delete')deleteManagedTag(tag);else if(action==='up')moveManagedTag(tag,-1);else if(action==='down')moveManagedTag(tag,1);
     });
+    document.getElementById('tag-manager-batch-select-all').addEventListener('click',selectAllManagedTags);
+    document.getElementById('tag-manager-batch-clear').addEventListener('click',clearManagedTagBatchSelection);
+    document.getElementById('tag-manager-batch-apply').addEventListener('click',function(){applyManagedTagBatchChanges();});
     document.getElementById('btn-trash-manager').addEventListener('click',function(){window.renderTrashManager();document.getElementById('trash-manager-modal').classList.remove('hidden');document.getElementById('trash-manager-modal').classList.add('flex');});
     document.getElementById('trash-manager-close').addEventListener('click',function(){document.getElementById('trash-manager-modal').classList.add('hidden');document.getElementById('trash-manager-modal').classList.remove('flex');});
     document.getElementById('trash-manager-list').addEventListener('click',function(event){
