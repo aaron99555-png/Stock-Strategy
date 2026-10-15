@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="359" name="app-version"/>
+<meta content="360" name="app-version"/>
 <script id="startup-performance-bootstrap">
 window.__ryanStartupPerf={start:performance.now(),localReady:0,firstRender:0,cloudStart:0,cloudEnd:0,cloudOk:null};
 </script>
@@ -6814,6 +6814,58 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 }
 </style>
 
+
+<style id="tag-manager-batch-confirm-v360">
+.tag-manager-batch-confirm-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-top:9px;
+  padding-top:9px;
+  border-top:1px solid #ddd6fe;
+}
+.dark .tag-manager-batch-confirm-row{border-color:#4c1d95;}
+.tag-manager-batch-confirm-hint{
+  min-width:0;
+  color:#6b7280;
+  font-size:9.5px;
+  line-height:1.35;
+  font-weight:700;
+}
+.dark .tag-manager-batch-confirm-hint{color:#9ca3af;}
+.tag-manager-batch-confirm-bottom{
+  flex:0 0 auto;
+  min-width:150px;
+  height:38px;
+  padding:0 14px;
+  border:1px solid #6d28d9;
+  border-radius:9px;
+  background:#6d28d9;
+  color:#fff;
+  font-size:11px;
+  font-weight:950;
+  box-shadow:0 4px 12px rgba(109,40,217,.2);
+}
+.tag-manager-batch-confirm-bottom:hover:not(:disabled){background:#5b21b6;}
+.tag-manager-batch-confirm-bottom:disabled{
+  opacity:.38;
+  cursor:not-allowed;
+  box-shadow:none;
+}
+@media(max-width:640px){
+  .tag-manager-batch-confirm-row{
+    flex-direction:column;
+    align-items:stretch;
+  }
+  .tag-manager-batch-confirm-bottom{
+    width:100%;
+    min-width:0;
+    height:42px;
+  }
+}
+</style>
+
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen flex flex-col antialiased">
 <nav class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-50 transition-colors duration-300">
@@ -8478,6 +8530,13 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 - 提醒標註顏色提供 15 種既有顏色，並保留「不變」。
 - 三個批次欄位都可各自選「不變」，因此可只改頻率、只改標籤顏色、只改提醒標註顏色，或任意組合一起改。
 - 批次提醒顏色下拉加入左側色條預覽。
+-->
+<!-- v360：
+【新增批次修改確認按鈕】
+- 將原本「套用到已選標籤」改名為更明確的「確認批次修改」。
+- 批次工具列底部再新增一顆大型「確認批次修改」按鈕，避免畫面擁擠時看不到。
+- 只要尚未勾選標籤，兩顆確認按鈕都會呈停用狀態；勾選後同步啟用。
+- 上方與底部兩顆按鈕都執行相同的批次套用功能。
 -->
 <!-- 核心 JavaScript -->
 <script>
@@ -16547,8 +16606,10 @@ setChkDirection('long');
       '<label class="tag-manager-batch-field"><span>必填頻率</span><select id="tag-manager-batch-cadence"><option value="keep">不變</option><option value="none">不提醒</option><option value="irregular">不定時</option><option value="closing">尾盤填寫</option><option value="afterClose">盤後填寫</option><option value="weekly">每週填寫</option><option value="monthly">每月填寫</option></select></label>',
       '<label class="tag-manager-batch-field"><span>標籤顏色</span><select id="tag-manager-batch-theme"><option value="keep">不變</option><option value="rose">紅色</option><option value="blue">藍色</option><option value="amber">橘色</option><option value="purple">紫色</option><option value="teal">綠色</option></select></label>',
       '<label class="tag-manager-batch-field"><span>提醒標註顏色</span><select id="tag-manager-batch-reminder-color"><option value="keep">不變</option><option value="rose">紅色</option><option value="orange">橙色</option><option value="amber">琥珀色</option><option value="yellow">黃色</option><option value="lime">萊姆綠</option><option value="green">綠色</option><option value="teal">青綠色</option><option value="cyan">青色</option><option value="sky">天藍色</option><option value="blue">藍色</option><option value="indigo">靛藍色</option><option value="violet">紫羅蘭</option><option value="purple">紫色</option><option value="pink">粉紅色</option><option value="slate">灰藍色</option></select></label>',
-      '<button id="tag-manager-batch-apply" type="button" class="tag-manager-batch-apply" disabled><i class="fa-solid fa-wand-magic-sparkles mr-1.5"></i>套用到已選標籤</button>',
-      '</div></div>',
+      '<button id="tag-manager-batch-apply" type="button" class="tag-manager-batch-apply" disabled><i class="fa-solid fa-check mr-1.5"></i>確認批次修改</button>',
+      '</div>',
+      '<div class="tag-manager-batch-confirm-row"><div class="tag-manager-batch-confirm-hint"><i class="fa-solid fa-circle-info mr-1.5"></i>選好標籤與批次設定後，按右側確認即可一次套用。</div><button id="tag-manager-batch-confirm-bottom" type="button" class="tag-manager-batch-confirm-bottom" disabled><i class="fa-solid fa-check-double mr-1.5"></i>確認批次修改</button></div>',
+      '</div>',
       '<div id="tag-manager-list" class="space-y-4"></div>',
       '</div>',
       '</div></div></div>',
@@ -16619,9 +16680,11 @@ setChkDirection('long');
     });
     var count=managedTagBatchSelection.size,
         counter=document.getElementById('tag-manager-batch-count'),
-        apply=document.getElementById('tag-manager-batch-apply');
+        apply=document.getElementById('tag-manager-batch-apply'),
+        confirmBottom=document.getElementById('tag-manager-batch-confirm-bottom');
     if(counter)counter.textContent='已選 '+count;
     if(apply)apply.disabled=count===0;
+    if(confirmBottom)confirmBottom.disabled=count===0;
     document.querySelectorAll('.tag-manager-batch-check').forEach(function(input){
       var tag=decodeURIComponent(input.dataset.tagName||'');
       input.checked=managedTagBatchSelection.has(tag);
@@ -17473,6 +17536,7 @@ setChkDirection('long');
     document.getElementById('tag-manager-batch-clear').addEventListener('click',clearManagedTagBatchSelection);
     document.getElementById('tag-manager-batch-reminder-color').addEventListener('change',updateBatchReminderColorPreview);
     document.getElementById('tag-manager-batch-apply').addEventListener('click',function(){applyManagedTagBatchChanges();});
+    document.getElementById('tag-manager-batch-confirm-bottom').addEventListener('click',function(){applyManagedTagBatchChanges();});
     document.getElementById('btn-trash-manager').addEventListener('click',function(){window.renderTrashManager();document.getElementById('trash-manager-modal').classList.remove('hidden');document.getElementById('trash-manager-modal').classList.add('flex');});
     document.getElementById('trash-manager-close').addEventListener('click',function(){document.getElementById('trash-manager-modal').classList.add('hidden');document.getElementById('trash-manager-modal').classList.remove('flex');});
     document.getElementById('trash-manager-list').addEventListener('click',function(event){
