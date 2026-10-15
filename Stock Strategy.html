@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="351" name="app-version"/>
+<meta content="353" name="app-version"/>
 <script id="startup-performance-bootstrap">
 window.__ryanStartupPerf={start:performance.now(),localReady:0,firstRender:0,cloudStart:0,cloudEnd:0,cloudOk:null};
 </script>
@@ -6386,6 +6386,91 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 }
 </style>
 
+
+<style id="strategy-streak-badge-v352">
+.strategy-streak-badge{
+  display:inline-flex;
+  align-items:center;
+  vertical-align:middle;
+  padding:1px 4px;
+  border-radius:999px;
+  background:rgba(249,115,22,.14);
+  border:1px solid rgba(249,115,22,.28);
+  color:#c2410c;
+  font-size:9px;
+  line-height:1.15;
+  font-weight:950;
+  white-space:nowrap;
+}
+.dark .strategy-streak-badge{
+  background:rgba(249,115,22,.18);
+  border-color:rgba(251,146,60,.35);
+  color:#fdba74;
+}
+</style>
+
+
+<style id="journal-holder-fit-content-v353">
+/* v353：兩個千張大戶條件改成內容寬度，不再固定大格 */
+@media (min-width:1200px){
+  #module-journal .journal-fixed-filter-toolbar{
+    grid-template-columns:
+      330px 185px
+      88px 88px 88px
+      max-content max-content
+      118px 92px 104px 104px
+      minmax(1px,1fr)!important;
+  }
+
+  #module-journal .journal-filter-row-grid-6 > label:nth-of-type(1),
+  #module-journal .journal-filter-row-grid-6 > label:nth-of-type(2){
+    width:max-content!important;
+    min-width:0!important;
+    max-width:none!important;
+    padding:4px 7px!important;
+    justify-self:start!important;
+    justify-content:flex-start!important;
+    gap:5px!important;
+  }
+
+  #module-journal .journal-filter-row-grid-6 > label:nth-of-type(1) span,
+  #module-journal .journal-filter-row-grid-6 > label:nth-of-type(2) span{
+    font-size:9.5px!important;
+    letter-spacing:-.02em!important;
+    white-space:nowrap!important;
+  }
+}
+
+/* 中型桌機同樣採內容寬度；寬度不足時由既有外層橫向捲動承接 */
+@media (min-width:900px) and (max-width:1199px){
+  #module-journal .journal-fixed-filter-toolbar{
+    grid-template-columns:
+      320px 180px
+      86px 86px 86px
+      max-content max-content
+      116px 90px 102px 102px!important;
+  }
+
+  #module-journal .journal-filter-row-grid-6 > label:nth-of-type(1),
+  #module-journal .journal-filter-row-grid-6 > label:nth-of-type(2){
+    width:max-content!important;
+    min-width:0!important;
+    max-width:none!important;
+    padding:4px 7px!important;
+    justify-self:start!important;
+    justify-content:flex-start!important;
+    gap:5px!important;
+  }
+
+  #module-journal .journal-filter-row-grid-6 > label:nth-of-type(1) span,
+  #module-journal .journal-filter-row-grid-6 > label:nth-of-type(2) span{
+    font-size:9.5px!important;
+    letter-spacing:-.02em!important;
+    white-space:nowrap!important;
+  }
+}
+</style>
+
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen flex flex-col antialiased">
 <nav class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-50 transition-colors duration-300">
@@ -6687,6 +6772,10 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 <input class="copy-compare-duplicates rounded border-purple-300 dark:border-purple-600 accent-purple-600 w-3.5 h-3.5" type="checkbox"/>
 <span>🔁②③</span>
 </label>
+<label class="inline-flex items-center gap-1 cursor-pointer whitespace-nowrap" title="同一股票、同一策略連續 2 個以上交易日進榜時顯示 🔥連N日">
+<input class="copy-mark-strategy-streak rounded border-orange-300 dark:border-orange-700 accent-orange-600 w-3.5 h-3.5" type="checkbox"/>
+<span>🔥連續進榜</span>
+</label>
 <label class="inline-flex items-center gap-1 cursor-pointer whitespace-nowrap" title="複製時標示近期營收創高">
 <input class="copy-mark-revenue-high rounded border-pink-300 dark:border-pink-700 accent-pink-600 w-3.5 h-3.5" type="checkbox"/>
 <span>💰營收創高</span>
@@ -6742,6 +6831,8 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="strategy">策略</button>
 <button class="flex-shrink-0 btn-copy-base bg-fuchsia-50 dark:bg-fuchsia-900/40 hover:bg-fuchsia-600 border-fuchsia-200 dark:border-fuchsia-700/50 text-fuchsia-700 dark:text-fuchsia-200 btn-copy" data-mode="copy_a" title="破繭而出、月來越好、季不可失、OBV突破、MACD突破">複製A</button>
 <button class="flex-shrink-0 btn-copy-base bg-teal-50 dark:bg-teal-900/40 hover:bg-teal-600 border-teal-200 dark:border-teal-700/50 text-teal-700 dark:text-teal-200 btn-copy" data-mode="copy_b" title="量價齊揚、高成交值、一陽指">複製B</button>
+<button class="flex-shrink-0 btn-copy-base bg-amber-50 dark:bg-amber-900/40 hover:bg-amber-600 border-amber-200 dark:border-amber-700/50 text-amber-700 dark:text-amber-200 btn-copy" data-mode="copy_c" title="小碎步、多排上漲">複製C</button>
+<button class="flex-shrink-0 btn-copy-base bg-emerald-50 dark:bg-emerald-900/40 hover:bg-emerald-600 border-emerald-200 dark:border-emerald-700/50 text-emerald-700 dark:text-emerald-200 btn-copy" data-mode="friends" title="複製「月季線好朋友」策略名單">🤝 好朋友</button>
 <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="score">分數</button>
 <button class="flex-shrink-0 btn-copy-base bg-sky-50 dark:bg-sky-900/40 hover:bg-sky-600 border-sky-200 dark:border-sky-700/50 text-sky-700 dark:text-sky-200 btn-copy" data-mode="futures">股期</button>
 <button class="flex-shrink-0 btn-copy-base bg-sky-50 dark:bg-sky-900/40 hover:bg-sky-600 border-sky-200 dark:border-sky-700/50 text-sky-700 dark:text-sky-200 btn-copy" data-mode="futures_score">股期分數</button>
@@ -7380,6 +7471,10 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 <input class="copy-compare-duplicates rounded border-purple-300 dark:border-purple-600 accent-purple-600 w-3.5 h-3.5" type="checkbox"/>
 <span>🔁②③</span>
 </label>
+<label class="inline-flex items-center gap-1 cursor-pointer whitespace-nowrap" title="同一股票、同一策略連續 2 個以上交易日進榜時顯示 🔥連N日">
+<input class="copy-mark-strategy-streak rounded border-orange-300 dark:border-orange-700 accent-orange-600 w-3.5 h-3.5" type="checkbox"/>
+<span>🔥連續進榜</span>
+</label>
 <label class="inline-flex items-center gap-1 cursor-pointer whitespace-nowrap" title="複製時標示近期營收創高">
 <input class="copy-mark-revenue-high rounded border-pink-300 dark:border-pink-700 accent-pink-600 w-3.5 h-3.5" type="checkbox"/>
 <span>💰營收創高</span>
@@ -7435,6 +7530,8 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="strategy">策略</button>
 <button class="flex-shrink-0 btn-copy-base bg-fuchsia-50 dark:bg-fuchsia-900/40 hover:bg-fuchsia-600 border-fuchsia-200 dark:border-fuchsia-700/50 text-fuchsia-700 dark:text-fuchsia-200 btn-copy" data-mode="copy_a" title="破繭而出、月來越好、季不可失、OBV突破、MACD突破">複製A</button>
 <button class="flex-shrink-0 btn-copy-base bg-teal-50 dark:bg-teal-900/40 hover:bg-teal-600 border-teal-200 dark:border-teal-700/50 text-teal-700 dark:text-teal-200 btn-copy" data-mode="copy_b" title="量價齊揚、高成交值、一陽指">複製B</button>
+<button class="flex-shrink-0 btn-copy-base bg-amber-50 dark:bg-amber-900/40 hover:bg-amber-600 border-amber-200 dark:border-amber-700/50 text-amber-700 dark:text-amber-200 btn-copy" data-mode="copy_c" title="小碎步、多排上漲">複製C</button>
+<button class="flex-shrink-0 btn-copy-base bg-emerald-50 dark:bg-emerald-900/40 hover:bg-emerald-600 border-emerald-200 dark:border-emerald-700/50 text-emerald-700 dark:text-emerald-200 btn-copy" data-mode="friends" title="複製「月季線好朋友」策略名單">🤝 好朋友</button>
 <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="score">分數</button>
 <button class="flex-shrink-0 btn-copy-base bg-sky-50 dark:bg-sky-900/40 hover:bg-sky-600 border-sky-200 dark:border-sky-700/50 text-sky-700 dark:text-sky-200 btn-copy" data-mode="futures">股期</button>
 <button class="flex-shrink-0 btn-copy-base bg-sky-50 dark:bg-sky-900/40 hover:bg-sky-600 border-sky-200 dark:border-sky-700/50 text-sky-700 dark:text-sky-200 btn-copy" data-mode="futures_score">股期分數</button>
@@ -7955,6 +8052,26 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 - 「分數不限」欄位加寬，字級與字重同步放大，辨識更明顯。
 - 第一排其他欄位位置與第二排三按鈕配置維持不變。
 -->
+<!-- v352：
+【新增策略標籤／好朋友複製／同策略連續進榜小標籤】
+- 策略標籤新增「多排籌碼集中」，歸類於「💰 量價與籌碼」。
+- 策略標籤新增「月季線好朋友」，歸類於「📈 技術指標」。
+- 既有使用者的 tagSettings 也會自動補入上述兩個標籤，不需手動重建。
+- 策略日誌與追蹤清單的複製方式新增「🤝 好朋友」，專門複製「月季線好朋友」名單。
+- 新增「🔥連續進榜」標示小標籤開關。
+- 判斷規則：同一股票＋同一策略，連續 2 個以上「交易日」都有進榜，顯示「🔥連N日」。
+- 策略日誌／追蹤清單畫面中的每個策略標籤會直接顯示該策略的連續天數。
+- 在策略分組、複製A/B、精選馬廄、好朋友等有明確策略上下文的複製清單，也會顯示「🔥連N日」。
+- 取消勾選「🔥連續進榜」後，畫面與複製清單都會同步隱藏此標示。
+-->
+<!-- v353：
+【大戶篩選格自適應＋新增複製C】
+- 「近一週千張大戶增」與「千張大戶連續增加」改為內容寬度，格子大小貼近文字，不再留多餘空白。
+- 新增「複製C」。
+- 複製C包含：小碎步、 多排上漲。
+- 複製C沿用既有複製標示設定：目標價、備註、新進榜、🔥連續進榜、營收/大戶等小標籤。
+- 🔁重複策略統計由原本 A+B 改為 A+B+C 全部策略共同計算。
+-->
 <!-- 核心 JavaScript -->
 <script>
 const originalDateSetter=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set;
@@ -7970,7 +8087,7 @@ const ADMIN_SESSION_STORAGE_KEY='ryan_admin_session_v1';
 const XLSX_CDN_URL='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
 const getSyncPath=()=>DIRECT_SYNC_PATH;
 const isCloudMode=()=>true;
-let cloudSyncInterval=null, state={journals:[],plans:[],revenueRecords:[],reports:[],checklists:[],trash:[],deletionTombstones:{},tagSettings:null,epsData:{},codeToName:{},nameToCode:{},customMarketHolidays:[],journalClosePrices:{},watchlistPrices:{},watchlistMeta:{},watchlistGroups:[],activeWatchlistGroupId:'watch-all',copyCompareDuplicates:false,copyMarkRevenueHigh:true,copyMarkLargeHolder:true,copyMarkLargeHolder3W:true,copyMarkNewEntry:true,copyMarkTargetPrice:true,copyMarkNotes:true,filters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,largeHolder14:false,largeHolderConsecutive:false,highTurnoverRevenue:false,tags:[],minScore:0,strengthGrade:'all',tagLogic:'OR',status:'all',quick:'all'},favFilters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,largeHolder14:false,largeHolderConsecutive:false,highTurnoverRevenue:false,tags:[],minScore:0,strengthGrade:'all',tagLogic:'OR',status:'all',quick:'all'},revenueFilters:{month:'',code:'',type:'all',revenuePattern:'none',revenueN:3,revenueCount:2,holderPattern:'none',holderN:3,holderCount:2,minMomentum:0},reportFilters:{start:'',end:'',code:''},sortConfig:{key:'createdAt',asc:false},favSortConfig:{key:'createdAt',asc:false},planSortConfig:{key:'createdAt',asc:false},revenueSortConfig:{key:'month',asc:false},reportSortConfig:{key:'date',asc:false},checklistSortConfig:{key:'createdAt',asc:false}};
+let cloudSyncInterval=null, state={journals:[],plans:[],revenueRecords:[],reports:[],checklists:[],trash:[],deletionTombstones:{},tagSettings:null,epsData:{},codeToName:{},nameToCode:{},customMarketHolidays:[],journalClosePrices:{},watchlistPrices:{},watchlistMeta:{},watchlistGroups:[],activeWatchlistGroupId:'watch-all',copyCompareDuplicates:false,copyMarkRevenueHigh:true,copyMarkLargeHolder:true,copyMarkLargeHolder3W:true,copyMarkStrategyStreak:true,copyMarkNewEntry:true,copyMarkTargetPrice:true,copyMarkNotes:true,filters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,largeHolder14:false,largeHolderConsecutive:false,highTurnoverRevenue:false,tags:[],minScore:0,strengthGrade:'all',tagLogic:'OR',status:'all',quick:'all'},favFilters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,largeHolder14:false,largeHolderConsecutive:false,highTurnoverRevenue:false,tags:[],minScore:0,strengthGrade:'all',tagLogic:'OR',status:'all',quick:'all'},revenueFilters:{month:'',code:'',type:'all',revenuePattern:'none',revenueN:3,revenueCount:2,holderPattern:'none',holderN:3,holderCount:2,minMomentum:0},reportFilters:{start:'',end:'',code:''},sortConfig:{key:'createdAt',asc:false},favSortConfig:{key:'createdAt',asc:false},planSortConfig:{key:'createdAt',asc:false},revenueSortConfig:{key:'month',asc:false},reportSortConfig:{key:'date',asc:false},checklistSortConfig:{key:'createdAt',asc:false}};
 const selectedIds={journal:new Set(),fav:new Set(),plan:new Set(),revenue:new Set(),report:new Set(),checklist:new Set()};
 
 const escapeHTML=str=>(!str&&str!==0)?'':String(str).replace(/[&<>'"]/g,tag=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[tag]||tag));
@@ -8122,8 +8239,8 @@ const TAG_CATEGORIES = [
     {title: "🌟 特別關注", theme: "rose", tags: ["特別追蹤", "總編概念股"]},
     {title: "📊 基本面佳", theme: "blue", tags: ["多頭營收創高", "追風馬", "赤兔馬", "千里馬"]},
     {title: "🔥 動能與型態", theme: "amber", tags: ["一陽指", "金包銀", "披荊斬棘", "破繭而出", "月來越好", "季不可失", "守株待兔", "缺口", "小碎步", "多排上漲"]},
-    {title: "💰 量價與籌碼", theme: "purple", tags: ["量價齊揚", "高成交值", "高成交值高營收", "外資連買", "投信連買", "外資+投信", "外資+自營", "投信+自營", "三法聯手", "多頭法人買籌碼集中", "1日籌碼集中度", "5日籌碼集中", "20日籌碼集中", "籌碼集中大戶增"]},
-    {title: "📈 技術指標", theme: "teal", tags: ["OBV突破", "MACD突破", "KD金叉"]},
+    {title: "💰 量價與籌碼", theme: "purple", tags: ["量價齊揚", "高成交值", "高成交值高營收", "外資連買", "投信連買", "外資+投信", "外資+自營", "投信+自營", "三法聯手", "多頭法人買籌碼集中", "多排籌碼集中", "1日籌碼集中度", "5日籌碼集中", "20日籌碼集中", "籌碼集中大戶增"]},
+    {title: "📈 技術指標", theme: "teal", tags: ["OBV突破", "MACD突破", "KD金叉", "月季線好朋友"]},
     {title: "🌱 快樂農夫與他的韭菜田投資週報", theme: "purple", tags: ["黑卡會員", "尊耀會員", "頂峰會員", "鐵粉會員"]}
 ];
 
@@ -9988,6 +10105,8 @@ function loadLocalData(){
     if(state.copyCompareDuplicates===undefined)state.copyCompareDuplicates=true;
     if(state.copyMarkRevenueHigh===undefined)state.copyMarkRevenueHigh=true;
     if(state.copyMarkLargeHolder===undefined)state.copyMarkLargeHolder=true;
+    if(state.copyMarkLargeHolder3W===undefined)state.copyMarkLargeHolder3W=true;
+    if(state.copyMarkStrategyStreak===undefined)state.copyMarkStrategyStreak=true;
     if(state.copyMarkNewEntry===undefined)state.copyMarkNewEntry=true;
     if(state.copyMarkTargetPrice===undefined)state.copyMarkTargetPrice=true;
     if(state.copyMarkNotes===undefined)state.copyMarkNotes=true;
@@ -10113,6 +10232,7 @@ const formatPotentialUpside=value=>{
 const renderTableRows=(data,tbId,emId,isFav=false)=>{
     const tb=document.getElementById(tbId),em=document.getElementById(emId),lt=isFav?'fav':'journal',countEl=document.getElementById(`${lt}-stock-count`);
     const canRemoveTags=Boolean(window.isAdminMode&&window.isAdminMode());
+    const strategyStreakIndex=state.copyMarkStrategyStreak!==false?buildStrategyStreakIndex():null;
     const stockCount=new Set(data.map(item=>String(item.code||'').trim()).filter(Boolean)).size;
     if(countEl){countEl.dataset.stockCount=String(stockCount);countEl.innerHTML=`<i class="fa-solid fa-chart-simple"></i>目前顯示 ${stockCount} 檔股票`;}
     document.querySelectorAll(`[data-mobile-stock-count="${lt}"]`).forEach(el=>{el.innerHTML=`<i class="fa-solid fa-chart-simple"></i>顯示 ${stockCount} 檔`;});
@@ -10120,7 +10240,13 @@ const renderTableRows=(data,tbId,emId,isFav=false)=>{
     em.classList.add('hidden'); let rh='';
     data.forEach(i=>{
         const ei=i.ei||getEpsInfo(i.code,i),sc=i.score!==undefined?i.score:getScore(i.tags,ei,i.code,i.date),horseNewTags=getHorseNewEntryTags(i),horseNewTagSet=new Set(horseNewTags);
-        const tagHtml=(i.tags||[]).map(t=>{const normalizedTag=normalizeStrategyTagName(t),isNewHorse=horseNewTagSet.has(normalizedTag);return`<span class="inline-block text-[11px] font-bold px-2 py-0.5 rounded-md mr-1 mb-1 border shadow-sm transition ${canRemoveTags?'cursor-pointer hover:opacity-80':'cursor-default'} ${getTagStyle(t)}"${canRemoveTags?` data-action="remove-tag" data-id="${i.id}" data-tag="${escapeHTML(t)}" title="${isNewHorse?'🆕新進榜 新進榜｜點擊移除標籤':'點擊移除標籤'}"`:` title="${isNewHorse?'🆕新進榜 新進榜｜前一個月內未出現相同馬標籤':'策略標籤'}"`}>${escapeHTML(t)}${isNewHorse?' <span class="horse-new-badge ml-1" title="🆕新進榜 新進榜：同股往前一個月內未出現相同馬標籤">🆕新進榜</span>':''}${canRemoveTags?' ✕':''}</span>`;}).join('');
+        const tagHtml=(i.tags||[]).map(t=>{
+            const normalizedTag=normalizeStrategyTagName(t),
+                  isNewHorse=horseNewTagSet.has(normalizedTag),
+                  streakBadge=getStrategyStreakBadgeText(i,normalizedTag,strategyStreakIndex),
+                  streakHtml=streakBadge?` <span class="strategy-streak-badge ml-1" title="同股同策略連續交易日進榜">${escapeHTML(streakBadge)}</span>`:'';
+            return`<span class="inline-block text-[11px] font-bold px-2 py-0.5 rounded-md mr-1 mb-1 border shadow-sm transition ${canRemoveTags?'cursor-pointer hover:opacity-80':'cursor-default'} ${getTagStyle(t)}"${canRemoveTags?` data-action="remove-tag" data-id="${i.id}" data-tag="${escapeHTML(t)}" title="${isNewHorse?'🆕新進榜｜點擊移除標籤':'點擊移除標籤'}"`:` title="${isNewHorse?'🆕新進榜':'策略標籤'}"`}>${escapeHTML(t)}${streakHtml}${isNewHorse?' <span class="horse-new-badge ml-1" title="🆕新進榜">🆕新進榜</span>':''}${canRemoveTags?' ✕':''}</span>`;
+        }).join('');
         let fl=i.isFavorite===true?1:(parseInt(i.isFavorite)||0),fc='text-gray-400 dark:text-gray-500 hover:text-yellow-500',fi='<i class="fa-solid fa-star pointer-events-none"></i>',ft='加入追蹤';
         if(fl===1){fc='text-yellow-500';ft='一星追蹤';}else if(fl===2){fc='text-orange-500';fi='<i class="fa-solid fa-star pointer-events-none"></i><span class="ml-1 text-[10px] font-bold pointer-events-none">2</span>';ft='二次追蹤';}else if(fl===3){fc='text-red-500';fi='<i class="fa-solid fa-star pointer-events-none"></i><span class="ml-1 text-[10px] font-bold pointer-events-none">3</span>';ft='三次追蹤';}
         const fd=i.date?i.date.replace(/-/g,'/'):'',closePriceValue=Number(i.closePrice),closePriceDate=String(i.closePriceDate||''),closePriceSource=String(i.closePriceSource||''),closePriceHtml=Number.isFinite(closePriceValue)&&closePriceValue>0?`<div class="font-black text-[13px] sm:text-sm text-gray-800 dark:text-gray-100 tabular-nums" title="${escapeHTML(closePriceSource?`來源：${closePriceSource}`:'')}">${escapeHTML(formatMarketPrice(closePriceValue))}</div>${closePriceDate?`<div class="mt-0.5 text-[9px] text-gray-400 tabular-nums">${escapeHTML(closePriceDate.replace(/-/g,'/'))}</div>`:''}`:'<span class="text-gray-300 dark:text-gray-600">—</span>',dailyChangePercentValue=Number(i.dailyChangePercent),dailyPreviousClose=Number(i.dailyPreviousClose),dailyChangePercentHtml=`<div title="${Number.isFinite(dailyPreviousClose)&&dailyPreviousClose>0?`前一交易日收盤：${escapeHTML(formatMarketPrice(dailyPreviousClose))}`:''}">${formatDailyChangePercent(Number.isFinite(dailyChangePercentValue)?dailyChangePercentValue:null)}</div>`,potentialUpside=getPotentialUpsidePercent(ei.targetPrice,closePriceValue),potentialUpsideHtml=formatPotentialUpside(potentialUpside),rbh=getRevenueMonthsHtml(i.code,i.date||getToday()),hr=hasReportForCode(i.code),rb=hr?renderReportIndicator(i.code,i.date||''):'',futuresBadge=ei.futures?'<span class="shrink-0 bg-sky-600 text-white text-[9px] px-1 rounded ml-1">期</span>':'',resonance=getJournalResonance(i),resonanceBadge=resonance.isMultiple?`<span class="inline-flex items-center rounded-md bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-200 px-1.5 py-0.5 text-[10px] font-black mr-1 mb-1" title="共振來源：${escapeHTML(resonance.sources.join('、'))}"><i class="fa-solid fa-bolt mr-1"></i>${escapeHTML(resonance.sources.join('＋'))}</span>`:'',th=renderStockStrengthBadges(i.code,i.date||getToday())+resonanceBadge+tagHtml,statusBadge=getJournalStatusBadge(i.status),overdueBadge=isJournalOverdue(i)?`<span class="inline-flex items-center rounded-md bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-200 px-1.5 py-0.5 text-[10px] font-black ml-1"><i class="fa-solid fa-clock mr-1"></i>逾期 ${journalTradingAge(i.date)} 日</span>`:'',returnValue=getJournalReturn(i),reviewBadge=i.review?.reviewDate?`<div class="mt-1 text-[10px] font-bold ${returnValue===null?'text-gray-500 dark:text-gray-400':returnValue>=0?'tw-red':'tw-green'}">複盤 ${escapeHTML(i.review.outcome||'未判定')}${returnValue===null?'':`｜${returnValue>=0?'+':''}${returnValue.toFixed(1)}%`}</div>`:'',dataIssues=getJournalDataIssues(i),issueBadge=dataIssues.length?`<div class="mt-1 inline-flex items-center rounded-md bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-200 px-1.5 py-0.5 text-[10px] font-black" title="${escapeHTML(dataIssues.join('；'))}"><i class="fa-solid fa-triangle-exclamation mr-1"></i>異常 ${dataIssues.length} 項</div>`:'',notesHtml=`<div class="mb-1">${statusBadge}${overdueBadge}</div>${reviewBadge}${issueBadge}<div class="mt-1">${escapeHTML(i.notes||'')}</div>`,trackedPriceValue=Number(i.trackedPrice),trackedReturnValue=i.trackingReturn,trackedDate=i.trackedAt?new Date(Number(i.trackedAt)).toLocaleDateString('zh-TW',{year:'numeric',month:'2-digit',day:'2-digit'}):'',trackedPriceHtml=Number.isFinite(trackedPriceValue)&&trackedPriceValue>0?`<div class="font-black text-[13px] text-amber-700 dark:text-amber-300 tabular-nums" title="${escapeHTML(i.trackedPriceSource||'追蹤基準價')}">${escapeHTML(formatMarketPrice(trackedPriceValue))}</div>${trackedDate?`<div class="mt-0.5 text-[9px] text-gray-400">${escapeHTML(trackedDate)}</div>`:''}<button type="button" data-action="set-watch-price" data-id="${i.id}" class="mt-1 text-[9px] font-bold text-blue-500 hover:underline">重設</button>`:`<button type="button" data-action="set-watch-price" data-id="${i.id}" class="text-[10px] font-black text-blue-600 dark:text-blue-300 hover:underline">設定</button>`,trackingReturnHtml=Number.isFinite(trackedReturnValue)?`<span class="font-black tabular-nums ${trackedReturnValue>0?'tw-red':trackedReturnValue<0?'tw-green':'text-gray-500'}">${trackedReturnValue>0?'+':''}${trackedReturnValue.toFixed(1)}%</span>`:'<span class="text-gray-300 dark:text-gray-600">—</span>';
@@ -13472,7 +13598,7 @@ const orderTagsForCopy=(tags,selectedTags=[])=>{
 };
 const COPY_TAG_ICONS={
     '多頭營收創高':'📈','營收創高':'💰','赤兔馬':'🐎','千里馬':'🏇','追風馬':'🌪️','黑卡會員':'🖤','鐵粉會員':'💗','尊耀會員':'👑','頂峰會員':'🏔️','一陽指':'☝️','金包銀':'🥇','披荊斬棘':'⚔️','破繭而出':'🦋','月來越好':'🌙','季不可失':'🗓️','守株待兔':'🐇','缺口':'🚀','小碎步':'👣','多排上漲':'🧱',
-    '量價齊揚':'📊','高成交值':'💰','高成交值高營收':'💹','千張大戶':'👥','外資連買':'🌍','投信連買':'🏦','多頭法人買籌碼集中':'🏦','1日籌碼集中度':'1️⃣','5日籌碼集中':'5️⃣','20日籌碼集中':'2️⃣0️⃣','OBV突破':'🌊','MACD突破':'〽️','KD金叉':'✨','大腸包小腸':'🌭'
+    '量價齊揚':'📊','高成交值':'💰','高成交值高營收':'💹','千張大戶':'👥','外資連買':'🌍','投信連買':'🏦','多頭法人買籌碼集中':'🏦','1日籌碼集中度':'1️⃣','5日籌碼集中':'5️⃣','20日籌碼集中':'2️⃣0️⃣','多排籌碼集中':'🧱','OBV突破':'🌊','MACD突破':'〽️','KD金叉':'✨','月季線好朋友':'🤝','大腸包小腸':'🌭'
 };
 const COPY_TAG_ICON_POOL=['🔹','🔸','🔺','🔻','🟠','🟡','🟢','🔵','🟣','⚪','⚫','💠','🔷','🔶','▪️','▫️','♦️','♣️','♠️','♥️','🧩','🧭','🪄','🪙','🛡️','⚡','🔥','🌟','🎯','📌'];
 const buildCopyTagIconMap=tags=>{
@@ -13529,6 +13655,57 @@ const appendDuplicateMark=(journal,duplicateCodes)=>{
     const count=duplicateCodes instanceof Map?Number(duplicateCodes.get(code)||0):2;
     return ` 🔁${getDuplicateCountBadge(count)}`;
 };
+
+// v352：同股同策略連續交易日進榜標示。
+const buildStrategyStreakIndex=()=>{
+    const index=new Map();
+    (state.journals||[]).forEach(journal=>{
+        const code=String(journal?.code||'').trim(),
+              date=normalizeHorseJournalDate(journal?.date);
+        if(!code||!date)return;
+        (journal.tags||[]).forEach(rawTag=>{
+            const tag=normalizeStrategyTagName(rawTag);
+            if(!tag||NON_STRATEGY_COPY_TAGS.has(tag))return;
+            const key=`${code}\u0001${tag}`;
+            if(!index.has(key))index.set(key,new Set());
+            index.get(key).add(date);
+        });
+    });
+    return index;
+};
+const previousTradingDateForStrategyStreak=date=>{
+    let cursor=normalizeHorseJournalDate(date);
+    if(!cursor)return'';
+    for(let guard=0;guard<15;guard++){
+        cursor=addIsoDays(cursor,-1);
+        if(!cursor)return'';
+        if(isJournalTradingDate(cursor,state.customMarketHolidays))return cursor;
+    }
+    return'';
+};
+const getStrategyConsecutiveDays=(journal,tag,index=null)=>{
+    const code=String(journal?.code||'').trim(),
+          wanted=normalizeStrategyTagName(tag),
+          date=normalizeHorseJournalDate(journal?.date);
+    if(!code||!wanted||!date||NON_STRATEGY_COPY_TAGS.has(wanted))return 1;
+    const source=index||buildStrategyStreakIndex(),
+          dates=source.get(`${code}\u0001${wanted}`);
+    if(!dates?.has(date))return 1;
+    let count=1,cursor=date;
+    for(let guard=0;guard<60;guard++){
+        const previous=previousTradingDateForStrategyStreak(cursor);
+        if(!previous||!dates.has(previous))break;
+        count++;
+        cursor=previous;
+    }
+    return count;
+};
+const getStrategyStreakBadgeText=(journal,tag,index=null)=>{
+    if(state.copyMarkStrategyStreak===false)return'';
+    const days=getStrategyConsecutiveDays(journal,tag,index);
+    return days>=2?`🔥連${days}日`:'';
+};
+
 // v162：所有策略相關複製統一顯示「🔁＋重複策略數小標籤」。
 const hasCopyRevenueHigh=(code,referenceDate=getToday())=>hasRecentRevenueHigh(code,referenceDate,1);
 const getCopyMomentumMarks=(code,referenceDate=getToday())=>{
@@ -13563,7 +13740,9 @@ const getStrategyCopyStockName=(journal,duplicateCodes,horseTag='',options={})=>
     const targetText=recentTarget?`【目標價：${formatCopyTargetPrice(recentTarget.targetPrice)}${recentTarget.achieved?'｜已達標':''}】`:'';
     const note=String(journal?.notes||'').trim().replace(/\s*\n+\s*/g,'；');
     const noteText=state.copyMarkNotes!==false&&note?`【備註：${note}】`:'';
-    return `${name}${targetText}${noteText}${state.copyMarkNewEntry!==false&&isNew?' 🆕新進榜':''}${appendDuplicateMark(journal,duplicateCodes)}${getCopyMomentumMarks(journal?.code,referenceDate)}`;
+    const streakTag=normalizeStrategyTagName(options?.strategyTag||horseTag||''),
+          streakText=streakTag?getStrategyStreakBadgeText(journal,streakTag,options?.strategyStreakIndex):'';
+    return `${name}${targetText}${noteText}${state.copyMarkNewEntry!==false&&isNew?' 🆕新進榜':''}${streakText?` ${streakText}`:''}${appendDuplicateMark(journal,duplicateCodes)}${getCopyMomentumMarks(journal?.code,referenceDate)}`;
 };
 
 // v295：農夫週報複製時，比對「前一次週報」是否曾出現。
@@ -13608,6 +13787,7 @@ const syncCopyLabelToggles=()=>{
     document.querySelectorAll('.copy-mark-revenue-high').forEach(cb=>{cb.checked=state.copyMarkRevenueHigh!==false;cb.disabled=false;});
     document.querySelectorAll('.copy-mark-large-holder').forEach(cb=>{cb.checked=state.copyMarkLargeHolder!==false;cb.disabled=false;});
     document.querySelectorAll('.copy-mark-large-holder-3w').forEach(cb=>{cb.checked=state.copyMarkLargeHolder3W!==false;cb.disabled=false;});
+    document.querySelectorAll('.copy-mark-strategy-streak').forEach(cb=>{cb.checked=state.copyMarkStrategyStreak!==false;cb.disabled=false;});
     document.querySelectorAll('.copy-mark-new-entry').forEach(cb=>{cb.checked=state.copyMarkNewEntry!==false;cb.disabled=false;});
     document.querySelectorAll('.copy-mark-target-price').forEach(cb=>{cb.checked=state.copyMarkTargetPrice!==false;cb.disabled=false;});
     document.querySelectorAll('.copy-mark-notes').forEach(cb=>{cb.checked=state.copyMarkNotes!==false;cb.disabled=false;});
@@ -13643,6 +13823,16 @@ document.querySelectorAll('.copy-mark-large-holder-3w').forEach(cb=>{
         syncCopyLabelToggles();
         saveLocalData();
         showToast(state.copyMarkLargeHolder3W?'已顯示 📈 大戶連三增小標籤':'已隱藏 📈 大戶連三增小標籤');
+    });
+});
+document.querySelectorAll('.copy-mark-strategy-streak').forEach(cb=>{
+    cb.addEventListener('change',e=>{
+        state.copyMarkStrategyStreak=e.target.checked;
+        syncCopyLabelToggles();
+        saveLocalData();
+        if(document.getElementById('module-journal')?.classList.contains('active'))renderJournalPrimaryView();
+        if(document.getElementById('module-favorites')?.classList.contains('active'))renderFavorites();
+        showToast(state.copyMarkStrategyStreak?'已顯示 🔥 同策略連續進榜小標籤':'已隱藏 🔥 同策略連續進榜小標籤');
     });
 });
 document.querySelectorAll('.copy-mark-new-entry').forEach(cb=>{
@@ -13836,9 +14026,9 @@ const getHorseTagPreviousSnapshotComparison=(tag,currentItems,filterState,isFavo
     };
 };
 
-const getHorseSnapshotCopyName=(journal,duplicateCodes,tag,newCodes)=>{
+const getHorseSnapshotCopyName=(journal,duplicateCodes,tag,newCodes,strategyStreakIndex=null)=>{
     // 專用「精選馬廄」只能用本次與上一期的差異判斷，不可沿用 7 日顯示狀態。
-    const base=getStrategyCopyStockName(journal,duplicateCodes,tag,{suppressNewEntry:true});
+    const base=getStrategyCopyStockName(journal,duplicateCodes,tag,{suppressNewEntry:true,strategyTag:tag,strategyStreakIndex});
     const code=String(journal?.code||'').trim();
     if(
         !HORSE_NEW_ENTRY_TAGS.has(normalizeStrategyTagName(tag))||
@@ -13850,7 +14040,8 @@ const getHorseSnapshotCopyName=(journal,duplicateCodes,tag,newCodes)=>{
 };
 
 document.querySelectorAll('.btn-copy').forEach(b=>{b.addEventListener('click',e=>{
-    const m=e.currentTarget.dataset.mode,at=document.querySelector('.tab-content.active').id,iF=at==='module-favorites',cf=iF?state.favFilters:state.filters,lt=iF?'fav':'journal';
+    const m=e.currentTarget.dataset.mode,at=document.querySelector('.tab-content.active').id,iF=at==='module-favorites',cf=iF?state.favFilters:state.filters,lt=iF?'fav':'journal',
+          strategyStreakIndex=state.copyMarkStrategyStreak!==false?buildStrategyStreakIndex():null;
     let d=iF
         ?getFilteredAndSortedData(getWatchlistRows(state.activeWatchlistGroupId),{...cf,start:'',end:''},state.favSortConfig)
         :getFilteredAndSortedData(state.journals,cf,state.sortConfig);
@@ -13868,6 +14059,21 @@ document.querySelectorAll('.btn-copy').forEach(b=>{b.addEventListener('click',e=
         executeCopy(tx.trim()+copyFootnote);return;
     }
 
+    if(m==='friends'){
+        const tag='月季線好朋友',icon='🤝',byCode=new Map();
+        d.filter(j=>journalHasStrategyTag(j,tag)).forEach(j=>{
+            const code=String(j.code||'').trim();if(!code)return;
+            const current=byCode.get(code);
+            if(!current||String(j.date||'')>String(current.date||'')||(String(j.date||'')===String(current.date||'')&&Number(j.createdAt||0)>Number(current.createdAt||0)))byCode.set(code,j);
+        });
+        const items=[...byCode.values()].sort((a,b)=>String(a.code||'').localeCompare(String(b.code||''),'zh-Hant',{numeric:true}));
+        if(!items.length)return showToast('目前沒有月季線好朋友標的','error');
+        const duplicateCodes=getDuplicateStrategyCodesFromJournals(d,[tag]);
+        const lines=items.map(j=>`${j.code} ${getStrategyCopyStockName(j,duplicateCodes,'',{strategyTag:tag,strategyStreakIndex})}`);
+        const tx=`${buildCopyHeader(ds,'好朋友')}\n\n${icon} [${tag}] (共 ${items.length} 檔)\n${lines.join('\n')}`;
+        executeCopy(tx.trim()+copyFootnote);return;
+    }
+
     if(m==='horses'){
         const horseTags=['追風馬','赤兔馬','千里馬'],horseIcons={'追風馬':'🌪️','赤兔馬':'🐎','千里馬':'🏇'},sections=[];
         const duplicateCodes=getDuplicateStrategyCodesFromJournals(d,horseTags);
@@ -13876,7 +14082,7 @@ document.querySelectorAll('.btn-copy').forEach(b=>{b.addEventListener('click',e=
         horseTags.forEach(tag=>{
             const comparison=horseComparisons.get(tag),items=comparison?.currentItems||[];
             if(!items.length)return;
-            const lines=items.map(j=>`${j.code} ${getHorseSnapshotCopyName(j,duplicateCodes,tag,comparison.newCodes)}`);
+            const lines=items.map(j=>`${j.code} ${getHorseSnapshotCopyName(j,duplicateCodes,tag,comparison.newCodes,strategyStreakIndex)}`);
             sections.push(`${horseIcons[tag]} [${tag}] (共 ${items.length} 檔)\n${lines.join('\n')}`);
         });
 
@@ -13908,14 +14114,15 @@ document.querySelectorAll('.btn-copy').forEach(b=>{b.addEventListener('click',e=
         executeCopy(tx.trim()+copyFootnote);return;
     }
 
-    if(m==='copy_a'||m==='copy_b'){
+    if(m==='copy_a'||m==='copy_b'||m==='copy_c'){
         const copyAPreset=[{tag:'破繭而出',icon:'🦋'},{tag:'月來越好',icon:'🌙'},{tag:'季不可失',icon:'🗓️'},{tag:'OBV突破',icon:'🌊'},{tag:'MACD突破',icon:'〽️'}];
         const copyBPreset=[{tag:'量價齊揚',icon:'📊'},{tag:'高成交值',icon:'💰'},{tag:'一陽指',icon:'☝️'}];
-        const preset=m==='copy_a'?copyAPreset:copyBPreset;
+        const copyCPreset=[{tag:'小碎步',icon:'👣'},{tag:'多排上漲',icon:'📈'}];
+        const preset=m==='copy_a'?copyAPreset:m==='copy_b'?copyBPreset:copyCPreset;
 
-        // v303：A / B 的重複性統計視為同一組。
-        // 不論目前按「複製A」或「複製B」，🔁②③… 都以 A+B 共 8 個策略一起計算。
-        const combinedPresetTags=[...copyAPreset,...copyBPreset].map(x=>x.tag);
+        // v353：A / B / C 的重複性統計視為同一組。
+        // 🔁②③… 以 A+B+C 全部策略一起計算。
+        const combinedPresetTags=[...copyAPreset,...copyBPreset,...copyCPreset].map(x=>x.tag);
         const duplicateCodes=getDuplicateStrategyCodesFromJournals(d,combinedPresetTags);
         const sections=[];
         preset.forEach(({tag,icon})=>{
@@ -13927,9 +14134,14 @@ document.querySelectorAll('.btn-copy').forEach(b=>{b.addEventListener('click',e=
             });
             const items=[...byCode.values()].sort((a,b)=>String(a.code||'').localeCompare(String(b.code||''),'zh-Hant',{numeric:true}));
             if(!items.length)return;
-            sections.push(`${icon} [${tag}] (共 ${items.length} 檔)\n${items.map(j=>`${j.code} ${getStrategyCopyStockName(j,duplicateCodes,tag)}`).join('\n')}`);
+            sections.push(`${icon} [${tag}] (共 ${items.length} 檔)\n${items.map(j=>`${j.code} ${getStrategyCopyStockName(j,duplicateCodes,tag,{strategyTag:tag,strategyStreakIndex})}`).join('\n')}`);
         });
-        if(!sections.length)return showToast(m==='copy_a'?'複製A目前無符合標的':'複製B目前無符合標的','error');
+        if(!sections.length)return showToast(
+            m==='copy_a'?'複製A目前無符合標的':
+            m==='copy_b'?'複製B目前無符合標的':
+            '複製C目前無符合標的',
+            'error'
+        );
         const tx=`${buildCopyHeader(ds,'多重濾網')}\n\n${sections.join('\n\n')}`;
         executeCopy(tx.trim()+copyFootnote);return;
     }
@@ -13968,7 +14180,7 @@ document.querySelectorAll('.btn-copy').forEach(b=>{b.addEventListener('click',e=
             : (cf.tags.length?[...cf.tags]:TAG_CATEGORIES.flatMap(c=>c.tags));
         Object.keys(sm).sort((a,b)=>{const iA=ord.indexOf(a),iB=ord.indexOf(b);if(iA!==-1&&iB!==-1)return iA-iB;if(iA!==-1)return -1;if(iB!==-1)return 1;return a.localeCompare(b);}).forEach(s=>{
             tx+=`${tagIcons.get(s)||'🏷️'} [${s}] (共 ${sm[s].length} 檔)\n`;
-            sm[s].forEach(a=>tx+=`${a.code} ${hasAnalystCopy?getAnalystCopyStockName(a,duplicateCodes,analystNewEntryInfo.newCodes):getStrategyCopyStockName(a,duplicateCodes)}\n`);
+            sm[s].forEach(a=>tx+=`${a.code} ${hasAnalystCopy?getAnalystCopyStockName(a,duplicateCodes,analystNewEntryInfo.newCodes):getStrategyCopyStockName(a,duplicateCodes,'',{strategyTag:s,strategyStreakIndex})}\n`);
             tx+='\n';
         });
     }else if(m==='score'){
@@ -15724,7 +15936,7 @@ setChkDirection('long');
 
       // v304：既有使用者自動補上「量價與籌碼」必要標籤，包含「多頭法人買籌碼集中」。
       var chipCategoryTitle='💰 量價與籌碼';
-      var chipAllianceTags=['高成交值高營收','外資連買','投信連買','外資+投信','外資+自營','投信+自營','三法聯手','多頭法人買籌碼集中','籌碼集中大戶增'];
+      var chipAllianceTags=['高成交值高營收','外資連買','投信連買','外資+投信','外資+自營','投信+自營','三法聯手','多頭法人買籌碼集中','多排籌碼集中','籌碼集中大戶增'];
       var chipCategory=normalizedCategories.find(function(category){return String(category.title||'')===chipCategoryTitle;});
       if(!chipCategory){
         chipCategory={title:chipCategoryTitle,theme:'purple',tags:[]};
@@ -15738,6 +15950,20 @@ setChkDirection('long');
           changed=true;
         }
       });
+
+      // v352：既有使用者自動補上「月季線好朋友」。
+      var technicalCategoryTitle='📈 技術指標';
+      var technicalCategory=normalizedCategories.find(function(category){return String(category.title||'')===technicalCategoryTitle;});
+      if(!technicalCategory){
+        technicalCategory={title:technicalCategoryTitle,theme:'teal',tags:[]};
+        normalizedCategories.push(technicalCategory);
+        changed=true;
+      }
+      if(!seen.has('月季線好朋友')){
+        technicalCategory.tags.push('月季線好朋友');
+        seen.add('月季線好朋友');
+        changed=true;
+      }
 
       var nextMeta={};
       normalizedCategories.forEach(function(category){
