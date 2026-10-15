@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="353" name="app-version"/>
+<meta content="354" name="app-version"/>
 <script id="startup-performance-bootstrap">
 window.__ryanStartupPerf={start:performance.now(),localReady:0,firstRender:0,cloudStart:0,cloudEnd:0,cloudOk:null};
 </script>
@@ -6471,6 +6471,108 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 }
 </style>
 
+
+<style id="strategy-streak-filter-color-v354">
+/* 標籤挑選中的「連續進榜」篩選 */
+.strategy-streak-filter-option{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  width:100%;
+  padding:8px 10px;
+  border:1px solid #fed7aa;
+  border-radius:10px;
+  background:#fff7ed;
+  cursor:pointer;
+  transition:.15s ease;
+}
+.strategy-streak-filter-option:hover{
+  border-color:#fb923c;
+  background:#ffedd5;
+}
+.dark .strategy-streak-filter-option{
+  border-color:#7c2d12;
+  background:rgba(124,45,18,.18);
+}
+.dark .strategy-streak-filter-option:hover{
+  border-color:#c2410c;
+  background:rgba(124,45,18,.28);
+}
+.strategy-streak-filter-option > input{
+  position:absolute;
+  opacity:0;
+  pointer-events:none;
+}
+.strategy-streak-filter-check{
+  flex:0 0 28px;
+  width:28px;
+  height:28px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid #fdba74;
+  border-radius:8px;
+  background:#fff;
+  color:#f97316;
+  font-size:12px;
+}
+.strategy-streak-filter-option > input:checked + .strategy-streak-filter-check{
+  background:#f97316;
+  border-color:#f97316;
+  color:#fff;
+  box-shadow:0 3px 10px rgba(249,115,22,.2);
+}
+.dark .strategy-streak-filter-check{
+  background:#111827;
+  border-color:#9a3412;
+  color:#fb923c;
+}
+.strategy-streak-filter-title{
+  display:block;
+  color:#9a3412;
+  font-size:11px;
+  line-height:1.2;
+  font-weight:950;
+}
+.dark .strategy-streak-filter-title{color:#fdba74;}
+.strategy-streak-filter-help{
+  display:block;
+  margin-top:2px;
+  color:#78716c;
+  font-size:9px;
+  line-height:1.35;
+  font-weight:650;
+}
+.dark .strategy-streak-filter-help{color:#a8a29e;}
+
+/* 連續進榜小標籤：完全沿用外層策略標籤的文字顏色，不再固定暗紅/橘色 */
+.strategy-streak-badge{
+  display:inline-flex!important;
+  align-items:center!important;
+  gap:3px!important;
+  vertical-align:middle;
+  padding:1px 4px!important;
+  border:1px solid currentColor!important;
+  border-radius:999px!important;
+  background:rgba(255,255,255,.34)!important;
+  color:inherit!important;
+  font-size:9px!important;
+  line-height:1.15!important;
+  font-weight:950!important;
+  white-space:nowrap!important;
+  opacity:.92;
+}
+.dark .strategy-streak-badge{
+  background:rgba(15,23,42,.24)!important;
+  border-color:currentColor!important;
+  color:inherit!important;
+}
+.strategy-streak-badge-icon{
+  color:inherit!important;
+  font-size:8px!important;
+}
+</style>
+
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen flex flex-col antialiased">
 <nav class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-50 transition-colors duration-300">
@@ -6748,7 +6850,15 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 </select><div class="journal-filter-tag-cell relative">
 <button class="bg-white dark:bg-gray-900/50 text-gray-900 dark:text-white text-xs sm:text-sm border border-gray-300 dark:border-gray-700/50 rounded-lg px-3 py-1.5 sm:py-2 focus:ring-2 focus:ring-blue-500 outline-none transition hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center justify-between gap-2 shadow-sm whitespace-nowrap" id="filter-tag-btn" type="button"><span>+ 標籤挑選</span><i class="fa-solid fa-chevron-down text-[10px] opacity-70"></i></button><button class="tag-preset-entry-btn" data-open-tag-presets="journal" type="button" title="開啟快速組合設定"><i class="fa-solid fa-bolt mr-1"></i><span>組合</span><span class="tag-preset-count-badge" data-tag-preset-count>0</span></button><button class="text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-red-600 text-gray-700 dark:text-gray-300 hover:text-white border border-gray-300 dark:border-gray-600 hover:border-red-500 px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center whitespace-nowrap" id="btn-clear-filters" type="button"><i class="fa-solid fa-eraser sm:mr-1.5"></i><span class="hidden sm:inline">清除篩選</span><span class="sm:hidden">清除</span></button>
 <div class="absolute left-0 top-full mt-1.5 w-[calc(100vw-24px)] sm:w-[920px] max-w-[calc(100vw-32px)] bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl shadow-2xl hidden z-50 p-3 max-h-[70vh] overflow-y-auto modal-enter" id="filter-tag-panel">
-<div class="mb-3 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between"><span class="text-xs font-bold text-gray-700 dark:text-gray-300">篩選邏輯</span><div class="flex items-center bg-gray-100 dark:bg-gray-900 p-1 rounded-lg"><button class="logic-btn px-2 py-1 text-[10px] sm:text-xs rounded font-medium transition-colors bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm" data-logic="OR" id="btn-logic-or" type="button">符合任一 (OR)</button><button class="logic-btn px-2 py-1 text-[10px] sm:text-xs rounded font-medium transition-colors text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" data-logic="AND" id="btn-logic-and" type="button">完全符合 (AND)</button></div></div>
+<div class="mb-2 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between"><span class="text-xs font-bold text-gray-700 dark:text-gray-300">篩選邏輯</span><div class="flex items-center bg-gray-100 dark:bg-gray-900 p-1 rounded-lg"><button class="logic-btn px-2 py-1 text-[10px] sm:text-xs rounded font-medium transition-colors bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm" data-logic="OR" id="btn-logic-or" type="button">符合任一 (OR)</button><button class="logic-btn px-2 py-1 text-[10px] sm:text-xs rounded font-medium transition-colors text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" data-logic="AND" id="btn-logic-and" type="button">完全符合 (AND)</button></div></div>
+<label class="strategy-streak-filter-option mb-3">
+<input class="filter-strategy-streak-only" id="filter-strategy-streak-only" type="checkbox"/>
+<span class="strategy-streak-filter-check"><i class="fa-solid fa-arrow-trend-up"></i></span>
+<span class="min-w-0">
+<span class="strategy-streak-filter-title">連續進榜</span>
+<span class="strategy-streak-filter-help">只看同一策略連續 2 個以上交易日進榜；有勾策略時只判斷已選策略</span>
+</span>
+</label>
 <div class="tag-preset-manager mb-3" id="tag-preset-manager-journal"></div>
 <div id="filter-tags-container"></div>
 <div class="sm:hidden sticky bottom-0 pt-3 mt-2 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"><button class="w-full min-h-[42px] rounded-lg bg-blue-600 text-white text-sm font-black shadow-sm" data-close-filter-tags="" type="button">完成標籤挑選</button></div>
@@ -7445,13 +7555,21 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 <button class="tag-preset-entry-btn" data-open-tag-presets="fav" type="button" title="開啟快速組合設定"><i class="fa-solid fa-bolt mr-1"></i><span>組合</span><span class="tag-preset-count-badge" data-tag-preset-count>0</span></button>
 <button class="text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-red-600 text-gray-700 dark:text-gray-300 hover:text-white border border-gray-300 dark:border-gray-600 hover:border-red-500 px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center whitespace-nowrap" id="btn-clear-filters-fav" type="button"><i class="fa-solid fa-eraser sm:mr-1.5"></i><span class="hidden sm:inline">清除篩選</span></button>
 <div class="absolute left-0 top-full mt-1.5 w-[calc(100vw-24px)] sm:w-[920px] max-w-[calc(100vw-32px)] bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl shadow-2xl hidden z-50 p-3 max-h-[70vh] overflow-y-auto modal-enter" id="filter-tag-panel-fav">
-<div class="mb-3 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+<div class="mb-2 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
 <span class="text-xs font-bold text-gray-700 dark:text-gray-300">篩選邏輯</span>
 <div class="flex items-center bg-gray-100 dark:bg-gray-900 p-1 rounded-lg">
 <button class="logic-btn-fav px-2 py-1 text-[10px] sm:text-xs rounded font-medium transition-colors bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm" data-logic="OR" id="btn-logic-or-fav" type="button">符合任一 (OR)</button>
 <button class="logic-btn-fav px-2 py-1 text-[10px] sm:text-xs rounded font-medium transition-colors text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" data-logic="AND" id="btn-logic-and-fav" type="button">完全符合 (AND)</button>
 </div>
 </div>
+<label class="strategy-streak-filter-option mb-3">
+<input class="filter-strategy-streak-only" id="filter-strategy-streak-only-fav" type="checkbox"/>
+<span class="strategy-streak-filter-check"><i class="fa-solid fa-arrow-trend-up"></i></span>
+<span class="min-w-0">
+<span class="strategy-streak-filter-title">連續進榜</span>
+<span class="strategy-streak-filter-help">只看同一策略連續 2 個以上交易日進榜；有勾策略時只判斷已選策略</span>
+</span>
+</label>
 <div class="tag-preset-manager mb-3" id="tag-preset-manager-fav"></div>
 <div id="filter-tags-container-fav"></div>
 <div class="sm:hidden sticky bottom-0 pt-3 mt-2 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"><button class="w-full min-h-[42px] rounded-lg bg-blue-600 text-white text-sm font-black shadow-sm" data-close-filter-tags="" type="button">完成標籤挑選</button></div>
@@ -8072,6 +8190,18 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 - 複製C沿用既有複製標示設定：目標價、備註、新進榜、🔥連續進榜、營收/大戶等小標籤。
 - 🔁重複策略統計由原本 A+B 改為 A+B+C 全部策略共同計算。
 -->
+<!-- v354：
+【策略標籤新增「連續進榜」篩選＋小標籤同色】
+- 「標籤挑選」視窗新增可勾選的「連續進榜」篩選。
+- 未選任何策略標籤時：只顯示至少有一個策略連續 2 個以上交易日進榜的股票。
+- 已勾策略標籤時：只判斷已選策略中是否至少一個符合連續 2+ 交易日進榜。
+- 連續進榜篩選同步套用策略日誌與追蹤清單。
+- 生效條件區會顯示「連續進榜」Chip，可單獨按 × 取消。
+- 清除篩選會一併取消「連續進榜」。
+- 原本「🔥連續進榜」標示小標籤開關仍保留，與篩選條件彼此獨立。
+- 清單上的連續進榜小標籤不再固定暗紅／橘色；圖示、文字、邊框改為繼承各策略標籤本身的顏色。
+- UI 火焰改用 Font Awesome 向量圖示，顏色會隨策略標籤變化；複製文字仍維持 🔥連N日。
+-->
 <!-- 核心 JavaScript -->
 <script>
 const originalDateSetter=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set;
@@ -8087,7 +8217,7 @@ const ADMIN_SESSION_STORAGE_KEY='ryan_admin_session_v1';
 const XLSX_CDN_URL='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
 const getSyncPath=()=>DIRECT_SYNC_PATH;
 const isCloudMode=()=>true;
-let cloudSyncInterval=null, state={journals:[],plans:[],revenueRecords:[],reports:[],checklists:[],trash:[],deletionTombstones:{},tagSettings:null,epsData:{},codeToName:{},nameToCode:{},customMarketHolidays:[],journalClosePrices:{},watchlistPrices:{},watchlistMeta:{},watchlistGroups:[],activeWatchlistGroupId:'watch-all',copyCompareDuplicates:false,copyMarkRevenueHigh:true,copyMarkLargeHolder:true,copyMarkLargeHolder3W:true,copyMarkStrategyStreak:true,copyMarkNewEntry:true,copyMarkTargetPrice:true,copyMarkNotes:true,filters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,largeHolder14:false,largeHolderConsecutive:false,highTurnoverRevenue:false,tags:[],minScore:0,strengthGrade:'all',tagLogic:'OR',status:'all',quick:'all'},favFilters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,largeHolder14:false,largeHolderConsecutive:false,highTurnoverRevenue:false,tags:[],minScore:0,strengthGrade:'all',tagLogic:'OR',status:'all',quick:'all'},revenueFilters:{month:'',code:'',type:'all',revenuePattern:'none',revenueN:3,revenueCount:2,holderPattern:'none',holderN:3,holderCount:2,minMomentum:0},reportFilters:{start:'',end:'',code:''},sortConfig:{key:'createdAt',asc:false},favSortConfig:{key:'createdAt',asc:false},planSortConfig:{key:'createdAt',asc:false},revenueSortConfig:{key:'month',asc:false},reportSortConfig:{key:'date',asc:false},checklistSortConfig:{key:'createdAt',asc:false}};
+let cloudSyncInterval=null, state={journals:[],plans:[],revenueRecords:[],reports:[],checklists:[],trash:[],deletionTombstones:{},tagSettings:null,epsData:{},codeToName:{},nameToCode:{},customMarketHolidays:[],journalClosePrices:{},watchlistPrices:{},watchlistMeta:{},watchlistGroups:[],activeWatchlistGroupId:'watch-all',copyCompareDuplicates:false,copyMarkRevenueHigh:true,copyMarkLargeHolder:true,copyMarkLargeHolder3W:true,copyMarkStrategyStreak:true,copyMarkNewEntry:true,copyMarkTargetPrice:true,copyMarkNotes:true,filters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,largeHolder14:false,largeHolderConsecutive:false,strategyStreakOnly:false,highTurnoverRevenue:false,tags:[],minScore:0,strengthGrade:'all',tagLogic:'OR',status:'all',quick:'all'},favFilters:{start:'',end:'',code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,largeHolder14:false,largeHolderConsecutive:false,strategyStreakOnly:false,highTurnoverRevenue:false,tags:[],minScore:0,strengthGrade:'all',tagLogic:'OR',status:'all',quick:'all'},revenueFilters:{month:'',code:'',type:'all',revenuePattern:'none',revenueN:3,revenueCount:2,holderPattern:'none',holderN:3,holderCount:2,minMomentum:0},reportFilters:{start:'',end:'',code:''},sortConfig:{key:'createdAt',asc:false},favSortConfig:{key:'createdAt',asc:false},planSortConfig:{key:'createdAt',asc:false},revenueSortConfig:{key:'month',asc:false},reportSortConfig:{key:'date',asc:false},checklistSortConfig:{key:'createdAt',asc:false}};
 const selectedIds={journal:new Set(),fav:new Set(),plan:new Set(),revenue:new Set(),report:new Set(),checklist:new Set()};
 
 const escapeHTML=str=>(!str&&str!==0)?'':String(str).replace(/[&<>'"]/g,tag=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[tag]||tag));
@@ -10120,11 +10250,12 @@ function loadLocalData(){
 }
 
 // v163：策略標籤篩選預設為「符合任一（OR）」。
-function createDefaultJournalFilters(){const rawToday=getToday(),today=window.ryanLastTradingDay?.(rawToday)||rawToday;return{start:today,end:today,code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,largeHolder14:false,largeHolderConsecutive:false,highTurnoverRevenue:false,tags:[],minScore:0,strengthGrade:'all',tagLogic:'OR',status:'all',quick:'all'};}
+function createDefaultJournalFilters(){const rawToday=getToday(),today=window.ryanLastTradingDay?.(rawToday)||rawToday;return{start:today,end:today,code:'',futuresOnly:false,excludeNegativeGrowth:false,revenueHigh:false,largeHolder14:false,largeHolderConsecutive:false,strategyStreakOnly:false,highTurnoverRevenue:false,tags:[],minScore:0,strengthGrade:'all',tagLogic:'OR',status:'all',quick:'all'};}
 const ensureJournalLargeHolderFilterState=filter=>{
     if(!filter||typeof filter!=='object')return filter;
     if(typeof filter.largeHolder14!=='boolean')filter.largeHolder14=false;
     if(typeof filter.largeHolderConsecutive!=='boolean')filter.largeHolderConsecutive=false;
+    if(typeof filter.strategyStreakOnly!=='boolean')filter.strategyStreakOnly=false;
     return filter;
 };
 ensureJournalLargeHolderFilterState(state.filters);
@@ -10147,7 +10278,7 @@ function resetSessionFiltersToDefaults(syncControls=false){
     document.querySelectorAll('.filter-start').forEach(input=>input.value=today);
     document.querySelectorAll('.filter-end').forEach(input=>input.value=today);
     document.querySelectorAll('.filter-code').forEach(input=>input.value='');
-    document.querySelectorAll('.filter-futures,.filter-exclude-negative-growth,.filter-revenue-high,.filter-large-holder,.filter-large-holder-consecutive').forEach(input=>input.checked=false);
+    document.querySelectorAll('.filter-futures,.filter-exclude-negative-growth,.filter-revenue-high,.filter-large-holder,.filter-large-holder-consecutive,.filter-strategy-streak-only').forEach(input=>input.checked=false);
     document.querySelectorAll('.filter-score').forEach(input=>input.value='0');
     document.querySelectorAll('.filter-strength-grade').forEach(input=>input.value='all');
     document.querySelectorAll('.filter-journal-status,.filter-journal-quick').forEach(input=>input.value='all');
@@ -10182,7 +10313,8 @@ const getJournalDerivedData=journal=>{
 };
 
 const getFilteredAndSortedData=(dl,cf,cs)=>{
-    const {start,end,code,futuresOnly,excludeNegativeGrowth,revenueHigh,largeHolder14,largeHolderConsecutive,tags,minScore,strengthGrade='all',tagLogic,status='all',quick='all'}=cf; const {key,asc}=cs;
+    const {start,end,code,futuresOnly,excludeNegativeGrowth,revenueHigh,largeHolder14,largeHolderConsecutive,strategyStreakOnly=false,tags,minScore,strengthGrade='all',tagLogic,status='all',quick='all'}=cf; const {key,asc}=cs;
+    const strategyStreakFilterIndex=strategyStreakOnly?buildStrategyStreakIndex():null;
     let ed=dl.map(j=>{const derived=getJournalDerivedData(j);return{...j,ei:derived.ei,score:derived.score,_searchText:derived.searchText};});
     let fd=ed.filter(j=>{
         if(start&&j.date<start)return false; if(end&&j.date>end)return false;
@@ -10199,6 +10331,12 @@ const getFilteredAndSortedData=(dl,cf,cs)=>{
         if(quick==='overdue'&&!isJournalOverdue(j))return false;
         if(quick==='issues'&&!getJournalDataIssues(j).length)return false;
         if(tags.length>0){if(tagLogic==='AND'){if(!tags.every(t=>j.tags&&j.tags.includes(t)))return false;}else{if(!tags.some(t=>j.tags&&j.tags.includes(t)))return false;}}
+        if(strategyStreakOnly){
+            const candidateTags=(tags.length?tags:(j.tags||[]))
+                .map(normalizeStrategyTagName)
+                .filter(tag=>tag&&!NON_STRATEGY_COPY_TAGS.has(tag)&&journalHasStrategyTag(j,tag));
+            if(!candidateTags.some(tag=>getStrategyConsecutiveDays(j,tag,strategyStreakFilterIndex)>=2))return false;
+        }
         return true;
     });
     fd.sort((a,b)=>{let vA,vB;switch(key){case'date':vA=a.date;vB=b.date;break;case'code':vA=a.code;vB=b.code;break;case'name':vA=a.name;vB=b.name;break;case'closePrice':vA=Number(a.closePrice??-9999);vB=Number(b.closePrice??-9999);break;case'dailyChangePercent':vA=Number(a.dailyChangePercent??-9999);vB=Number(b.dailyChangePercent??-9999);break;case'trackedPrice':vA=Number(a.trackedPrice??-9999);vB=Number(b.trackedPrice??-9999);break;case'trackingReturn':vA=Number(a.trackingReturn??-9999);vB=Number(b.trackingReturn??-9999);break;case'eps2025':vA=a.ei.eps2025??-9999;vB=b.ei.eps2025??-9999;break;case'eps2026':vA=a.ei.eps2026??-9999;vB=b.ei.eps2026??-9999;break;case'epsGrowth':vA=a.ei.epsGrowth??-9999;vB=b.ei.epsGrowth??-9999;break;case'score':vA=a.score;vB=b.score;break;case'targetPrice':vA=a.ei.targetPrice??-9999;vB=b.ei.targetPrice??-9999;break;case'potentialUpside':vA=getPotentialUpsidePercent(a.ei.targetPrice,a.closePrice)??-9999;vB=getPotentialUpsidePercent(b.ei.targetPrice,b.closePrice)??-9999;break;case'revenueHigh':vA=(journalHasStrategyTag(a,'高成交值高營收')?4:0)+(hasRevenueRecordForCode(a.code)?2:0)+(hasLatestLargeHolderIncrease(a.code,a.date)?1:0);vB=(journalHasStrategyTag(b,'高成交值高營收')?4:0)+(hasRevenueRecordForCode(b.code)?2:0)+(hasLatestLargeHolderIncrease(b.code,b.date)?1:0);break;case'tags':vA=(a.tags||[]).join('、');vB=(b.tags||[]).join('、');break;case'notes':vA=a.notes||'';vB=b.notes||'';break;default:vA=a.createdAt||0;vB=b.createdAt||0;break;}if(vA===vB)return(a.createdAt||0)-(b.createdAt||0);return asc?(vA>vB?1:-1):(vA>vB?-1:1);});
@@ -10244,7 +10382,7 @@ const renderTableRows=(data,tbId,emId,isFav=false)=>{
             const normalizedTag=normalizeStrategyTagName(t),
                   isNewHorse=horseNewTagSet.has(normalizedTag),
                   streakBadge=getStrategyStreakBadgeText(i,normalizedTag,strategyStreakIndex),
-                  streakHtml=streakBadge?` <span class="strategy-streak-badge ml-1" title="同股同策略連續交易日進榜">${escapeHTML(streakBadge)}</span>`:'';
+                  streakHtml=streakBadge?` <span class="strategy-streak-badge ml-1" title="同股同策略連續交易日進榜"><i class="fa-solid fa-fire-flame-curved strategy-streak-badge-icon"></i>${escapeHTML(streakBadge)}</span>`:'';
             return`<span class="inline-block text-[11px] font-bold px-2 py-0.5 rounded-md mr-1 mb-1 border shadow-sm transition ${canRemoveTags?'cursor-pointer hover:opacity-80':'cursor-default'} ${getTagStyle(t)}"${canRemoveTags?` data-action="remove-tag" data-id="${i.id}" data-tag="${escapeHTML(t)}" title="${isNewHorse?'🆕新進榜｜點擊移除標籤':'點擊移除標籤'}"`:` title="${isNewHorse?'🆕新進榜':'策略標籤'}"`}>${escapeHTML(t)}${streakHtml}${isNewHorse?' <span class="horse-new-badge ml-1" title="🆕新進榜">🆕新進榜</span>':''}${canRemoveTags?' ✕':''}</span>`;
         }).join('');
         let fl=i.isFavorite===true?1:(parseInt(i.isFavorite)||0),fc='text-gray-400 dark:text-gray-500 hover:text-yellow-500',fi='<i class="fa-solid fa-star pointer-events-none"></i>',ft='加入追蹤';
@@ -10388,6 +10526,7 @@ const renderJournalActiveFilterChips=()=>{
     if(f.revenueHigh)items.push(filterChipHtml('營收創高','revenueHigh','pink'));
     if(f.largeHolder14)items.push(filterChipHtml('近一週千張大戶增','largeHolder14','violet'));
     if(f.largeHolderConsecutive)items.push(filterChipHtml('千張大戶連續增加','largeHolderConsecutive','violet'));
+    if(f.strategyStreakOnly)items.push(filterChipHtml('連續進榜','strategyStreakOnly','amber'));
     if(Number(f.minScore||0)>0)items.push(filterChipHtml(`策略分數 ≥ ${f.minScore}`,'minScore','amber'));
     if(f.strengthGrade&&f.strengthGrade!=='all')items.push(filterChipHtml(`強度：${f.strengthGrade}級`,'strengthGrade',f.strengthGrade==='A'?'pink':f.strengthGrade==='B'?'amber':'slate'));
     if(f.status&&f.status!=='all')items.push(filterChipHtml(`狀態：${f.status}`,'status','slate'));
@@ -12520,7 +12659,7 @@ document.getElementById('btn-batch-journal-tag')?.addEventListener('click',()=>{
 document.addEventListener('click',e=>{const b=e.target.closest('[data-batch-delete-type]');if(b){e.preventDefault();window.confirmBatchDelete(b.dataset.batchDeleteType);}});
 document.getElementById('btn-batch-delete-cancel')?.addEventListener('click',()=>document.getElementById('batch-delete-modal').classList.add('hidden'));
 
-const filterFields=[{key:'start',cls:'filter-start',type:'value'},{key:'end',cls:'filter-end',type:'value'},{key:'code',cls:'filter-code',type:'value'},{key:'futuresOnly',cls:'filter-futures',type:'checked'},{key:'excludeNegativeGrowth',cls:'filter-exclude-negative-growth',type:'checked'},{key:'revenueHigh',cls:'filter-revenue-high',type:'checked'},{key:'largeHolder14',cls:'filter-large-holder',type:'checked'},{key:'largeHolderConsecutive',cls:'filter-large-holder-consecutive',type:'checked'},{key:'minScore',cls:'filter-score',type:'value',isInt:true},{key:'strengthGrade',cls:'filter-strength-grade',type:'value'},{key:'status',cls:'filter-journal-status',type:'value'},{key:'quick',cls:'filter-journal-quick',type:'value'}];
+const filterFields=[{key:'start',cls:'filter-start',type:'value'},{key:'end',cls:'filter-end',type:'value'},{key:'code',cls:'filter-code',type:'value'},{key:'futuresOnly',cls:'filter-futures',type:'checked'},{key:'excludeNegativeGrowth',cls:'filter-exclude-negative-growth',type:'checked'},{key:'revenueHigh',cls:'filter-revenue-high',type:'checked'},{key:'largeHolder14',cls:'filter-large-holder',type:'checked'},{key:'largeHolderConsecutive',cls:'filter-large-holder-consecutive',type:'checked'},{key:'strategyStreakOnly',cls:'filter-strategy-streak-only',type:'checked'},{key:'minScore',cls:'filter-score',type:'value',isInt:true},{key:'strengthGrade',cls:'filter-strength-grade',type:'value'},{key:'status',cls:'filter-journal-status',type:'value'},{key:'quick',cls:'filter-journal-quick',type:'value'}];
 const handleFilterChange=debounce((f,el)=>{let v=el.type==='checkbox'?el.checked:el.value;if(f.isInt)v=parseInt(v)||0;if(f.type==='value'&&el.type==='text')v=v.trim();state.filters[f.key]=v;state.favFilters[f.key]=v;document.querySelectorAll(`.${f.cls}`).forEach(o=>{if(f.type==='checked')o.checked=v;else o.value=v;});renderJournalFilterViews();},260);
 filterFields.forEach(f=>{document.querySelectorAll(`.${f.cls}`).forEach(el=>{const evt=(f.type==='value'&&el.type==='text')?'input':'change';if(evt==='input'){el.addEventListener('input',e=>handleFilterChange(f,e.target));}else{el.addEventListener('change',e=>{let v=e.target.type==='checkbox'?e.target.checked:e.target.value;if(f.isInt)v=parseInt(v)||0;state.filters[f.key]=v;state.favFilters[f.key]=v;document.querySelectorAll(`.${f.cls}`).forEach(o=>{if(f.type==='checked')o.checked=v;else o.value=v;});renderJournalFilterViews();});}});});
 
@@ -12544,6 +12683,7 @@ document.getElementById('journal-active-filter-chips')?.addEventListener('click'
     else if(key==='revenueHigh'){applyBoth('revenueHigh',false);document.querySelectorAll('.filter-revenue-high').forEach(el=>el.checked=false);}
     else if(key==='largeHolder14'){applyBoth('largeHolder14',false);document.querySelectorAll('.filter-large-holder').forEach(el=>el.checked=false);}
     else if(key==='largeHolderConsecutive'){applyBoth('largeHolderConsecutive',false);document.querySelectorAll('.filter-large-holder-consecutive').forEach(el=>el.checked=false);}
+    else if(key==='strategyStreakOnly'){applyBoth('strategyStreakOnly',false);document.querySelectorAll('.filter-strategy-streak-only').forEach(el=>el.checked=false);}
     else if(key==='minScore'){applyBoth('minScore',0);document.querySelectorAll('.filter-score').forEach(el=>el.value='0');}
     else if(key==='strengthGrade'){applyBoth('strengthGrade','all');document.querySelectorAll('.filter-strength-grade').forEach(el=>el.value='all');}
     else if(key==='status'){applyBoth('status','all');document.querySelectorAll('.filter-journal-status').forEach(el=>el.value='all');}
@@ -13703,7 +13843,7 @@ const getStrategyConsecutiveDays=(journal,tag,index=null)=>{
 const getStrategyStreakBadgeText=(journal,tag,index=null)=>{
     if(state.copyMarkStrategyStreak===false)return'';
     const days=getStrategyConsecutiveDays(journal,tag,index);
-    return days>=2?`🔥連${days}日`:'';
+    return days>=2?`連${days}日`:'';
 };
 
 // v162：所有策略相關複製統一顯示「🔁＋重複策略數小標籤」。
@@ -13742,7 +13882,7 @@ const getStrategyCopyStockName=(journal,duplicateCodes,horseTag='',options={})=>
     const noteText=state.copyMarkNotes!==false&&note?`【備註：${note}】`:'';
     const streakTag=normalizeStrategyTagName(options?.strategyTag||horseTag||''),
           streakText=streakTag?getStrategyStreakBadgeText(journal,streakTag,options?.strategyStreakIndex):'';
-    return `${name}${targetText}${noteText}${state.copyMarkNewEntry!==false&&isNew?' 🆕新進榜':''}${streakText?` ${streakText}`:''}${appendDuplicateMark(journal,duplicateCodes)}${getCopyMomentumMarks(journal?.code,referenceDate)}`;
+    return `${name}${targetText}${noteText}${state.copyMarkNewEntry!==false&&isNew?' 🆕新進榜':''}${streakText?` 🔥${streakText}`:''}${appendDuplicateMark(journal,duplicateCodes)}${getCopyMomentumMarks(journal?.code,referenceDate)}`;
 };
 
 // v295：農夫週報複製時，比對「前一次週報」是否曾出現。
@@ -14545,7 +14685,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
     const tD=getToday();
     if(!state.filters.start&&!state.filters.end){state.filters.start=tD;state.filters.end=tD;}
     document.getElementById('filter-start').value=state.filters.start||''; document.getElementById('filter-end').value=state.filters.end||''; document.getElementById('filter-start-fav').value=state.favFilters.start||''; document.getElementById('filter-end-fav').value=state.favFilters.end||''; document.getElementById('r-month').value=getPreviousMonthValue(); document.getElementById('rep-date').value=tD; document.getElementById('p-date').value=tD; document.getElementById('chk-date').value=tD; document.getElementById('filter-rep-start').value=state.reportFilters.start||''; document.getElementById('filter-rep-end').value=state.reportFilters.end||''; document.getElementById('filter-rep-code').value=state.reportFilters.code||''; document.getElementById('j-date').value=tD;
-    document.getElementById('filter-futures').checked=!!state.filters.futuresOnly;document.getElementById('filter-exclude-negative-growth').checked=!!state.filters.excludeNegativeGrowth;document.getElementById('filter-revenue-high').checked=!!state.filters.revenueHigh;document.getElementById('filter-large-holder').checked=!!state.filters.largeHolder14;document.getElementById('filter-large-holder-consecutive').checked=!!state.filters.largeHolderConsecutive;document.getElementById('filter-score').value=String(state.filters.minScore||0);
+    document.getElementById('filter-futures').checked=!!state.filters.futuresOnly;document.getElementById('filter-exclude-negative-growth').checked=!!state.filters.excludeNegativeGrowth;document.getElementById('filter-revenue-high').checked=!!state.filters.revenueHigh;document.getElementById('filter-large-holder').checked=!!state.filters.largeHolder14;document.getElementById('filter-large-holder-consecutive').checked=!!state.filters.largeHolderConsecutive;document.querySelectorAll('.filter-strategy-streak-only').forEach(el=>el.checked=!!state.filters.strategyStreakOnly);document.getElementById('filter-score').value=String(state.filters.minScore||0);
     document.getElementById('filter-journal-status').value=state.filters.status||'all';document.getElementById('filter-journal-quick').value=state.filters.quick||'all';
     document.getElementById('filter-futures-fav').checked=!!state.favFilters.futuresOnly;document.getElementById('filter-exclude-negative-growth-fav').checked=!!state.favFilters.excludeNegativeGrowth;document.getElementById('filter-revenue-high-fav').checked=!!state.favFilters.revenueHigh;document.getElementById('filter-large-holder-fav').checked=!!state.favFilters.largeHolder14;document.getElementById('filter-large-holder-consecutive-fav').checked=!!state.favFilters.largeHolderConsecutive;document.getElementById('filter-score-fav').value=String(state.favFilters.minScore||0);
     document.querySelectorAll('#filter-tags-container .filter-tag-cb').forEach(cb=>cb.checked=state.filters.tags.includes(cb.value));document.querySelectorAll('#filter-tags-container-fav .filter-tag-cb').forEach(cb=>cb.checked=state.favFilters.tags.includes(cb.value));renderFilterTags();
@@ -14900,7 +15040,7 @@ setChkDirection('long');
     if(moduleId==='module-journal'||moduleId==='module-favorites'){
       const fav=moduleId==='module-favorites',suffix=fav?'-fav':'',filterState=fav?state.favFilters:state.filters;
       const selectedTags=document.querySelectorAll(`${fav?'#filter-tags-container-fav':'#filter-tags-container'} .filter-tag-cb:checked`).length;
-      return value(`filter-start${suffix}`)!==today||value(`filter-end${suffix}`)!==today||!!value(`filter-code${suffix}`)||checked(`filter-futures${suffix}`)||checked(`filter-exclude-negative-growth${suffix}`)||checked(`filter-revenue-high${suffix}`)||value(`filter-score${suffix}`)!=='0'||value(`filter-strength-grade${suffix}`)!=='all'||selectedTags>0||(filterState?.tags||[]).length>0||(filterState?.tagLogic||'OR')!=='OR'||(filterState?.status||'all')!=='all'||(filterState?.quick||'all')!=='all';
+      return value(`filter-start${suffix}`)!==today||value(`filter-end${suffix}`)!==today||!!value(`filter-code${suffix}`)||checked(`filter-futures${suffix}`)||checked(`filter-exclude-negative-growth${suffix}`)||checked(`filter-revenue-high${suffix}`)||value(`filter-score${suffix}`)!=='0'||value(`filter-strength-grade${suffix}`)!=='all'||selectedTags>0||(filterState?.tags||[]).length>0||(filterState?.tagLogic||'OR')!=='OR'||(filterState?.status||'all')!=='all'||(filterState?.quick||'all')!=='all'||!!filterState?.strategyStreakOnly;
     }
     if(moduleId==='module-revenue')return!!(value('filter-revenue-month')||value('filter-revenue-code'));
     if(moduleId==='module-report')return!!(value('filter-rep-start')||value('filter-rep-end')||value('filter-rep-code'));
@@ -14976,7 +15116,7 @@ setChkDirection('long');
     document.getElementById('global-search-input')?.addEventListener('keydown',event=>{if(event.key==='Enter'&&lastGlobalSearchResults[0]){event.preventDefault();openGlobalStock(lastGlobalSearchResults[0].code,lastGlobalSearchResults[0].name);}});
     document.getElementById('global-search-results')?.addEventListener('click',event=>{const button=event.target.closest('[data-global-stock-code]');if(button)openGlobalStock(button.dataset.globalStockCode,button.dataset.globalStockName);});
     document.getElementById('global-search-modal')?.addEventListener('click',event=>{if(event.target.id==='global-search-modal')setGlobalSearchOpen(false);});
-    const mobileFilterControlSelector='.filter-start,.filter-end,.filter-code,.filter-futures,.filter-exclude-negative-growth,.filter-revenue-high,.filter-large-holder,.filter-large-holder-consecutive,.filter-score,.filter-strength-grade,.filter-tag-cb,#filter-revenue-month,#filter-revenue-code,#filter-revenue-type,#filter-rep-start,#filter-rep-end,#filter-rep-code';
+    const mobileFilterControlSelector='.filter-start,.filter-end,.filter-code,.filter-futures,.filter-exclude-negative-growth,.filter-revenue-high,.filter-large-holder,.filter-large-holder-consecutive,.filter-strategy-streak-only,.filter-score,.filter-strength-grade,.filter-tag-cb,#filter-revenue-month,#filter-revenue-code,#filter-revenue-type,#filter-rep-start,#filter-rep-end,#filter-rep-code';
     document.addEventListener('input',event=>{if(event.target.matches?.(mobileFilterControlSelector))updateMobileFilterIndicators();});
     document.addEventListener('change',event=>{if(event.target.matches?.(mobileFilterControlSelector))updateMobileFilterIndicators();});
     document.addEventListener('click',event=>{
