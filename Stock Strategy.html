@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="354" name="app-version"/>
+<meta content="355" name="app-version"/>
 <script id="startup-performance-bootstrap">
 window.__ryanStartupPerf={start:performance.now(),localReady:0,firstRender:0,cloudStart:0,cloudEnd:0,cloudOk:null};
 </script>
@@ -6473,78 +6473,6 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 
 
 <style id="strategy-streak-filter-color-v354">
-/* 標籤挑選中的「連續進榜」篩選 */
-.strategy-streak-filter-option{
-  display:flex;
-  align-items:center;
-  gap:9px;
-  width:100%;
-  padding:8px 10px;
-  border:1px solid #fed7aa;
-  border-radius:10px;
-  background:#fff7ed;
-  cursor:pointer;
-  transition:.15s ease;
-}
-.strategy-streak-filter-option:hover{
-  border-color:#fb923c;
-  background:#ffedd5;
-}
-.dark .strategy-streak-filter-option{
-  border-color:#7c2d12;
-  background:rgba(124,45,18,.18);
-}
-.dark .strategy-streak-filter-option:hover{
-  border-color:#c2410c;
-  background:rgba(124,45,18,.28);
-}
-.strategy-streak-filter-option > input{
-  position:absolute;
-  opacity:0;
-  pointer-events:none;
-}
-.strategy-streak-filter-check{
-  flex:0 0 28px;
-  width:28px;
-  height:28px;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  border:1px solid #fdba74;
-  border-radius:8px;
-  background:#fff;
-  color:#f97316;
-  font-size:12px;
-}
-.strategy-streak-filter-option > input:checked + .strategy-streak-filter-check{
-  background:#f97316;
-  border-color:#f97316;
-  color:#fff;
-  box-shadow:0 3px 10px rgba(249,115,22,.2);
-}
-.dark .strategy-streak-filter-check{
-  background:#111827;
-  border-color:#9a3412;
-  color:#fb923c;
-}
-.strategy-streak-filter-title{
-  display:block;
-  color:#9a3412;
-  font-size:11px;
-  line-height:1.2;
-  font-weight:950;
-}
-.dark .strategy-streak-filter-title{color:#fdba74;}
-.strategy-streak-filter-help{
-  display:block;
-  margin-top:2px;
-  color:#78716c;
-  font-size:9px;
-  line-height:1.35;
-  font-weight:650;
-}
-.dark .strategy-streak-filter-help{color:#a8a29e;}
-
 /* 連續進榜小標籤：完全沿用外層策略標籤的文字顏色，不再固定暗紅/橘色 */
 .strategy-streak-badge{
   display:inline-flex!important;
@@ -6570,6 +6498,63 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 .strategy-streak-badge-icon{
   color:inherit!important;
   font-size:8px!important;
+}
+</style>
+
+
+<style id="journal-streak-filter-position-v355">
+@media (min-width:1200px){
+  #module-journal .journal-fixed-filter-toolbar{
+    grid-template-columns:
+      330px 185px
+      88px 88px 88px 96px
+      max-content max-content
+      118px 92px 104px 104px
+      minmax(1px,1fr)!important;
+  }
+
+  #module-journal .journal-filter-row-conditions-1 > label:nth-of-type(1){grid-column:3!important;grid-row:1!important;}
+  #module-journal .journal-filter-row-conditions-1 > label:nth-of-type(2){grid-column:4!important;grid-row:1!important;}
+  #module-journal .journal-filter-row-conditions-1 > label:nth-of-type(3){grid-column:5!important;grid-row:1!important;}
+  #module-journal .journal-filter-row-conditions-1 > label:nth-of-type(4){grid-column:6!important;grid-row:1!important;}
+
+  #module-journal .journal-filter-row-grid-6 > label:nth-of-type(1){grid-column:7!important;grid-row:1!important;}
+  #module-journal .journal-filter-row-grid-6 > label:nth-of-type(2){grid-column:8!important;grid-row:1!important;}
+  #module-journal .journal-filter-row-grid-6 > select:nth-of-type(1){grid-column:9!important;grid-row:1!important;}
+  #module-journal .journal-filter-row-grid-6 > select:nth-of-type(2){grid-column:10!important;grid-row:1!important;}
+  #module-journal .journal-filter-row-grid-6 > select:nth-of-type(3){grid-column:11!important;grid-row:1!important;}
+  #module-journal .journal-filter-row-grid-6 > select:nth-of-type(4){grid-column:12!important;grid-row:1!important;}
+
+  #module-journal .journal-filter-row-conditions-1 > label:nth-of-type(4){
+    width:96px!important;
+    min-width:96px!important;
+    max-width:96px!important;
+    padding:4px 7px!important;
+  }
+  #module-journal .journal-filter-row-conditions-1 > label:nth-of-type(4) span{
+    font-size:10px!important;
+  }
+}
+
+@media (min-width:900px) and (max-width:1199px){
+  #module-journal .journal-fixed-filter-toolbar{
+    grid-template-columns:
+      320px 180px
+      86px 86px 86px 94px
+      max-content max-content
+      116px 90px 102px 102px!important;
+  }
+
+  #module-journal .journal-filter-row-conditions-1 > label:nth-of-type(1){grid-column:3!important;grid-row:1!important;}
+  #module-journal .journal-filter-row-conditions-1 > label:nth-of-type(2){grid-column:4!important;grid-row:1!important;}
+  #module-journal .journal-filter-row-conditions-1 > label:nth-of-type(3){grid-column:5!important;grid-row:1!important;}
+  #module-journal .journal-filter-row-conditions-1 > label:nth-of-type(4){grid-column:6!important;grid-row:1!important;}
+  #module-journal .journal-filter-row-grid-6 > label:nth-of-type(1){grid-column:7!important;grid-row:1!important;}
+  #module-journal .journal-filter-row-grid-6 > label:nth-of-type(2){grid-column:8!important;grid-row:1!important;}
+  #module-journal .journal-filter-row-grid-6 > select:nth-of-type(1){grid-column:9!important;grid-row:1!important;}
+  #module-journal .journal-filter-row-grid-6 > select:nth-of-type(2){grid-column:10!important;grid-row:1!important;}
+  #module-journal .journal-filter-row-grid-6 > select:nth-of-type(3){grid-column:11!important;grid-row:1!important;}
+  #module-journal .journal-filter-row-grid-6 > select:nth-of-type(4){grid-column:12!important;grid-row:1!important;}
 }
 </style>
 
@@ -6832,6 +6817,10 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 <input class="filter-futures rounded border-gray-300 dark:border-gray-600 text-sky-500 focus:ring-sky-500 w-3.5 h-3.5 sm:w-4 sm:h-4" id="filter-futures" type="checkbox"/>
 <span class="text-xs sm:text-sm text-sky-600 dark:text-sky-400 font-medium whitespace-nowrap">僅含股期</span>
 </label>
+<label class="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white dark:bg-gray-900/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-700/50 transition hover:bg-gray-50 dark:hover:bg-gray-800" title="只看同一策略連續 2 個以上交易日進榜；若已選策略標籤，只判斷已選策略">
+<input class="filter-strategy-streak-only rounded border-gray-300 dark:border-gray-600 text-orange-500 focus:ring-orange-500 w-3.5 h-3.5 sm:w-4 sm:h-4" id="filter-strategy-streak-only" type="checkbox"/>
+<span class="text-xs sm:text-sm text-orange-600 dark:text-orange-400 font-medium whitespace-nowrap">連續進榜</span>
+</label>
 </div><div class="journal-mobile-row journal-filter-row-grid-6"><label class="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white dark:bg-gray-900/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-700/50 transition hover:bg-gray-50 dark:hover:bg-gray-800" title="以基準日前最新一期千張大戶資料為準；最新一期有增加才符合">
 <input class="filter-large-holder rounded border-gray-300 dark:border-gray-600 text-violet-500 focus:ring-violet-500 w-3.5 h-3.5 sm:w-4 sm:h-4" id="filter-large-holder" type="checkbox"/>
 <span class="text-xs sm:text-sm text-violet-600 dark:text-violet-400 font-medium whitespace-nowrap">近一週千張大戶增</span>
@@ -6851,14 +6840,6 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 <button class="bg-white dark:bg-gray-900/50 text-gray-900 dark:text-white text-xs sm:text-sm border border-gray-300 dark:border-gray-700/50 rounded-lg px-3 py-1.5 sm:py-2 focus:ring-2 focus:ring-blue-500 outline-none transition hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center justify-between gap-2 shadow-sm whitespace-nowrap" id="filter-tag-btn" type="button"><span>+ 標籤挑選</span><i class="fa-solid fa-chevron-down text-[10px] opacity-70"></i></button><button class="tag-preset-entry-btn" data-open-tag-presets="journal" type="button" title="開啟快速組合設定"><i class="fa-solid fa-bolt mr-1"></i><span>組合</span><span class="tag-preset-count-badge" data-tag-preset-count>0</span></button><button class="text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-red-600 text-gray-700 dark:text-gray-300 hover:text-white border border-gray-300 dark:border-gray-600 hover:border-red-500 px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center whitespace-nowrap" id="btn-clear-filters" type="button"><i class="fa-solid fa-eraser sm:mr-1.5"></i><span class="hidden sm:inline">清除篩選</span><span class="sm:hidden">清除</span></button>
 <div class="absolute left-0 top-full mt-1.5 w-[calc(100vw-24px)] sm:w-[920px] max-w-[calc(100vw-32px)] bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl shadow-2xl hidden z-50 p-3 max-h-[70vh] overflow-y-auto modal-enter" id="filter-tag-panel">
 <div class="mb-2 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between"><span class="text-xs font-bold text-gray-700 dark:text-gray-300">篩選邏輯</span><div class="flex items-center bg-gray-100 dark:bg-gray-900 p-1 rounded-lg"><button class="logic-btn px-2 py-1 text-[10px] sm:text-xs rounded font-medium transition-colors bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm" data-logic="OR" id="btn-logic-or" type="button">符合任一 (OR)</button><button class="logic-btn px-2 py-1 text-[10px] sm:text-xs rounded font-medium transition-colors text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" data-logic="AND" id="btn-logic-and" type="button">完全符合 (AND)</button></div></div>
-<label class="strategy-streak-filter-option mb-3">
-<input class="filter-strategy-streak-only" id="filter-strategy-streak-only" type="checkbox"/>
-<span class="strategy-streak-filter-check"><i class="fa-solid fa-arrow-trend-up"></i></span>
-<span class="min-w-0">
-<span class="strategy-streak-filter-title">連續進榜</span>
-<span class="strategy-streak-filter-help">只看同一策略連續 2 個以上交易日進榜；有勾策略時只判斷已選策略</span>
-</span>
-</label>
 <div class="tag-preset-manager mb-3" id="tag-preset-manager-journal"></div>
 <div id="filter-tags-container"></div>
 <div class="sm:hidden sticky bottom-0 pt-3 mt-2 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"><button class="w-full min-h-[42px] rounded-lg bg-blue-600 text-white text-sm font-black shadow-sm" data-close-filter-tags="" type="button">完成標籤挑選</button></div>
@@ -7527,6 +7508,10 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 <input class="filter-futures rounded border-gray-300 dark:border-gray-600 text-sky-500 focus:ring-sky-500 w-3.5 h-3.5 sm:w-4 sm:h-4" id="filter-futures-fav" type="checkbox"/>
 <span class="text-xs sm:text-sm text-sky-600 dark:text-sky-400 font-medium whitespace-nowrap">僅含股期</span>
 </label>
+<label class="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white dark:bg-gray-900/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-700/50 transition hover:bg-gray-50 dark:hover:bg-gray-800" title="只看同一策略連續 2 個以上交易日進榜；若已選策略標籤，只判斷已選策略">
+<input class="filter-strategy-streak-only rounded border-gray-300 dark:border-gray-600 text-orange-500 focus:ring-orange-500 w-3.5 h-3.5 sm:w-4 sm:h-4" id="filter-strategy-streak-only-fav" type="checkbox"/>
+<span class="text-xs sm:text-sm text-orange-600 dark:text-orange-400 font-medium whitespace-nowrap">連續進榜</span>
+</label>
 <label class="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white dark:bg-gray-900/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-700/50 transition hover:bg-gray-50 dark:hover:bg-gray-800">
 <input class="filter-exclude-negative-growth rounded border-gray-300 dark:border-gray-600 text-green-500 focus:ring-green-500 w-3.5 h-3.5 sm:w-4 sm:h-4" id="filter-exclude-negative-growth-fav" type="checkbox"/>
 <span class="text-xs sm:text-sm text-green-600 dark:text-green-400 font-medium whitespace-nowrap">排除負成長</span>
@@ -7562,14 +7547,6 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 <button class="logic-btn-fav px-2 py-1 text-[10px] sm:text-xs rounded font-medium transition-colors text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" data-logic="AND" id="btn-logic-and-fav" type="button">完全符合 (AND)</button>
 </div>
 </div>
-<label class="strategy-streak-filter-option mb-3">
-<input class="filter-strategy-streak-only" id="filter-strategy-streak-only-fav" type="checkbox"/>
-<span class="strategy-streak-filter-check"><i class="fa-solid fa-arrow-trend-up"></i></span>
-<span class="min-w-0">
-<span class="strategy-streak-filter-title">連續進榜</span>
-<span class="strategy-streak-filter-help">只看同一策略連續 2 個以上交易日進榜；有勾策略時只判斷已選策略</span>
-</span>
-</label>
 <div class="tag-preset-manager mb-3" id="tag-preset-manager-fav"></div>
 <div id="filter-tags-container-fav"></div>
 <div class="sm:hidden sticky bottom-0 pt-3 mt-2 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"><button class="w-full min-h-[42px] rounded-lg bg-blue-600 text-white text-sm font-black shadow-sm" data-close-filter-tags="" type="button">完成標籤挑選</button></div>
@@ -8201,6 +8178,15 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 - 原本「🔥連續進榜」標示小標籤開關仍保留，與篩選條件彼此獨立。
 - 清單上的連續進榜小標籤不再固定暗紅／橘色；圖示、文字、邊框改為繼承各策略標籤本身的顏色。
 - UI 火焰改用 Font Awesome 向量圖示，顏色會隨策略標籤變化；複製文字仍維持 🔥連N日。
+-->
+<!-- v355：
+【連續進榜篩選移到上方快速條件】
+- 「連續進榜」從標籤挑選視窗移除。
+- 改放在上方快速條件列，位置就在「僅含股期」後面，符合使用者截圖指定位置。
+- 第一排順序：排除負成長 → 營收創高 → 僅含股期 → 連續進榜 → 近一週千張大戶增 → 千張大戶連續增加 → 分數／等級／狀態／訊號。
+- 追蹤清單也同步將「連續進榜」放到上方篩選列。
+- 原本連續進榜篩選邏輯、已選策略限定、生效條件 Chip、清除篩選全部保留。
+- 連續進榜小標籤仍維持「跟隨策略標籤顏色」。
 -->
 <!-- 核心 JavaScript -->
 <script>
