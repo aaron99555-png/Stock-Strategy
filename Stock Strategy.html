@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="362" name="app-version"/>
+<meta content="363" name="app-version"/>
 <script id="startup-performance-bootstrap">
 window.__ryanStartupPerf={start:performance.now(),localReady:0,firstRender:0,cloudStart:0,cloudEnd:0,cloudOk:null};
 </script>
@@ -131,7 +131,8 @@ html.dark .stock-code-invalid { border-color:#f87171 !important; box-shadow:0 0 
 }
 
 </style>
-<style id="admin-mode-style">
+<style id="app-merged-styles-v363-2">
+
 html.viewer-mode [data-target="module-plan"],
 html.viewer-mode [data-target="module-favorites"],
 html.viewer-mode [data-mobile-more-target="module-plan"],
@@ -168,8 +169,8 @@ html.viewer-mode .row-cb,
 html.viewer-mode .select-all-cb { visibility:hidden !important; pointer-events:none !important; }
 html.viewer-mode [data-action="remove-tag"] { cursor:default !important; pointer-events:none !important; }
 html.admin-mode #btn-mobile-admin-entry { background:#059669 !important; border-color:#047857 !important; color:#fff !important; }
-</style>
-<style>
+
+
 ::-webkit-scrollbar { width:6px; height:8px; } ::-webkit-scrollbar-track { background:transparent; } ::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:4px; } .dark ::-webkit-scrollbar-thumb { background:#4b5563; }
 .scrollbar-hide { -ms-overflow-style:none; scrollbar-width:none; } .scrollbar-hide::-webkit-scrollbar { display:none; }
 body { transition:background-color 0.3s, color 0.3s; scroll-behavior:smooth; }
@@ -255,10 +256,12 @@ input[type="date"]::-webkit-calendar-picker-indicator, input[type="month"]::-web
 @media (min-width:640px) {
   #module-report .report-summary-col { width:clamp(320px,55vw,760px); min-width:320px; max-width:clamp(320px,55vw,760px); white-space:pre-wrap !important; overflow-wrap:anywhere !important; word-break:break-word !important; }
 }
+
 </style>
 <meta content="#f6f3ed" name="theme-color"/>
 <meta content="light dark" name="color-scheme"/>
-<style id="global-optimization">
+<style id="app-merged-styles-v363-1">
+
 /* ===== Global UX optimization layer ===== */
 html { scroll-behavior: smooth; }
 body { text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; }
@@ -546,12 +549,12 @@ html.dark body main :is(#module-journal,#module-favorites,#module-revenue,#modul
     scroll-behavior: auto !important;
   }
 }
-</style>
-<style id="market-index-style">
+
+
 #market-index-status{min-height:1.25rem}
 .market-index-source{font-size:.72rem;opacity:.72}
-</style>
-<style id="v136-workbench-polish">
+
+
 /* v136 交易工作台美化 */
 #journal-war-room{box-shadow:0 10px 30px rgba(15,23,42,.08)}
 .dark #journal-war-room{box-shadow:0 12px 34px rgba(0,0,0,.22)}
@@ -594,8 +597,8 @@ html.dark body main :is(#module-journal,#module-favorites,#module-revenue,#modul
   .active-filter-strip{max-width:100%;overflow-x:auto;flex-wrap:nowrap!important;padding-bottom:2px}
   .active-filter-strip::-webkit-scrollbar{display:none}
 }
-</style>
-<style id="milk-light-theme-v144">
+
+
 /* v144 舒適淺色系：奶油白＋燕麥米＋低飽和霧色，降低刺眼與偏黃感 */
 html:not(.dark){
   --soft-bg:#f6f3ed;
@@ -790,8 +793,8 @@ html:not(.dark) .shadow-xl{
     box-shadow:0 3px 12px rgba(83,72,58,.07)!important;
   }
 }
-</style>
-<style id="date-range-fast-v155">
+
+
 .date-range-fast{max-width:100%;white-space:nowrap;gap:.15rem}
 .date-field-shift{display:inline-flex;align-items:center;min-width:0;gap:.12rem}
 .date-shift-btn{
@@ -815,14 +818,14 @@ html:not(.dark) .shadow-xl{
   .date-field-shift{flex-basis:100%}
   .date-range-separator{display:none}
 }
-</style>
-<style id="journal-reference-mode-v150">
+
+
 #journal-reference-mode-wrap{transition:border-color .15s ease,background-color .15s ease,box-shadow .15s ease}
 @media(max-width:639px){
   #journal-reference-mode-wrap{width:100%;justify-content:center}
 }
-</style>
-<style id="journal-form-compact-v156">
+
+
 /* v156：新增條件區塊縮緊留白，勾選框位置更貼近輸入列 */
 #journal-form{margin-top:0!important}
 #journal-form .grid{margin-top:0!important}
@@ -849,8 +852,8 @@ html:not(.dark) .shadow-xl{
     padding:.4rem .65rem;
   }
 }
-</style>
-<style id="revenue-new-row-v157">
+
+
 @keyframes revenueNewRowFlash{
   0%,100%{box-shadow:inset 0 0 0 0 rgba(124,58,237,0);background-color:inherit}
   18%,72%{box-shadow:inset 4px 0 0 rgba(124,58,237,.85);background-color:rgba(237,233,254,.88)}
@@ -863,8 +866,8 @@ html:not(.dark) .shadow-xl{
   0%,100%{box-shadow:inset 0 0 0 0 rgba(167,139,250,0);background-color:inherit}
   18%,72%{box-shadow:inset 4px 0 0 rgba(167,139,250,.95);background-color:rgba(76,29,149,.28)}
 }
-</style>
-<style id="horse-new-badge-v164">
+
+
 .horse-new-badge{
   display:inline-flex;
   align-items:center;
@@ -884,8 +887,8 @@ html:not(.dark) .shadow-xl{
   background:rgba(124,45,18,.35);
   border-color:rgba(251,146,60,.6);
 }
-</style>
-<style id="war-room-layout-v166">
+
+
 /* v166：今日作戰室改為上下兩層，避免統計卡與排行在桌機被擠窄。 */
 #journal-war-room{overflow:hidden}
 #journal-war-room .war-room-body{display:block!important}
@@ -1302,8 +1305,8 @@ html:not(.dark) .shadow-xl{
     min-width:0!important;
   }
 }
-</style>
-<style id="jellystock-module-v169">
+
+
 #module-jellystock .jellystock-frame-wrap{position:relative;width:100%;min-height:720px;height:calc(100dvh - 180px);overflow:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
 #jellystock-frame{display:block;width:100%;height:100%;min-height:720px;border:0;background:#fff;touch-action:auto}
 #jellystock-loading{position:absolute;inset:0;z-index:2;display:flex;align-items:center;justify-content:center;gap:.75rem;background:rgba(255,255,255,.94);transition:opacity .2s ease,visibility .2s ease}
@@ -1344,8 +1347,8 @@ html:not(.dark) .shadow-xl{
   body.jellystock-fullscreen-open #jellystock-toolbar button{flex:0 0 auto!important}
 }
 @media(min-width:1024px) and (max-width:1399px){nav .nav-btn{padding-left:.55rem!important;padding-right:.55rem!important;font-size:11px!important}nav .nav-btn i{margin-right:.35rem!important}}
-</style>
-<style id="top-nav-fix-v181">
+
+
 /* v181：保留不遮字，但進一步縮減頂部導覽按鈕下方留白 */
 @media (min-width: 768px){
   .desktop-nav-scroll,
@@ -1427,8 +1430,8 @@ header, .top-header, .app-header{
 nav, .top-nav, .desktop-nav, .module-nav{
   overflow:visible !important;
 }
-</style>
-<style id="copy-small-label-controls-v182">
+
+
 .copy-small-label-controls{min-height:32px}
 .copy-small-label-controls label{padding:2px 3px;border-radius:5px;transition:background-color .15s ease}
 .copy-small-label-controls label:hover{background:rgba(124,58,237,.08)}
@@ -1437,8 +1440,8 @@ nav, .top-nav, .desktop-nav, .module-nav{
   .copy-small-label-controls>span{font-size:10px}
   .copy-small-label-controls label span{font-size:10px}
 }
-</style>
-<style id="journal-close-price-v187">
+
+
 #module-journal .journal-close-price-col,
 #module-journal .journal-close-price-cell{
     width:82px!important;
@@ -1456,8 +1459,8 @@ nav, .top-nav, .desktop-nav, .module-nav{
         padding-right:.35rem!important;
     }
 }
-</style>
-<style id="all-module-yahoo-links-v191">
+
+
 .yahoo-stock-link-cell{
     cursor:pointer!important;
 }
@@ -1469,8 +1472,8 @@ nav, .top-nav, .desktop-nav, .module-nav{
     outline:2px solid #60a5fa;
     outline-offset:-2px;
 }
-</style>
-<style id="journal-mobile-filter-layout-v213">
+
+
 /* Desktop/tablet: row wrappers do not change the original toolbar flow. */
 @media (min-width:431px){
   #module-journal .journal-fixed-filter-toolbar > .journal-mobile-row{display:contents}
@@ -1704,9 +1707,8 @@ nav, .top-nav, .desktop-nav, .module-nav{
     margin-top:0!important;
   }
 }
-</style>
 
-<style id="streak-layout-compact-v238">
+
 /* v238 策略訊號雷達：縮短篩選區高度，讓結果更快進入可視範圍 */
 #streak-radar-panel,
 #journal-streak-panel,
@@ -1743,14 +1745,8 @@ nav, .top-nav, .desktop-nav, .module-nav{
 .streak-quick-btn{
   min-height:34px !important;
 }
-</style>
 
 
-
-
-
-
-<style id="streak-results-fix-v241">
 /* v241：結果直接排在摘要後方，不再使用動態左右搬移 DOM */
 #streak-results-header:not(.hidden){
   display:flex !important;
@@ -1781,20 +1777,16 @@ nav, .top-nav, .desktop-nav, .module-nav{
   border-top:1px solid rgba(139,92,246,.16);
   background:rgba(139,92,246,.035);
 }
-</style>
 
 
-<style id="streak-force-visible-v243">
 #streak-results.streak-has-results{
  display:grid !important;
  visibility:visible !important;
  opacity:1 !important;
  min-height:80px !important;
 }
-</style>
 
 
-<style id="mobile-filter-tag-modal-v265">
 @media (max-width:640px){
   body.mobile-filter-tag-modal-open{
     overflow:hidden!important;
@@ -1861,10 +1853,8 @@ nav, .top-nav, .desktop-nav, .module-nav{
     max-width:100%!important;
   }
 }
-</style>
 
 
-<style id="journal-potential-upside-v266">
 #module-journal .journal-upside-col,
 #module-journal .journal-upside-cell{
     width:88px!important;
@@ -1882,10 +1872,8 @@ nav, .top-nav, .desktop-nav, .module-nav{
         padding-right:.35rem!important;
     }
 }
-</style>
 
 
-<style id="copy-small-label-mobile-wrap-v270">
 @media (max-width: 640px){
   :is(#module-journal,#module-favorites,#mobile-action-sheet-body) .copy-small-label-controls{
     display:flex !important;
@@ -1926,10 +1914,8 @@ nav, .top-nav, .desktop-nav, .module-nav{
     overflow:visible !important;
   }
 }
-</style>
 
 
-<style id="journal-mobile-action-grid-v271">
 @media (max-width:640px){
   #module-journal .journal-action-cell{
     white-space:normal!important;
@@ -1987,10 +1973,8 @@ nav, .top-nav, .desktop-nav, .module-nav{
     align-self:flex-start!important;
   }
 }
-</style>
 
 
-<style id="filter-logic-wide-panel-v279">
 @media (min-width:641px){
   #filter-tag-panel,
   #filter-tag-panel-fav{
@@ -2013,20 +1997,16 @@ nav, .top-nav, .desktop-nav, .module-nav{
     line-height:1.2!important;
   }
 }
-</style>
 
 
-<style id="streak-stock-search-v282">
 @media (max-width:640px){
   #streak-stock-search{
     height:42px!important;
     font-size:13px!important;
   }
 }
-</style>
 
 
-<style id="filter-tag-modal-v286">
 body.mobile-filter-tag-modal-open{
   overflow:hidden!important;
 }
@@ -2145,10 +2125,8 @@ body > #filter-tag-panel-fav.mobile-filter-tag-modal .filter-tag-choice-grid lab
     padding:.5rem .45rem!important;
   }
 }
-</style>
 
 
-<style id="war-room-click-list-v288">
 #journal-war-room .workbench-stat-card{
   cursor:pointer!important;
 }
@@ -2263,10 +2241,8 @@ body > #filter-tag-panel-fav.mobile-filter-tag-modal .filter-tag-choice-grid lab
 @media (max-width:390px){
   .war-room-selection-grid{grid-template-columns:1fr}
 }
-</style>
 
 
-<style id="dashboard-redesign-v290">
 /* ==========================================================
    v290 資訊儀表板大改版
    原則：不改既有 ID / data-* / 表單流程 / 事件邏輯，只重整視覺層級。
@@ -2671,10 +2647,8 @@ html.dark .stock-identity-name{color:#f4f7fb!important}
     transition:box-shadow .18s ease,border-color .18s ease;
   }
 }
-</style>
 
 
-<style id="filter-clear-next-to-tags-v292">
 #module-journal .journal-filter-tag-cell{
   display:grid!important;
   grid-template-columns:minmax(0,1fr) auto!important;
@@ -2711,10 +2685,8 @@ html.dark .stock-identity-name{color:#f4f7fb!important}
   flex-wrap:wrap!important;
   max-width:100%!important;
 }
-</style>
 
 
-<style id="horse-new-under-name-v293">
 #journal-table-body .horse-new-stock-row,
 #fav-table-body .horse-new-stock-row{
   display:flex;
@@ -2733,10 +2705,8 @@ html.dark .stock-identity-name{color:#f4f7fb!important}
     margin-top:4px;
   }
 }
-</style>
 
 
-<style id="cnyes-target-reference-v297">
 .cnyes-target-row{
   background:linear-gradient(90deg,rgba(255,247,237,.72),rgba(255,255,255,0));
 }
@@ -2757,10 +2727,8 @@ html.dark .cnyes-target-row{
     width:100%;
   }
 }
-</style>
 
 
-<style id="streak-copy-tag-toggle-v298">
 #streak-copy-show-tags{
   flex:0 0 auto;
 }
@@ -2773,18 +2741,14 @@ html.dark .cnyes-target-row{
     font-size:11px!important;
   }
 }
-</style>
 
 
-<style id="reminder-color-expanded-v300">
 #tag-manager-reminder-color{
   transition:border-color .18s ease,box-shadow .18s ease;
   padding-left:14px!important;
 }
-</style>
 
 
-<style id="journal-daily-change-v302">
 #module-journal .journal-change-percent-col,
 #module-journal .journal-change-percent-cell{
   width:76px!important;
@@ -2829,18 +2793,14 @@ html.dark #module-journal table :is(th,td):nth-child(7){
     padding-right:.3rem!important;
   }
 }
-</style>
 
 
-<style id="target-achieved-v303">
 #module-journal td .target-achieved,
 #module-favorites td .target-achieved{
   white-space:nowrap;
 }
-</style>
 
 
-<style id="journal-tag-card-match-farmer-v306">
 .journal-tag-category-card{
   border:1px solid rgba(168,85,247,.28);
   border-radius:14px;
@@ -2892,10 +2852,8 @@ html.dark #module-journal table :is(th,td):nth-child(7){
     padding:10px 11px 12px;
   }
 }
-</style>
 
 
-<style id="target-achieved-show-price-v307">
 .target-achieved-wrap{
   line-height:1.05;
   vertical-align:middle;
@@ -2916,10 +2874,8 @@ html.dark #module-journal table :is(th,td):nth-child(7){
     gap:3px!important;
   }
 }
-</style>
 
 
-<style id="journal-column-index-fix-v308">
 /* v302 新增漲幅%後的正確順序：
    4 收盤價 / 5 漲幅% / 6 目標價 / 7 潛在漲幅 / 8 25EPS / 9 26EPS / 10 成長率 / 11 分數 */
 #module-journal table :is(th,td):nth-child(6){
@@ -2939,10 +2895,8 @@ html.dark #module-journal table :is(th,td):nth-child(7){
   width:66px!important;min-width:66px!important;max-width:66px!important;
   padding-left:.25rem!important;padding-right:.25rem!important;text-align:center!important;
 }
-</style>
 
 
-<style id="tag-filter-preset-v309">
 .tag-preset-manager{
   border:1px solid rgba(99,102,241,.22);
   border-radius:12px;
@@ -3109,10 +3063,8 @@ html.dark #module-journal table :is(th,td):nth-child(7){
   .tag-preset-head{align-items:flex-start}
   .tag-preset-save-btn{padding:6px 8px}
 }
-</style>
 
 
-<style id="tag-preset-visible-entry-v310">
 .tag-preset-entry-btn{
   display:inline-flex;
   align-items:center;
@@ -3215,10 +3167,8 @@ html.dark #module-journal table :is(th,td):nth-child(7){
     font-size:11px;
   }
 }
-</style>
 
 
-<style id="streak-compact-layout-v311">
 #streak-filter-panel{
   padding:10px 14px!important;
 }
@@ -3307,10 +3257,8 @@ html.dark #module-journal table :is(th,td):nth-child(7){
     padding-right:10px!important;
   }
 }
-</style>
 
 
-<style id="copy-toolbar-two-row-v312">
 .copy-toolbar{
   flex-wrap:wrap!important;
   overflow-x:visible!important;
@@ -3347,10 +3295,8 @@ html.dark #module-journal table :is(th,td):nth-child(7){
     min-height:32px;
   }
 }
-</style>
 
 
-<style id="mobile-layout-rebuild-v313">
 /* =========================
    圖一：策略日誌手機篩選重排
    ========================= */
@@ -3680,10 +3626,8 @@ html.dark #module-journal table :is(th,td):nth-child(7){
     grid-column:span 6 / span 6!important;
   }
 }
-</style>
 
 
-<style id="journal-tag-filled-state-v317">
 #form-tags-container .journal-form-tag-btn{
   position:relative;
 }
@@ -3721,10 +3665,8 @@ html.dark #module-journal table :is(th,td):nth-child(7){
     font-size:8.5px!important;
   }
 }
-</style>
 
 
-<style id="copy-custom-title-v323">
 .copy-title-row{
   flex:0 0 100%;
   width:100%;
@@ -3804,10 +3746,8 @@ html.dark #module-journal table :is(th,td):nth-child(7){
     font-size:11.5px;
   }
 }
-</style>
 
 
-<style id="watchlist-workspace-v324">
 #module-favorites .card-panel{
   border-top:0!important;
   overflow:hidden;
@@ -3927,10 +3867,8 @@ html.dark #module-journal table :is(th,td):nth-child(7){
   .watchlist-batch-select{grid-column:1/-1;width:100%}
   #module-favorites .copy-section{padding-left:10px!important;padding-right:10px!important}
 }
-</style>
 
 
-<style id="watchlist-price-v325">
 .watchlist-price-update-btn{
   background:#2563eb!important;
   border-color:#1d4ed8!important;
@@ -4009,10 +3947,8 @@ html.dark #module-favorites table :is(th,td):nth-child(5){
     padding-top:.15rem!important;
   }
 }
-</style>
 
 
-<style id="watchlist-mobile-column-fix-v326">
 @media(max-width:640px){
   /* v325 新增兩欄後，舊 v145/v313 的 favorites nth-child 規則會誤套到目標價等欄位。 */
   html.mobile-view-card #module-favorites table.mobile-card-table tbody td:nth-child(10){
@@ -4034,10 +3970,8 @@ html.dark #module-favorites table :is(th,td):nth-child(5){
     background:transparent!important;
   }
 }
-</style>
 
 
-<style id="watchlist-picker-v328">
 #watchlist-picker-modal .watchlist-picker-group:has(.watchlist-picker-group-cb:checked){
   border-color:#f59e0b!important;
   background:#fffbeb!important;
@@ -4051,10 +3985,8 @@ html.dark #watchlist-picker-modal .watchlist-picker-group:has(.watchlist-picker-
   #watchlist-picker-modal{align-items:flex-end!important;padding:0!important}
   #watchlist-picker-modal>div{max-width:none!important;border-radius:1.25rem 1.25rem 0 0!important;max-height:88vh;overflow-y:auto}
 }
-</style>
 
 
-<style id="watchlist-priority-selected-v330">
 .watchlist-priority-option{
   display:block;
   position:relative;
@@ -4159,10 +4091,8 @@ html.dark #watchlist-picker-modal .watchlist-picker-group:has(.watchlist-picker-
   outline:2px solid #3b82f6;
   outline-offset:2px;
 }
-</style>
 
 
-<style id="watchlist-tracking-performance-v332">
 #module-favorites table :is(th,td):nth-child(6){width:84px!important;min-width:84px!important;max-width:84px!important;text-align:right!important;background-image:linear-gradient(rgba(255,247,237,.78),rgba(255,247,237,.78))!important}
 #module-favorites table :is(th,td):nth-child(7){width:78px!important;min-width:78px!important;max-width:78px!important;text-align:right!important;background-image:linear-gradient(rgba(254,242,242,.62),rgba(254,242,242,.62))!important}
 #module-favorites table :is(th,td):nth-child(8),#module-favorites table :is(th,td):nth-child(9){width:76px!important;min-width:76px!important;max-width:76px!important;text-align:right!important;background-image:none!important}
@@ -4179,10 +4109,8 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
  html.mobile-view-card #module-favorites table.mobile-card-table tbody td:nth-child(7)::before{content:'追蹤後%'}
  html.mobile-view-card #module-favorites table.mobile-card-table tbody td:nth-child(14),html.mobile-view-card #module-favorites table.mobile-card-table tbody td:nth-child(15){grid-column:1/-1!important;padding-top:.15rem!important}
 }
-</style>
 
 
-<style id="report-reader-continuous-v333">
 .report-reader-wake-status{border-color:#bbf7d0;background:#f0fdf4;color:#15803d}
 .dark .report-reader-wake-status{border-color:#166534;background:rgba(20,83,45,.28);color:#86efac}
 .report-reader-wake-status.is-pending{border-color:#fde68a;background:#fffbeb;color:#a16207}
@@ -4196,10 +4124,8 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 .dark .report-reader-continuous-toggle:has(#report-reader-continuous:checked){border-color:#7c3aed!important;background:rgba(76,29,149,.34)!important;color:#ddd6fe!important}
 .report-reader-continuous-toggle:has(#report-reader-continuous:checked) .report-reader-toggle-dot{background:#7c3aed;color:#fff;transform:scale(1.05)}
 @media(max-width:640px){.report-reader-continuous-toggle{padding-left:7px!important;padding-right:7px!important}.report-reader-toggle-dot{width:20px;height:20px}}
-</style>
 
 
-<style id="top-nav-spacing-v337">
 /* v337：桌機頂部模組列重新收斂高度，按鈕不再貼上方／下方留大塊空白 */
 @media (min-width:1024px){
   /* 導覽主列本身就是 64px，所有模組按鈕必須收在這個高度內 */
@@ -4265,10 +4191,8 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
     font-size:12px!important;
   }
 }
-</style>
 
 
-<style id="special-attention-multiselect-v339">
 #form-tags-container .tag-input[data-special-attention="1"]:checked + .journal-form-tag-btn{
   box-shadow:0 0 0 2px rgba(244,63,94,.22),0 6px 14px rgba(244,63,94,.14)!important;
 }
@@ -4279,10 +4203,8 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
   font-weight:900;
   opacity:.72;
 }
-</style>
 
 
-<style id="copy-title-layout-v340">
 .copy-title-card{
   flex:0 0 100%;
   width:100%;
@@ -4487,10 +4409,8 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
     width:100%;
   }
 }
-</style>
 
 
-<style id="journal-streak-height-view-v343">
 /* 1. 策略日誌主表格：增加可視高度，桌機可一次看到更多檔 */
 #journal-table-scroll{
   max-height:min(78vh, 920px)!important;
@@ -4656,10 +4576,8 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
     grid-column:1 / 3;
   }
 }
-</style>
 
 
-<style id="journal-control-layout-v344">
 /* v344：策略日誌上方控制區重新分組，減少大片空白並提升掃讀速度 */
 @media (min-width:900px){
   #module-journal .journal-fixed-filter-toolbar{
@@ -4920,9 +4838,8 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
   #module-journal .journal-maintenance-tools{width:100%;}
   #module-journal .journal-maintenance-title{display:none;}
 }
-</style>
 
-<style id="journal-control-layout-v345">
+
 /* v345：重做策略日誌篩選區桌機版排版，避免空白過多並提升辨識度 */
 @media (min-width:1200px){
   #module-journal .journal-fixed-filter-toolbar{
@@ -5213,11 +5130,8 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
   #module-journal .journal-maintenance-title{border-bottom:0!important;border-right:1px solid #bbf7d0;padding:0 10px 0 0!important;}
   #module-journal .journal-maintenance-tools > button{width:auto!important;flex:1 1 160px!important;}
 }
-</style>
 
 
-
-<style id="journal-filter-compact-width-v346">
 /* v346：篩選控制項改成內容導向寬度，不再整排平均撐滿 */
 @media (min-width:1200px){
   #module-journal .journal-fixed-filter-toolbar{
@@ -5368,10 +5282,8 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
     max-width:350px!important;
   }
 }
-</style>
 
 
-<style id="journal-filter-horizontal-v347">
 /* v347：桌機策略日誌篩選區改為真正橫向工具列，不再上下直排 */
 @media (min-width:900px){
   #module-journal .journal-fixed-filter-toolbar{
@@ -5593,10 +5505,8 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
     max-width:305px!important;
   }
 }
-</style>
 
 
-<style id="journal-filter-chain-v348">
 /* v348：桌機篩選區改為「接龍式單列橫排」，不再上下堆疊 */
 @media (min-width:1200px){
   #module-journal .journal-fixed-filter-toolbar{
@@ -5843,10 +5753,8 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
     grid-column:auto!important;
   }
 }
-</style>
 
 
-<style id="journal-filter-left-right-v349">
 /* v349：依需求將篩選列拆成「左區＋右區」第一排，第二排放下拉與標籤 */
 @media (min-width:1200px){
   #module-journal .card-panel > .p-4:first-of-type{
@@ -6088,10 +5996,8 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
   }
   #module-journal .journal-filter-tags-display-row{grid-column:1 / -1;grid-row:3;display:flex!important;gap:8px!important;align-items:center!important;flex-wrap:wrap!important;}
 }
-</style>
 
 
-<style id="journal-filter-layout-v350">
 /* v350：第一排全接龍，第二排只留標籤挑選／清除篩選／組合 */
 @media (min-width:1200px){
   #module-journal .journal-fixed-filter-toolbar{
@@ -6316,10 +6222,8 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
   #module-journal .journal-filter-tag-cell [data-open-tag-presets="journal"]{grid-column:3!important;}
   #module-journal .journal-filter-tags-display-row{grid-column:1 / -1!important;grid-row:3!important;}
 }
-</style>
 
 
-<style id="journal-filter-size-tuning-v351">
 /* v351：大戶兩格再縮小，分數欄加大 */
 @media (min-width:1200px){
   #module-journal .journal-fixed-filter-toolbar{
@@ -6384,10 +6288,8 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
     padding-right:8px!important;
   }
 }
-</style>
 
 
-<style id="strategy-streak-badge-v352">
 .strategy-streak-badge{
   display:inline-flex;
   align-items:center;
@@ -6407,10 +6309,8 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
   border-color:rgba(251,146,60,.35);
   color:#fdba74;
 }
-</style>
 
 
-<style id="journal-holder-fit-content-v353">
 /* v353：兩個千張大戶條件改成內容寬度，不再固定大格 */
 @media (min-width:1200px){
   #module-journal .journal-fixed-filter-toolbar{
@@ -6469,10 +6369,8 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
     white-space:nowrap!important;
   }
 }
-</style>
 
 
-<style id="strategy-streak-filter-color-v354">
 /* 連續進榜小標籤：完全沿用外層策略標籤的文字顏色，不再固定暗紅/橘色 */
 .strategy-streak-badge{
   display:inline-flex!important;
@@ -6499,10 +6397,8 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
   color:inherit!important;
   font-size:8px!important;
 }
-</style>
 
 
-<style id="journal-streak-filter-position-v355">
 @media (min-width:1200px){
   #module-journal .journal-fixed-filter-toolbar{
     grid-template-columns:
@@ -6556,10 +6452,8 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
   #module-journal .journal-filter-row-grid-6 > select:nth-of-type(3){grid-column:11!important;grid-row:1!important;}
   #module-journal .journal-filter-row-grid-6 > select:nth-of-type(4){grid-column:12!important;grid-row:1!important;}
 }
-</style>
 
 
-<style id="tag-manager-batch-v357">
 .tag-manager-batch-toolbar{
   padding:10px;
   border:1px solid #ddd6fe;
@@ -6731,10 +6625,8 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
     grid-column:1 / -1;
   }
 }
-</style>
 
 
-<style id="tag-manager-batch-checkbox-v358">
 /* v358：批次勾選框改為原生可見 checkbox，避免使用者找不到 */
 .tag-manager-batch-box{
   flex:0 0 auto!important;
@@ -6812,10 +6704,8 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
     padding:0 5px!important;
   }
 }
-</style>
 
 
-<style id="tag-manager-batch-confirm-v360">
 .tag-manager-batch-confirm-row{
   display:flex;
   align-items:center;
@@ -6864,10 +6754,8 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
     height:42px;
   }
 }
-</style>
 
 
-<style id="tag-filter-live-count-v361">
 .tag-filter-live-summary{position:sticky;top:0;z-index:16;display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 10px;padding:8px 10px;border:1px solid #bfdbfe;border-radius:11px;background:rgba(239,246,255,.96);box-shadow:0 4px 14px rgba(37,99,235,.08);backdrop-filter:blur(8px)}
 .dark .tag-filter-live-summary{border-color:#1e3a8a;background:rgba(30,58,138,.22)}
 .tag-filter-live-summary-main{display:flex;align-items:center;gap:8px;min-width:0}.tag-filter-live-summary-icon{flex:0 0 30px;width:30px;height:30px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;background:#2563eb;color:#fff;font-size:12px}
@@ -6876,10 +6764,8 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 .tag-filter-live-summary-active{border-color:#60a5fa}.tag-filter-live-summary-empty{border-color:#fecaca;background:rgba(254,242,242,.97)}.dark .tag-filter-live-summary-empty{border-color:#7f1d1d;background:rgba(127,29,29,.16)}.tag-filter-live-summary-empty .tag-filter-live-summary-icon{background:#ef4444}.tag-filter-live-summary-empty .tag-filter-live-summary-value{color:#b91c1c}.dark .tag-filter-live-summary-empty .tag-filter-live-summary-value{color:#fca5a5}
 body > #filter-tag-panel.mobile-filter-tag-modal .tag-filter-live-summary,body > #filter-tag-panel-fav.mobile-filter-tag-modal .tag-filter-live-summary{top:49px}
 @media(max-width:640px){.tag-filter-live-summary{padding:7px 8px;gap:7px}.tag-filter-live-summary-icon{width:28px;height:28px;flex-basis:28px}.tag-filter-live-summary-value strong{font-size:18px}.tag-filter-live-summary-meta{gap:5px;font-size:8.5px}}
-</style>
 
 
-<style id="tag-filter-live-stock-links-v362">
 /* v362：目前符合旁直接列出代號／股名，可點 Yahoo K線 */
 .tag-filter-live-summary{
   display:grid!important;
@@ -7015,6 +6901,7 @@ body > #filter-tag-panel.mobile-filter-tag-modal .tag-filter-live-summary,body >
   }
   .tag-filter-live-stock-list{max-height:74px;}
 }
+
 </style>
 
 </head>
@@ -10327,7 +10214,7 @@ function renderDynamicTags(){
                 state.favFilters.tags=state.favFilters.tags.filter(t=>t!==v);
             }
             document.querySelectorAll('.filter-tag-cb').forEach(c=>{if(c.value===v)c.checked=isC;});
-            renderFilterTags();renderJournalFilterViews();
+            renderFilterTags();scheduleJournalFilterViews();
         });
     });
     if(typeof renderStreakStrategyOptions==='function')renderStreakStrategyOptions();
@@ -10339,7 +10226,7 @@ window.removeFilterTag=tag=>{
     state.filters.tags=state.filters.tags.filter(t=>t!==tag);
     state.favFilters.tags=state.favFilters.tags.filter(t=>t!==tag);
     document.querySelectorAll('.filter-tag-cb').forEach(cb=>{if(cb.value===tag)cb.checked=false;});
-    renderFilterTags();renderJournalFilterViews();
+    renderFilterTags();scheduleJournalFilterViews();
 };
 
 function renderFilterTags(){
@@ -11801,8 +11688,9 @@ const getWatchlistRows=(groupId=state.activeWatchlistGroupId)=>{
 
 // v362：標籤挑選視窗即時顯示「目前符合幾檔」＋符合個股代號／股名。
 // 以股票代號去重；每檔顯示一個可直接開啟 Yahoo 股市技術分析（K線）的標籤。
-window.updateTagFilterMatchSummary=function(scope){
-    const scopes=scope?[scope]:['journal','fav'];
+const tagFilterSummaryPendingScopes=new Set();
+let tagFilterSummaryRaf=0;
+const runTagFilterMatchSummary=scopes=>{
     scopes.forEach(currentScope=>{
         const isFav=currentScope==='fav',
               filterState=isFav?{...state.favFilters,start:'',end:''}:{...state.filters},
@@ -11859,7 +11747,21 @@ window.updateTagFilterMatchSummary=function(scope){
         }
     });
 };
-
+window.updateTagFilterMatchSummary=function(scope){
+    const requested=scope?[scope]:['journal','fav'];
+    requested.forEach(currentScope=>{
+        const panel=document.getElementById(currentScope==='fav'?'filter-tag-panel-fav':'filter-tag-panel');
+        if(!panel||panel.classList.contains('hidden'))return;
+        tagFilterSummaryPendingScopes.add(currentScope);
+    });
+    if(!tagFilterSummaryPendingScopes.size||tagFilterSummaryRaf)return;
+    tagFilterSummaryRaf=requestAnimationFrame(()=>{
+        tagFilterSummaryRaf=0;
+        const scopes=[...tagFilterSummaryPendingScopes];
+        tagFilterSummaryPendingScopes.clear();
+        runTagFilterMatchSummary(scopes);
+    });
+};
 const getWatchlistCodesForGroup=groupId=>{
     const index=getWatchlistIndex(),codes=[];
     index.byCode.forEach((info,code)=>{
@@ -12321,6 +12223,14 @@ const renderJournalFilterViews=()=>{
     const favoritesActive=document.getElementById('module-favorites')?.classList.contains('active');
     if(journalActive)renderJournalPrimaryView();
     if(favoritesActive)renderFavorites();
+};
+let journalFilterRenderRaf=0;
+const scheduleJournalFilterViews=()=>{
+    if(journalFilterRenderRaf)return;
+    journalFilterRenderRaf=requestAnimationFrame(()=>{
+        journalFilterRenderRaf=0;
+        renderJournalFilterViews();
+    });
 };
 
 let lastJournalStreakResult=null;
