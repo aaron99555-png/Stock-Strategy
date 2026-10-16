@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="361" name="app-version"/>
+<meta content="362" name="app-version"/>
 <script id="startup-performance-bootstrap">
 window.__ryanStartupPerf={start:performance.now(),localReady:0,firstRender:0,cloudStart:0,cloudEnd:0,cloudOk:null};
 </script>
@@ -6878,6 +6878,145 @@ body > #filter-tag-panel.mobile-filter-tag-modal .tag-filter-live-summary,body >
 @media(max-width:640px){.tag-filter-live-summary{padding:7px 8px;gap:7px}.tag-filter-live-summary-icon{width:28px;height:28px;flex-basis:28px}.tag-filter-live-summary-value strong{font-size:18px}.tag-filter-live-summary-meta{gap:5px;font-size:8.5px}}
 </style>
 
+
+<style id="tag-filter-live-stock-links-v362">
+/* v362：目前符合旁直接列出代號／股名，可點 Yahoo K線 */
+.tag-filter-live-summary{
+  display:grid!important;
+  grid-template-columns:auto minmax(0,1fr) auto!important;
+  align-items:center!important;
+  gap:10px!important;
+}
+.tag-filter-live-summary-main{min-width:112px!important;}
+.tag-filter-live-stock-area{
+  min-width:0;
+  align-self:stretch;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:4px;
+  padding:0 8px;
+  border-left:1px solid rgba(59,130,246,.18);
+  border-right:1px solid rgba(59,130,246,.18);
+}
+.dark .tag-filter-live-stock-area{
+  border-color:rgba(147,197,253,.16);
+}
+.tag-filter-live-stock-title{
+  display:flex;
+  align-items:center;
+  color:#64748b;
+  font-size:8.5px;
+  line-height:1.1;
+  font-weight:900;
+  white-space:nowrap;
+}
+.tag-filter-live-stock-title > span{
+  margin-left:5px;
+  color:#94a3b8;
+  font-size:8px;
+  font-weight:700;
+}
+.dark .tag-filter-live-stock-title{color:#94a3b8;}
+.dark .tag-filter-live-stock-title > span{color:#64748b;}
+.tag-filter-live-stock-list{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:4px;
+  max-height:66px;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  padding:1px 2px 2px 0;
+  scrollbar-width:thin;
+}
+.tag-filter-live-stock-chip{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  min-height:23px;
+  padding:2px 6px;
+  border:1px solid #bfdbfe;
+  border-radius:7px;
+  background:#fff;
+  color:#1e40af;
+  font-size:9px;
+  line-height:1;
+  font-weight:800;
+  white-space:nowrap;
+  cursor:pointer;
+  user-select:none;
+  transition:.12s ease;
+}
+.tag-filter-live-stock-chip:hover,
+.tag-filter-live-stock-chip:focus-visible{
+  border-color:#3b82f6;
+  background:#dbeafe;
+  color:#1d4ed8;
+  transform:translateY(-1px);
+  outline:none;
+  box-shadow:0 2px 7px rgba(37,99,235,.12);
+}
+.tag-filter-live-stock-chip b{
+  font-size:9.5px;
+  font-weight:950;
+}
+.tag-filter-live-stock-chip > span{
+  max-width:76px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.tag-filter-live-stock-chip i{
+  font-size:7px;
+  opacity:.62;
+}
+.dark .tag-filter-live-stock-chip{
+  border-color:#1e40af;
+  background:rgba(30,58,138,.26);
+  color:#bfdbfe;
+}
+.dark .tag-filter-live-stock-chip:hover,
+.dark .tag-filter-live-stock-chip:focus-visible{
+  border-color:#60a5fa;
+  background:rgba(37,99,235,.36);
+  color:#eff6ff;
+}
+.tag-filter-live-stock-placeholder{
+  display:inline-flex;
+  align-items:center;
+  min-height:23px;
+  color:#94a3b8;
+  font-size:9px;
+  font-weight:750;
+}
+.tag-filter-live-stock-none{color:#ef4444;}
+.tag-filter-live-summary-meta{
+  justify-self:end;
+}
+
+@media(max-width:760px){
+  .tag-filter-live-summary{
+    grid-template-columns:auto 1fr!important;
+    align-items:start!important;
+  }
+  .tag-filter-live-stock-area{
+    grid-column:1 / -1;
+    grid-row:2;
+    width:100%;
+    padding:7px 0 0;
+    border-left:0;
+    border-right:0;
+    border-top:1px solid rgba(59,130,246,.18);
+  }
+  .tag-filter-live-summary-meta{
+    grid-column:2;
+    grid-row:1;
+    align-self:center;
+  }
+  .tag-filter-live-stock-list{max-height:74px;}
+}
+</style>
+
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen flex flex-col antialiased">
 <nav class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-50 transition-colors duration-300">
@@ -7162,6 +7301,7 @@ body > #filter-tag-panel.mobile-filter-tag-modal .tag-filter-live-summary,body >
 <div class="mb-2 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between"><span class="text-xs font-bold text-gray-700 dark:text-gray-300">篩選邏輯</span><div class="flex items-center bg-gray-100 dark:bg-gray-900 p-1 rounded-lg"><button class="logic-btn px-2 py-1 text-[10px] sm:text-xs rounded font-medium transition-colors bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm" data-logic="OR" id="btn-logic-or" type="button">符合任一 (OR)</button><button class="logic-btn px-2 py-1 text-[10px] sm:text-xs rounded font-medium transition-colors text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" data-logic="AND" id="btn-logic-and" type="button">完全符合 (AND)</button></div></div>
 <div class="tag-filter-live-summary" id="tag-filter-live-summary-journal">
 <div class="tag-filter-live-summary-main"><span class="tag-filter-live-summary-icon"><i class="fa-solid fa-chart-simple"></i></span><div><div class="tag-filter-live-summary-label">目前符合</div><div class="tag-filter-live-summary-value"><strong id="tag-filter-match-count-journal">0</strong><span>檔股票</span></div></div></div>
+<div class="tag-filter-live-stock-area"><div class="tag-filter-live-stock-title"><i class="fa-solid fa-arrow-pointer mr-1"></i>符合個股 <span>點擊可看 Yahoo K線</span></div><div class="tag-filter-live-stock-list" id="tag-filter-match-stocks-journal"><span class="tag-filter-live-stock-placeholder">勾選策略標籤後顯示個股</span></div></div>
 <div class="tag-filter-live-summary-meta"><span>已選 <b id="tag-filter-selected-count-journal">0</b> 個標籤</span><span class="tag-filter-live-summary-logic" id="tag-filter-logic-label-journal">OR</span></div>
 </div>
 <div class="tag-preset-manager mb-3" id="tag-preset-manager-journal"></div>
@@ -7873,6 +8013,7 @@ body > #filter-tag-panel.mobile-filter-tag-modal .tag-filter-live-summary,body >
 </div>
 <div class="tag-filter-live-summary" id="tag-filter-live-summary-fav">
 <div class="tag-filter-live-summary-main"><span class="tag-filter-live-summary-icon"><i class="fa-solid fa-chart-simple"></i></span><div><div class="tag-filter-live-summary-label">目前符合</div><div class="tag-filter-live-summary-value"><strong id="tag-filter-match-count-fav">0</strong><span>檔股票</span></div></div></div>
+<div class="tag-filter-live-stock-area"><div class="tag-filter-live-stock-title"><i class="fa-solid fa-arrow-pointer mr-1"></i>符合個股 <span>點擊可看 Yahoo K線</span></div><div class="tag-filter-live-stock-list" id="tag-filter-match-stocks-fav"><span class="tag-filter-live-stock-placeholder">勾選策略標籤後顯示個股</span></div></div>
 <div class="tag-filter-live-summary-meta"><span>已選 <b id="tag-filter-selected-count-fav">0</b> 個標籤</span><span class="tag-filter-live-summary-logic" id="tag-filter-logic-label-fav">OR</span></div>
 </div>
 <div class="tag-preset-manager mb-3" id="tag-preset-manager-fav"></div>
@@ -8567,6 +8708,17 @@ body > #filter-tag-panel.mobile-filter-tag-modal .tag-filter-live-summary,body >
 - OR／AND 切換、快速組合、移除標籤、清除篩選時皆同步更新。
 - 計數會連同日期、搜尋、股期、營收、大戶、分數、等級、狀態、訊號、連續進榜等現有條件一起計算。
 - 標籤視窗捲動時，統計卡會固定在上方，方便邊勾邊看檔數變化。
+-->
+<!-- v362：
+【標籤篩選即時列出符合個股＋Yahoo K線連結】
+- 在「目前符合 X 檔股票」旁新增「符合個股」區塊。
+- 勾選策略標籤時，同步即時顯示所有符合的股票代號與股名。
+- 同一股票跨多筆／多日資料仍只顯示一次。
+- 個股以代號排序，清單可換行並在過多時垂直捲動，避免撐大標籤挑選視窗。
+- 每個「代號＋股名」都是可點擊標籤，直接開啟 Yahoo 股市該股技術分析／K線頁。
+- 支援鍵盤 Enter／Space，沿用既有 Yahoo 連結機制，不另外複製網址邏輯。
+- 未勾策略標籤時顯示提示；已勾但 0 檔時顯示「目前沒有符合個股」。
+- 策略日誌與追蹤清單標籤挑選視窗皆同步支援。
 -->
 <!-- 核心 JavaScript -->
 <script>
@@ -11647,8 +11799,8 @@ const getWatchlistRows=(groupId=state.activeWatchlistGroupId)=>{
     return rows;
 };
 
-// v361：標籤挑選視窗即時顯示「目前符合幾檔」。
-// 以股票代號去重，因此同一檔股票跨多日資料只計 1 檔。
+// v362：標籤挑選視窗即時顯示「目前符合幾檔」＋符合個股代號／股名。
+// 以股票代號去重；每檔顯示一個可直接開啟 Yahoo 股市技術分析（K線）的標籤。
 window.updateTagFilterMatchSummary=function(scope){
     const scopes=scope?[scope]:['journal','fav'];
     scopes.forEach(currentScope=>{
@@ -11664,24 +11816,46 @@ window.updateTagFilterMatchSummary=function(scope){
             rows=[];
         }
 
-        const selectedCount=(filterState.tags||[]).length,
-              stockCount=new Set(rows.map(row=>String(row?.code||'').trim()).filter(Boolean)).size,
+        const byCode=new Map();
+        rows.forEach(row=>{
+            const code=String(row?.code||'').trim();
+            if(!code||byCode.has(code))return;
+            const name=String(row?.name||state.codeToName?.[code]||getMasterStockName?.(code)||'').trim();
+            byCode.set(code,{code,name});
+        });
+        const stocks=[...byCode.values()].sort((a,b)=>String(a.code).localeCompare(String(b.code),'zh-Hant',{numeric:true})),
+              selectedCount=(filterState.tags||[]).length,
+              stockCount=stocks.length,
               logic=filterState.tagLogic==='AND'?'AND':'OR',
               suffix=isFav?'fav':'journal',
               countEl=document.getElementById(`tag-filter-match-count-${suffix}`),
               selectedEl=document.getElementById(`tag-filter-selected-count-${suffix}`),
               logicEl=document.getElementById(`tag-filter-logic-label-${suffix}`),
+              stockListEl=document.getElementById(`tag-filter-match-stocks-${suffix}`),
               summaryEl=document.getElementById(`tag-filter-live-summary-${suffix}`);
 
         if(countEl)countEl.textContent=String(stockCount);
         if(selectedEl)selectedEl.textContent=String(selectedCount);
         if(logicEl)logicEl.textContent=logic;
+        if(stockListEl){
+            if(selectedCount===0){
+                stockListEl.innerHTML='<span class="tag-filter-live-stock-placeholder">勾選策略標籤後顯示個股</span>';
+            }else if(!stocks.length){
+                stockListEl.innerHTML='<span class="tag-filter-live-stock-placeholder tag-filter-live-stock-none"><i class="fa-solid fa-circle-exclamation mr-1"></i>目前沒有符合個股</span>';
+            }else{
+                stockListEl.innerHTML=stocks.map(stock=>{
+                    const yahooAttrs=getYahooStockAttributes(stock.code),
+                          displayName=stock.name||'未命名';
+                    return `<span class="tag-filter-live-stock-chip"${yahooAttrs}><b>${escapeHTML(stock.code)}</b><span>${escapeHTML(displayName)}</span><i class="fa-solid fa-arrow-up-right-from-square"></i></span>`;
+                }).join('');
+            }
+        }
         if(summaryEl){
-            summaryEl.classList.toggle('tag-filter-live-summary-empty',stockCount===0);
+            summaryEl.classList.toggle('tag-filter-live-summary-empty',selectedCount>0&&stockCount===0);
             summaryEl.classList.toggle('tag-filter-live-summary-active',selectedCount>0);
             summaryEl.title=selectedCount
-                ? `目前已選 ${selectedCount} 個標籤，依 ${logic} 邏輯及其他篩選條件，共符合 ${stockCount} 檔股票`
-                : `目前尚未選策略標籤；依其他篩選條件，共有 ${stockCount} 檔股票`;
+                ? `目前已選 ${selectedCount} 個標籤，依 ${logic} 邏輯及其他篩選條件，共符合 ${stockCount} 檔股票；點擊個股可開啟 Yahoo K線`
+                : `目前尚未選策略標籤；勾選後會即時顯示符合個股`;
         }
     });
 };
