@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="360" name="app-version"/>
+<meta content="361" name="app-version"/>
 <script id="startup-performance-bootstrap">
 window.__ryanStartupPerf={start:performance.now(),localReady:0,firstRender:0,cloudStart:0,cloudEnd:0,cloudOk:null};
 </script>
@@ -6866,6 +6866,18 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 }
 </style>
 
+
+<style id="tag-filter-live-count-v361">
+.tag-filter-live-summary{position:sticky;top:0;z-index:16;display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 10px;padding:8px 10px;border:1px solid #bfdbfe;border-radius:11px;background:rgba(239,246,255,.96);box-shadow:0 4px 14px rgba(37,99,235,.08);backdrop-filter:blur(8px)}
+.dark .tag-filter-live-summary{border-color:#1e3a8a;background:rgba(30,58,138,.22)}
+.tag-filter-live-summary-main{display:flex;align-items:center;gap:8px;min-width:0}.tag-filter-live-summary-icon{flex:0 0 30px;width:30px;height:30px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;background:#2563eb;color:#fff;font-size:12px}
+.tag-filter-live-summary-label{color:#64748b;font-size:9px;line-height:1.1;font-weight:850}.dark .tag-filter-live-summary-label{color:#94a3b8}.tag-filter-live-summary-value{display:flex;align-items:baseline;gap:4px;margin-top:2px;color:#1e3a8a;white-space:nowrap}.dark .tag-filter-live-summary-value{color:#bfdbfe}.tag-filter-live-summary-value strong{font-size:20px;line-height:1;font-weight:950;font-variant-numeric:tabular-nums}.tag-filter-live-summary-value span{font-size:10px;font-weight:900}
+.tag-filter-live-summary-meta{flex:0 0 auto;display:flex;align-items:center;gap:7px;color:#64748b;font-size:9px;font-weight:800;white-space:nowrap}.dark .tag-filter-live-summary-meta{color:#94a3b8}.tag-filter-live-summary-meta b{color:#2563eb;font-size:11px;font-weight:950}.dark .tag-filter-live-summary-meta b{color:#93c5fd}.tag-filter-live-summary-logic{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:22px;padding:0 7px;border-radius:999px;background:#dbeafe;color:#1d4ed8;font-size:9px;font-weight:950}.dark .tag-filter-live-summary-logic{background:rgba(37,99,235,.3);color:#bfdbfe}
+.tag-filter-live-summary-active{border-color:#60a5fa}.tag-filter-live-summary-empty{border-color:#fecaca;background:rgba(254,242,242,.97)}.dark .tag-filter-live-summary-empty{border-color:#7f1d1d;background:rgba(127,29,29,.16)}.tag-filter-live-summary-empty .tag-filter-live-summary-icon{background:#ef4444}.tag-filter-live-summary-empty .tag-filter-live-summary-value{color:#b91c1c}.dark .tag-filter-live-summary-empty .tag-filter-live-summary-value{color:#fca5a5}
+body > #filter-tag-panel.mobile-filter-tag-modal .tag-filter-live-summary,body > #filter-tag-panel-fav.mobile-filter-tag-modal .tag-filter-live-summary{top:49px}
+@media(max-width:640px){.tag-filter-live-summary{padding:7px 8px;gap:7px}.tag-filter-live-summary-icon{width:28px;height:28px;flex-basis:28px}.tag-filter-live-summary-value strong{font-size:18px}.tag-filter-live-summary-meta{gap:5px;font-size:8.5px}}
+</style>
+
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen flex flex-col antialiased">
 <nav class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-50 transition-colors duration-300">
@@ -7148,6 +7160,10 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 <button class="bg-white dark:bg-gray-900/50 text-gray-900 dark:text-white text-xs sm:text-sm border border-gray-300 dark:border-gray-700/50 rounded-lg px-3 py-1.5 sm:py-2 focus:ring-2 focus:ring-blue-500 outline-none transition hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center justify-between gap-2 shadow-sm whitespace-nowrap" id="filter-tag-btn" type="button"><span>+ 標籤挑選</span><i class="fa-solid fa-chevron-down text-[10px] opacity-70"></i></button><button class="tag-preset-entry-btn" data-open-tag-presets="journal" type="button" title="開啟快速組合設定"><i class="fa-solid fa-bolt mr-1"></i><span>組合</span><span class="tag-preset-count-badge" data-tag-preset-count>0</span></button><button class="text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 hover:bg-red-600 text-gray-700 dark:text-gray-300 hover:text-white border border-gray-300 dark:border-gray-600 hover:border-red-500 px-3 py-1.5 sm:py-2 rounded-lg transition shadow-sm flex items-center whitespace-nowrap" id="btn-clear-filters" type="button"><i class="fa-solid fa-eraser sm:mr-1.5"></i><span class="hidden sm:inline">清除篩選</span><span class="sm:hidden">清除</span></button>
 <div class="absolute left-0 top-full mt-1.5 w-[calc(100vw-24px)] sm:w-[920px] max-w-[calc(100vw-32px)] bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl shadow-2xl hidden z-50 p-3 max-h-[70vh] overflow-y-auto modal-enter" id="filter-tag-panel">
 <div class="mb-2 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between"><span class="text-xs font-bold text-gray-700 dark:text-gray-300">篩選邏輯</span><div class="flex items-center bg-gray-100 dark:bg-gray-900 p-1 rounded-lg"><button class="logic-btn px-2 py-1 text-[10px] sm:text-xs rounded font-medium transition-colors bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm" data-logic="OR" id="btn-logic-or" type="button">符合任一 (OR)</button><button class="logic-btn px-2 py-1 text-[10px] sm:text-xs rounded font-medium transition-colors text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" data-logic="AND" id="btn-logic-and" type="button">完全符合 (AND)</button></div></div>
+<div class="tag-filter-live-summary" id="tag-filter-live-summary-journal">
+<div class="tag-filter-live-summary-main"><span class="tag-filter-live-summary-icon"><i class="fa-solid fa-chart-simple"></i></span><div><div class="tag-filter-live-summary-label">目前符合</div><div class="tag-filter-live-summary-value"><strong id="tag-filter-match-count-journal">0</strong><span>檔股票</span></div></div></div>
+<div class="tag-filter-live-summary-meta"><span>已選 <b id="tag-filter-selected-count-journal">0</b> 個標籤</span><span class="tag-filter-live-summary-logic" id="tag-filter-logic-label-journal">OR</span></div>
+</div>
 <div class="tag-preset-manager mb-3" id="tag-preset-manager-journal"></div>
 <div id="filter-tags-container"></div>
 <div class="sm:hidden sticky bottom-0 pt-3 mt-2 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"><button class="w-full min-h-[42px] rounded-lg bg-blue-600 text-white text-sm font-black shadow-sm" data-close-filter-tags="" type="button">完成標籤挑選</button></div>
@@ -7855,6 +7871,10 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 <button class="logic-btn-fav px-2 py-1 text-[10px] sm:text-xs rounded font-medium transition-colors text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" data-logic="AND" id="btn-logic-and-fav" type="button">完全符合 (AND)</button>
 </div>
 </div>
+<div class="tag-filter-live-summary" id="tag-filter-live-summary-fav">
+<div class="tag-filter-live-summary-main"><span class="tag-filter-live-summary-icon"><i class="fa-solid fa-chart-simple"></i></span><div><div class="tag-filter-live-summary-label">目前符合</div><div class="tag-filter-live-summary-value"><strong id="tag-filter-match-count-fav">0</strong><span>檔股票</span></div></div></div>
+<div class="tag-filter-live-summary-meta"><span>已選 <b id="tag-filter-selected-count-fav">0</b> 個標籤</span><span class="tag-filter-live-summary-logic" id="tag-filter-logic-label-fav">OR</span></div>
+</div>
 <div class="tag-preset-manager mb-3" id="tag-preset-manager-fav"></div>
 <div id="filter-tags-container-fav"></div>
 <div class="sm:hidden sticky bottom-0 pt-3 mt-2 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"><button class="w-full min-h-[42px] rounded-lg bg-blue-600 text-white text-sm font-black shadow-sm" data-close-filter-tags="" type="button">完成標籤挑選</button></div>
@@ -8537,6 +8557,16 @@ html.dark #module-favorites table :is(th,td):nth-child(7){background-image:linea
 - 批次工具列底部再新增一顆大型「確認批次修改」按鈕，避免畫面擁擠時看不到。
 - 只要尚未勾選標籤，兩顆確認按鈕都會呈停用狀態；勾選後同步啟用。
 - 上方與底部兩顆按鈕都執行相同的批次套用功能。
+-->
+<!-- v361：
+【標籤挑選即時顯示符合檔數】
+- 在策略日誌與追蹤清單的「標籤挑選」視窗新增即時統計卡。
+- 使用者每勾／取消一個策略標籤，立即顯示目前符合幾檔股票。
+- 「幾檔」以股票代號去重，同一股票即使跨多日有多筆紀錄仍只計 1 檔。
+- 同時顯示目前已選幾個標籤，以及 OR／AND 篩選邏輯。
+- OR／AND 切換、快速組合、移除標籤、清除篩選時皆同步更新。
+- 計數會連同日期、搜尋、股期、營收、大戶、分數、等級、狀態、訊號、連續進榜等現有條件一起計算。
+- 標籤視窗捲動時，統計卡會固定在上方，方便邊勾邊看檔數變化。
 -->
 <!-- 核心 JavaScript -->
 <script>
@@ -9844,7 +9874,7 @@ const initCollapsible=(buttonId,wrapperId,chevronId,pinButtonId,pinKey,label,par
 };
 
 const setupLogicBtns=(sel,fKey,cb)=>{
-    document.querySelectorAll(sel).forEach(btn=>{btn.addEventListener('click',e=>{const lg=e.target.dataset.logic;state[fKey].tagLogic=lg;document.querySelectorAll(sel).forEach(b=>{b.classList.remove('bg-white','dark:bg-gray-700','text-blue-600','dark:text-blue-400','shadow-sm');b.classList.add('text-gray-500','dark:text-gray-400','hover:text-gray-700','dark:hover:text-gray-200');});e.target.classList.remove('text-gray-500','dark:text-gray-400','hover:text-gray-700','dark:hover:text-gray-200');e.target.classList.add('bg-white','dark:bg-gray-700','text-blue-600','dark:text-blue-400','shadow-sm');cb();});});
+    document.querySelectorAll(sel).forEach(btn=>{btn.addEventListener('click',e=>{const lg=e.target.dataset.logic;state[fKey].tagLogic=lg;document.querySelectorAll(sel).forEach(b=>{b.classList.remove('bg-white','dark:bg-gray-700','text-blue-600','dark:text-blue-400','shadow-sm');b.classList.add('text-gray-500','dark:text-gray-400','hover:text-gray-700','dark:hover:text-gray-200');});e.target.classList.remove('text-gray-500','dark:text-gray-400','hover:text-gray-700','dark:hover:text-gray-200');e.target.classList.add('bg-white','dark:bg-gray-700','text-blue-600','dark:text-blue-400','shadow-sm');cb();window.updateTagFilterMatchSummary?.();});});
 };
 
 const JOURNAL_FORM_TAG_KEY='ryan_journal_form_tag_v1';
@@ -10165,6 +10195,7 @@ function renderFilterTags(){
     const h=state.filters.tags.map(t=>`<button type="button" data-filter-remove-tag="${escapeHTML(encodeURIComponent(t))}" class="${getTagStyle(t, true)} text-xs px-2 py-1 rounded-lg flex items-center cursor-pointer hover:opacity-80 transition shadow-sm">${escapeHTML(t)} <i class="fa-solid fa-xmark ml-1.5 opacity-70"></i></button>`).join('');
     if(d1)d1.innerHTML=h;
     if(d2)d2.innerHTML=h;
+    window.updateTagFilterMatchSummary?.();
 }
 document.addEventListener('click',event=>{const button=event.target.closest('[data-filter-remove-tag]');if(button)window.removeFilterTag(decodeURIComponent(button.dataset.filterRemoveTag));});
 
@@ -10226,7 +10257,10 @@ const openMobileFilterTagPanel=panel=>{
     backdrop.classList.remove('hidden');
     document.body.classList.add('mobile-filter-tag-modal-open');
 
-    requestAnimationFrame(()=>panel.scrollTo({top:0,behavior:'auto'}));
+    requestAnimationFrame(()=>{
+        panel.scrollTo({top:0,behavior:'auto'});
+        window.updateTagFilterMatchSummary?.(panel.id==='filter-tag-panel-fav'?'fav':'journal');
+    });
 };
 
 // v310：常駐「⚡ 組合」按鈕，直接開啟快速組合區。
@@ -11611,6 +11645,45 @@ const getWatchlistRows=(groupId=state.activeWatchlistGroupId)=>{
         rows.push(applyWatchlistMetaToRow(applyWatchlistQuoteToRow({...info.latest,isFavorite:Math.max(1,info.priority),favoriteGroupIds:[...info.groupIds]})));
     });
     return rows;
+};
+
+// v361：標籤挑選視窗即時顯示「目前符合幾檔」。
+// 以股票代號去重，因此同一檔股票跨多日資料只計 1 檔。
+window.updateTagFilterMatchSummary=function(scope){
+    const scopes=scope?[scope]:['journal','fav'];
+    scopes.forEach(currentScope=>{
+        const isFav=currentScope==='fav',
+              filterState=isFav?{...state.favFilters,start:'',end:''}:{...state.filters},
+              source=isFav?getWatchlistRows(state.activeWatchlistGroupId):(state.journals||[]),
+              sortConfig=isFav?state.favSortConfig:state.sortConfig;
+        let rows=[];
+        try{
+            rows=getFilteredAndSortedData(source,filterState,sortConfig);
+        }catch(error){
+            console.warn('標籤篩選即時檔數計算失敗',error);
+            rows=[];
+        }
+
+        const selectedCount=(filterState.tags||[]).length,
+              stockCount=new Set(rows.map(row=>String(row?.code||'').trim()).filter(Boolean)).size,
+              logic=filterState.tagLogic==='AND'?'AND':'OR',
+              suffix=isFav?'fav':'journal',
+              countEl=document.getElementById(`tag-filter-match-count-${suffix}`),
+              selectedEl=document.getElementById(`tag-filter-selected-count-${suffix}`),
+              logicEl=document.getElementById(`tag-filter-logic-label-${suffix}`),
+              summaryEl=document.getElementById(`tag-filter-live-summary-${suffix}`);
+
+        if(countEl)countEl.textContent=String(stockCount);
+        if(selectedEl)selectedEl.textContent=String(selectedCount);
+        if(logicEl)logicEl.textContent=logic;
+        if(summaryEl){
+            summaryEl.classList.toggle('tag-filter-live-summary-empty',stockCount===0);
+            summaryEl.classList.toggle('tag-filter-live-summary-active',selectedCount>0);
+            summaryEl.title=selectedCount
+                ? `目前已選 ${selectedCount} 個標籤，依 ${logic} 邏輯及其他篩選條件，共符合 ${stockCount} 檔股票`
+                : `目前尚未選策略標籤；依其他篩選條件，共有 ${stockCount} 檔股票`;
+        }
+    });
 };
 
 const getWatchlistCodesForGroup=groupId=>{
