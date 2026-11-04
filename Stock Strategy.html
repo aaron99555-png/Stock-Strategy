@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="363" name="app-version"/>
+<meta content="365" name="app-version"/>
 <script id="startup-performance-bootstrap">
 window.__ryanStartupPerf={start:performance.now(),localReady:0,firstRender:0,cloudStart:0,cloudEnd:0,cloudOk:null};
 </script>
@@ -6904,6 +6904,137 @@ body > #filter-tag-panel.mobile-filter-tag-modal .tag-filter-live-summary,body >
 
 </style>
 
+
+<style id="journal-entry-condition-summary-v365">
+.journal-entry-condition-summary{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  width:100%;
+  min-width:0;
+  padding:9px 11px;
+  border:1px solid #bfdbfe;
+  border-radius:12px;
+  background:linear-gradient(90deg,#eff6ff 0%,#f8fafc 60%,#fff 100%);
+  box-shadow:0 3px 12px rgba(37,99,235,.06);
+}
+.dark .journal-entry-condition-summary{
+  border-color:#1e3a8a;
+  background:linear-gradient(90deg,rgba(30,58,138,.28),rgba(15,23,42,.72));
+}
+.journal-entry-condition-summary-head{
+  flex:0 0 auto;
+  min-width:112px;
+  padding-right:10px;
+  border-right:1px solid #dbeafe;
+}
+.dark .journal-entry-condition-summary-head{border-right-color:#1e3a8a;}
+.journal-entry-condition-summary-title{
+  display:block;
+  color:#1d4ed8;
+  font-size:11px;
+  line-height:1.2;
+  font-weight:950;
+  white-space:nowrap;
+}
+.dark .journal-entry-condition-summary-title{color:#93c5fd;}
+.journal-entry-condition-summary-count{
+  display:block;
+  margin-top:3px;
+  color:#64748b;
+  font-size:9px;
+  line-height:1.1;
+  font-weight:800;
+}
+.dark .journal-entry-condition-summary-count{color:#94a3b8;}
+.journal-entry-condition-summary-chips{
+  min-width:0;
+  flex:1 1 auto;
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:5px;
+}
+.journal-entry-condition-chip,
+.journal-entry-condition-empty{
+  min-height:25px;
+  display:inline-flex;
+  align-items:center;
+  padding:3px 8px;
+  border-radius:8px;
+  font-size:10px;
+  line-height:1.15;
+  font-weight:900;
+  white-space:nowrap;
+}
+.journal-entry-condition-empty{
+  border:1px dashed #cbd5e1;
+  background:#f8fafc;
+  color:#64748b;
+}
+.dark .journal-entry-condition-empty{
+  border-color:#475569;
+  background:#111827;
+  color:#94a3b8;
+}
+.journal-entry-condition-chip-status{
+  border:1px solid #bae6fd;
+  background:#f0f9ff;
+  color:#0369a1;
+}
+.dark .journal-entry-condition-chip-status{
+  border-color:#075985;
+  background:rgba(3,105,161,.18);
+  color:#7dd3fc;
+}
+.journal-entry-condition-chip-reference{
+  border:1px solid #fcd34d;
+  background:#fffbeb;
+  color:#b45309;
+}
+.dark .journal-entry-condition-chip-reference{
+  border-color:#92400e;
+  background:rgba(120,53,15,.24);
+  color:#fcd34d;
+}
+.journal-entry-condition-summary.has-selected-tags{
+  border-color:#93c5fd;
+}
+.journal-entry-condition-summary.reference-mode{
+  border-color:#fbbf24;
+  background:linear-gradient(90deg,#fffbeb 0%,#f8fafc 62%,#fff 100%);
+}
+.dark .journal-entry-condition-summary.reference-mode{
+  border-color:#92400e;
+  background:linear-gradient(90deg,rgba(120,53,15,.25),rgba(15,23,42,.72));
+}
+@media(max-width:640px){
+  .journal-entry-condition-summary{
+    display:block;
+    padding:8px 9px;
+  }
+  .journal-entry-condition-summary-head{
+    min-width:0;
+    padding:0 0 6px;
+    margin-bottom:6px;
+    border-right:0;
+    border-bottom:1px solid #dbeafe;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+  }
+  .dark .journal-entry-condition-summary-head{border-bottom-color:#1e3a8a;}
+  .journal-entry-condition-summary-count{margin-top:0;}
+  .journal-entry-condition-chip,
+  .journal-entry-condition-empty{
+    font-size:9.5px;
+    min-height:24px;
+    padding:3px 7px;
+  }
+}
+</style>
+
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen flex flex-col antialiased">
 <nav class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-50 transition-colors duration-300">
@@ -6980,6 +7111,15 @@ body > #filter-tag-panel.mobile-filter-tag-modal .tag-filter-live-summary,body >
 </section>
 <div class="mb-6" id="journal-add-section">
 <div class="card-panel p-4 sm:p-6 border-t-4 border-blue-500 flex flex-col gap-4">
+<div aria-live="polite" class="journal-entry-condition-summary" id="journal-entry-condition-summary">
+<div class="journal-entry-condition-summary-head">
+<span class="journal-entry-condition-summary-title"><i class="fa-solid fa-list-check mr-1.5"></i>目前選擇條件</span>
+<span class="journal-entry-condition-summary-count" id="journal-entry-condition-summary-count">0 個策略標籤</span>
+</div>
+<div class="journal-entry-condition-summary-chips" id="journal-entry-condition-summary-chips">
+<span class="journal-entry-condition-empty">尚未選擇策略標籤</span>
+</div>
+</div>
 <div aria-controls="journal-form-wrapper" aria-expanded="false" class="w-full flex justify-between items-center border-b border-gray-200 dark:border-gray-700/50 pb-3 cursor-pointer group" id="toggle-journal-form-btn" role="button" tabindex="0">
 <h2 class="font-bold text-blue-600 dark:text-blue-400 flex items-center text-lg sm:text-xl relative text-left select-none pointer-events-none">
 <div class="bg-blue-500/10 dark:bg-blue-500/20 p-1.5 rounded mr-2"><i class="fa-solid fa-pen-to-square"></i></div> 
@@ -7273,7 +7413,7 @@ body > #filter-tag-panel.mobile-filter-tag-modal .tag-filter-live-summary,body >
 <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="strategy">策略</button>
 <button class="flex-shrink-0 btn-copy-base bg-fuchsia-50 dark:bg-fuchsia-900/40 hover:bg-fuchsia-600 border-fuchsia-200 dark:border-fuchsia-700/50 text-fuchsia-700 dark:text-fuchsia-200 btn-copy" data-mode="copy_a" title="破繭而出、月來越好、季不可失、OBV突破、MACD突破">複製A</button>
 <button class="flex-shrink-0 btn-copy-base bg-teal-50 dark:bg-teal-900/40 hover:bg-teal-600 border-teal-200 dark:border-teal-700/50 text-teal-700 dark:text-teal-200 btn-copy" data-mode="copy_b" title="量價齊揚、高成交值、一陽指">複製B</button>
-<button class="flex-shrink-0 btn-copy-base bg-amber-50 dark:bg-amber-900/40 hover:bg-amber-600 border-amber-200 dark:border-amber-700/50 text-amber-700 dark:text-amber-200 btn-copy" data-mode="copy_c" title="小碎步、多排上漲">複製C</button>
+<button class="flex-shrink-0 btn-copy-base bg-amber-50 dark:bg-amber-900/40 hover:bg-amber-600 border-amber-200 dark:border-amber-700/50 text-amber-700 dark:text-amber-200 btn-copy" data-mode="copy_c" title="小碎步、多排上漲、營收創高量突破、高成交值高營收">複製C</button>
 <button class="flex-shrink-0 btn-copy-base bg-emerald-50 dark:bg-emerald-900/40 hover:bg-emerald-600 border-emerald-200 dark:border-emerald-700/50 text-emerald-700 dark:text-emerald-200 btn-copy" data-mode="friends" title="複製「月季線好朋友」策略名單">🤝 好朋友</button>
 <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="score">分數</button>
 <button class="flex-shrink-0 btn-copy-base bg-sky-50 dark:bg-sky-900/40 hover:bg-sky-600 border-sky-200 dark:border-sky-700/50 text-sky-700 dark:text-sky-200 btn-copy" data-mode="futures">股期</button>
@@ -7981,7 +8121,7 @@ body > #filter-tag-panel.mobile-filter-tag-modal .tag-filter-live-summary,body >
 <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="strategy">策略</button>
 <button class="flex-shrink-0 btn-copy-base bg-fuchsia-50 dark:bg-fuchsia-900/40 hover:bg-fuchsia-600 border-fuchsia-200 dark:border-fuchsia-700/50 text-fuchsia-700 dark:text-fuchsia-200 btn-copy" data-mode="copy_a" title="破繭而出、月來越好、季不可失、OBV突破、MACD突破">複製A</button>
 <button class="flex-shrink-0 btn-copy-base bg-teal-50 dark:bg-teal-900/40 hover:bg-teal-600 border-teal-200 dark:border-teal-700/50 text-teal-700 dark:text-teal-200 btn-copy" data-mode="copy_b" title="量價齊揚、高成交值、一陽指">複製B</button>
-<button class="flex-shrink-0 btn-copy-base bg-amber-50 dark:bg-amber-900/40 hover:bg-amber-600 border-amber-200 dark:border-amber-700/50 text-amber-700 dark:text-amber-200 btn-copy" data-mode="copy_c" title="小碎步、多排上漲">複製C</button>
+<button class="flex-shrink-0 btn-copy-base bg-amber-50 dark:bg-amber-900/40 hover:bg-amber-600 border-amber-200 dark:border-amber-700/50 text-amber-700 dark:text-amber-200 btn-copy" data-mode="copy_c" title="小碎步、多排上漲、營收創高量突破、高成交值高營收">複製C</button>
 <button class="flex-shrink-0 btn-copy-base bg-emerald-50 dark:bg-emerald-900/40 hover:bg-emerald-600 border-emerald-200 dark:border-emerald-700/50 text-emerald-700 dark:text-emerald-200 btn-copy" data-mode="friends" title="複製「月季線好朋友」策略名單">🤝 好朋友</button>
 <button class="flex-shrink-0 btn-copy-base bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 border-blue-200 dark:border-blue-700/50 text-blue-700 dark:text-blue-200 btn-copy" data-mode="score">分數</button>
 <button class="flex-shrink-0 btn-copy-base bg-sky-50 dark:bg-sky-900/40 hover:bg-sky-600 border-sky-200 dark:border-sky-700/50 text-sky-700 dark:text-sky-200 btn-copy" data-mode="futures">股期</button>
@@ -9249,7 +9389,7 @@ const fridaySerial=value=>{if(!/^\d{4}-\d{2}-\d{2}$/.test(String(value||'')))ret
 let analysisDataIndexVersion=-1,analysisDataIndexCache=null;
 const getAnalysisDataIndex=()=>{
     if(analysisDataIndexCache&&analysisDataIndexVersion===analysisCacheVersion)return analysisDataIndexCache;
-    const revenueByCode=new Map(),journalsByCode=new Map(),reportCodes=new Set(),revenueCodes=new Set();
+    const revenueByCode=new Map(),journalsByCode=new Map(),journalsByDate=new Map(),reportCodes=new Set(),revenueCodes=new Set();
     let globalLatestHolderSerial=null;
     (state.revenueRecords||[]).forEach(record=>{
         const code=String(record?.code||'').trim();if(!code)return;
@@ -9262,12 +9402,19 @@ const getAnalysisDataIndex=()=>{
         }
     });
     (state.journals||[]).forEach(record=>{
-        const code=String(record?.code||'').trim();if(!code)return;
-        if(!journalsByCode.has(code))journalsByCode.set(code,[]);
-        journalsByCode.get(code).push(record);
+        const code=String(record?.code||'').trim();
+        const date=String(record?.date||'').slice(0,10);
+        if(code){
+            if(!journalsByCode.has(code))journalsByCode.set(code,[]);
+            journalsByCode.get(code).push(record);
+        }
+        if(date){
+            if(!journalsByDate.has(date))journalsByDate.set(date,[]);
+            journalsByDate.get(date).push(record);
+        }
     });
     (state.reports||[]).forEach(record=>{const code=String(record?.code||'').trim();if(code)reportCodes.add(code);});
-    analysisDataIndexCache={revenueByCode,journalsByCode,reportCodes,revenueCodes,globalLatestHolderSerial};
+    analysisDataIndexCache={revenueByCode,journalsByCode,journalsByDate,reportCodes,revenueCodes,globalLatestHolderSerial};
     analysisDataIndexVersion=analysisCacheVersion;
     return analysisDataIndexCache;
 };
@@ -10111,8 +10258,8 @@ document.addEventListener('click',event=>{
 const getJournalTagFilledCountsForDate=(dateValue=document.getElementById('j-date')?.value)=>{
     const date=String(dateValue||'').slice(0,10),counts=new Map();
     if(!/^\d{4}-\d{2}-\d{2}$/.test(date))return counts;
-    (state.journals||[]).forEach(journal=>{
-        if(String(journal?.date||'').slice(0,10)!==date)return;
+    const rows=getAnalysisDataIndex().journalsByDate?.get(date)||[];
+    rows.forEach(journal=>{
         const seen=new Set((journal?.tags||[]).map(normalizeStrategyTagName).filter(Boolean));
         seen.forEach(tag=>counts.set(tag,(counts.get(tag)||0)+1));
     });
@@ -10136,6 +10283,46 @@ const updateJournalTagFilledState=()=>{
     });
 };
 window.updateJournalTagFilledState=updateJournalTagFilledState;
+
+let journalEntryConditionSummarySignature='';
+const updateJournalEntryConditionSummary=()=>{
+    const root=document.getElementById('journal-entry-condition-summary');
+    const chips=document.getElementById('journal-entry-condition-summary-chips');
+    const countEl=document.getElementById('journal-entry-condition-summary-count');
+    if(!root||!chips||!countEl)return;
+
+    const selected=[...document.querySelectorAll('#form-tags-container .tag-input:checked')]
+        .map(input=>normalizeStrategyTagName(input.value))
+        .filter(Boolean);
+    const primary=selected.find(tag=>!SPECIAL_ATTENTION_TAGS.has(tag))||'';
+    const specials=selected.filter(tag=>SPECIAL_ATTENTION_TAGS.has(tag));
+    const status=normalizeJournalStatus(document.getElementById('j-status')?.value||'新訊號');
+    const referenceOnly=Boolean(document.getElementById('journal-reference-only')?.checked);
+    const signature=JSON.stringify({primary,specials,status,referenceOnly});
+
+    countEl.textContent=`${selected.length} 個策略標籤`;
+    root.classList.toggle('has-selected-tags',selected.length>0);
+    root.classList.toggle('reference-mode',referenceOnly);
+
+    if(signature===journalEntryConditionSummarySignature)return;
+    journalEntryConditionSummarySignature=signature;
+
+    const parts=[];
+    if(primary){
+        parts.push(`<span class="journal-entry-condition-chip journal-entry-condition-chip-strategy ${getTagStyle(primary,true)}"><i class="fa-solid fa-bullseye mr-1"></i>${escapeHTML(primary)}</span>`);
+    }else{
+        parts.push('<span class="journal-entry-condition-empty"><i class="fa-regular fa-circle mr-1"></i>主策略未選</span>');
+    }
+    specials.forEach(tag=>{
+        parts.push(`<span class="journal-entry-condition-chip journal-entry-condition-chip-special ${getTagStyle(tag,true)}"><i class="fa-solid fa-star mr-1"></i>${escapeHTML(tag)}</span>`);
+    });
+    parts.push(`<span class="journal-entry-condition-chip journal-entry-condition-chip-status"><i class="fa-solid fa-signal mr-1"></i>${escapeHTML(status)}</span>`);
+    if(referenceOnly){
+        parts.push('<span class="journal-entry-condition-chip journal-entry-condition-chip-reference"><i class="fa-solid fa-eye mr-1"></i>只看參考資料</span>');
+    }
+    chips.innerHTML=parts.join('');
+};
+window.updateJournalEntryConditionSummary=updateJournalEntryConditionSummary;
 
 function renderDynamicTags(){
     const fc=document.getElementById('form-tags-container');
@@ -10200,6 +10387,7 @@ function renderDynamicTags(){
                 }
             }
             updateTagInputVisual(this);
+            updateJournalEntryConditionSummary();
         });
     });
     
@@ -10220,6 +10408,7 @@ function renderDynamicTags(){
     if(typeof renderStreakStrategyOptions==='function')renderStreakStrategyOptions();
     renderTagFilterPresetUI();
     updateJournalTagFilledState();
+    updateJournalEntryConditionSummary();
 }
 
 window.removeFilterTag=tag=>{
@@ -10232,8 +10421,8 @@ window.removeFilterTag=tag=>{
 function renderFilterTags(){
     const d1=document.getElementById('filter-tags-display'),d2=document.getElementById('filter-tags-display-fav');
     const h=state.filters.tags.map(t=>`<button type="button" data-filter-remove-tag="${escapeHTML(encodeURIComponent(t))}" class="${getTagStyle(t, true)} text-xs px-2 py-1 rounded-lg flex items-center cursor-pointer hover:opacity-80 transition shadow-sm">${escapeHTML(t)} <i class="fa-solid fa-xmark ml-1.5 opacity-70"></i></button>`).join('');
-    if(d1)d1.innerHTML=h;
-    if(d2)d2.innerHTML=h;
+    if(d1&&d1.innerHTML!==h)d1.innerHTML=h;
+    if(d2&&d2.innerHTML!==h)d2.innerHTML=h;
     window.updateTagFilterMatchSummary?.();
 }
 document.addEventListener('click',event=>{const button=event.target.closest('[data-filter-remove-tag]');if(button)window.removeFilterTag(decodeURIComponent(button.dataset.filterRemoveTag));});
@@ -13318,8 +13507,10 @@ const syncJournalReferenceMode=()=>{
     wrap?.classList.toggle('ring-2',enabled);
     wrap?.classList.toggle('ring-amber-300',enabled);
     wrap?.classList.toggle('dark:ring-amber-700',enabled);
+    window.updateJournalEntryConditionSummary?.();
 };
 document.getElementById('journal-reference-only')?.addEventListener('change',syncJournalReferenceMode);
+document.getElementById('j-status')?.addEventListener('change',()=>window.updateJournalEntryConditionSummary?.());
 document.getElementById('j-date')?.addEventListener('change',()=>{
     window.renderTagRequirementReminder?.();
     window.updateJournalTagFilledState?.();
@@ -13346,6 +13537,7 @@ const resetJournalFastEntryFields=()=>{
     if(name)name.value='';
     if(notes)notes.value='';
     if(status)status.value='新訊號';
+    window.updateJournalEntryConditionSummary?.();
 
     requestAnimationFrame(()=>{
         try{code?.focus({preventScroll:true});}
@@ -14750,7 +14942,7 @@ document.querySelectorAll('.btn-copy').forEach(b=>{b.addEventListener('click',e=
     if(m==='copy_a'||m==='copy_b'||m==='copy_c'){
         const copyAPreset=[{tag:'破繭而出',icon:'🦋'},{tag:'月來越好',icon:'🌙'},{tag:'季不可失',icon:'🗓️'},{tag:'OBV突破',icon:'🌊'},{tag:'MACD突破',icon:'〽️'}];
         const copyBPreset=[{tag:'量價齊揚',icon:'📊'},{tag:'高成交值',icon:'💰'},{tag:'一陽指',icon:'☝️'}];
-        const copyCPreset=[{tag:'小碎步',icon:'👣'},{tag:'多排上漲',icon:'📈'}];
+        const copyCPreset=[{tag:'小碎步',icon:'👣'},{tag:'多排上漲',icon:'📈'},{tag:'營收創高量突破',icon:'🚀'},{tag:'高成交值高營收',icon:'💹'}];
         const preset=m==='copy_a'?copyAPreset:m==='copy_b'?copyBPreset:copyCPreset;
 
         // v353：A / B / C 的重複性統計視為同一組。
