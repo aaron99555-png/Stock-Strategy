@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>萊恩起漲手札</title>
-<meta content="365" name="app-version"/>
+<meta content="366" name="app-version"/>
 <script id="startup-performance-bootstrap">
 window.__ryanStartupPerf={start:performance.now(),localReady:0,firstRender:0,cloudStart:0,cloudEnd:0,cloudOk:null};
 </script>
@@ -7295,7 +7295,7 @@ body > #filter-tag-panel.mobile-filter-tag-modal .tag-filter-live-summary,body >
 <input class="filter-exclude-negative-growth rounded border-gray-300 dark:border-gray-600 text-green-500 focus:ring-green-500 w-3.5 h-3.5 sm:w-4 sm:h-4" id="filter-exclude-negative-growth" type="checkbox"/>
 <span class="text-xs sm:text-sm text-green-600 dark:text-green-400 font-medium whitespace-nowrap">排除負成長</span>
 </label>
-<label class="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white dark:bg-gray-900/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-700/50 transition hover:bg-gray-50 dark:hover:bg-gray-800">
+<label class="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white dark:bg-gray-900/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-700/50 transition hover:bg-gray-50 dark:hover:bg-gray-800" title="依每筆策略日誌日期比對前一個月的營收創高資料；例如 11 月日誌比對 10 月營收創高">
 <input class="filter-revenue-high rounded border-gray-300 dark:border-gray-600 text-pink-500 focus:ring-pink-500 w-3.5 h-3.5 sm:w-4 sm:h-4" id="filter-revenue-high" type="checkbox"/>
 <span class="text-xs sm:text-sm text-pink-600 dark:text-pink-400 font-medium whitespace-nowrap">營收創高</span>
 </label>
@@ -8007,7 +8007,7 @@ body > #filter-tag-panel.mobile-filter-tag-modal .tag-filter-live-summary,body >
 <input class="filter-exclude-negative-growth rounded border-gray-300 dark:border-gray-600 text-green-500 focus:ring-green-500 w-3.5 h-3.5 sm:w-4 sm:h-4" id="filter-exclude-negative-growth-fav" type="checkbox"/>
 <span class="text-xs sm:text-sm text-green-600 dark:text-green-400 font-medium whitespace-nowrap">排除負成長</span>
 </label>
-<label class="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white dark:bg-gray-900/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-700/50 transition hover:bg-gray-50 dark:hover:bg-gray-800">
+<label class="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white dark:bg-gray-900/50 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-700/50 transition hover:bg-gray-50 dark:hover:bg-gray-800" title="依每筆策略日誌日期比對前一個月的營收創高資料；例如 11 月日誌比對 10 月營收創高">
 <input class="filter-revenue-high rounded border-gray-300 dark:border-gray-600 text-pink-500 focus:ring-pink-500 w-3.5 h-3.5 sm:w-4 sm:h-4" id="filter-revenue-high-fav" type="checkbox"/>
 <span class="text-xs sm:text-sm text-pink-600 dark:text-pink-400 font-medium whitespace-nowrap">營收創高</span>
 </label>
@@ -9422,6 +9422,23 @@ const getRevenueRecordsForCode=code=>getAnalysisDataIndex().revenueByCode.get(St
 const getJournalsForCode=code=>getAnalysisDataIndex().journalsByCode.get(String(code||'').trim())||[];
 const hasReportForCode=code=>getAnalysisDataIndex().reportCodes.has(String(code||'').trim());
 const hasRevenueRecordForCode=code=>getAnalysisDataIndex().revenueCodes.has(String(code||'').trim());
+// v366：策略日誌「營收創高」篩選固定比對該筆日誌日期的前一個月。
+// 例如 2026/11 的日誌只比對 2026/10 營收創高；跨月區間則每筆各自換算。
+const getPreviousMonthSerialForJournalDate=referenceDate=>{
+    const refSerial=monthSerial(String(referenceDate||'').slice(0,7));
+    return refSerial===null?null:refSerial-1;
+};
+const hasPreviousMonthRevenueHigh=(code,referenceDate)=>{
+    const targetSerial=getPreviousMonthSerialForJournalDate(referenceDate);
+    if(targetSerial===null)return false;
+    const wantedCode=String(code||'').trim();
+    if(!wantedCode)return false;
+    return getRevenueRecordsForCode(wantedCode).some(record=>
+        normalizeMomentumRecordType(record)==='revenue'&&
+        String(record.code||'').trim()===wantedCode&&
+        monthSerial(record.month)===targetSerial
+    );
+};
 
 const getMomentumQualifyingCodes=(type,mode,windowSize,minCount)=>{mode=String(mode||'none');if(mode==='none')return null;const size=Math.max(1,parseInt(windowSize)||1),need=Math.max(1,parseInt(minCount)||1),groups=new Map();(state.revenueRecords||[]).forEach(record=>{if(normalizeMomentumRecordType(record)!==type)return;const code=String(record.code||'').trim();if(!code)return;const serial=type==='largeHolder'?fridaySerial(record.date):monthSerial(record.month);if(serial===null)return;if(!groups.has(code))groups.set(code,new Set());groups.get(code).add(serial);});const matched=new Set(),globalLatest=type==='largeHolder'?getLatestLargeHolderSerial(getToday()):null;groups.forEach((set,code)=>{const values=[...set].sort((a,b)=>b-a);if(!values.length)return;const latest=type==='largeHolder'?globalLatest:values[0];if(latest===null||latest===undefined)return;if(type==='largeHolder'&&!set.has(latest))return;if(mode==='consecutive'){let ok=true;for(let i=0;i<size;i++){if(!set.has(latest-i)){ok=false;break;}}if(ok)matched.add(code);}else if(mode==='window'){const count=values.filter(value=>value<=latest&&value>latest-size).length;if(count>=need)matched.add(code);}});return matched;};
 const applyRevenueMomentumFilters=rows=>{let filtered=[...rows],f=state.revenueFilters||{};if(f.type==='highTurnoverRevenue')f.type='all';if(f.type&&f.type!=='all')filtered=filtered.filter(r=>normalizeMomentumRecordType(r)===f.type);if(f.month)filtered=filtered.filter(r=>normalizeMomentumRecordType(r)==='revenue'&&r.month===f.month);if(f.code){const query=String(f.code).toLocaleLowerCase();filtered=filtered.filter(r=>[r.code,r.name,r.notes,getMomentumTypeLabel(normalizeMomentumRecordType(r))].some(value=>String(value||'').toLocaleLowerCase().includes(query)));}const revenueCodes=getMomentumQualifyingCodes('revenue',f.revenuePattern,f.revenueN,f.revenueCount),holderCodes=getMomentumQualifyingCodes('largeHolder',f.holderPattern,f.holderN,f.holderCount);if(revenueCodes)filtered=filtered.filter(r=>revenueCodes.has(String(r.code||'').trim()));if(holderCodes)filtered=filtered.filter(r=>holderCodes.has(String(r.code||'').trim()));if(Number(f.minMomentum||0)>0)filtered=filtered.filter(r=>getMomentumMetrics(r.code).score>=Number(f.minMomentum));return filtered;};
@@ -10918,7 +10935,7 @@ const getFilteredAndSortedData=(dl,cf,cs)=>{
         if(start&&j.date<start)return false; if(end&&j.date>end)return false;
         if(code){const query=String(code).toLocaleLowerCase();if(!j._searchText.includes(query))return false;}
         if(futuresOnly&&!j.ei.futures)return false; if(excludeNegativeGrowth&&j.ei.epsGrowth!==null&&j.ei.epsGrowth<0)return false;
-        if(revenueHigh&&!hasRevenueRecordForCode(j.code))return false; if(largeHolder14&&!hasLatestLargeHolderIncrease(j.code,j.date))return false; if(largeHolderConsecutive&&getMomentumMetrics(j.code,j.date).holderStreak<2)return false;
+        if(revenueHigh&&!hasPreviousMonthRevenueHigh(j.code,j.date))return false; if(largeHolder14&&!hasLatestLargeHolderIncrease(j.code,j.date))return false; if(largeHolderConsecutive&&getMomentumMetrics(j.code,j.date).holderStreak<2)return false;
         if(minScore>0&&j.score<minScore)return false;
         if(strengthGrade!=='all'&&getStockStrengthMetrics(j.code,j.date||getToday()).grade!==strengthGrade)return false;
         if(status!=='all'&&normalizeJournalStatus(j.status)!==status)return false;
@@ -10937,7 +10954,7 @@ const getFilteredAndSortedData=(dl,cf,cs)=>{
         }
         return true;
     });
-    fd.sort((a,b)=>{let vA,vB;switch(key){case'date':vA=a.date;vB=b.date;break;case'code':vA=a.code;vB=b.code;break;case'name':vA=a.name;vB=b.name;break;case'closePrice':vA=Number(a.closePrice??-9999);vB=Number(b.closePrice??-9999);break;case'dailyChangePercent':vA=Number(a.dailyChangePercent??-9999);vB=Number(b.dailyChangePercent??-9999);break;case'trackedPrice':vA=Number(a.trackedPrice??-9999);vB=Number(b.trackedPrice??-9999);break;case'trackingReturn':vA=Number(a.trackingReturn??-9999);vB=Number(b.trackingReturn??-9999);break;case'eps2025':vA=a.ei.eps2025??-9999;vB=b.ei.eps2025??-9999;break;case'eps2026':vA=a.ei.eps2026??-9999;vB=b.ei.eps2026??-9999;break;case'epsGrowth':vA=a.ei.epsGrowth??-9999;vB=b.ei.epsGrowth??-9999;break;case'score':vA=a.score;vB=b.score;break;case'targetPrice':vA=a.ei.targetPrice??-9999;vB=b.ei.targetPrice??-9999;break;case'potentialUpside':vA=getPotentialUpsidePercent(a.ei.targetPrice,a.closePrice)??-9999;vB=getPotentialUpsidePercent(b.ei.targetPrice,b.closePrice)??-9999;break;case'revenueHigh':vA=(journalHasStrategyTag(a,'高成交值高營收')?4:0)+(hasRevenueRecordForCode(a.code)?2:0)+(hasLatestLargeHolderIncrease(a.code,a.date)?1:0);vB=(journalHasStrategyTag(b,'高成交值高營收')?4:0)+(hasRevenueRecordForCode(b.code)?2:0)+(hasLatestLargeHolderIncrease(b.code,b.date)?1:0);break;case'tags':vA=(a.tags||[]).join('、');vB=(b.tags||[]).join('、');break;case'notes':vA=a.notes||'';vB=b.notes||'';break;default:vA=a.createdAt||0;vB=b.createdAt||0;break;}if(vA===vB)return(a.createdAt||0)-(b.createdAt||0);return asc?(vA>vB?1:-1):(vA>vB?-1:1);});
+    fd.sort((a,b)=>{let vA,vB;switch(key){case'date':vA=a.date;vB=b.date;break;case'code':vA=a.code;vB=b.code;break;case'name':vA=a.name;vB=b.name;break;case'closePrice':vA=Number(a.closePrice??-9999);vB=Number(b.closePrice??-9999);break;case'dailyChangePercent':vA=Number(a.dailyChangePercent??-9999);vB=Number(b.dailyChangePercent??-9999);break;case'trackedPrice':vA=Number(a.trackedPrice??-9999);vB=Number(b.trackedPrice??-9999);break;case'trackingReturn':vA=Number(a.trackingReturn??-9999);vB=Number(b.trackingReturn??-9999);break;case'eps2025':vA=a.ei.eps2025??-9999;vB=b.ei.eps2025??-9999;break;case'eps2026':vA=a.ei.eps2026??-9999;vB=b.ei.eps2026??-9999;break;case'epsGrowth':vA=a.ei.epsGrowth??-9999;vB=b.ei.epsGrowth??-9999;break;case'score':vA=a.score;vB=b.score;break;case'targetPrice':vA=a.ei.targetPrice??-9999;vB=b.ei.targetPrice??-9999;break;case'potentialUpside':vA=getPotentialUpsidePercent(a.ei.targetPrice,a.closePrice)??-9999;vB=getPotentialUpsidePercent(b.ei.targetPrice,b.closePrice)??-9999;break;case'revenueHigh':vA=(journalHasStrategyTag(a,'高成交值高營收')?4:0)+(hasPreviousMonthRevenueHigh(a.code,a.date)?2:0)+(hasLatestLargeHolderIncrease(a.code,a.date)?1:0);vB=(journalHasStrategyTag(b,'高成交值高營收')?4:0)+(hasPreviousMonthRevenueHigh(b.code,b.date)?2:0)+(hasLatestLargeHolderIncrease(b.code,b.date)?1:0);break;case'tags':vA=(a.tags||[]).join('、');vB=(b.tags||[]).join('、');break;case'notes':vA=a.notes||'';vB=b.notes||'';break;default:vA=a.createdAt||0;vB=b.createdAt||0;break;}if(vA===vB)return(a.createdAt||0)-(b.createdAt||0);return asc?(vA>vB?1:-1):(vA>vB?-1:1);});
     return fd;
 };
 
@@ -11121,7 +11138,7 @@ const renderJournalActiveFilterChips=()=>{
     if(f.code)items.push(filterChipHtml(`搜尋：${f.code}`,'code','blue'));
     if(f.futuresOnly)items.push(filterChipHtml('僅含股期','futuresOnly','blue'));
     if(f.excludeNegativeGrowth)items.push(filterChipHtml('排除負成長','excludeNegativeGrowth','emerald'));
-    if(f.revenueHigh)items.push(filterChipHtml('營收創高','revenueHigh','pink'));
+    if(f.revenueHigh)items.push(filterChipHtml('營收創高・前一月','revenueHigh','pink'));
     if(f.largeHolder14)items.push(filterChipHtml('近一週千張大戶增','largeHolder14','violet'));
     if(f.largeHolderConsecutive)items.push(filterChipHtml('千張大戶連續增加','largeHolderConsecutive','violet'));
     if(f.strategyStreakOnly)items.push(filterChipHtml('連續進榜','strategyStreakOnly','amber'));
@@ -18409,5 +18426,13 @@ setChkDirection('long');
 })();
 </script>
 
+<!-- v366：
+【營收創高篩選改為前一個月精準比對】
+- 每筆策略日誌依自己的日期換算前一個月。
+- 例如 2026/11 的策略日誌只比對 2026/10 的營收創高資料。
+- 跨月份日期區間會逐筆換算，不共用單一月份。
+- 僅 type=revenue（營收創高）資料可符合。
+- revenueHigh 排序同步採相同規則，避免篩選與排序判定不一致。
+-->
 </body>
 </html>
